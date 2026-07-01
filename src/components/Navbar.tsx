@@ -36,10 +36,10 @@ const Navbar = () => {
               </a>
             ))}
             <div className="flex items-center space-x-3 pl-2 border-l border-gray-200">
-              <a href="#" className="text-primary hover:text-primary/80 font-medium transition duration-300 px-2">
+              <a href="/login" className="text-primary hover:text-primary/80 font-medium transition duration-300 px-2">
                 Login
               </a>
-              <a href="#" className="bg-secondary/10 text-secondary border border-secondary hover:bg-secondary hover:text-white px-4 py-2 rounded-full font-medium transition duration-300">
+              <a href="/register" className="bg-secondary/10 text-secondary border border-secondary hover:bg-secondary hover:text-white px-4 py-2 rounded-full font-medium transition duration-300">
                 Register
               </a>
 
@@ -72,10 +72,10 @@ const Navbar = () => {
               </a>
             ))}
             <div className="border-t border-gray-100 mt-2 pt-2 pb-2 space-y-2">
-              <a href="#" className="block px-3 py-2 text-primary hover:bg-primary/5 rounded-md font-medium">
+              <a href="/login" className="block px-3 py-2 text-primary hover:bg-primary/5 rounded-md font-medium">
                 Login
               </a>
-              <a href="#" className="block px-3 py-2 text-secondary hover:bg-secondary/5 rounded-md font-medium">
+              <a href="/register" className="block px-3 py-2 text-secondary hover:bg-secondary/5 rounded-md font-medium">
                 Register
               </a>
             </div>
