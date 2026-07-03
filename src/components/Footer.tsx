@@ -152,8 +152,8 @@ const Footer = () => {
 
             {/* Legal Links */}
             <div className="flex space-x-6 text-sm text-gray-400 order-1 lg:order-2">
-              <a href="#" className="hover:text-secondary transition-colors duration-300 relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-[1px] after:bg-secondary hover:after:w-full after:transition-all after:duration-300">Privacy Policy</a>
-              <a href="#" className="hover:text-tertiary transition-colors duration-300 relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-[1px] after:bg-tertiary hover:after:w-full after:transition-all after:duration-300">Terms of Service</a>
+              <a href="/privacy" className="hover:text-secondary transition-colors duration-300 relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-[1px] after:bg-secondary hover:after:w-full after:transition-all after:duration-300">Privacy Policy</a>
+              <a href="/terms" className="hover:text-tertiary transition-colors duration-300 relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-[1px] after:bg-tertiary hover:after:w-full after:transition-all after:duration-300">Terms of Service</a>
             </div>
           </div>
         </div>
