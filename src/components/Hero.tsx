@@ -18,34 +18,34 @@ const Hero = () => {
     const tl = gsap.timeline();
 
     // Subtle background zoom
-    tl.fromTo(bgRef.current, 
-      { scale: 1.15, filter: "brightness(0.5)" }, 
+    tl.fromTo(bgRef.current,
+      { scale: 1.15, filter: "brightness(0.5)" },
       { scale: 1, filter: "brightness(1)", duration: 2.5, ease: "power2.out" }
     )
-    // Logo entrance
-    .fromTo(logoRef.current,
-      { y: -60, opacity: 0, rotate: -15 },
-      { y: 0, opacity: 1, rotate: 0, duration: 1, ease: "back.out(1.5)" },
-      "-=2"
-    )
-    // Title entrance
-    .fromTo(titleRef.current,
-      { y: 50, opacity: 0, scale: 0.9 },
-      { y: 0, opacity: 1, scale: 1, duration: 1.2, ease: "power3.out" },
-      "-=1.5"
-    )
-    // Description
-    .fromTo(descRef.current,
-      { y: 30, opacity: 0 },
-      { y: 0, opacity: 1, duration: 1, ease: "power2.out" },
-      "-=1"
-    )
-    // Buttons stagger
-    .fromTo(btnContainerRef.current?.children ? Array.from(btnContainerRef.current.children) : [],
-      { y: 30, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.8, stagger: 0.2, ease: "power2.out" },
-      "-=0.8"
-    );
+      // Logo entrance
+      .fromTo(logoRef.current,
+        { y: -60, opacity: 0, rotate: -15 },
+        { y: 0, opacity: 1, rotate: 0, duration: 1, ease: "back.out(1.5)" },
+        "-=2"
+      )
+      // Title entrance
+      .fromTo(titleRef.current,
+        { y: 50, opacity: 0, scale: 0.9 },
+        { y: 0, opacity: 1, scale: 1, duration: 1.2, ease: "power3.out" },
+        "-=1.5"
+      )
+      // Description
+      .fromTo(descRef.current,
+        { y: 30, opacity: 0 },
+        { y: 0, opacity: 1, duration: 1, ease: "power2.out" },
+        "-=1"
+      )
+      // Buttons stagger
+      .fromTo(btnContainerRef.current?.children ? Array.from(btnContainerRef.current.children) : [],
+        { y: 30, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.8, stagger: 0.2, ease: "power2.out" },
+        "-=0.8"
+      );
   }, { scope: containerRef });
 
   return (
@@ -87,12 +87,12 @@ const Hero = () => {
           ref={btnContainerRef}
           className="flex flex-col sm:flex-row gap-4"
         >
-          <button className="bg-primary hover:bg-opacity-90 text-white px-8 py-4 rounded-full font-semibold text-lg transition duration-300 shadow-lg hover:shadow-primary/50 transform hover:-translate-y-1">
+          <a href="/appointment" className="bg-primary hover:bg-opacity-90 text-white px-8 py-4 rounded-full font-semibold text-lg transition duration-300 shadow-lg hover:shadow-primary/50 transform hover:-translate-y-1 inline-block text-center">
             Book Appointment
-          </button>
-          <button className="bg-white/20 hover:bg-white/30 backdrop-blur-md text-white border border-white/50 px-8 py-4 rounded-full font-semibold text-lg transition duration-300 transform hover:-translate-y-1">
+          </a>
+          <a href="/contact" className="bg-white/20 hover:bg-white/30 backdrop-blur-md text-white border border-white/50 px-8 py-4 rounded-full font-semibold text-lg transition duration-300 transform hover:-translate-y-1 inline-block text-center">
             Contact Us
-          </button>
+          </a>
         </div>
       </div>
     </section>

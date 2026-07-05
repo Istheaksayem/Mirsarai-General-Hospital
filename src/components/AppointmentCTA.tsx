@@ -23,9 +23,9 @@ const AppointmentCTA = () => {
           <p className="text-lg md:text-xl text-blue-100 mb-10 max-w-2xl mx-auto font-light">
             Don't wait to prioritize your health. Schedule a consultation with our world-class specialists and take the first step towards a healthier tomorrow.
           </p>
-          <button className="bg-secondary hover:bg-opacity-90 text-white px-10 py-5 rounded-full font-bold text-xl transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 transform">
+          <a href="/appointment" className="inline-block bg-secondary hover:bg-opacity-90 text-white px-10 py-5 rounded-full font-bold text-xl transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 transform">
             Book Appointment
-          </button>
+          </a>
         </motion.div>
       </div>
     </section>
