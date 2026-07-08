@@ -1,0 +1,34 @@
+{
+  "statistics": {
+    "todayPatients": 18,
+    "todayPatientsTrend": 20.0,
+    "completedConsultations": 11,
+    "completedConsultationsTrend": 37.5,
+    "pendingPrescriptions": 5,
+    "pendingPrescriptionsTrend": -16.7,
+    "urgentAlerts": 2,
+    "urgentAlertsTrend": 0.0
+  },
+  "todayAppointments": [
+    { "id": "apt-301", "patientName": "Abdul Karim", "age": 58, "gender": "Male", "timeSlot": "09:30 AM", "type": "Consultation", "status": "in-consultation" },
+    { "id": "apt-302", "patientName": "Faruk Ahmed", "age": 42, "gender": "Male", "timeSlot": "10:00 AM", "type": "Follow-up", "status": "waiting" },
+    { "id": "apt-303", "patientName": "Sajeda Khatun", "age": 31, "gender": "Female", "timeSlot": "10:30 AM", "type": "Consultation", "status": "waiting" },
+    { "id": "apt-304", "patientName": "Fariha Sultana", "age": 25, "gender": "Female", "timeSlot": "11:00 AM", "type": "Consultation", "status": "confirmed" },
+    { "id": "apt-305", "patientName": "Kamil Ahmed", "age": 63, "gender": "Male", "timeSlot": "11:30 AM", "type": "Emergency", "status": "confirmed" }
+  ],
+  "schedule": [
+    { "day": "Saturday", "time": "09:00 AM - 01:00 PM", "status": "Active" },
+    { "day": "Sunday", "time": "09:00 AM - 01:00 PM", "status": "Active" },
+    { "day": "Monday", "time": "09:00 AM - 01:00 PM", "status": "Active" },
+    { "day": "Tuesday", "time": "09:00 AM - 01:00 PM", "status": "Active" },
+    { "day": "Wednesday", "time": "09:00 AM - 01:00 PM", "status": "Active" },
+    { "day": "Thursday", "time": "Off", "status": "Off" },
+    { "day": "Friday", "time": "Off", "status": "Off" }
+  ],
+  "patientHistorySummary": [
+    { "id": "hist-401", "patientName": "Salma Begum", "diagnosis": "Hypertension & Type 2 Diabetes", "date": "2026-07-06", "prescriptionUploaded": true },
+    { "id": "hist-402", "patientName": "Rashedul Islam", "diagnosis": "Acute Bronchitis", "date": "2026-07-05", "prescriptionUploaded": true },
+    { "id": "hist-403", "patientName": "Mizanur Rahman", "diagnosis": "Gastritis", "date": "2026-07-04", "prescriptionUploaded": true },
+    { "id": "hist-404", "patientName": "Anwara Chowdhury", "diagnosis": "Osteoarthritis", "date": "2026-07-01", "prescriptionUploaded": true }
+  ]
+}

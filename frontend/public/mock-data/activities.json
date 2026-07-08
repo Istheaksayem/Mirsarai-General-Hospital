@@ -1,0 +1,8 @@
+[
+  { "id": "act-001", "user": "Ishtiaque Sayem", "role": "Super Admin", "action": "Updated Website CMS Hero Section", "module": "Website CMS", "timestamp": "2026-07-08T17:12:00Z", "status": "success", "ipAddress": "103.82.172.5" },
+  { "id": "act-002", "user": "Rehana Chowdhury", "role": "Reception Admin", "action": "Checked In Patient Jahanara Begum", "module": "Queue Management", "timestamp": "2026-07-08T17:01:00Z", "status": "success", "ipAddress": "103.82.172.18" },
+  { "id": "act-003", "user": "Dr. Tasnim Alam", "role": "Doctor", "action": "Uploaded Prescription for Abdul Karim", "module": "Prescription", "timestamp": "2026-07-08T16:55:00Z", "status": "success", "ipAddress": "192.168.10.45" },
+  { "id": "act-004", "user": "Moinul Islam", "role": "Lab Admin", "action": "Uploaded Diagnostic Report: rep-001.pdf", "module": "Diagnostic Reports", "timestamp": "2026-07-08T16:30:00Z", "status": "success", "ipAddress": "192.168.10.60" },
+  { "id": "act-005", "user": "Rehana Chowdhury", "role": "Reception Admin", "action": "Generated Invoice: inv-201", "module": "Billing", "timestamp": "2026-07-08T16:15:00Z", "status": "success", "ipAddress": "103.82.172.18" },
+  { "id": "act-006", "user": "System Auto", "role": "System", "action": "Failed Login Attempt from IP 198.51.100.42", "module": "Security", "timestamp": "2026-07-08T15:24:00Z", "status": "failed", "ipAddress": "198.51.100.42" }
+]

@@ -1,0 +1,42 @@
+{
+  "hero": {
+    "title": "Mirsarai General Hospital",
+    "subtitle": "Providing Quality Healthcare Since 1985",
+    "description": "We are committed to providing exceptional medical care to the people of Mirsarai and surrounding areas with experienced doctors and modern equipment.",
+    "ctaText": "Book Appointment",
+    "backgroundImage": "/hospital-banner.jpg"
+  },
+  "about": {
+    "title": "About Our Hospital",
+    "description": "Mirsarai General Hospital has been serving the community for over 40 years with state-of-the-art facilities and qualified medical professionals.",
+    "mission": "To provide affordable, accessible, and compassionate healthcare to all.",
+    "vision": "To be the leading healthcare institution in Chittagong Division.",
+    "values": ["Compassion", "Excellence", "Integrity", "Innovation", "Teamwork"]
+  },
+  "stats": {
+    "bedsCapacity": 250,
+    "doctorsCount": 45,
+    "nursesCount": 120,
+    "yearsExperience": 40,
+    "patientsSeen": 50000
+  },
+  "services": [
+    { "id": "SVC-001", "title": "Cardiology", "icon": "heart", "description": "Advanced cardiac care including ECG, Echo, and cardiac surgery", "isActive": true, "order": 1 },
+    { "id": "SVC-002", "title": "Neurology", "icon": "brain", "description": "Comprehensive neurological evaluation and treatment", "isActive": true, "order": 2 },
+    { "id": "SVC-003", "title": "Pediatrics", "icon": "baby", "description": "Dedicated care for infants, children, and adolescents", "isActive": true, "order": 3 },
+    { "id": "SVC-004", "title": "Orthopedics", "icon": "bone", "description": "Treatment of bone, joint, and muscle conditions", "isActive": true, "order": 4 },
+    { "id": "SVC-005", "title": "Gynecology", "icon": "shield", "description": "Women's health and maternity services", "isActive": true, "order": 5 },
+    { "id": "SVC-006", "title": "Laboratory", "icon": "flask", "description": "Full-service diagnostic laboratory", "isActive": true, "order": 6 }
+  ],
+  "contact": {
+    "address": "Mirsarai, Chittagong, Bangladesh",
+    "phone": "+880-1234-567890",
+    "emergency": "+880-1234-567891",
+    "email": "info@mgh.com",
+    "hours": { "outpatient": "8:00 AM - 8:00 PM", "emergency": "24/7", "pathology": "7:00 AM - 9:00 PM" }
+  },
+  "notices": [
+    { "id": "N-001", "title": "COVID-19 Protocol Update", "content": "All visitors are required to wear masks. Temperature check at entry.", "isActive": true, "publishedAt": "2026-07-01T00:00:00Z" },
+    { "id": "N-002", "title": "New MRI Machine Installed", "content": "We are pleased to announce our new 3T MRI machine is now operational.", "isActive": true, "publishedAt": "2026-06-15T00:00:00Z" }
+  ]
+}

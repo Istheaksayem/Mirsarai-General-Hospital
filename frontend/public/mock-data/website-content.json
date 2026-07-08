@@ -1,0 +1,27 @@
+{
+  "hero": {
+    "title": "Your Health, Our Priority",
+    "subtitle": "Providing World-Class Healthcare in Mirsarai",
+    "description": "Mirsarai General Hospital is dedicated to delivering high-quality, compassionate clinical services to our community. With modern technologies and experienced specialists, we are here for you 24/7.",
+    "ctaText": "Book Appointment",
+    "ctaLink": "/appointment",
+    "emergencyContact": "+880 1812-990000"
+  },
+  "about": {
+    "title": "Welcome to Mirsarai General Hospital",
+    "description": "Established with a vision to make premium medical services accessible, Mirsarai General Hospital has become a trusted name in healthcare. We combine experienced medical professionals with the latest diagnostic and therapeutic techniques.",
+    "mission": "To provide compassionate, high-quality, and affordable healthcare services to the people of Mirsarai and surrounding regions.",
+    "vision": "To be the leading hospital in the district, known for clinical excellence, patient-centric care, and innovative medical solutions."
+  },
+  "contact": {
+    "phone": "+880 31-556677",
+    "mobile": "+880 1711-001122",
+    "email": "info@mirsaraihospital.com",
+    "address": "Mirsarai Sadar, Dhaka-Chattogram Highway, Mirsarai, Chattogram, Bangladesh",
+    "mapCoordinates": "22.7725, 91.5724"
+  },
+  "testimonials": [
+    { "id": 1, "name": "Mohammad Solaiman", "relation": "Patient", "feedback": "The doctors and staff were incredibly professional and caring when I was admitted. The facilities are modern and clean.", "rating": 5 },
+    { "id": 2, "name": "Sultana Razia", "relation": "Mother of Patient", "feedback": "The NICU team saved my newborn child. I cannot express enough gratitude. Highly recommended pediatric services.", "rating": 5 }
+  ]
+}

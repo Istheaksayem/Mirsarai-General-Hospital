@@ -1,0 +1,7 @@
+[
+  { "id": "not-001", "title": "New Appointment Booked", "message": "Patient Jahanara Begum has booked an appointment with Dr. Rafiqul Islam.", "type": "info", "timestamp": "2026-07-08T17:30:00Z", "isRead": false },
+  { "id": "not-002", "title": "Server Performance Warning", "message": "High memory consumption detected on primary API server.", "type": "warning", "timestamp": "2026-07-08T16:45:00Z", "isRead": false },
+  { "id": "not-003", "title": "Report Approved", "message": "Chest X-Ray report for Shirina Akhter has been finalized and sent to patient.", "type": "success", "timestamp": "2026-07-08T15:20:00Z", "isRead": true },
+  { "id": "not-004", "title": "Billing Pending Alert", "message": "Bkash transaction for Invoice #inv-204 is still marked as pending verification.", "type": "alert", "timestamp": "2026-07-08T14:15:00Z", "isRead": false },
+  { "id": "not-005", "title": "Database Optimization Complete", "message": "Database indexes were successfully optimized.", "type": "success", "timestamp": "2026-07-08T03:00:00Z", "isRead": true }
+]

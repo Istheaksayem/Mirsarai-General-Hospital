@@ -1,0 +1,10 @@
+[
+  { "id": "LT-001", "name": "Complete Blood Count (CBC)", "category": "Hematology", "turnaroundTime": "4 hours", "price": 600, "description": "Measures different components of blood including RBC, WBC, platelets", "status": "active", "tests_included": ["Hemoglobin","WBC","RBC","Platelets","Hematocrit"] },
+  { "id": "LT-002", "name": "Lipid Profile", "category": "Biochemistry", "turnaroundTime": "6 hours", "price": 900, "description": "Measures cholesterol and triglycerides", "status": "active", "tests_included": ["Total Cholesterol","HDL","LDL","Triglycerides","VLDL"] },
+  { "id": "LT-003", "name": "HbA1c Test", "category": "Biochemistry", "turnaroundTime": "8 hours", "price": 750, "description": "Measures average blood glucose over 3 months", "status": "active", "tests_included": ["Glycated Hemoglobin"] },
+  { "id": "LT-004", "name": "Thyroid Function Test", "category": "Endocrinology", "turnaroundTime": "12 hours", "price": 1200, "description": "Evaluates thyroid gland function", "status": "active", "tests_included": ["TSH","Free T3","Free T4"] },
+  { "id": "LT-005", "name": "Urine Analysis", "category": "Pathology", "turnaroundTime": "2 hours", "price": 300, "description": "Tests physical and chemical properties of urine", "status": "active", "tests_included": ["pH","Protein","Glucose","Ketones","Blood","Microscopy"] },
+  { "id": "LT-006", "name": "X-Ray Chest", "category": "Radiology", "turnaroundTime": "1 hour", "price": 1200, "description": "Chest X-ray for lung and heart evaluation", "status": "active", "tests_included": ["PA View","Lateral View"] },
+  { "id": "LT-007", "name": "Abdominal Ultrasound", "category": "Radiology", "turnaroundTime": "1 hour", "price": 2500, "description": "Ultrasound evaluation of abdominal organs", "status": "active", "tests_included": ["Liver","Gallbladder","Spleen","Kidneys","Pancreas"] },
+  { "id": "LT-008", "name": "Brain MRI", "category": "Radiology", "turnaroundTime": "3 hours", "price": 8000, "description": "MRI scan of the brain", "status": "active", "tests_included": ["Brain Parenchyma","Vessels","Ventricles"] }
+]

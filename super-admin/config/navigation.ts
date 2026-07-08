@@ -1,13 +1,20 @@
 import {
   Activity,
   BarChart3,
+  Bell,
+  Building2,
   CalendarDays,
   ClipboardList,
+  CreditCard,
   FileText,
   FlaskConical,
+  Globe,
   LayoutDashboard,
+  Search,
   Settings,
+  Shield,
   Stethoscope,
+  Upload,
   UserCheck,
   Users,
   type LucideIcon,
@@ -29,203 +36,93 @@ export interface NavSection {
 export const NAV_CONFIG: Record<Role, NavSection[]> = {
   "super-admin": [
     {
-      items: [
-        {
-          label: "Dashboard",
-          href: "/super-admin",
-          icon: LayoutDashboard,
-        },
-      ],
+      items: [{ label: "Dashboard", href: "/super-admin", icon: LayoutDashboard }],
     },
     {
       title: "Management",
       items: [
-        { label: "Staff & Users", href: "/super-admin/users", icon: Users },
-        {
-          label: "Doctors",
-          href: "/super-admin/doctors",
-          icon: Stethoscope,
-        },
-        {
-          label: "Departments",
-          href: "/super-admin/departments",
-          icon: Activity,
-        },
+        { label: "Patients", href: "/super-admin/patients", icon: Users },
+        { label: "Doctors", href: "/super-admin/doctors", icon: Stethoscope },
+        { label: "Departments", href: "/super-admin/departments", icon: Building2 },
       ],
     },
     {
       title: "Operations",
       items: [
-        {
-          label: "Appointments",
-          href: "/super-admin/appointments",
-          icon: CalendarDays,
-          badge: "12",
-        },
-        {
-          label: "Reports",
-          href: "/super-admin/reports",
-          icon: BarChart3,
-        },
-        {
-          label: "Billing",
-          href: "/super-admin/billing",
-          icon: FileText,
-        },
+        { label: "Appointments", href: "/super-admin/appointments", icon: CalendarDays, badge: "12" },
+        { label: "Reports", href: "/super-admin/reports", icon: BarChart3 },
+        { label: "Billing", href: "/super-admin/billing", icon: CreditCard },
       ],
     },
     {
       title: "System",
       items: [
-        {
-          label: "Settings",
-          href: "/super-admin/settings",
-          icon: Settings,
-        },
+        { label: "Roles", href: "/super-admin/roles", icon: Shield },
+        { label: "Website CMS", href: "/super-admin/cms", icon: Globe },
+        { label: "Settings", href: "/super-admin/settings", icon: Settings },
       ],
     },
   ],
 
   "reception-admin": [
     {
+      items: [{ label: "Dashboard", href: "/reception-admin", icon: LayoutDashboard }],
+    },
+    {
+      title: "Front Desk",
       items: [
-        {
-          label: "Dashboard",
-          href: "/reception-admin",
-          icon: LayoutDashboard,
-        },
+        { label: "Patients", href: "/reception-admin/patients", icon: Users },
+        { label: "Appointments", href: "/reception-admin/appointments", icon: CalendarDays, badge: "5" },
+        { label: "Queue", href: "/reception-admin/queue", icon: Activity },
       ],
     },
     {
-      title: "Reception",
+      title: "Finance",
       items: [
-        {
-          label: "Appointments",
-          href: "/reception-admin/appointments",
-          icon: CalendarDays,
-          badge: "5",
-        },
-        {
-          label: "Patients",
-          href: "/reception-admin/patients",
-          icon: Users,
-        },
-        {
-          label: "Check-In",
-          href: "/reception-admin/check-in",
-          icon: UserCheck,
-        },
-      ],
-    },
-    {
-      title: "Records",
-      items: [
-        {
-          label: "Patient Records",
-          href: "/reception-admin/records",
-          icon: ClipboardList,
-        },
-        {
-          label: "Billing",
-          href: "/reception-admin/billing",
-          icon: FileText,
-        },
+        { label: "Billing", href: "/reception-admin/billing", icon: CreditCard },
+        { label: "Notifications", href: "/reception-admin/notifications", icon: Bell, badge: "3" },
       ],
     },
   ],
 
   "lab-admin": [
     {
-      items: [
-        {
-          label: "Dashboard",
-          href: "/lab-admin",
-          icon: LayoutDashboard,
-        },
-      ],
+      items: [{ label: "Dashboard", href: "/lab-admin", icon: LayoutDashboard }],
     },
     {
       title: "Laboratory",
       items: [
-        {
-          label: "Test Orders",
-          href: "/lab-admin/orders",
-          icon: FlaskConical,
-          badge: "8",
-        },
-        {
-          label: "Results",
-          href: "/lab-admin/results",
-          icon: ClipboardList,
-        },
-        {
-          label: "Patients",
-          href: "/lab-admin/patients",
-          icon: Users,
-        },
+        { label: "Diagnostic Records", href: "/lab-admin/diagnostic", icon: FlaskConical, badge: "8" },
+        { label: "Reports", href: "/lab-admin/reports", icon: BarChart3 },
+        { label: "Upload Reports", href: "/lab-admin/upload", icon: Upload },
       ],
     },
     {
-      title: "Reports",
+      title: "Search",
       items: [
-        {
-          label: "Lab Reports",
-          href: "/lab-admin/reports",
-          icon: BarChart3,
-        },
-        {
-          label: "Inventory",
-          href: "/lab-admin/inventory",
-          icon: FileText,
-        },
+        { label: "Patient Search", href: "/lab-admin/patients", icon: Search },
       ],
     },
   ],
 
   doctor: [
     {
-      items: [
-        {
-          label: "Dashboard",
-          href: "/doctor",
-          icon: LayoutDashboard,
-        },
-      ],
+      items: [{ label: "Dashboard", href: "/doctor", icon: LayoutDashboard }],
     },
     {
       title: "Clinical",
       items: [
-        {
-          label: "My Patients",
-          href: "/doctor/patients",
-          icon: Users,
-        },
-        {
-          label: "Appointments",
-          href: "/doctor/appointments",
-          icon: CalendarDays,
-          badge: "3",
-        },
-        {
-          label: "Prescriptions",
-          href: "/doctor/prescriptions",
-          icon: ClipboardList,
-        },
+        { label: "Today's Appointments", href: "/doctor/appointments", icon: CalendarDays, badge: "3" },
+        { label: "Patient History", href: "/doctor/patients", icon: Users },
+        { label: "Prescriptions", href: "/doctor/prescriptions", icon: ClipboardList },
       ],
     },
     {
       title: "Records",
       items: [
-        {
-          label: "Lab Results",
-          href: "/doctor/lab-results",
-          icon: FlaskConical,
-        },
-        {
-          label: "Reports",
-          href: "/doctor/reports",
-          icon: BarChart3,
-        },
+        { label: "Medical Reports", href: "/doctor/reports", icon: BarChart3 },
+        { label: "Schedule", href: "/doctor/schedule", icon: CalendarDays },
+        { label: "Profile", href: "/doctor/profile", icon: UserCheck },
       ],
     },
   ],

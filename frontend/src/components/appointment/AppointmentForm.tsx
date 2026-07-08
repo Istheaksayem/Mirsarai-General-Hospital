@@ -31,7 +31,7 @@ const departments = [
 
 const steps = ["Personal Info", "Select Doctor", "Schedule", "Confirm"];
 
-const stepVariants = {
+const stepVariants: any = {
   initial: (dir: number) => ({ opacity: 0, x: dir > 0 ? 60 : -60 }),
   animate: { opacity: 1, x: 0, transition: { duration: 0.35, ease: "easeOut" } },
   exit: (dir: number) => ({ opacity: 0, x: dir > 0 ? -60 : 60, transition: { duration: 0.25 } }),
