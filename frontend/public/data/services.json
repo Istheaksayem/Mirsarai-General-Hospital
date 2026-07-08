@@ -1,0 +1,56 @@
+[
+    {
+        "id": 1,
+        "title": "Diagnostic Services",
+        "slug": "diagnostic-services",
+        "shortDescription": "Advanced diagnostic facilities for accurate and timely medical reports.",
+        "description": "Our Diagnostic Services provide reliable and accurate medical testing using modern equipment and experienced laboratory professionals. We ensure fast report delivery and maintain the highest standards of quality to support accurate diagnosis and effective treatment.",
+        "image": "https://images.unsplash.com/photo-1579154204601-01588f351e67?w=1200",
+        "icon": "FaMicroscope",
+        "features": [
+            "Modern Laboratory Equipment",
+            "Fast & Accurate Test Reports",
+            "Experienced Lab Technicians",
+            "Affordable Diagnostic Packages",
+            "Digital Report Collection",
+            "Quality Assurance"
+        ],
+        "availableServices": [
+            "Complete Blood Count (CBC)",
+            "Blood Sugar Test",
+            "Urine Analysis",
+            "Liver Function Test (LFT)",
+            "Kidney Function Test (KFT)",
+            "ECG",
+            "Digital X-Ray",
+            "Ultrasonography (USG)"
+        ]
+    },
+    {
+        "id": 2,
+        "title": "NICU & Baby Care",
+        "slug": "nicu-baby-care",
+        "shortDescription": "Specialized intensive care and healthcare services for newborn babies.",
+        "description": "Our NICU & Baby Care Unit is dedicated to providing specialized medical care for premature, low birth weight, and critically ill newborns. Equipped with advanced neonatal technology and experienced pediatric specialists, we ensure the highest level of care for every baby.",
+        "image": "https://images.unsplash.com/photo-1584515933487-779824d29309?w=1200",
+        "icon": "FaBaby",
+        "features": [
+            "24/7 Neonatal Intensive Care",
+            "Experienced Pediatric Specialists",
+            "Advanced Incubators",
+            "Ventilator Support",
+            "Continuous Monitoring",
+            "Parental Guidance & Counseling"
+        ],
+        "availableServices": [
+            "Neonatal Intensive Care (NICU)",
+            "Premature Baby Care",
+            "Newborn Emergency Care",
+            "Incubator Facility",
+            "Phototherapy for Jaundice",
+            "Vaccination Support",
+            "Growth & Development Monitoring",
+            "Pediatric Consultation"
+        ]
+    }
+]

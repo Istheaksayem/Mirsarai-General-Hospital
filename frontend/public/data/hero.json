@@ -1,0 +1,170 @@
+{
+    "component": "Hospital Hero Section",
+    "framework": "Next.js",
+    "styling": "Tailwind CSS",
+    "animation": {
+        "library": "GSAP",
+        "timeline": true,
+        "effects": [
+            {
+                "element": "Background",
+                "animation": "Zoom Out + Brightness Fade",
+                "from": {
+                    "scale": 1.15,
+                    "brightness": 0.5
+                },
+                "to": {
+                    "scale": 1,
+                    "brightness": 1
+                },
+                "duration": 2.5,
+                "ease": "power2.out"
+            },
+            {
+                "element": "Hospital Logo",
+                "animation": "Drop In",
+                "from": {
+                    "y": -60,
+                    "opacity": 0,
+                    "rotate": -15
+                },
+                "to": {
+                    "y": 0,
+                    "opacity": 1,
+                    "rotate": 0
+                },
+                "duration": 1,
+                "ease": "back.out(1.5)"
+            },
+            {
+                "element": "Heading",
+                "animation": "Fade Up + Scale",
+                "from": {
+                    "y": 50,
+                    "opacity": 0,
+                    "scale": 0.9
+                },
+                "to": {
+                    "y": 0,
+                    "opacity": 1,
+                    "scale": 1
+                },
+                "duration": 1.2,
+                "ease": "power3.out"
+            },
+            {
+                "element": "Description",
+                "animation": "Fade Up",
+                "from": {
+                    "y": 30,
+                    "opacity": 0
+                },
+                "to": {
+                    "y": 0,
+                    "opacity": 1
+                },
+                "duration": 1
+            },
+            {
+                "element": "Buttons",
+                "animation": "Stagger Fade Up",
+                "from": {
+                    "y": 30,
+                    "opacity": 0
+                },
+                "to": {
+                    "y": 0,
+                    "opacity": 1
+                },
+                "stagger": 0.2,
+                "duration": 0.8
+            }
+        ]
+    },
+    "layout": {
+        "height": "90vh",
+        "alignment": "center",
+        "contentWidth": "max-w-5xl",
+        "textAlign": "center",
+        "responsive": true
+    },
+    "background": {
+        "type": "image",
+        "image": "/hospital-banner.jpg",
+        "overlay": {
+            "color": "#000000",
+            "opacity": 0.5
+        }
+    },
+    "logo": {
+        "image": "/genaral_Hospital_logo.jpeg",
+        "shape": "circle",
+        "size": "80px",
+        "background": "glassmorphism",
+        "blur": true
+    },
+    "heading": {
+        "text": "Mirsarai General Hospital",
+        "fontSize": {
+            "mobile": "text-4xl",
+            "desktop": "text-6xl"
+        },
+        "fontWeight": "bold",
+        "color": "#ffffff",
+        "tracking": "tight"
+    },
+    "description": {
+        "text": "Compassionate Care, Advanced Medicine.",
+        "fontSize": {
+            "mobile": "text-xl",
+            "desktop": "text-2xl"
+        },
+        "color": "#e5e7eb",
+        "fontWeight": "light"
+    },
+    "buttons": [
+        {
+            "label": "Book Appointment",
+            "link": "/appointment",
+            "style": {
+                "background": "primary",
+                "text": "white",
+                "borderRadius": "9999px",
+                "padding": "px-8 py-4",
+                "hover": {
+                    "translateY": "-4px",
+                    "shadow": true
+                }
+            }
+        },
+        {
+            "label": "Contact Us",
+            "link": "/contact",
+            "style": {
+                "background": "rgba(255,255,255,0.2)",
+                "backdropBlur": true,
+                "border": "1px solid rgba(255,255,255,0.5)",
+                "text": "white",
+                "borderRadius": "9999px",
+                "padding": "px-8 py-4",
+                "hover": {
+                    "background": "rgba(255,255,255,0.3)",
+                    "translateY": "-4px"
+                }
+            }
+        }
+    ],
+    "theme": {
+        "primaryColor": "#0EA5E9",
+        "secondaryColor": "#ffffff",
+        "accentColor": "#14B8A6",
+        "font": "Inter",
+        "style": "Modern Healthcare",
+        "mood": "Professional, Clean, Trustworthy"
+    },
+    "accessibility": {
+        "altText": true,
+        "keyboardNavigation": true,
+        "highContrast": true
+    }
+}
