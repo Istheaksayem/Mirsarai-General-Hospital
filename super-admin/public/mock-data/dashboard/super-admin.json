@@ -1,0 +1,20 @@
+{
+  "totalPatients": 4821,
+  "totalDoctors": 38,
+  "totalDepartments": 8,
+  "appointmentsToday": 47,
+  "appointmentsPending": 12,
+  "revenueThisMonth": 1284000,
+  "checkInsToday": 31,
+  "labReportsPending": 6,
+  "unpaidInvoices": 9,
+  "revenueChart": [
+    { "month": "Jan", "revenue": 980000 },
+    { "month": "Feb", "revenue": 1050000 },
+    { "month": "Mar", "revenue": 1120000 },
+    { "month": "Apr", "revenue": 1090000 },
+    { "month": "May", "revenue": 1200000 },
+    { "month": "Jun", "revenue": 1180000 },
+    { "month": "Jul", "revenue": 1284000 }
+  ]
+}

@@ -1,0 +1,12 @@
+[
+  { "id": "pat-001", "name": "Abdul Karim", "age": 58, "gender": "Male", "bloodGroup": "O+", "phone": "+880 1711-223344", "email": "karim.abdul@email.com", "lastVisit": "2026-07-08", "status": "in-treatment", "address": "Mirsarai Sadar, Chattogram" },
+  { "id": "pat-002", "name": "Jahanara Begum", "age": 45, "gender": "Female", "bloodGroup": "A-", "phone": "+880 1812-334455", "email": "jahanara.begum@email.com", "lastVisit": "2026-07-08", "status": "active", "address": "Zorarganj, Mirsarai" },
+  { "id": "pat-003", "name": "Mohammad Yasin", "age": 28, "gender": "Male", "bloodGroup": "B+", "phone": "+880 1913-445566", "email": "yasin.md@email.com", "lastVisit": "2026-07-08", "status": "active", "address": "Baraiyarhat, Mirsarai" },
+  { "id": "pat-004", "name": "Fariha Sultana", "age": 25, "gender": "Female", "bloodGroup": "AB+", "phone": "+880 1614-556677", "email": "fariha.s@email.com", "lastVisit": "2026-07-08", "status": "active", "address": "Mirsarai Bypass, Chattogram" },
+  { "id": "pat-005", "name": "Nayan Chowdhury", "age": 34, "gender": "Male", "bloodGroup": "O-", "phone": "+880 1515-667788", "email": "nayan.c@email.com", "lastVisit": "2026-07-08", "status": "active", "address": "Sufia Road, Mirsarai" },
+  { "id": "pat-006", "name": "Sajeda Khatun", "age": 31, "gender": "Female", "bloodGroup": "O+", "phone": "+880 1716-778899", "email": "sajeda.k@email.com", "lastVisit": "2026-07-08", "status": "completed", "address": "Dhum Union, Mirsarai" },
+  { "id": "pat-007", "name": "Kamal Uddin", "age": 52, "gender": "Male", "bloodGroup": "A+", "phone": "+880 1817-889900", "email": "kamal.u@email.com", "lastVisit": "2026-07-07", "status": "completed", "address": "Zorarganj Bazar, Mirsarai" },
+  { "id": "pat-008", "name": "Rumana Akhter", "age": 22, "gender": "Female", "bloodGroup": "B-", "phone": "+880 1918-990011", "email": "rumana.a@email.com", "lastVisit": "2026-07-07", "status": "completed", "address": "Wahedpur, Mirsarai" },
+  { "id": "pat-009", "name": "Faruk Ahmed", "age": 42, "gender": "Male", "bloodGroup": "AB-", "phone": "+880 1619-001122", "email": "faruk.ahmed@email.com", "lastVisit": "2026-07-08", "status": "in-treatment", "address": "Mayani Union, Mirsarai" },
+  { "id": "pat-010", "name": "Fatema Begum", "age": 60, "gender": "Female", "bloodGroup": "O+", "phone": "+880 1720-112233", "email": "fatema.b@email.com", "lastVisit": "2026-07-08", "status": "active", "address": "Mirsarai Sadar, Chattogram" }
+]

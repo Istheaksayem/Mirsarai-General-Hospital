@@ -1,0 +1,6 @@
+[
+  { "id": "role-001", "name": "Super Admin", "description": "Full access to all modules, configurations, logs, and database metrics.", "userCount": 3, "permissions": ["all_access", "manage_roles", "manage_settings", "manage_website", "view_reports", "manage_appointments", "manage_doctors", "manage_departments", "manage_patients"] },
+  { "id": "role-002", "name": "Doctor", "description": "Access to check today's schedule, view patient files, write prescriptions, and upload medical reports.", "userCount": 84, "permissions": ["view_appointments", "edit_consultations", "write_prescriptions", "upload_reports", "view_patient_history"] },
+  { "id": "role-003", "name": "Reception Admin", "description": "Access to schedule appointments, check-in patients, manage queue, issue bills, and print invoices.", "userCount": 12, "permissions": ["manage_appointments", "manage_patients", "manage_queue", "manage_billing", "view_notifications"] },
+  { "id": "role-004", "name": "Lab Admin", "description": "Access to patient lookup, diagnostic records queue, reports upload, and lab tests configuration.", "userCount": 8, "permissions": ["view_diagnostic_records", "upload_diagnostic_reports", "search_patients", "view_reports"] }
+]
