@@ -1,5 +1,5 @@
 import React from "react";
-import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn, FaPhoneAlt, FaEnvelope, FaMapMarkerAlt, FaHeartbeat, FaArrowRight } from "react-icons/fa";
+import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn, FaPhoneAlt, FaEnvelope, FaMapMarkerAlt, FaHeartbeat, FaArrowRight, FaYoutube } from "react-icons/fa";
 
 const Footer = () => {
   return (
@@ -25,7 +25,7 @@ const Footer = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 mt-10 md:mt-0">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 mb-16">
-          
+
           {/* Brand & About (Spans 4 columns) */}
           <div className="lg:col-span-4">
             <div className="bg-white/95 backdrop-blur-sm inline-block p-3 rounded-xl mb-6 shadow-lg shadow-black/10 border border-white/20 transform hover:scale-105 transition-transform duration-300">
@@ -35,18 +35,16 @@ const Footer = () => {
               Committed to providing compassionate care and advanced medical solutions. We combine state-of-the-art technology with human empathy, because your health is our top priority.
             </p>
             <div className="flex space-x-4">
-              <a href="https://www.facebook.com/mirsaraigeneralhospital" className="group w-11 h-11 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-secondary hover:border-secondary hover:shadow-[0_0_15px_rgba(118,188,33,0.5)] transition-all duration-300">
+              <a href="https://www.facebook.com/mirsaraigeneralhospital" className="group w-11 h-11 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-blue-500 hover:border-secondary hover:shadow-[0_0_15px_rgba(118,188,33,0.5)] transition-all duration-300">
                 <FaFacebookF className="text-gray-300 group-hover:text-white transition-colors" />
               </a>
-              <a href="#" className="group w-11 h-11 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-tertiary hover:border-tertiary hover:shadow-[0_0_15px_rgba(0,188,212,0.5)] transition-all duration-300">
-                <FaTwitter className="text-gray-300 group-hover:text-white transition-colors" />
+              <a href="#" className="group w-11 h-11 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-red-500 hover:border-tertiary hover:shadow-[0_0_15px_rgba(0,188,212,0.5)] transition-all duration-300">
+                <FaYoutube className="text-gray-300 group-hover:text-white transition-colors" />
               </a>
-              <a href="#" className="group w-11 h-11 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-pink-500 hover:border-pink-500 hover:shadow-[0_0_15px_rgba(236,72,153,0.5)] transition-all duration-300">
+              <a href="#" className="group w-11 h-11 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 hover:border-pink-500 hover:shadow-[0_0_15px_rgba(236,72,153,0.5)] transition-all duration-300">
                 <FaInstagram className="text-gray-300 group-hover:text-white transition-colors" />
               </a>
-              <a href="#" className="group w-11 h-11 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-blue-600 hover:border-blue-600 hover:shadow-[0_0_15px_rgba(37,99,235,0.5)] transition-all duration-300">
-                <FaLinkedinIn className="text-gray-300 group-hover:text-white transition-colors" />
-              </a>
+
             </div>
           </div>
 
@@ -59,11 +57,11 @@ const Footer = () => {
             <ul className="space-y-4 text-sm text-gray-300">
               {[
                 { name: 'Home', href: '/' },
-                { name: 'About Us', href: '#' },
-                { name: 'Services', href: '#' },
-                { name: 'Our Doctors', href: '#' },
-                { name: 'Appointments', href: '#' },
-                { name: 'Contact Us', href: '/contact' }
+                { name: 'About Us', href: 'about' },
+                { name: 'Services', href: 'services' },
+                { name: 'Our Doctors', href: 'doctors' },
+                { name: 'Appointments', href: 'appointment' },
+                { name: 'Contact Us', href: 'contact' }
               ].map((item) => (
                 <li key={item.name}>
                   <a href={item.href} className="group flex items-center hover:text-secondary transition-colors duration-300">
@@ -99,7 +97,7 @@ const Footer = () => {
               <span className="w-8 h-[2px] bg-gradient-to-r from-secondary to-tertiary mr-3 rounded-full"></span>
               Get In Touch
             </h3>
-            
+
             <ul className="space-y-4 text-sm text-gray-300 mb-8">
               <li className="flex items-start group">
                 <div className="mt-1 mr-4 p-2 rounded-full bg-white/5 text-secondary group-hover:bg-secondary group-hover:text-white transition-all duration-300">
@@ -144,7 +142,7 @@ const Footer = () => {
         {/* Newsletter & Copyright Separator */}
         <div className="border-t border-white/10 pt-8 pb-4">
           <div className="flex flex-col lg:flex-row justify-between items-center gap-6">
-            
+
             {/* Copyright */}
             <p className="text-gray-400 text-sm text-center lg:text-left order-2 lg:order-1">
               &copy; {new Date().getFullYear()} <span className="text-white font-medium">Mirsharai General Hospital</span>. All Rights Reserved.
