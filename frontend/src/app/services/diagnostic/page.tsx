@@ -1,166 +1,401 @@
 "use client";
 
-import React from "react";
-import { useQuery } from "@tanstack/react-query";
-import { notFound } from "next/navigation";
-import { FaMicroscope, FaCheckCircle } from "react-icons/fa";
-import { motion } from "framer-motion";
+import { useDiagnosticService } from "@/hooks/useDiagnosticService";
+import { FaMicroscope, FaClock, FaUserMd, FaCheckCircle, FaFlask, FaHeartbeat } from "react-icons/fa";
+import { MdScience } from "react-icons/md";
 
-// Types
-interface Service {
-  id: number;
-  title: string;
-  slug: string;
-  shortDescription: string;
-  description: string;
-  image: string;
-  icon: string;
-  features: string[];
-  availableServices: string[];
-}
-
-const fetchServices = async (): Promise<Service[]> => {
-  const res = await fetch("/data/services.json");
-  if (!res.ok) throw new Error("Failed to fetch services");
-  return res.json();
+const iconMap: Record<string, any> = {
+  FaMicroscope,
+  FaClock,
+  FaUserMd,
+  FaCheckCircle,
 };
 
-export default function DiagnosticServicePage() {
-  const { data: services, isLoading, error } = useQuery({
-    queryKey: ["services"],
-    queryFn: fetchServices,
-  });
+const DiagnosticServicePage = () => {
+  const { data, isLoading, isError } = useDiagnosticService();
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-[60vh] bg-gray-50/30">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary"></div>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--background)" }}>
+        <div className="flex flex-col items-center gap-4 animate-fadeInSlide">
+          <div className="w-16 h-16 rounded-full border-4 border-[var(--color-accent)] border-t-transparent animate-spin" />
+          <p className="font-semibold text-lg" style={{ color: "var(--color-accent)" }}>Loading...</p>
+        </div>
       </div>
     );
   }
 
-  if (error || !services) {
+  if (isError || !data) {
     return (
-      <div className="flex justify-center items-center min-h-[60vh] text-red-500 bg-gray-50/30 font-medium text-lg">
-        Error loading service data. Please try again later.
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--background)" }}>
+        <p className="text-red-500 text-lg font-medium">Failed to load diagnostic service data.</p>
       </div>
     );
   }
 
-  // Find the specific service data
-  const service = services.find((s) => s.slug === "diagnostic-services");
-
-  if (!service) {
-    return notFound();
-  }
+  const { diagnostic } = data;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white pt-16 pb-24">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <main className="overflow-hidden" style={{ background: "var(--background)" }}>
+      {/* ── Hero Section with Background Image ── */}
+      <section className="relative py-40 px-4 overflow-hidden">
+        {/* Background Image with Minimal Overlay */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src={diagnostic.backgroundImage}
+            alt="Diagnostic Lab"
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src =
+                "https://images.unsplash.com/photo-1579154204601-01588f351e67?w=1920&h=800&fit=crop";
+            }}
+          />
+          {/* Light overlay for text readability */}
+          <div 
+            className="absolute inset-0" 
+            style={{ 
+              background: "linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 100%)" 
+            }} 
+          />
+        </div>
 
-        {/* Header Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="text-center max-w-3xl mx-auto mb-16"
-        >
-          <div className="flex justify-center mb-6">
-            <div className="p-4 bg-primary/10 rounded-3xl shadow-sm border border-primary/10">
-              <FaMicroscope className="w-10 h-10 md:w-12 md:h-12 text-primary" />
-            </div>
-          </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-6 tracking-tight">
-            {service.title}
-          </h1>
-          <p className="text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto">
-            {service.shortDescription}
-          </p>
-        </motion.div>
+        {/* Decorative floating elements */}
+        <div className="absolute top-20 left-10 w-72 h-72 rounded-full opacity-20 blur-3xl" style={{ background: "var(--color-accent)" }} />
+        <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full opacity-15 blur-3xl" style={{ background: "#a78bfa" }} />
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-          {/* Left Column: Image & Description */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-            className="lg:col-span-7 space-y-8"
-          >
-            <div className="relative rounded-[2rem] overflow-hidden shadow-2xl group border border-gray-100">
-              <div className="absolute inset-0 bg-primary/5 group-hover:bg-transparent transition duration-500 z-10"></div>
-              <img
-                src={service.image}
-                alt={service.title}
-                className="w-full h-[350px] md:h-[450px] object-cover transform group-hover:scale-105 transition duration-700 ease-out"
-              />
-            </div>
-
-            <div className="bg-white p-8 md:p-10 rounded-[2rem] shadow-sm border border-gray-100/80 hover:shadow-md transition duration-300">
-              <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-                <span className="w-2 h-6 bg-primary rounded-full"></span>
-                Overview
-              </h3>
-              <p className="text-gray-600 leading-relaxed text-lg">
-                {service.description}
+        <div className="relative z-10 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Left Content */}
+            <div className="animate-fadeInSlide text-white">
+              <div 
+                className="inline-flex items-center gap-3 px-5 py-2.5 mb-6"
+                style={{
+                  background: "rgba(255, 255, 255, 0.1)",
+                  borderRadius: "var(--radius-xl)",
+                  backdropFilter: "blur(10px)",
+                  border: "1px solid rgba(255, 255, 255, 0.2)"
+                }}
+              >
+                <FaMicroscope size={20} />
+                <span className="text-sm font-semibold tracking-wider uppercase">
+                  Laboratory Excellence
+                </span>
+              </div>
+              <h1 className="text-5xl md:text-6xl font-extrabold mb-6 leading-tight tracking-tight">
+                {diagnostic.title}
+              </h1>
+              <p className="text-lg md:text-xl text-white/90 leading-relaxed mb-8">
+                {diagnostic.heroDescription}
               </p>
-            </div>
-          </motion.div>
-
-          {/* Right Column: Features & Services Lists */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
-            className="lg:col-span-5 space-y-8"
-          >
-            {/* Features */}
-            <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100/80 hover:shadow-md transition duration-300">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                <span className="w-2 h-6 bg-secondary rounded-full"></span>
-                Key Features
-              </h3>
-              <ul className="space-y-4">
-                {service.features.map((feature, idx) => (
-                  <li key={idx} className="flex items-start gap-4 p-3 rounded-2xl hover:bg-gray-50 transition duration-200">
-                    <FaCheckCircle className="text-secondary mt-1 flex-shrink-0" size={20} />
-                    <span className="text-gray-700 font-medium text-[1.05rem]">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Available Services */}
-            <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100/80 hover:shadow-md transition duration-300">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                <span className="w-2 h-6 bg-primary rounded-full"></span>
-                Available Services
-              </h3>
-              <div className="flex flex-wrap gap-3">
-                {service.availableServices.map((item, idx) => (
-                  <span
-                    key={idx}
-                    className="px-4 py-2.5 bg-gray-50 text-gray-700 rounded-xl text-sm font-semibold border border-gray-100 hover:bg-primary hover:text-white hover:border-primary transition duration-300 shadow-sm cursor-default"
-                  >
-                    {item}
-                  </span>
-                ))}
+              <div className="flex flex-wrap gap-4">
+                <a
+                  href="#services"
+                  className="inline-block px-8 py-4 font-bold text-white transition-all duration-300 hover:-translate-y-1 transform"
+                  style={{
+                    background: "linear-gradient(135deg, var(--color-accent), #a78bfa)",
+                    borderRadius: "var(--radius-lg)",
+                    boxShadow: "var(--shadow-xl)"
+                  }}
+                >
+                  View Services
+                </a>
+                <a
+                  href="/appointment"
+                  className="inline-block px-8 py-4 font-bold text-white transition-all duration-300 hover:-translate-y-1 transform"
+                  style={{
+                    background: "rgba(255, 255, 255, 0.1)",
+                    backdropFilter: "blur(10px)",
+                    borderRadius: "var(--radius-lg)",
+                    border: "2px solid rgba(255, 255, 255, 0.3)"
+                  }}
+                >
+                  Book Test
+                </a>
               </div>
             </div>
 
-            {/* CTA */}
-            <div className="bg-gradient-to-br from-primary to-[#005c99] p-8 md:p-10 rounded-[2rem] shadow-xl text-white text-center relative overflow-hidden group">
-              <div className="absolute -top-24 -right-24 w-48 h-48 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition duration-700"></div>
-              <h3 className="text-2xl font-bold mb-4 relative z-10">Need Medical Assistance?</h3>
-              <p className="text-primary-50 mb-8 opacity-95 relative z-10 text-[1.05rem]">
-                Our expert team is available 24/7 to provide the best care for you and your family.
-              </p>
-              <a href="/appointment" className="relative z-10 inline-block bg-white text-primary font-bold py-3.5 px-8 rounded-full shadow-lg hover:shadow-2xl hover:-translate-y-1 transition duration-300 ease-in-out w-full sm:w-auto">
-                Book an Appointment
-              </a>
+            {/* Right Stats Cards */}
+            <div className="grid grid-cols-2 gap-4 animate-fadeInSlide" style={{ animationDelay: "0.2s" }}>
+              {diagnostic.statistics.slice(0, 4).map((stat, i) => (
+                <div
+                  key={i}
+                  className="glass-panel p-6 text-center hover:-translate-y-2 transition-all duration-300"
+                  style={{
+                    borderRadius: "var(--radius-lg)",
+                    background: "rgba(255, 255, 255, 0.1)",
+                    backdropFilter: "blur(20px)",
+                    border: "1px solid rgba(255, 255, 255, 0.2)"
+                  }}
+                >
+                  <p className="text-4xl font-extrabold text-white mb-1">{stat.value}</p>
+                  <p className="text-white/80 text-sm font-medium">{stat.label}</p>
+                </div>
+              ))}
             </div>
-          </motion.div>
+          </div>
         </div>
-      </div>
-    </div>
+      </section>
+
+      {/* ── Features Grid ── */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 -mt-16 relative z-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {diagnostic.features.map((feature, index) => {
+            const Icon = iconMap[feature.icon] || FaMicroscope;
+            return (
+              <div
+                key={index}
+                className="glass-panel p-8 text-center group hover:-translate-y-2 transition-all duration-500"
+                style={{
+                  borderRadius: "var(--radius-lg)",
+                  animationDelay: `${index * 0.1}s`
+                }}
+              >
+                <div 
+                  className="w-16 h-16 flex items-center justify-center mx-auto mb-5 transition-all duration-300 group-hover:scale-110"
+                  style={{
+                    borderRadius: "var(--radius-md)",
+                    background: "linear-gradient(135deg, var(--color-accent), #a78bfa)"
+                  }}
+                >
+                  <Icon className="text-white" size={28} />
+                </div>
+                <h3 className="text-lg font-bold mb-3" style={{ color: "var(--color-primary)" }}>
+                  {feature.title}
+                </h3>
+                <p className="text-sm leading-relaxed" style={{ color: "var(--foreground)", opacity: 0.7 }}>
+                  {feature.description}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ── About Section ── */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div className="animate-fadeInSlide">
+            <h2 className="text-4xl md:text-5xl font-bold mb-8 leading-tight" style={{ color: "var(--color-primary)" }}>
+              Advanced <span style={{ color: "var(--color-accent)" }}>Diagnostic</span> Solutions
+            </h2>
+            <p 
+              className="text-lg leading-relaxed mb-8"
+              style={{ color: "var(--foreground)", opacity: 0.75 }}
+            >
+              {diagnostic.description}
+            </p>
+            
+            <div className="space-y-4">
+              <div className="flex items-center gap-4">
+                <div 
+                  className="w-12 h-12 flex items-center justify-center flex-shrink-0"
+                  style={{
+                    background: "rgba(139, 92, 246, 0.1)",
+                    borderRadius: "var(--radius-md)"
+                  }}
+                >
+                  <FaClock style={{ color: "var(--color-accent)" }} size={20} />
+                </div>
+                <div>
+                  <p className="font-semibold" style={{ color: "var(--color-primary)" }}>
+                    Working Hours
+                  </p>
+                  <p className="text-sm" style={{ color: "var(--foreground)", opacity: 0.6 }}>
+                    {diagnostic.workingHours.weekdays} (Weekdays)
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-4">
+                <div 
+                  className="w-12 h-12 flex items-center justify-center flex-shrink-0"
+                  style={{
+                    background: "rgba(239, 68, 68, 0.1)",
+                    borderRadius: "var(--radius-md)"
+                  }}
+                >
+                  <FaHeartbeat style={{ color: "#ef4444" }} size={20} />
+                </div>
+                <div>
+                  <p className="font-semibold" style={{ color: "var(--color-primary)" }}>
+                    Emergency Services
+                  </p>
+                  <p className="text-sm" style={{ color: "var(--foreground)", opacity: 0.6 }}>
+                    {diagnostic.workingHours.emergency}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="relative animate-fadeInSlide" style={{ animationDelay: "0.2s" }}>
+            <div 
+              className="absolute -top-6 -right-6 w-full h-full"
+              style={{
+                background: "linear-gradient(135deg, var(--color-accent), #a78bfa)",
+                opacity: 0.1,
+                borderRadius: "var(--radius-xl)"
+              }}
+            />
+            <img
+              src="https://images.unsplash.com/photo-1579154204601-01588f351e67?w=800&h=600&fit=crop"
+              alt="Laboratory"
+              className="relative z-10 w-full h-[500px] object-cover"
+              style={{
+                borderRadius: "var(--radius-xl)",
+                boxShadow: "var(--shadow-xl)"
+              }}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* ── Services Grid ── */}
+      <section className="py-24 px-4 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-[var(--color-accent)] blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-[var(--color-primary)] blur-3xl" />
+        </div>
+
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="text-center mb-16 animate-fadeInSlide">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight" style={{ color: "var(--color-primary)" }}>
+              Our Laboratory Services
+            </h2>
+            <p className="text-lg max-w-2xl mx-auto" style={{ color: "var(--foreground)", opacity: 0.7 }}>
+              Comprehensive diagnostic testing across multiple specialties
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {diagnostic.services.map((service, index) => (
+              <div
+                key={index}
+                className="premium-card p-8 hover:scale-[1.02] transition-all duration-300"
+                style={{
+                  borderRadius: "var(--radius-lg)",
+                  animationDelay: `${index * 0.1}s`
+                }}
+              >
+                <div className="flex items-center gap-4 mb-6">
+                  <div 
+                    className="w-12 h-12 flex items-center justify-center"
+                    style={{
+                      background: "linear-gradient(135deg, var(--color-accent), #a78bfa)",
+                      borderRadius: "var(--radius-md)"
+                    }}
+                  >
+                    <MdScience className="text-white" size={24} />
+                  </div>
+                  <h3 className="text-2xl font-bold" style={{ color: "var(--color-primary)" }}>
+                    {service.category}
+                  </h3>
+                </div>
+                <ul className="grid grid-cols-1 gap-3">
+                  {service.tests?.map((test, idx) => (
+                    <li key={idx} className="flex items-start gap-3">
+                      <FaCheckCircle 
+                        className="mt-1 flex-shrink-0" 
+                        size={16} 
+                        style={{ color: "var(--color-accent)" }}
+                      />
+                      <span className="text-sm leading-relaxed" style={{ color: "var(--foreground)", opacity: 0.75 }}>
+                        {test}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Statistics ── */}
+      <section className="py-28 px-4 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.03]">
+          <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-[var(--color-accent)] blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-[var(--color-primary)] blur-3xl" />
+        </div>
+        
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="text-center mb-16 animate-fadeInSlide">
+            <div 
+              className="inline-block px-5 py-2 mb-6 text-sm font-bold tracking-wider uppercase"
+              style={{
+                background: "linear-gradient(135deg, var(--color-accent), #a78bfa)",
+                color: "white",
+                borderRadius: "var(--radius-xl)"
+              }}
+            >
+              Our Impact
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight" style={{ color: "var(--color-primary)" }}>
+              Excellence in Numbers
+            </h2>
+            <p className="text-lg max-w-2xl mx-auto leading-relaxed" style={{ color: "var(--foreground)", opacity: 0.7 }}>
+              Trusted by thousands for accurate and timely diagnostic services
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {diagnostic.statistics.map((stat, i) => (
+              <div
+                key={i}
+                className="premium-card text-center p-10 group hover:-translate-y-2 animate-fadeInSlide glow-effect"
+                style={{
+                  animationDelay: `${i * 0.1}s`,
+                  borderRadius: "var(--radius-lg)"
+                }}
+              >
+                <div 
+                  className="w-14 h-14 flex items-center justify-center mx-auto mb-4 transition-transform duration-300 group-hover:scale-110"
+                  style={{
+                    background: "linear-gradient(135deg, var(--color-accent), #a78bfa)",
+                    borderRadius: "var(--radius-md)"
+                  }}
+                >
+                  <FaFlask className="text-white" size={24} />
+                </div>
+                <p className="text-5xl font-extrabold mb-2 tracking-tight" style={{ color: "var(--color-accent)" }}>
+                  {stat.value}
+                </p>
+                <p className="text-sm font-medium tracking-wide" style={{ color: "var(--foreground)", opacity: 0.7 }}>
+                  {stat.label}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA Section ── */}
+      <section className="py-28 px-4 text-center">
+        <div className="max-w-3xl mx-auto animate-fadeInSlide">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight tracking-tight" style={{ color: "var(--color-primary)" }}>
+            Need Diagnostic Services?
+          </h2>
+          <p 
+            className="text-lg mb-12 leading-relaxed max-w-xl mx-auto"
+            style={{ color: "var(--foreground)", opacity: 0.7 }}
+          >
+            Book your test today or visit our diagnostic center for immediate service
+          </p>
+          <a
+            href="/appointment"
+            className="inline-block text-white px-12 py-5 font-bold text-lg transition-all duration-500 hover:-translate-y-2 transform"
+            style={{
+              background: "linear-gradient(135deg, var(--color-accent) 0%, #a78bfa 100%)",
+              borderRadius: "var(--radius-xl)",
+              boxShadow: "var(--shadow-xl)"
+            }}
+          >
+            Book Diagnostic Test
+          </a>
+        </div>
+      </section>
+    </main>
   );
-}
+};
+
+export default DiagnosticServicePage;

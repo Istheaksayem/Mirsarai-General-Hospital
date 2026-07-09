@@ -1,0 +1,118 @@
+{
+  "diagnostic": {
+    "id": 1,
+    "title": "Diagnostic Services",
+    "subtitle": "Advanced Medical Testing & Laboratory Excellence",
+    "heroDescription": "State-of-the-art diagnostic center equipped with modern technology for accurate and timely results. Our experienced technicians and pathologists ensure precision in every test.",
+    "backgroundImage": "/images/diagnostic-lab.jpg",
+    "description": "Mirsarai General Hospital's Diagnostic Center offers comprehensive laboratory services with cutting-edge equipment and experienced medical professionals. We provide accurate, fast, and reliable test results to support effective diagnosis and treatment.",
+    "features": [
+      {
+        "title": "Advanced Equipment",
+        "description": "Latest medical technology for precise diagnostic testing",
+        "icon": "FaMicroscope"
+      },
+      {
+        "title": "Fast Results",
+        "description": "Quick turnaround time for urgent test reports",
+        "icon": "FaClock"
+      },
+      {
+        "title": "Experienced Staff",
+        "description": "Qualified pathologists and lab technicians",
+        "icon": "FaUserMd"
+      },
+      {
+        "title": "Quality Assurance",
+        "description": "Stringent quality control for accurate results",
+        "icon": "FaCheckCircle"
+      }
+    ],
+    "services": [
+      {
+        "category": "Clinical Pathology",
+        "tests": [
+          "Complete Blood Count (CBC)",
+          "Blood Sugar (Fasting & Random)",
+          "Lipid Profile",
+          "Liver Function Test (LFT)",
+          "Kidney Function Test (KFT)",
+          "Thyroid Function Test",
+          "Urine Routine Examination",
+          "Stool Examination"
+        ]
+      },
+      {
+        "category": "Biochemistry",
+        "tests": [
+          "Serum Electrolytes",
+          "Cardiac Enzymes",
+          "HbA1c (Glycated Hemoglobin)",
+          "Serum Protein",
+          "Bilirubin (Total & Direct)",
+          "Calcium & Phosphorus",
+          "Uric Acid",
+          "Amylase & Lipase"
+        ]
+      },
+      {
+        "category": "Microbiology",
+        "tests": [
+          "Blood Culture",
+          "Urine Culture",
+          "Stool Culture",
+          "Sputum Culture",
+          "Wound Swab Culture",
+          "Sensitivity Testing"
+        ]
+      },
+      {
+        "category": "Serology & Immunology",
+        "tests": [
+          "HIV Screening",
+          "Hepatitis B & C Markers",
+          "Dengue NS1 & Antibody",
+          "Typhoid (Widal Test)",
+          "VDRL/RPR",
+          "Blood Group & Rh Typing",
+          "CRP (C-Reactive Protein)",
+          "ASO Titre"
+        ]
+      },
+      {
+        "category": "Imaging Services",
+        "tests": [
+          "X-Ray (Digital)",
+          "Ultrasound (USG)",
+          "ECG (Electrocardiogram)",
+          "Echocardiography",
+          "CT Scan (Available on referral)",
+          "MRI (Available on referral)"
+        ]
+      }
+    ],
+    "workingHours": {
+      "weekdays": "8:00 AM - 10:00 PM",
+      "weekends": "9:00 AM - 8:00 PM",
+      "emergency": "24/7 Available"
+    },
+    "statistics": [
+      {
+        "value": "50,000+",
+        "label": "Tests Conducted Annually"
+      },
+      {
+        "value": "100+",
+        "label": "Different Test Types"
+      },
+      {
+        "value": "2-24hrs",
+        "label": "Average Report Time"
+      },
+      {
+        "value": "99.5%",
+        "label": "Accuracy Rate"
+      }
+    ]
+  }
+}
