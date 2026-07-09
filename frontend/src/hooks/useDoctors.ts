@@ -1,27 +1,32 @@
 import { useQuery } from "@tanstack/react-query";
 
+interface BilingualText {
+  en: string;
+  bn: string;
+}
+
 export interface Doctor {
   id: number;
-  name: string;
+  name: BilingualText;
   slug: string;
-  specialization: string;
+  specialization: BilingualText;
   qualification: string;
-  experience: string;
-  department: string;
-  designation: string;
+  experience: BilingualText;
+  department: BilingualText;
+  designation: BilingualText;
   image: string;
   phone: string;
   email: string;
-  chamberTime: string;
+  chamberTime: BilingualText;
   consultationFee: number;
   languages: string[];
-  about: string;
-  services: string[];
+  about: BilingualText;
+  services: BilingualText[];
   available: boolean;
 }
 
 const fetchDoctors = async (): Promise<Doctor[]> => {
-  const res = await fetch("/data/doctors.json");
+  const res = await fetch("/data/doctors.json", { cache: "no-store" });
   if (!res.ok) throw new Error("Failed to fetch doctors data");
   return res.json();
 };

@@ -1,23 +1,85 @@
 "use client";
 
 import React from "react";
+import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { useDoctors } from "@/hooks/useDoctors";
 import Link from "next/link";
 
+// ── Fetcher ────────────────────────────────────────────────────────────────
+const fetchDoctors = async (): Promise<Doctor[]> => {
+  const res = await fetch("/data/doctors.json", { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch doctors");
+  return res.json();
+};
+
+// ── Skeleton ───────────────────────────────────────────────────────────────
+const DoctorsSkeleton = () => (
+  <section className="py-20 bg-white dark:bg-gray-900">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="text-center mb-16 space-y-4 animate-pulse">
+        <div className="h-10 w-80 bg-gray-200 dark:bg-gray-700 rounded-lg mx-auto" />
+        <div className="h-4 w-96 bg-gray-200 dark:bg-gray-700 rounded mx-auto" />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="h-[480px] bg-gray-200 dark:bg-gray-700 rounded-3xl animate-pulse" />
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
+// ── Main Doctors ───────────────────────────────────────────────────────────
 const Doctors = () => {
   const { data: doctors, isLoading, error } = useDoctors();
 
   return (
-    <section className="py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Our Specialist Doctors</h2>
-          <div className="w-20 h-1 bg-primary mx-auto rounded-full mb-4"></div>
-          <p className="text-gray-600 max-w-2xl mx-auto text-lg">
-            Meet our team of highly qualified and experienced medical professionals dedicated to your well-being.
+    <section className="relative py-20 lg:py-28 bg-white dark:bg-gray-900 overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#76BC21]/5 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#1E2B7A]/5 rounded-full blur-3xl" />
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-[#76BC21]/10 text-[#76BC21] rounded-full text-sm font-semibold uppercase tracking-wide mb-4"
+          >
+            <FaUserMd />
+            {lang === "bn" ? "আমাদের বিশেষজ্ঞ" : "Our Specialists"}
+          </motion.div>
+
+          <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-4">
+            {lang === "bn" ? (
+              <>
+                আমাদের <span className="text-[#1E2B7A] dark:text-[#76BC21]">বিশেষজ্ঞ ডাক্তার</span>
+              </>
+            ) : (
+              <>
+                Our Specialist <span className="text-[#1E2B7A] dark:text-[#76BC21]">Doctors</span>
+              </>
+            )}
+          </h2>
+
+          <div className="w-24 h-1.5 bg-gradient-to-r from-[#1E2B7A] to-[#76BC21] mx-auto rounded-full mb-6" />
+
+          <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto text-lg leading-relaxed">
+            {lang === "bn"
+              ? "আপনার সুস্বাস্থ্যের জন্য নিবেদিত উচ্চ যোগ্যতাসম্পন্ন এবং অভিজ্ঞ চিকিৎসা পেশাদারদের আমাদের দলের সাথে দেখা করুন।"
+              : "Meet our team of highly qualified and experienced medical professionals dedicated to your well-being."}
           </p>
-        </div>
+        </motion.div>
 
         {isLoading ? (
           <div className="flex justify-center items-center py-12">

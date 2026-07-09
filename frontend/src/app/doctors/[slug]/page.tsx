@@ -4,54 +4,85 @@ import React, { use } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { notFound } from "next/navigation";
 import { motion } from "framer-motion";
-import { FaUserMd, FaGraduationCap, FaBriefcase, FaMoneyBillWave, FaClock, FaCheckCircle, FaGlobe, FaPhoneAlt, FaEnvelope } from "react-icons/fa";
+import {
+  FaGraduationCap,
+  FaBriefcase,
+  FaMoneyBillWave,
+  FaClock,
+  FaCheckCircle,
+  FaGlobe,
+  FaPhoneAlt,
+  FaEnvelope,
+  FaCalendarAlt,
+  FaMapMarkerAlt,
+  FaStar,
+  FaEdit,
+  FaUserMd,
+} from "react-icons/fa";
+import { useLanguage } from "@/context/LanguageContext";
+import Link from "next/link";
 
 interface Doctor {
   id: number;
-  name: string;
+  name: { en: string; bn: string };
   slug: string;
-  specialization: string;
+  specialization: { en: string; bn: string };
   qualification: string;
-  experience: string;
-  department: string;
-  designation: string;
+  experience: { en: string; bn: string };
+  department: { en: string; bn: string };
+  designation: { en: string; bn: string };
   image: string;
   phone: string;
   email: string;
-  chamberTime: string;
+  chamberTime: { en: string; bn: string };
   consultationFee: number;
   languages: string[];
-  about: string;
-  services: string[];
+  about: { en: string; bn: string };
+  services: Array<{ en: string; bn: string }>;
   available: boolean;
 }
 
 const fetchDoctors = async (): Promise<Doctor[]> => {
-  const res = await fetch("/data/doctors.json");
+  const res = await fetch("/data/doctors.json", { cache: "no-store" });
   if (!res.ok) throw new Error("Failed to fetch doctors");
   return res.json();
 };
 
 export default function DoctorProfilePage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = use(params);
+  const { lang } = useLanguage();
 
-  const { data: doctors, isLoading, error } = useQuery({
+  const { data: doctors, isLoading, isError } = useQuery({
     queryKey: ["doctors"],
     queryFn: fetchDoctors,
   });
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-[60vh] bg-gray-50/30">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary"></div>
+      <div className="flex justify-center items-center min-h-[80vh] bg-gray-50 dark:bg-gray-900">
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#1E2B7A]" />
+          <p className="text-gray-600 dark:text-gray-400 font-medium">
+            {lang === "bn" ? "লোড হচ্ছে..." : "Loading..."}
+          </p>
+        </div>
       </div>
     );
   }
 
-  if (error || !doctors) {
+  if (isError || !doctors) {
     return (
-      <div className="flex justify-center items-center min-h-[60vh] text-red-500 bg-gray-50/30 font-medium text-lg">
-        Error loading doctor profile. Please try again later.
+      <div className="flex justify-center items-center min-h-[80vh] bg-gray-50 dark:bg-gray-900">
+        <div className="text-center">
+          <p className="text-red-500 font-medium text-lg mb-4">
+            {lang === "bn" ? "ডাক্তারের প্রোফাইল লোড করতে ব্যর্থ।" : "Error loading doctor profile."}
+          </p>
+          <Link href="/doctors">
+            <button className="px-6 py-3 bg-[#1E2B7A] text-white rounded-lg font-semibold hover:bg-[#76BC21] transition-colors">
+              {lang === "bn" ? "ফিরে যান" : "Go Back"}
+            </button>
+          </Link>
+        </div>
       </div>
     );
   }
@@ -93,165 +124,219 @@ export default function DoctorProfilePage({ params }: { params: Promise<{ slug: 
                   <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
                   Available Today
                 </div>
-              )}
+              </div>
+
+              {/* Info */}
+              <div className="p-6 space-y-6">
+                {/* Name & Title */}
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                    {lang === "bn" ? doctor.name.bn : doctor.name.en}
+                  </h1>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm">
+                    {lang === "bn" ? doctor.designation.bn : doctor.designation.en}
+                  </p>
+                </div>
+
+                {/* Contact Info */}
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-gray-50 dark:bg-gray-900 flex items-center justify-center shrink-0 mt-0.5">
+                      <FaMapMarkerAlt className="text-[#1E2B7A] dark:text-[#76BC21]" size={16} />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs text-gray-400 font-semibold uppercase mb-1">
+                        {lang === "bn" ? "ঠিকানা" : "Address"}
+                      </p>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">
+                        {lang === "bn" ? "মীরসরাই জেনারেল হাসপাতাল" : "Mirsarai General Hospital"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-gray-50 dark:bg-gray-900 flex items-center justify-center shrink-0">
+                      <FaPhoneAlt className="text-[#76BC21]" size={14} />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs text-gray-400 font-semibold uppercase mb-1">
+                        {lang === "bn" ? "ফোন নম্বর" : "Phone number"}
+                      </p>
+                      <a href={`tel:${doctor.phone}`} className="text-sm text-gray-700 dark:text-gray-300 hover:text-[#1E2B7A] dark:hover:text-[#76BC21] transition-colors">
+                        {doctor.phone}
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-gray-50 dark:bg-gray-900 flex items-center justify-center shrink-0">
+                      <FaEnvelope className="text-[#1E2B7A] dark:text-[#76BC21]" size={14} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-gray-400 font-semibold uppercase mb-1">
+                        {lang === "bn" ? "ইমেইল" : "Email"}
+                      </p>
+                      <a href={`mailto:${doctor.email}`} className="text-sm text-gray-700 dark:text-gray-300 hover:text-[#1E2B7A] dark:hover:text-[#76BC21] transition-colors truncate block">
+                        {doctor.email}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="pt-4 space-y-2">
+                  <Link href="/appointment" className="block">
+                    <button className="w-full py-3.5 bg-gradient-to-r from-[#76BC21] to-[#67a81d] hover:from-[#67a81d] hover:to-[#76BC21] text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                      <FaCalendarAlt />
+                      {lang === "bn" ? "অ্যাপয়েন্টমেন্ট বুক করুন" : "Book Appointment"}
+                    </button>
+                  </Link>
+                </div>
+              </div>
             </div>
 
-            {/* Info */}
-            <div className="w-full md:w-2/3 lg:w-3/4 p-8 md:p-10 flex flex-col justify-center">
-              <div className="inline-block px-4 py-1.5 bg-secondary/10 text-secondary text-sm font-bold rounded-full mb-4 w-fit uppercase tracking-wide">
-                {doctor.department}
-              </div>
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 mb-2">
-                {doctor.name}
-              </h1>
-              <p className="text-xl text-primary font-medium mb-6">{doctor.designation}</p>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 mb-8">
-                <div className="flex items-center gap-3 text-gray-600">
-                  <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center shrink-0 text-primary">
-                    <FaGraduationCap size={20} />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-400 font-semibold uppercase">Qualification</p>
-                    <p className="font-medium">{doctor.qualification}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 text-gray-600">
-                  <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center shrink-0 text-secondary">
-                    <FaBriefcase size={18} />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-400 font-semibold uppercase">Specialization</p>
-                    <p className="font-medium">{doctor.specialization}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 text-gray-600">
-                  <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center shrink-0 text-orange-500">
-                    <FaClock size={18} />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-400 font-semibold uppercase">Experience</p>
-                    <p className="font-medium">{doctor.experience}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 text-gray-600">
-                  <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center shrink-0 text-green-500">
-                    <FaMoneyBillWave size={18} />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-400 font-semibold uppercase">Consultation Fee</p>
-                    <p className="font-medium">৳{doctor.consultationFee}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap gap-4 pt-6 border-t border-gray-100">
-                <a href="#appointment" className="bg-primary text-white font-bold py-3 px-8 rounded-full shadow-md hover:shadow-lg hover:bg-primary/90 transition duration-300">
-                  Book Appointment
-                </a>
-                {/* <a href={`tel:${doctor.phone}`} className="flex items-center gap-2 bg-gray-50 text-gray-700 font-bold py-3 px-6 rounded-full hover:bg-gray-100 transition duration-300">
-                  <FaPhoneAlt /> Call Doctor
-                </a> */}
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Details Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-            className="lg:col-span-2 space-y-8"
-          >
-            {/* About */}
-            <div className="bg-white/70 backdrop-blur-xl p-8 rounded-[2rem] shadow-[0_4px_20px_rgb(0,0,0,0.04)] border border-white">
-              <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-                <span className="w-2 h-6 bg-primary rounded-full"></span>
-                About {doctor.name}
+            {/* Experience Card */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-6">
+              <h3 className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">
+                {lang === "bn" ? "অভিজ্ঞতা" : "Experience"}
               </h3>
-              <p className="text-gray-600 leading-relaxed text-lg">
-                {doctor.about}
+              <div className="flex items-end gap-2 mb-1">
+                <span className="text-4xl font-black text-gray-900 dark:text-white">
+                  {lang === "bn" ? doctor.experience.bn.split("+")[0] : doctor.experience.en.split("+")[0]}
+                </span>
+                <span className="text-xl font-bold text-gray-500 dark:text-gray-400 mb-1">
+                  {lang === "bn" ? "বছর" : "years"}
+                </span>
+              </div>
+              <p className="text-xs text-gray-400">
+                {lang === "bn" ? "এক্সপেরিয়েন্স এ উচ্চ" : "of experience"}
               </p>
             </div>
 
-            {/* Services */}
-            <div className="bg-white/70 backdrop-blur-xl p-8 rounded-[2rem] shadow-[0_4px_20px_rgb(0,0,0,0.04)] border border-white">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                <span className="w-2 h-6 bg-secondary rounded-full"></span>
-                Specialized Services
+            {/* Rating Card */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-6">
+              <h3 className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">
+                {lang === "bn" ? "রেটিং" : "Rating"}
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {doctor.services.map((service, idx) => (
-                  <motion.div
-                    key={idx}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: 0.2 + idx * 0.1, type: "spring", bounce: 0.5 }}
-                    className="flex items-start gap-3 p-3 rounded-2xl hover:bg-white hover:shadow-md transition-all duration-300 border border-transparent hover:border-gray-100 group"
-                  >
-                    <FaCheckCircle className="text-secondary mt-1 shrink-0 group-hover:scale-110 transition-transform" size={18} />
-                    <span className="text-gray-700 font-medium group-hover:text-primary transition-colors">{service}</span>
-                  </motion.div>
-                ))}
+              <div className="flex items-center gap-3 mb-1">
+                <span className="text-4xl font-black text-gray-900 dark:text-white">5</span>
+                <FaStar className="text-amber-400 text-2xl" />
+              </div>
+              <p className="text-xs text-gray-400">
+                {lang === "bn" ? "এই ডাক্তারের রেটিং ভাল" : "This doctor's rating is good"}
+              </p>
+            </div>
+
+            {/* Education Card */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-6">
+              <h3 className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase mb-4">
+                {lang === "bn" ? "শিক্ষা" : "Education"}
+              </h3>
+              <div className="flex items-start gap-3">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#1E2B7A] to-[#2c3e7a] flex items-center justify-center shrink-0">
+                  <FaGraduationCap className="text-white" size={20} />
+                </div>
+                <div>
+                  <p className="font-bold text-gray-900 dark:text-white mb-1">{doctor.qualification}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {lang === "bn" ? "মেডিকেল ডিগ্রি" : "Medical Degree"}
+                  </p>
+                </div>
               </div>
             </div>
           </motion.div>
 
-          {/* Right Column */}
+          {/* Right Content */}
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
             className="space-y-8"
           >
-            {/* Schedule & Contact */}
-            <div className="bg-white/70 backdrop-blur-xl p-8 rounded-[2rem] shadow-[0_4px_20px_rgb(0,0,0,0.04)] border border-white">
-              <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                <span className="w-2 h-6 bg-primary rounded-full"></span>
-                Chamber & Contact
+            {/* About Section */}
+            <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl border border-gray-100 dark:border-gray-700 p-8">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {lang === "bn" ? "সম্পর্কে" : "About"}
+                </h2>
+              </div>
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                {lang === "bn" ? doctor.about.bn : doctor.about.en}
+              </p>
+            </div>
+
+            {/* Stats Row */}
+            <div className="grid sm:grid-cols-2 gap-6">
+              {/* Consultation Fee */}
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-6">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center">
+                    <FaMoneyBillWave className="text-green-500" size={20} />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400 font-semibold uppercase">
+                      {lang === "bn" ? "পরামর্শ ফি" : "Consultation Fee"}
+                    </p>
+                    <p className="text-2xl font-black text-gray-900 dark:text-white">
+                      ৳{doctor.consultationFee}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Chamber Time */}
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-6">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-xl bg-[#1E2B7A]/10 dark:bg-[#1E2B7A]/20 flex items-center justify-center">
+                    <FaClock className="text-[#1E2B7A] dark:text-[#76BC21]" size={20} />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400 font-semibold uppercase">
+                      {lang === "bn" ? "চেম্বার সময়" : "Chamber Time"}
+                    </p>
+                    <p className="text-sm font-bold text-gray-700 dark:text-gray-300">
+                      {lang === "bn" ? doctor.chamberTime.bn : doctor.chamberTime.en}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Services Section */}
+            <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl border border-gray-100 dark:border-gray-700 p-8">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+                {lang === "bn" ? "বিশেষায়িত সেবা" : "Specialized Services"}
+              </h2>
+              <div className="grid sm:grid-cols-2 gap-4">
+                {doctor.services.map((service, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-start gap-3 p-4 rounded-xl bg-gradient-to-br from-[#76BC21]/5 to-transparent border border-[#76BC21]/20 hover:border-[#76BC21]/40 hover:shadow-md transition-all group"
+                  >
+                    <FaCheckCircle className="text-[#76BC21] mt-0.5 shrink-0 group-hover:scale-110 transition-transform" size={18} />
+                    <span className="text-gray-700 dark:text-gray-300 font-medium">
+                      {lang === "bn" ? service.bn : service.en}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Languages */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-6">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <FaGlobe className="text-[#1E2B7A] dark:text-[#76BC21]" />
+                {lang === "bn" ? "ভাষা" : "Languages Spoken"}
               </h3>
-
-              <div className="space-y-6">
-                <div>
-                  <p className="text-sm text-gray-400 font-semibold uppercase mb-2">Chamber Time</p>
-                  <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex items-center gap-3">
-                    <FaClock className="text-primary shrink-0" size={20} />
-                    <span className="text-gray-700 font-medium">{doctor.chamberTime}</span>
-                  </div>
-                </div>
-
-                <div>
-                  <p className="text-sm text-gray-400 font-semibold uppercase mb-2">Contact Number</p>
-                  <a href={`tel:${doctor.phone}`} className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex items-center gap-3 hover:bg-primary/5 hover:border-primary/20 transition group">
-                    <FaPhoneAlt className="text-primary shrink-0" size={18} />
-                    <span className="text-gray-700 font-medium group-hover:text-primary transition">{doctor.phone}</span>
-                  </a>
-                </div>
-
-                <div>
-                  <p className="text-sm text-gray-400 font-semibold uppercase mb-2">Email Address</p>
-                  <a href={`mailto:${doctor.email}`} className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex items-center gap-3 hover:bg-primary/5 hover:border-primary/20 transition group">
-                    <FaEnvelope className="text-primary shrink-0" size={18} />
-                    <span className="text-gray-700 font-medium group-hover:text-primary transition break-all">{doctor.email}</span>
-                  </a>
-                </div>
-
-                <div>
-                  <p className="text-sm text-gray-400 font-semibold uppercase mb-2">Languages Spoken</p>
-                  <div className="flex gap-2 flex-wrap">
-                    {doctor.languages.map(lang => (
-                      <span key={lang} className="px-3 py-1.5 bg-gray-50 border border-gray-100 rounded-lg text-sm font-medium text-gray-600 flex items-center gap-1.5">
-                        <FaGlobe className="text-gray-400" size={12} /> {lang}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+              <div className="flex flex-wrap gap-2">
+                {doctor.languages.map((language) => (
+                  <span
+                    key={language}
+                    className="px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-semibold text-gray-700 dark:text-gray-300"
+                  >
+                    {language}
+                  </span>
+                ))}
               </div>
             </div>
           </motion.div>

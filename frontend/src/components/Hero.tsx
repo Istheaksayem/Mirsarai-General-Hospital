@@ -1,268 +1,340 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { motion } from "framer-motion";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, EffectFade, Pagination, Navigation } from "swiper/modules";
+import { motion, AnimatePresence } from "framer-motion";
+import { FiSearch, FiMapPin, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { useLanguage } from "@/context/LanguageContext";
+import Link from "next/link";
 
-// Import Swiper styles
-import "swiper/css";
-import "swiper/css/effect-fade";
-import "swiper/css/pagination";
-import "swiper/css/navigation";
-
-// ---------- Types ----------
+// ── Types ──────────────────────────────────────────────────────────────────
 interface HeroButton {
-  label: string;
+  label: { en: string; bn: string };
   link: string;
-  style: {
-    background: string;
-    text: string;
-    backdropBlur?: boolean;
-    border?: string;
-  };
+  variant: "primary" | "outline";
+}
+
+interface HeroSlide {
+  id: number;
+  slideNumber: string;
+  heading: { en: string; bn: string };
+  description: { en: string; bn: string };
+  image: string;
+  buttons: HeroButton[];
 }
 
 interface HeroData {
-  background: { image: string; overlay: { color: string; opacity: number } };
-  logo: { image: string };
-  heading: { text: string; fontSize: { mobile: string; desktop: string } };
-  description: { text: string; fontSize: { mobile: string; desktop: string }; color: string };
-  buttons: HeroButton[];
-  layout: { height: string; contentWidth: string };
+  slides: HeroSlide[];
+  searchBar: {
+    enabled: boolean;
+    title: { en: string; bn: string };
+    searchPlaceholder: { en: string; bn: string };
+    locationPlaceholder: { en: string; bn: string };
+    advancedSearchLink: { en: string; bn: string };
+  };
+  joinTeam: {
+    enabled: boolean;
+    question: { en: string; bn: string };
+    title: { en: string; bn: string };
+    buttonLabel: { en: string; bn: string };
+    buttonLink: string;
+    image: string;
+  };
 }
 
-// ---------- Fetcher ----------
+// ── Fetcher ────────────────────────────────────────────────────────────────
 const fetchHeroData = async (): Promise<HeroData> => {
-  const res = await fetch("/data/hero.json");
+  const res = await fetch("/data/hero.json", { cache: "no-store" });
   if (!res.ok) throw new Error("Failed to fetch hero data");
   return res.json();
 };
 
-// ---------- Skeleton ----------
+// ── Skeleton ───────────────────────────────────────────────────────────────
 const HeroSkeleton = () => (
-  <section className="relative w-full h-[90vh] flex items-center justify-center bg-gray-900 overflow-hidden animate-pulse">
-    <div className="flex flex-col items-center gap-6 w-full max-w-2xl px-4">
-      <div className="h-24 w-24 rounded-full bg-white/10" />
-      <div className="h-12 w-3/4 rounded-lg bg-white/10" />
-      <div className="h-6 w-1/2 rounded-lg bg-white/10" />
-      <div className="flex gap-4 mt-4">
-        <div className="h-14 w-44 rounded-full bg-white/10" />
-        <div className="h-14 w-36 rounded-full bg-white/10" />
+  <section className="relative w-full h-screen bg-gray-900 animate-pulse">
+    <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent z-10" />
+    <div className="relative z-20 h-full flex items-center max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="space-y-6 max-w-2xl">
+        <div className="h-12 w-20 bg-white/10 rounded" />
+        <div className="h-20 w-full bg-white/10 rounded-lg" />
+        <div className="h-8 w-3/4 bg-white/10 rounded" />
+        <div className="flex gap-4">
+          <div className="h-14 w-44 bg-white/10 rounded-lg" />
+          <div className="h-14 w-36 bg-white/10 rounded-lg" />
+        </div>
       </div>
     </div>
   </section>
 );
 
-// ---------- Main Hero ----------
+// ── Main Hero ──────────────────────────────────────────────────────────────
 const Hero = () => {
   const { data, isLoading, isError } = useQuery<HeroData>({
     queryKey: ["hero"],
     queryFn: fetchHeroData,
-    staleTime: 1000 * 60 * 10, // cache 10 min
+    staleTime: 1000 * 60 * 10,
   });
+  const { lang } = useLanguage();
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [location, setLocation] = useState("");
+
+  // Auto-advance slides every 5 seconds
+  useEffect(() => {
+    if (!data) return;
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % data.slides.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [data]);
 
   if (isLoading) return <HeroSkeleton />;
-
   if (isError || !data) {
     return (
-      <section className="relative w-full h-[90vh] flex items-center justify-center bg-gray-900">
-        <p className="text-white text-lg">Failed to load hero section. Please try again.</p>
+      <section className="relative w-full h-screen flex items-center justify-center bg-gray-900">
+        <p className="text-white">Failed to load hero section.</p>
       </section>
     );
   }
 
-  // Create an array of slides for the slider
-  // We use the data from hero.json for the first slide, and mock additional slides for the slider effect
-  const slides = [
-    {
-      id: 1,
-      image: data.background.image,
-      heading: data.heading.text,
-      description: data.description.text,
-    },
-    {
-      id: 2,
-      image: "/hospital-banner.jpg", // Assuming this exists or falls back safely
-      heading: "Advanced Medical Technology",
-      description: "State-of-the-art facilities for accurate diagnosis and treatment.",
-    },
-    {
-      id: 3,
-      image: "/hospital-banner.jpg", // Assuming this exists or falls back safely
-      heading: "24/7 Emergency Services",
-      description: "We are always here when you need us the most.",
-    }
-  ];
+  const slides = data.slides;
+  const current = slides[currentSlide];
 
-  const overlayStyle = {
-    backgroundColor: data.background.overlay.color,
-    opacity: data.background.overlay.opacity,
-  };
+  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
+  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
 
   return (
-    <section
-      className="relative w-full overflow-hidden"
-      style={{ height: data.layout.height }}
-    >
-      <Swiper
-        modules={[Autoplay, EffectFade, Pagination, Navigation]}
-        effect="fade"
-        speed={1000}
-        autoplay={{
-          delay: 5000,
-          disableOnInteraction: false,
-        }}
-        pagination={{
-          clickable: true,
-          dynamicBullets: true,
-        }}
-        navigation={true}
-        loop={true}
-        className="w-full h-full hero-swiper"
-      >
-        {slides.map((slide, index) => (
-          <SwiperSlide key={slide.id} className="relative w-full h-full overflow-hidden">
-            {({ isActive }) => (
-              <>
-                {/* Background Image with Zoom Effect */}
+    <>
+      {/* Fullscreen Slider */}
+      <section className="relative w-full h-screen overflow-hidden">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={current.id}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8 }}
+            className="absolute inset-0"
+          >
+            {/* Background Image */}
+            <motion.div
+              initial={{ scale: 1.1 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 8, ease: "linear" }}
+              className="absolute inset-0 bg-cover bg-center"
+              style={{
+                backgroundImage: `url('${current.image}')`,
+              }}
+            />
+
+            {/* Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-transparent" />
+
+            {/* Content */}
+            <div className="relative z-10 h-full flex items-center max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 50 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="max-w-2xl space-y-6"
+              >
+                {/* Slide Number */}
+                <motion.p
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-7xl font-black text-white/10"
+                >
+                  {current.slideNumber}
+                </motion.p>
+
+                {/* Heading */}
+                <motion.h1
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-tight"
+                >
+                  <span className="text-[#76bc21]">
+                    {lang === "bn" ? current.heading.bn.split(" ")[0] : current.heading.en.split(" ")[0]}
+                  </span>
+                  <br />
+                  <span className="text-white">
+                    {lang === "bn"
+                      ? current.heading.bn.split(" ").slice(1).join(" ")
+                      : current.heading.en.split(" ").slice(1).join(" ")}
+                  </span>
+                </motion.h1>
+
+                {/* Description */}
+                <motion.p
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className="text-lg sm:text-xl text-gray-200 max-w-xl"
+                >
+                  {lang === "bn" ? current.description.bn : current.description.en}
+                </motion.p>
+
+                {/* Buttons */}
                 <motion.div
-                  initial={{ scale: 1.15 }}
-                  animate={{ scale: isActive ? 1 : 1.15 }}
-                  transition={{ duration: 6, ease: "easeOut" }}
-                  className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-                  style={{ backgroundImage: `url('${slide.image}')` }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 }}
+                  className="flex flex-wrap gap-4 pt-4"
+                >
+                  {current.buttons.map((btn, idx) => (
+                    <Link key={idx} href={btn.link}>
+                      {btn.variant === "primary" ? (
+                        <button className="px-8 py-4 bg-[#1E2B7A] text-white rounded-lg font-semibold text-base hover:bg-[#76BC21] transition-all duration-300 shadow-lg hover:shadow-2xl hover:-translate-y-1">
+                          {lang === "bn" ? btn.label.bn : btn.label.en}
+                        </button>
+                      ) : (
+                        <button className="px-8 py-4 border-2 border-white text-white rounded-lg font-semibold text-base hover:bg-white hover:text-[#1E2B7A] transition-all duration-300">
+                          {lang === "bn" ? btn.label.bn : btn.label.en}
+                        </button>
+                      )}
+                    </Link>
+                  ))}
+                </motion.div>
+              </motion.div>
+            </div>
+
+            {/* Left Arrow */}
+            <button
+              onClick={prevSlide}
+              aria-label="Previous slide"
+              className="absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 z-20 w-14 h-14 flex items-center justify-center rounded-full bg-white/10 hover:bg-[#1E2B7A] backdrop-blur-md border border-white/20 text-white transition-all duration-300 hover:scale-110 group"
+            >
+              <FiChevronLeft size={28} className="group-hover:scale-125 transition-transform" />
+            </button>
+
+            {/* Right Arrow */}
+            <button
+              onClick={nextSlide}
+              aria-label="Next slide"
+              className="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 z-20 w-14 h-14 flex items-center justify-center rounded-full bg-white/10 hover:bg-[#1E2B7A] backdrop-blur-md border border-white/20 text-white transition-all duration-300 hover:scale-110 group"
+            >
+              <FiChevronRight size={28} className="group-hover:scale-125 transition-transform" />
+            </button>
+
+            {/* Slide Indicators (bottom center) */}
+            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3">
+              {slides.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentSlide(idx)}
+                  className={[
+                    "h-1.5 rounded-full transition-all duration-300",
+                    idx === currentSlide
+                      ? "w-12 bg-[#76BC21]"
+                      : "w-8 bg-white/40 hover:bg-white/70",
+                  ].join(" ")}
                 />
+              ))}
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      </section>
 
-                {/* Dark Overlay */}
-                <div className="absolute inset-0" style={overlayStyle} />
-
-                {/* Content */}
-                <div className={`relative z-10 w-full h-full flex items-center justify-center text-center px-4 sm:px-6 lg:px-8 ${data.layout.contentWidth} mx-auto`}>
-                  <div className="flex flex-col items-center">
-                    {/* Logo */}
-                    <motion.div
-                      initial={{ y: -50, opacity: 0 }}
-                      animate={{ y: isActive ? 0 : -50, opacity: isActive ? 1 : 0 }}
-                      transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-                      className="mb-8 bg-white/10 p-4 rounded-full backdrop-blur-sm"
-                    >
-                      <img
-                        src={data.logo.image}
-                        alt="Hospital Logo"
-                        className="h-20 w-auto rounded-full"
-                      />
-                    </motion.div>
-
-                    {/* Heading */}
-                    <motion.h1
-                      initial={{ y: 30, opacity: 0 }}
-                      animate={{ y: isActive ? 0 : 30, opacity: isActive ? 1 : 0 }}
-                      transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
-                      className={`${data.heading.fontSize.mobile} md:${data.heading.fontSize.desktop} font-bold text-white mb-4 tracking-tight`}
-                    >
-                      {slide.heading}
-                    </motion.h1>
-
-                    {/* Description */}
-                    <motion.p
-                      initial={{ y: 20, opacity: 0 }}
-                      animate={{ y: isActive ? 0 : 20, opacity: isActive ? 1 : 0 }}
-                      transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}
-                      className={`${data.description.fontSize.mobile} md:${data.description.fontSize.desktop} mb-10 font-light`}
-                      style={{ color: data.description.color }}
-                    >
-                      {slide.description}
-                    </motion.p>
-
-                    {/* Buttons */}
-                    <motion.div
-                      initial={{ y: 20, opacity: 0 }}
-                      animate={{ y: isActive ? 0 : 20, opacity: isActive ? 1 : 0 }}
-                      transition={{ duration: 0.8, delay: 0.8, ease: "easeOut" }}
-                      className="flex flex-col sm:flex-row gap-4"
-                    >
-                      {data.buttons.map((btn, i) => {
-                        const isPrimary = i === 0;
-                        return (
-                          <a
-                            key={btn.label}
-                            href={btn.link}
-                            className={
-                              isPrimary
-                                ? "bg-primary hover:bg-opacity-90 text-white px-8 py-4 rounded-full font-semibold text-lg transition duration-300 shadow-lg hover:shadow-primary/50 transform hover:-translate-y-1 inline-block text-center"
-                                : "bg-white/20 hover:bg-white/30 backdrop-blur-md text-white border border-white/50 px-8 py-4 rounded-full font-semibold text-lg transition duration-300 transform hover:-translate-y-1 inline-block text-center"
-                            }
-                          >
-                            {btn.label}
-                          </a>
-                        );
-                      })}
-                    </motion.div>
+      {/* Bottom Search + Join Section */}
+      <div className="relative -mt-20 z-30 max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 overflow-hidden">
+          <div className="grid md:grid-cols-[1.5fr_1fr]">
+            {/* Search Bar */}
+            {data.searchBar.enabled && (
+              <div className="p-6 lg:p-8">
+                <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4">
+                  {lang === "bn" ? data.searchBar.title.bn : data.searchBar.title.en}
+                </h3>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  {/* Search Input */}
+                  <div className="flex-1 relative">
+                    <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                    <input
+                      type="text"
+                      placeholder={
+                        lang === "bn"
+                          ? data.searchBar.searchPlaceholder.bn
+                          : data.searchBar.searchPlaceholder.en
+                      }
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-11 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1E2B7A] transition-all"
+                    />
                   </div>
+
+                  {/* Location Dropdown */}
+                  <div className="relative sm:w-48">
+                    <FiMapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                    <select
+                      value={location}
+                      onChange={(e) => setLocation(e.target.value)}
+                      className="w-full pl-11 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1E2B7A] transition-all appearance-none cursor-pointer"
+                    >
+                      <option value="">
+                        {lang === "bn"
+                          ? data.searchBar.locationPlaceholder.bn
+                          : data.searchBar.locationPlaceholder.en}
+                      </option>
+                      <option value="dhaka">{lang === "bn" ? "ঢাকা" : "Dhaka"}</option>
+                      <option value="chittagong">{lang === "bn" ? "চট্টগ্রাম" : "Chittagong"}</option>
+                      <option value="mirsarai">{lang === "bn" ? "মীরসরাই" : "Mirsarai"}</option>
+                    </select>
+                  </div>
+
+                  {/* Search Button */}
+                  <button className="px-8 py-3 bg-[#1E2B7A] text-white rounded-lg font-semibold hover:bg-[#76BC21] transition-all duration-300 shadow-md whitespace-nowrap">
+                    <FiSearch className="inline mr-2" size={18} />
+                    {lang === "bn" ? "খুঁজুন" : "Search"}
+                  </button>
                 </div>
-              </>
+
+                <Link
+                  href="/doctors"
+                  className="inline-block mt-3 text-xs font-semibold text-gray-400 hover:text-[#1E2B7A] transition-colors uppercase tracking-wide"
+                >
+                  {lang === "bn"
+                    ? data.searchBar.advancedSearchLink.bn
+                    : data.searchBar.advancedSearchLink.en}
+                </Link>
+              </div>
             )}
-          </SwiperSlide>
-        ))}
-      </Swiper>
 
-      {/* Floating Animated Shapes (Overlay for the whole slider) */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none mix-blend-screen">
-        {/* Shape 1 */}
-        <motion.div
-          animate={{
-            y: [0, -30, 0],
-            x: [0, 20, 0],
-            rotate: [0, 5, 0],
-          }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-[20%] left-[10%] w-64 h-64 bg-primary/20 rounded-full blur-[80px]"
-        />
-        {/* Shape 2 */}
-        <motion.div
-          animate={{
-            y: [0, 40, 0],
-            x: [0, -30, 0],
-            rotate: [0, -10, 0],
-          }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute bottom-[10%] right-[10%] w-80 h-80 bg-secondary/20 rounded-full blur-[100px]"
-        />
+            {/* Join Team */}
+            {data.joinTeam.enabled && (
+              <div className="relative bg-gradient-to-br from-[#1E2B7A] to-[#2c3e7a] text-white p-6 lg:p-8 flex items-center gap-4 overflow-hidden">
+                {/* Decorative background shape */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-[#76BC21]/10 rounded-full blur-3xl" />
+                
+                <div className="flex-1 z-10">
+                  <p className="text-sm opacity-90 mb-1">
+                    {lang === "bn" ? data.joinTeam.question.bn : data.joinTeam.question.en}
+                  </p>
+                  <h4 className="text-xl font-bold mb-3">
+                    {lang === "bn" ? data.joinTeam.title.bn : data.joinTeam.title.en}
+                  </h4>
+                  <Link href={data.joinTeam.buttonLink}>
+                    <button className="px-6 py-2.5 bg-[#76BC21] hover:bg-[#67a81d] rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+                      {lang === "bn" ? data.joinTeam.buttonLabel.bn : data.joinTeam.buttonLabel.en}
+                    </button>
+                  </Link>
+                </div>
+
+                <div className="hidden sm:block relative w-32 h-32 rounded-full overflow-hidden border-4 border-white/20 shadow-xl flex-shrink-0 z-10">
+                  <img
+                    src={data.joinTeam.image}
+                    alt="Doctor"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
-
-      <style jsx global>{`
-        .hero-swiper .swiper-pagination-bullet {
-          background-color: white;
-          opacity: 0.5;
-        }
-        .hero-swiper .swiper-pagination-bullet-active {
-          background-color: var(--primary);
-          opacity: 1;
-        }
-        .hero-swiper .swiper-button-next,
-        .hero-swiper .swiper-button-prev {
-          color: white;
-          background: rgba(255, 255, 255, 0.1);
-          width: 50px;
-          height: 50px;
-          border-radius: 50%;
-          backdrop-filter: blur(4px);
-          transition: all 0.3s ease;
-        }
-        .hero-swiper .swiper-button-next:hover,
-        .hero-swiper .swiper-button-prev:hover {
-          background: rgba(255, 255, 255, 0.2);
-          transform: scale(1.1);
-        }
-        .hero-swiper .swiper-button-next:after,
-        .hero-swiper .swiper-button-prev:after {
-          font-size: 20px;
-          font-weight: bold;
-        }
-      `}</style>
-    </section>
+    </>
   );
 };
 
