@@ -57,9 +57,9 @@ export default function DiagnosticServicePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white pt-16 pb-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Header Section */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
@@ -80,7 +80,7 @@ export default function DiagnosticServicePage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           {/* Left Column: Image & Description */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
@@ -88,13 +88,13 @@ export default function DiagnosticServicePage() {
           >
             <div className="relative rounded-[2rem] overflow-hidden shadow-2xl group border border-gray-100">
               <div className="absolute inset-0 bg-primary/5 group-hover:bg-transparent transition duration-500 z-10"></div>
-              <img 
-                src={service.image} 
-                alt={service.title} 
-                className="w-full h-[350px] md:h-[450px] object-cover transform group-hover:scale-105 transition duration-700 ease-out" 
+              <img
+                src={service.image}
+                alt={service.title}
+                className="w-full h-[350px] md:h-[450px] object-cover transform group-hover:scale-105 transition duration-700 ease-out"
               />
             </div>
-            
+
             <div className="bg-white p-8 md:p-10 rounded-[2rem] shadow-sm border border-gray-100/80 hover:shadow-md transition duration-300">
               <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
                 <span className="w-2 h-6 bg-primary rounded-full"></span>
@@ -107,7 +107,7 @@ export default function DiagnosticServicePage() {
           </motion.div>
 
           {/* Right Column: Features & Services Lists */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
@@ -137,8 +137,8 @@ export default function DiagnosticServicePage() {
               </h3>
               <div className="flex flex-wrap gap-3">
                 {service.availableServices.map((item, idx) => (
-                  <span 
-                    key={idx} 
+                  <span
+                    key={idx}
                     className="px-4 py-2.5 bg-gray-50 text-gray-700 rounded-xl text-sm font-semibold border border-gray-100 hover:bg-primary hover:text-white hover:border-primary transition duration-300 shadow-sm cursor-default"
                   >
                     {item}
@@ -146,7 +146,7 @@ export default function DiagnosticServicePage() {
                 ))}
               </div>
             </div>
-            
+
             {/* CTA */}
             <div className="bg-gradient-to-br from-primary to-[#005c99] p-8 md:p-10 rounded-[2rem] shadow-xl text-white text-center relative overflow-hidden group">
               <div className="absolute -top-24 -right-24 w-48 h-48 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition duration-700"></div>

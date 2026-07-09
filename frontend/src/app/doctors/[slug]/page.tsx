@@ -63,15 +63,19 @@ export default function DoctorProfilePage({ params }: { params: Promise<{ slug: 
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white pt-12 pb-24">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#f8fafc] pt-12 pb-24 relative overflow-hidden">
+      {/* Decorative Blobs */}
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px] translate-x-1/3 -translate-y-1/3 pointer-events-none z-0"></div>
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-secondary/10 rounded-full blur-[100px] -translate-x-1/4 translate-y-1/4 pointer-events-none z-0"></div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
         {/* Profile Header Card */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden mb-12"
+          initial={{ opacity: 0, y: 30, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.7, ease: "easeOut", type: "spring", bounce: 0.4 }}
+          className="bg-white/80 backdrop-blur-2xl rounded-[2rem] shadow-[0_8px_40px_rgb(0,0,0,0.06)] border border-white overflow-hidden mb-12 relative"
         >
           <div className="flex flex-col md:flex-row">
             {/* Image */}
@@ -157,13 +161,14 @@ export default function DoctorProfilePage({ params }: { params: Promise<{ slug: 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column */}
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
             className="lg:col-span-2 space-y-8"
           >
             {/* About */}
-            <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
+            <div className="bg-white/70 backdrop-blur-xl p-8 rounded-[2rem] shadow-[0_4px_20px_rgb(0,0,0,0.04)] border border-white">
               <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
                 <span className="w-2 h-6 bg-primary rounded-full"></span>
                 About {doctor.name}
@@ -174,17 +179,24 @@ export default function DoctorProfilePage({ params }: { params: Promise<{ slug: 
             </div>
 
             {/* Services */}
-            <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
+            <div className="bg-white/70 backdrop-blur-xl p-8 rounded-[2rem] shadow-[0_4px_20px_rgb(0,0,0,0.04)] border border-white">
               <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
                 <span className="w-2 h-6 bg-secondary rounded-full"></span>
                 Specialized Services
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {doctor.services.map((service, idx) => (
-                  <div key={idx} className="flex items-start gap-3 p-3 rounded-2xl hover:bg-gray-50 transition duration-200 border border-transparent hover:border-gray-100">
-                    <FaCheckCircle className="text-secondary mt-1 shrink-0" size={18} />
-                    <span className="text-gray-700 font-medium">{service}</span>
-                  </div>
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: 0.2 + idx * 0.1, type: "spring", bounce: 0.5 }}
+                    className="flex items-start gap-3 p-3 rounded-2xl hover:bg-white hover:shadow-md transition-all duration-300 border border-transparent hover:border-gray-100 group"
+                  >
+                    <FaCheckCircle className="text-secondary mt-1 shrink-0 group-hover:scale-110 transition-transform" size={18} />
+                    <span className="text-gray-700 font-medium group-hover:text-primary transition-colors">{service}</span>
+                  </motion.div>
                 ))}
               </div>
             </div>
@@ -192,13 +204,14 @@ export default function DoctorProfilePage({ params }: { params: Promise<{ slug: 
 
           {/* Right Column */}
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
             className="space-y-8"
           >
             {/* Schedule & Contact */}
-            <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
+            <div className="bg-white/70 backdrop-blur-xl p-8 rounded-[2rem] shadow-[0_4px_20px_rgb(0,0,0,0.04)] border border-white">
               <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
                 <span className="w-2 h-6 bg-primary rounded-full"></span>
                 Chamber & Contact

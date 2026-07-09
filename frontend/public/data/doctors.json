@@ -8,11 +8,11 @@
         "experience": "12+ Years",
         "department": "Medicine",
         "designation": "Consultant Physician",
-        "image": "/images/doctors/doctor-1.jpg",
+        "image": "https://i.ibb.co.com/5hGmmcHY/young-doctor-is-using-stethoscope-listen-heartbeat-patient-shot-female-doctor-giving-male-patient-ch.jpg",
         "phone": "+8801712345678",
         "email": "abdullah@example.com",
         "chamberTime": "Saturday - Thursday | 5:00 PM - 9:00 PM",
-        "consultationFee": 700,
+        "consultationFee": 800,
         "languages": [
             "Bangla",
             "English"

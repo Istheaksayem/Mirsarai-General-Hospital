@@ -55,8 +55,12 @@ export default function DoctorDirectoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white pt-16 pb-24">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#f8fafc] relative overflow-hidden pt-16 pb-24">
+      {/* Decorative Blobs */}
+      <div className="absolute top-0 left-0 w-96 h-96 bg-primary/15 rounded-full blur-[100px] -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-secondary/10 rounded-full blur-[120px] translate-x-1/3 translate-y-1/3 pointer-events-none"></div>
+
+      <div className="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header Section */}
         <motion.div 
@@ -83,10 +87,11 @@ export default function DoctorDirectoryPage() {
           {doctors.map((doctor, index) => (
             <motion.div
               key={doctor.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 group flex flex-col"
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.6, delay: index * 0.1, ease: "easeOut" }}
+              className="bg-white/70 backdrop-blur-xl rounded-3xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.1)] transition-all duration-500 border border-white group flex flex-col hover:-translate-y-2"
             >
               {/* Image Section */}
               <div className="relative h-64 overflow-hidden bg-gray-100">
@@ -96,10 +101,6 @@ export default function DoctorDirectoryPage() {
                   src={doctor.image} 
                   alt={doctor.name} 
                   className="w-full h-full object-cover object-top transform group-hover:scale-105 transition duration-700 ease-out" 
-                  onError={(e) => {
-                    // Fallback to placeholder if image fails to load
-                    (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(doctor.name)}&background=0D8ABC&color=fff&size=512`;
-                  }}
                 />
                 {doctor.available && (
                   <div className="absolute top-4 right-4 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full z-20 shadow-sm flex items-center gap-1">
@@ -130,10 +131,10 @@ export default function DoctorDirectoryPage() {
                   </div>
                 </div>
 
-                <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
+                <div className="mt-auto pt-5 flex items-center justify-between">
                   <Link 
                     href={`/doctors/${doctor.slug}`}
-                    className="flex-1 text-center bg-primary/10 text-primary hover:bg-primary hover:text-white font-semibold py-2.5 px-4 rounded-xl transition duration-300"
+                    className="flex-1 text-center bg-white border border-primary/20 text-primary hover:bg-primary hover:text-white font-bold py-3 px-4 rounded-xl transition duration-300 shadow-sm hover:shadow-md"
                   >
                     View Profile
                   </Link>
