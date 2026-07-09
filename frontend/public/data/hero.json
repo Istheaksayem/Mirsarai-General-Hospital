@@ -1,170 +1,117 @@
 {
-    "component": "Hospital Hero Section",
-    "framework": "Next.js",
-    "styling": "Tailwind CSS",
-    "animation": {
-        "library": "GSAP",
-        "timeline": true,
-        "effects": [
-            {
-                "element": "Background",
-                "animation": "Zoom Out + Brightness Fade",
-                "from": {
-                    "scale": 1.15,
-                    "brightness": 0.5
-                },
-                "to": {
-                    "scale": 1,
-                    "brightness": 1
-                },
-                "duration": 2.5,
-                "ease": "power2.out"
-            },
-            {
-                "element": "Hospital Logo",
-                "animation": "Drop In",
-                "from": {
-                    "y": -60,
-                    "opacity": 0,
-                    "rotate": -15
-                },
-                "to": {
-                    "y": 0,
-                    "opacity": 1,
-                    "rotate": 0
-                },
-                "duration": 1,
-                "ease": "back.out(1.5)"
-            },
-            {
-                "element": "Heading",
-                "animation": "Fade Up + Scale",
-                "from": {
-                    "y": 50,
-                    "opacity": 0,
-                    "scale": 0.9
-                },
-                "to": {
-                    "y": 0,
-                    "opacity": 1,
-                    "scale": 1
-                },
-                "duration": 1.2,
-                "ease": "power3.out"
-            },
-            {
-                "element": "Description",
-                "animation": "Fade Up",
-                "from": {
-                    "y": 30,
-                    "opacity": 0
-                },
-                "to": {
-                    "y": 0,
-                    "opacity": 1
-                },
-                "duration": 1
-            },
-            {
-                "element": "Buttons",
-                "animation": "Stagger Fade Up",
-                "from": {
-                    "y": 30,
-                    "opacity": 0
-                },
-                "to": {
-                    "y": 0,
-                    "opacity": 1
-                },
-                "stagger": 0.2,
-                "duration": 0.8
-            }
-        ]
+  "slides": [
+    {
+      "id": 1,
+      "slideNumber": "01.",
+      "heading": {
+        "en": "Emergency? Find Nearest Medical Facility",
+        "bn": "জরুরি? নিকটতম চিকিৎসা সুবিধা খুঁজুন"
+      },
+      "description": {
+        "en": "Get immediate access to hospitals, clinics, and doctors near you.",
+        "bn": "আপনার কাছাকাছি হাসপাতাল, ক্লিনিক এবং ডাক্তারদের তাৎক্ষণিক অ্যাক্সেস পান।"
+      },
+      "image": "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1920&h=1080&fit=crop",
+      "buttons": [
+        { "label": { "en": "View Hospitals", "bn": "হাসপাতাল দেখুন" }, "link": "/departments", "variant": "primary" },
+        { "label": { "en": "View Doctors", "bn": "ডাক্তার দেখুন" }, "link": "/doctors", "variant": "outline" }
+      ]
     },
-    "layout": {
-        "height": "90vh",
-        "alignment": "center",
-        "contentWidth": "max-w-5xl",
-        "textAlign": "center",
-        "responsive": true
+    {
+      "id": 2,
+      "slideNumber": "02.",
+      "heading": {
+        "en": "Expert Doctors, Advanced Care",
+        "bn": "বিশেষজ্ঞ ডাক্তার, উন্নত সেবা"
+      },
+      "description": {
+        "en": "Access to highly qualified medical professionals with modern facilities.",
+        "bn": "আধুনিক সুবিধা সহ উচ্চ যোগ্যতাসম্পন্ন চিকিৎসা পেশাদারদের অ্যাক্সেস।"
+      },
+      "image": "https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=1920&h=1080&fit=crop",
+      "buttons": [
+        { "label": { "en": "Book Appointment", "bn": "অ্যাপয়েন্টমেন্ট বুক করুন" }, "link": "/appointment", "variant": "primary" },
+        { "label": { "en": "Our Services", "bn": "আমাদের সেবা" }, "link": "/services/diagnostic", "variant": "outline" }
+      ]
     },
-    "background": {
-        "type": "image",
-        "image": "/hospital-banner.jpg",
-        "overlay": {
-            "color": "#000000",
-            "opacity": 0.5
-        }
+    {
+      "id": 3,
+      "slideNumber": "03.",
+      "heading": {
+        "en": "24/7 Emergency Services Available",
+        "bn": "২৪/৭ জরুরি সেবা উপলব্ধ"
+      },
+      "description": {
+        "en": "Round-the-clock medical assistance whenever you need it most.",
+        "bn": "যখনই আপনার প্রয়োজন, ঘড়ির কাঁটায় চিকিৎসা সহায়তা।"
+      },
+      "image": "https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=1920&h=1080&fit=crop",
+      "buttons": [
+        { "label": { "en": "Emergency Contact", "bn": "জরুরি যোগাযোগ" }, "link": "/contact", "variant": "primary" },
+        { "label": { "en": "Learn More", "bn": "আরও জানুন" }, "link": "/about", "variant": "outline" }
+      ]
     },
-    "logo": {
-        "image": "/genaral_Hospital_logo.jpeg",
-        "shape": "circle",
-        "size": "80px",
-        "background": "glassmorphism",
-        "blur": true
-    },
-    "heading": {
-        "text": "Mirsarai General Hospital",
-        "fontSize": {
-            "mobile": "text-4xl",
-            "desktop": "text-6xl"
-        },
-        "fontWeight": "bold",
-        "color": "#ffffff",
-        "tracking": "tight"
-    },
-    "description": {
-        "text": "Compassionate Care, Advanced Medicine.",
-        "fontSize": {
-            "mobile": "text-xl",
-            "desktop": "text-2xl"
-        },
-        "color": "#e5e7eb",
-        "fontWeight": "light"
-    },
-    "buttons": [
-        {
-            "label": "Book Appointment",
-            "link": "/appointment",
-            "style": {
-                "background": "primary",
-                "text": "white",
-                "borderRadius": "9999px",
-                "padding": "px-8 py-4",
-                "hover": {
-                    "translateY": "-4px",
-                    "shadow": true
-                }
-            }
-        },
-        {
-            "label": "Contact Us",
-            "link": "/contact",
-            "style": {
-                "background": "rgba(255,255,255,0.2)",
-                "backdropBlur": true,
-                "border": "1px solid rgba(255,255,255,0.5)",
-                "text": "white",
-                "borderRadius": "9999px",
-                "padding": "px-8 py-4",
-                "hover": {
-                    "background": "rgba(255,255,255,0.3)",
-                    "translateY": "-4px"
-                }
-            }
-        }
-    ],
-    "theme": {
-        "primaryColor": "#0EA5E9",
-        "secondaryColor": "#ffffff",
-        "accentColor": "#14B8A6",
-        "font": "Inter",
-        "style": "Modern Healthcare",
-        "mood": "Professional, Clean, Trustworthy"
-    },
-    "accessibility": {
-        "altText": true,
-        "keyboardNavigation": true,
-        "highContrast": true
+    {
+      "id": 4,
+      "slideNumber": "04.",
+      "heading": {
+        "en": "State-of-the-Art Diagnostic Facilities",
+        "bn": "অত্যাধুনিক ডায়াগনস্টিক সুবিধা"
+      },
+      "description": {
+        "en": "Advanced technology for accurate diagnosis and better treatment.",
+        "bn": "সঠিক রোগ নির্ণয় এবং উন্নত চিকিৎসার জন্য উন্নত প্রযুক্তি।"
+      },
+      "image": "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=1920&h=1080&fit=crop",
+      "buttons": [
+        { "label": { "en": "View Services", "bn": "সেবা দেখুন" }, "link": "/services/diagnostic", "variant": "primary" },
+        { "label": { "en": "Contact Us", "bn": "যোগাযোগ করুন" }, "link": "/contact", "variant": "outline" }
+      ]
     }
+  ],
+  "searchBar": {
+    "enabled": true,
+    "title": {
+      "en": "Start Your Search",
+      "bn": "আপনার অনুসন্ধান শুরু করুন"
+    },
+    "searchPlaceholder": {
+      "en": "Search doctors, clinics, hospitals, etc.",
+      "bn": "ডাক্তার, ক্লিনিক, হাসপাতাল ইত্যাদি অনুসন্ধান করুন"
+    },
+    "locationPlaceholder": {
+      "en": "Select a location",
+      "bn": "একটি অবস্থান নির্বাচন করুন"
+    },
+    "advancedSearchLink": {
+      "en": "ADVANCED SEARCH",
+      "bn": "উন্নত অনুসন্ধান"
+    }
+  },
+  "joinTeam": {
+    "enabled": true,
+    "question": {
+      "en": "Are You A Doctor?",
+      "bn": "আপনি কি ডাক্তার?"
+    },
+    "title": {
+      "en": "Join Our Team",
+      "bn": "আমাদের দলে যোগ দিন"
+    },
+    "buttonLabel": {
+      "en": "Join As Doctors",
+      "bn": "ডাক্তার হিসাবে যোগ দিন"
+    },
+    "buttonLink": "/register",
+    "image": "/genaral_Hospital_logo.jpeg"
+  },
+  "decorativeShapes": {
+    "enabled": true,
+    "shapes": [
+      { "color": "#3b82f6", "size": 300, "position": { "top": "15%", "left": "8%" }, "opacity": 0.15 },
+      { "color": "#f59e0b", "size": 200, "position": { "top": "25%", "left": "10%" }, "opacity": 0.2 },
+      { "color": "#ef4444", "size": 150, "position": { "bottom": "20%", "left": "5%" }, "opacity": 0.15 },
+      { "color": "#ec4899", "size": 180, "position": { "top": "40%", "left": "12%" }, "opacity": 0.12 }
+    ]
+  }
 }

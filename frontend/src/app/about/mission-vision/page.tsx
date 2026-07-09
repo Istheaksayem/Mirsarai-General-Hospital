@@ -8,6 +8,7 @@ import {
   FaLightbulb,
   FaUserCheck,
 } from "react-icons/fa";
+import { motion } from "framer-motion";
 
 const valueIcons: Record<string, React.ElementType> = {
   Compassion: FaHeartbeat,
@@ -72,7 +73,13 @@ const MissionVisionPage = () => {
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Mission */}
-          <div className="relative group rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-500">
+          <motion.div 
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="relative group rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-500"
+          >
             <div className="absolute inset-0 bg-gradient-to-br from-primary to-[#162060]" />
             {/* decorative ring */}
             <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/5" />
@@ -90,10 +97,16 @@ const MissionVisionPage = () => {
               {/* bottom accent line */}
               <div className="mt-8 h-1 w-16 rounded-full bg-secondary group-hover:w-32 transition-all duration-500" />
             </div>
-          </div>
+          </motion.div>
 
           {/* Vision */}
-          <div className="relative group rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-500">
+          <motion.div 
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+            className="relative group rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-500"
+          >
             <div className="absolute inset-0 bg-gradient-to-br from-tertiary/90 to-[#008fa3]" />
             <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/5" />
             <div className="absolute -bottom-10 -left-10 w-48 h-48 rounded-full bg-white/10" />
@@ -109,7 +122,7 @@ const MissionVisionPage = () => {
               </p>
               <div className="mt-8 h-1 w-16 rounded-full bg-white/50 group-hover:w-32 transition-all duration-500" />
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -133,8 +146,12 @@ const MissionVisionPage = () => {
               const Icon = valueIcons[val.title] || FaStar;
               const color = valueColors[i % valueColors.length];
               return (
-                <div
+                <motion.div
                   key={val.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 0.5, delay: i * 0.1, ease: "easeOut" }}
                   className={`${color.bg} border ${color.border} rounded-2xl p-7 hover:shadow-lg transition duration-300 hover:-translate-y-1 group`}
                 >
                   <div className="flex items-center gap-4 mb-4">
@@ -144,7 +161,7 @@ const MissionVisionPage = () => {
                     <h3 className="text-lg font-bold text-gray-800">{val.title}</h3>
                   </div>
                   <p className="text-gray-600 text-sm leading-relaxed">{val.description}</p>
-                </div>
+                </motion.div>
               );
             })}
           </div>
@@ -167,7 +184,13 @@ const MissionVisionPage = () => {
 
       {/* ── CTA ── */}
       <section className="py-20 px-4 text-center bg-white">
-        <div className="max-w-xl mx-auto">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="max-w-xl mx-auto"
+        >
           <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
             Experience Our Care
           </h2>
@@ -188,7 +211,7 @@ const MissionVisionPage = () => {
               ← Back to About Us
             </a>
           </div>
-        </div>
+        </motion.div>
       </section>
     </main>
   );

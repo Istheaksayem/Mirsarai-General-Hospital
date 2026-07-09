@@ -1,56 +1,86 @@
 [
-    {
-        "id": 1,
-        "title": "Diagnostic Services",
-        "slug": "diagnostic-services",
-        "shortDescription": "Advanced diagnostic facilities for accurate and timely medical reports.",
-        "description": "Our Diagnostic Services provide reliable and accurate medical testing using modern equipment and experienced laboratory professionals. We ensure fast report delivery and maintain the highest standards of quality to support accurate diagnosis and effective treatment.",
-        "image": "https://images.unsplash.com/photo-1579154204601-01588f351e67?w=1200",
-        "icon": "FaMicroscope",
-        "features": [
-            "Modern Laboratory Equipment",
-            "Fast & Accurate Test Reports",
-            "Experienced Lab Technicians",
-            "Affordable Diagnostic Packages",
-            "Digital Report Collection",
-            "Quality Assurance"
-        ],
-        "availableServices": [
-            "Complete Blood Count (CBC)",
-            "Blood Sugar Test",
-            "Urine Analysis",
-            "Liver Function Test (LFT)",
-            "Kidney Function Test (KFT)",
-            "ECG",
-            "Digital X-Ray",
-            "Ultrasonography (USG)"
-        ]
+  {
+    "id": 1,
+    "title": {
+      "en": "Emergency Care",
+      "bn": "জরুরি সেবা"
     },
-    {
-        "id": 2,
-        "title": "NICU & Baby Care",
-        "slug": "nicu-baby-care",
-        "shortDescription": "Specialized intensive care and healthcare services for newborn babies.",
-        "description": "Our NICU & Baby Care Unit is dedicated to providing specialized medical care for premature, low birth weight, and critically ill newborns. Equipped with advanced neonatal technology and experienced pediatric specialists, we ensure the highest level of care for every baby.",
-        "image": "https://images.unsplash.com/photo-1584515933487-779824d29309?w=1200",
-        "icon": "FaBaby",
-        "features": [
-            "24/7 Neonatal Intensive Care",
-            "Experienced Pediatric Specialists",
-            "Advanced Incubators",
-            "Ventilator Support",
-            "Continuous Monitoring",
-            "Parental Guidance & Counseling"
-        ],
-        "availableServices": [
-            "Neonatal Intensive Care (NICU)",
-            "Premature Baby Care",
-            "Newborn Emergency Care",
-            "Incubator Facility",
-            "Phototherapy for Jaundice",
-            "Vaccination Support",
-            "Growth & Development Monitoring",
-            "Pediatric Consultation"
-        ]
-    }
+    "description": {
+      "en": "24/7 rapid response and comprehensive emergency medical services.",
+      "bn": "২৪/৭ দ্রুত সাড়া এবং সার্বিক জরুরি চিকিৎসা সেবা।"
+    },
+    "icon": "FaAmbulance",
+    "color": "#ef4444",
+    "link": "/services/emergency"
+  },
+  {
+    "id": 2,
+    "title": {
+      "en": "General Medicine",
+      "bn": "সাধারণ চিকিৎসা"
+    },
+    "description": {
+      "en": "Expert diagnosis, treatment, and management of adult health conditions.",
+      "bn": "প্রাপ্তবয়স্কদের স্বাস্থ্য সমস্যার বিশেষজ্ঞ নির্ণয়, চিকিৎসা এবং ব্যবস্থাপনা।"
+    },
+    "icon": "FaStethoscope",
+    "color": "#1E2B7A",
+    "link": "/departments"
+  },
+  {
+    "id": 3,
+    "title": {
+      "en": "Cardiology",
+      "bn": "হৃদরোগ বিশেষজ্ঞ"
+    },
+    "description": {
+      "en": "Advanced cardiac care, diagnostics, and heart disease management.",
+      "bn": "উন্নত হৃদরোগ সেবা, রোগ নির্ণয় এবং হৃদরোগ ব্যবস্থাপনা।"
+    },
+    "icon": "FaHeartbeat",
+    "color": "#f59e0b",
+    "link": "/departments"
+  },
+  {
+    "id": 4,
+    "title": {
+      "en": "Orthopedics",
+      "bn": "অর্থোপেডিক্স"
+    },
+    "description": {
+      "en": "Specialized care for bones, joints, ligaments, tendons, and muscles.",
+      "bn": "হাড়, জয়েন্ট, লিগামেন্ট, টেন্ডন এবং পেশীর বিশেষ সেবা।"
+    },
+    "icon": "FaBone",
+    "color": "#76BC21",
+    "link": "/departments"
+  },
+  {
+    "id": 5,
+    "title": {
+      "en": "Pediatrics",
+      "bn": "শিশু বিশেষজ্ঞ"
+    },
+    "description": {
+      "en": "Compassionate and expert medical care for infants, children, and adolescents.",
+      "bn": "শিশু, বাচ্চা এবং কিশোরদের জন্য যত্নশীল এবং বিশেষজ্ঞ চিকিৎসা সেবা।"
+    },
+    "icon": "FaBaby",
+    "color": "#ec4899",
+    "link": "/services/nicu"
+  },
+  {
+    "id": 6,
+    "title": {
+      "en": "Laboratory Services",
+      "bn": "পরীক্ষাগার সেবা"
+    },
+    "description": {
+      "en": "State-of-the-art diagnostic testing with accurate and fast results.",
+      "bn": "অত্যাধুনিক ডায়াগনস্টিক পরীক্ষা এবং দ্রুত ও নির্ভুল ফলাফল।"
+    },
+    "icon": "FaMicroscope",
+    "color": "#8b5cf6",
+    "link": "/services/diagnostic"
+  }
 ]
