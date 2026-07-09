@@ -1,109 +1,241 @@
 [
     {
         "id": 1,
-        "name": "Dr. Md. Abdullah Al Mamun",
+        "name": {
+            "en": "Dr. Md. Abdullah Al Mamun",
+            "bn": "ডা. মোঃ আব্দুল্লাহ আল মামুন"
+        },
         "slug": "dr-md-abdullah-al-mamun",
-        "specialization": "Medicine Specialist",
+        "specialization": {
+            "en": "Medicine Specialist",
+            "bn": "মেডিসিন বিশেষজ্ঞ"
+        },
         "qualification": "MBBS, FCPS (Medicine)",
-        "experience": "12+ Years",
-        "department": "Medicine",
-        "designation": "Consultant Physician",
-        "image": "https://i.ibb.co.com/5hGmmcHY/young-doctor-is-using-stethoscope-listen-heartbeat-patient-shot-female-doctor-giving-male-patient-ch.jpg",
+        "experience": {
+            "en": "12+ Years",
+            "bn": "১২+ বছর"
+        },
+        "department": {
+            "en": "Medicine",
+            "bn": "মেডিসিন"
+        },
+        "designation": {
+            "en": "Consultant Physician",
+            "bn": "পরামর্শক চিকিৎসক"
+        },
+        "image": "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=800&h=1000&fit=crop",
         "phone": "+8801712345678",
-        "email": "abdullah@example.com",
-        "chamberTime": "Saturday - Thursday | 5:00 PM - 9:00 PM",
+        "email": "abdullah@mirsaraihospital.com",
+        "chamberTime": {
+            "en": "Saturday - Thursday | 5:00 PM - 9:00 PM",
+            "bn": "শনিবার - বৃহস্পতিবার | বিকাল ৫:০০ - রাত ৯:০০"
+        },
         "consultationFee": 800,
         "languages": [
             "Bangla",
             "English"
         ],
-        "about": "Experienced medicine specialist dedicated to providing comprehensive healthcare and personalized treatment for patients.",
+        "about": {
+            "en": "Experienced medicine specialist dedicated to providing comprehensive healthcare and personalized treatment for patients with over 12 years of clinical experience.",
+            "bn": "অভিজ্ঞ মেডিসিন বিশেষজ্ঞ যিনি ১২ বছরের বেশি ক্লিনিক্যাল অভিজ্ঞতা সহ রোগীদের জন্য ব্যাপক স্বাস্থ্যসেবা এবং ব্যক্তিগতকৃত চিকিৎসা প্রদানে নিবেদিত।"
+        },
         "services": [
-            "General Medicine",
-            "Diabetes Management",
-            "Hypertension Treatment",
-            "Health Checkup"
+            {
+                "en": "General Medicine",
+                "bn": "সাধারণ চিকিৎসা"
+            },
+            {
+                "en": "Diabetes Management",
+                "bn": "ডায়াবেটিস ব্যবস্থাপনা"
+            },
+            {
+                "en": "Hypertension Treatment",
+                "bn": "উচ্চরক্তচাপ চিকিৎসা"
+            },
+            {
+                "en": "Health Checkup",
+                "bn": "স্বাস্থ্য পরীক্ষা"
+            }
         ],
         "available": true
     },
     {
         "id": 2,
-        "name": "Dr. Farhana Rahman",
+        "name": {
+            "en": "Dr. Farhana Rahman",
+            "bn": "ডা. ফারহানা রহমান"
+        },
         "slug": "dr-farhana-rahman",
-        "specialization": "Gynecology & Obstetrics",
+        "specialization": {
+            "en": "Gynecology & Obstetrics",
+            "bn": "স্ত্রীরোগ ও প্রসূতি"
+        },
         "qualification": "MBBS, FCPS (Gynecology)",
-        "experience": "10+ Years",
-        "department": "Gynecology",
-        "designation": "Consultant",
-        "image": "/images/doctors/doctor-2.jpg",
+        "experience": {
+            "en": "10+ Years",
+            "bn": "১০+ বছর"
+        },
+        "department": {
+            "en": "Gynecology",
+            "bn": "স্ত্রীরোগ"
+        },
+        "designation": {
+            "en": "Consultant Gynecologist",
+            "bn": "পরামর্শক স্ত্রীরোগ বিশেষজ্ঞ"
+        },
+        "image": "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=800&h=1000&fit=crop",
         "phone": "+8801812345678",
-        "email": "farhana@example.com",
-        "chamberTime": "Sunday - Thursday | 4:00 PM - 8:00 PM",
+        "email": "farhana@mirsaraihospital.com",
+        "chamberTime": {
+            "en": "Sunday - Thursday | 4:00 PM - 8:00 PM",
+            "bn": "রবিবার - বৃহস্পতিবার | বিকাল ৪:০০ - রাত ৮:০০"
+        },
         "consultationFee": 800,
         "languages": [
             "Bangla",
             "English"
         ],
-        "about": "Specialized in women's healthcare, pregnancy care, infertility management, and safe motherhood services.",
+        "about": {
+            "en": "Specialized in women's healthcare, pregnancy care, infertility management, and safe motherhood services with compassionate approach.",
+            "bn": "মহিলাদের স্বাস্থ্যসেবা, গর্ভাবস্থার যত্ন, বন্ধ্যাত্ব ব্যবস্থাপনা এবং নিরাপদ মাতৃত্ব সেবায় বিশেষজ্ঞ।"
+        },
         "services": [
-            "Pregnancy Care",
-            "Normal Delivery",
-            "C-Section Consultation",
-            "Women's Health"
+            {
+                "en": "Pregnancy Care",
+                "bn": "গর্ভাবস্থার যত্ন"
+            },
+            {
+                "en": "Normal Delivery",
+                "bn": "স্বাভাবিক প্রসব"
+            },
+            {
+                "en": "C-Section Consultation",
+                "bn": "সিজারিয়ান পরামর্শ"
+            },
+            {
+                "en": "Women's Health",
+                "bn": "মহিলা স্বাস্থ্য"
+            }
         ],
         "available": true
     },
     {
         "id": 3,
-        "name": "Dr. Mahmudul Hasan",
+        "name": {
+            "en": "Dr. Mahmudul Hasan",
+            "bn": "ডা. মাহমুদুল হাসান"
+        },
         "slug": "dr-mahmudul-hasan",
-        "specialization": "Pediatrics & Neonatology",
+        "specialization": {
+            "en": "Pediatrics & Neonatology",
+            "bn": "শিশুরোগ ও নবজাতক"
+        },
         "qualification": "MBBS, MD (Pediatrics)",
-        "experience": "9+ Years",
-        "department": "Pediatrics",
-        "designation": "Child Specialist",
-        "image": "/images/doctors/doctor-3.jpg",
+        "experience": {
+            "en": "9+ Years",
+            "bn": "৯+ বছর"
+        },
+        "department": {
+            "en": "Pediatrics",
+            "bn": "শিশুরোগ"
+        },
+        "designation": {
+            "en": "Child Specialist",
+            "bn": "শিশু বিশেষজ্ঞ"
+        },
+        "image": "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=800&h=1000&fit=crop",
         "phone": "+8801912345678",
-        "email": "mahmud@example.com",
-        "chamberTime": "Saturday - Wednesday | 3:00 PM - 7:00 PM",
+        "email": "mahmud@mirsaraihospital.com",
+        "chamberTime": {
+            "en": "Saturday - Wednesday | 3:00 PM - 7:00 PM",
+            "bn": "শনিবার - বুধবার | বিকাল ৩:০০ - সন্ধ্যা ৭:০০"
+        },
         "consultationFee": 600,
         "languages": [
             "Bangla",
             "English"
         ],
-        "about": "Dedicated pediatrician providing specialized healthcare for newborns, infants, and children.",
+        "about": {
+            "en": "Dedicated pediatrician providing specialized healthcare for newborns, infants, and children with expertise in child development.",
+            "bn": "শিশু বিকাশে দক্ষতা সহ নবজাতক, শিশু এবং বাচ্চাদের জন্য বিশেষায়িত স্বাস্থ্যসেবা প্রদানকারী নিবেদিত শিশুরোগ বিশেষজ্ঞ।"
+        },
         "services": [
-            "Child Health Checkup",
-            "Vaccination",
-            "Newborn Care",
-            "NICU Consultation"
+            {
+                "en": "Child Health Checkup",
+                "bn": "শিশু স্বাস্থ্য পরীক্ষা"
+            },
+            {
+                "en": "Vaccination",
+                "bn": "টিকাদান"
+            },
+            {
+                "en": "Newborn Care",
+                "bn": "নবজাতকের যত্ন"
+            },
+            {
+                "en": "NICU Consultation",
+                "bn": "এনআইসিইউ পরামর্শ"
+            }
         ],
         "available": true
     },
     {
         "id": 4,
-        "name": "Dr. Nusrat Jahan",
+        "name": {
+            "en": "Dr. Nusrat Jahan",
+            "bn": "ডা. নুসরাত জাহান"
+        },
         "slug": "dr-nusrat-jahan",
-        "specialization": "Radiology & Imaging",
+        "specialization": {
+            "en": "Radiology & Imaging",
+            "bn": "রেডিওলজি ও ইমেজিং"
+        },
         "qualification": "MBBS, MD (Radiology)",
-        "experience": "8+ Years",
-        "department": "Radiology",
-        "designation": "Consultant Radiologist",
-        "image": "/images/doctors/doctor-4.jpg",
+        "experience": {
+            "en": "8+ Years",
+            "bn": "৮+ বছর"
+        },
+        "department": {
+            "en": "Radiology",
+            "bn": "রেডিওলজি"
+        },
+        "designation": {
+            "en": "Consultant Radiologist",
+            "bn": "পরামর্শক রেডিওলজিস্ট"
+        },
+        "image": "https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=800&h=1000&fit=crop",
         "phone": "+8801612345678",
-        "email": "nusrat@example.com",
-        "chamberTime": "Saturday - Thursday | 10:00 AM - 4:00 PM",
+        "email": "nusrat@mirsaraihospital.com",
+        "chamberTime": {
+            "en": "Saturday - Thursday | 10:00 AM - 4:00 PM",
+            "bn": "শনিবার - বৃহস্পতিবার | সকাল ১০:০০ - বিকাল ৪:০০"
+        },
         "consultationFee": 500,
         "languages": [
             "Bangla",
             "English"
         ],
-        "about": "Expert in diagnostic imaging, ultrasound, digital X-ray, and radiological reporting.",
+        "about": {
+            "en": "Expert in diagnostic imaging, ultrasound, digital X-ray, and radiological reporting with precision and accuracy.",
+            "bn": "নির্ভুলতা এবং নির্ভুলতার সাথে ডায়াগনস্টিক ইমেজিং, আল্ট্রাসাউন্ড, ডিজিটাল এক্স-রে এবং রেডিওলজিক্যাল রিপোর্টিংয়ে বিশেষজ্ঞ।"
+        },
         "services": [
-            "Ultrasound",
-            "Digital X-Ray",
-            "Imaging Consultation",
-            "Diagnostic Reporting"
+            {
+                "en": "Ultrasound",
+                "bn": "আল্ট্রাসাউন্ড"
+            },
+            {
+                "en": "Digital X-Ray",
+                "bn": "ডিজিটাল এক্স-রে"
+            },
+            {
+                "en": "Imaging Consultation",
+                "bn": "ইমেজিং পরামর্শ"
+            },
+            {
+                "en": "Diagnostic Reporting",
+                "bn": "ডায়াগনস্টিক রিপোর্টিং"
+            }
         ],
         "available": true
     }
