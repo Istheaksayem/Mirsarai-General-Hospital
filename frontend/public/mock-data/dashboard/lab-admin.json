@@ -1,0 +1,24 @@
+{
+  "statistics": {
+    "testsCompletedToday": 32,
+    "testsCompletedTodayTrend": 14.2,
+    "pendingReports": 18,
+    "pendingReportsTrend": -10.0,
+    "totalLabTemplates": 45,
+    "totalLabTemplatesTrend": 0.0,
+    "averageTurnaroundTime": "2.4 hours",
+    "averageTurnaroundTimeTrend": -5.2
+  },
+  "diagnosticRecords": [
+    { "id": "lab-501", "patientName": "Faruk Ahmed", "testType": "Complete Blood Count (CBC)", "priority": "urgent", "requestDate": "2026-07-08T09:30:00Z", "status": "in-progress" },
+    { "id": "lab-502", "patientName": "Fatema Begum", "testType": "Lipid Profile & Glucose", "priority": "normal", "requestDate": "2026-07-08T09:45:00Z", "status": "pending" },
+    { "id": "lab-503", "patientName": "Abdul Wahab", "testType": "Electrocardiogram (ECG)", "priority": "urgent", "requestDate": "2026-07-08T10:00:00Z", "status": "pending" },
+    { "id": "lab-504", "patientName": "Shirina Akhter", "testType": "Chest X-Ray", "priority": "normal", "requestDate": "2026-07-08T10:15:00Z", "status": "completed" },
+    { "id": "lab-505", "patientName": "Zahir Raihan", "testType": "Ultrasonography (USG)", "priority": "normal", "requestDate": "2026-07-08T10:30:00Z", "status": "completed" }
+  ],
+  "recentReports": [
+    { "id": "rep-701", "patientName": "Shirina Akhter", "testType": "Chest X-Ray", "doctorName": "Dr. Rafiqul Islam", "dateUploaded": "2026-07-08T10:50:00Z", "fileSize": "1.2 MB" },
+    { "id": "rep-702", "patientName": "Zahir Raihan", "testType": "Ultrasonography (USG)", "doctorName": "Dr. Nusrat Jahan", "dateUploaded": "2026-07-08T10:45:00Z", "fileSize": "2.4 MB" },
+    { "id": "rep-703", "patientName": "Hasanuzzaman", "testType": "Urine Analysis", "doctorName": "Dr. Kamrul Hasan", "dateUploaded": "2026-07-08T09:15:00Z", "fileSize": "480 KB" }
+  ]
+}

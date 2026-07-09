@@ -1,0 +1,46 @@
+{
+  "statistics": {
+    "totalPatients": 12840,
+    "totalPatientsTrend": 12.5,
+    "totalDoctors": 84,
+    "totalDoctorsTrend": 4.2,
+    "activeDepartments": 14,
+    "activeDepartmentsTrend": 0.0,
+    "monthlyAppointments": 3412,
+    "monthlyAppointmentsTrend": 18.1,
+    "totalRevenue": 248900,
+    "totalRevenueTrend": 15.3,
+    "systemUptime": "99.98%"
+  },
+  "departmentPerformance": [
+    { "id": 1, "name": "Cardiology", "doctorsCount": 12, "patientsCount": 1420, "revenue": 45200, "efficiency": 94 },
+    { "id": 2, "name": "Pediatrics", "doctorsCount": 10, "patientsCount": 1850, "revenue": 38100, "efficiency": 91 },
+    { "id": 3, "name": "Orthopedics", "doctorsCount": 8, "patientsCount": 980, "revenue": 31400, "efficiency": 88 },
+    { "id": 4, "name": "Neurology", "doctorsCount": 6, "patientsCount": 640, "revenue": 28900, "efficiency": 85 },
+    { "id": 5, "name": "Emergency", "doctorsCount": 15, "patientsCount": 3120, "revenue": 52300, "efficiency": 96 },
+    { "id": 6, "name": "Gynecology", "doctorsCount": 9, "patientsCount": 1250, "revenue": 29800, "efficiency": 90 }
+  ],
+  "revenueOverview": [
+    { "month": "Jan", "consultations": 18200, "diagnostic": 12500, "pharmacy": 8400, "total": 39100 },
+    { "month": "Feb", "consultations": 19500, "diagnostic": 13400, "pharmacy": 9200, "total": 42100 },
+    { "month": "Mar", "consultations": 22100, "diagnostic": 15100, "pharmacy": 10500, "total": 47700 },
+    { "month": "Apr", "consultations": 21000, "diagnostic": 14800, "pharmacy": 9800, "total": 45600 },
+    { "month": "May", "consultations": 24200, "diagnostic": 16900, "pharmacy": 11200, "total": 52300 },
+    { "month": "Jun", "consultations": 27500, "diagnostic": 19200, "pharmacy": 13100, "total": 59800 }
+  ],
+  "roleDistribution": [
+    { "role": "Super Admin", "count": 3 },
+    { "role": "Doctor", "count": 84 },
+    { "role": "Reception Admin", "count": 12 },
+    { "role": "Lab Admin", "count": 8 },
+    { "role": "Nurse", "count": 65 },
+    { "role": "Patient", "count": 12840 }
+  ],
+  "systemLogs": [
+    { "id": "log-001", "level": "info", "message": "Database backup completed successfully", "timestamp": "2026-07-08T17:15:00Z", "service": "BackupManager" },
+    { "id": "log-002", "level": "warning", "message": "High CPU utilization detected (87%)", "timestamp": "2026-07-08T16:42:00Z", "service": "ServerMonitor" },
+    { "id": "log-003", "level": "info", "message": "SSL certificate renewed for api.mirsaraihospital.com", "timestamp": "2026-07-08T15:10:00Z", "service": "SecurityService" },
+    { "id": "log-004", "level": "error", "message": "Failed login attempt block for IP 192.168.1.144", "timestamp": "2026-07-08T14:55:00Z", "service": "AuthService" },
+    { "id": "log-005", "level": "info", "message": "SMS gateway provider balance checked: OK", "timestamp": "2026-07-08T14:30:00Z", "service": "NotificationService" }
+  ]
+}

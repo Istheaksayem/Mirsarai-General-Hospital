@@ -1,0 +1,10 @@
+{
+  "appointmentsToday": 47,
+  "pendingCheckIns": 12,
+  "checkedIn": 31,
+  "inQueue": 9,
+  "paymentsToday": 42500,
+  "newPatientsToday": 8,
+  "pendingInvoices": 5,
+  "avgWaitTime": 18
+}
