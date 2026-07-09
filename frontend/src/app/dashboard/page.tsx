@@ -220,7 +220,8 @@ export default function DashboardPage() {
                   <div className="h-1 border-t border-gray-100 dark:border-slate-800/50 my-3" />
                 )}
 
-                {/* Sub l                {group.modules.map((mod) => {
+                {/* Sub modules */}
+                {group.modules.map((mod) => {
                   const isActive = activeModule === mod;
                   const itemContent = (
                     <button
@@ -250,7 +251,7 @@ export default function DashboardPage() {
                   ) : (
                     <React.Fragment key={mod}>{itemContent}</React.Fragment>
                   );
-                })}           })}
+                })}
               </div>
             ))}
           </nav>
@@ -322,12 +323,6 @@ export default function DashboardPage() {
                 <span>Search command...</span>
               </div>
               <span className="text-[9px] font-black tracking-wide px-1.5 py-0.5 bg-slate-200/50 dark:bg-slate-800 text-slate-450 rounded">
-                Ctrl K
-              </span>
-            </button>
-              <div className="flex items-center gap-2 text-xs font-semibold">
-                <FiSearch size={14} />
-              <span className="text-[9px] font-black tracking-wide px-1.5 py-0.5 bg-gray-200/50 dark:bg-slate-800 text-gray-400 rounded">
                 Ctrl K
               </span>
             </button>

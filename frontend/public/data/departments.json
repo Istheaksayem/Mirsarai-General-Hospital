@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "name": "Cardiology",
+    "slug": "cardiology",
+    "icon": "FaHeartPulse",
+    "image": "/images/departments/cardiology.jpg",
+    "shortDescription": "Specialized care for heart and cardiovascular diseases.",
+    "description": "Our Cardiology Department provides comprehensive diagnosis, treatment, and preventive care for heart and blood vessel diseases using modern technology and experienced cardiologists.",
+    "services": [
+      "ECG",
+      "Echocardiography",
+      "Heart Disease Treatment",
+      "Hypertension Management",
+      "Cardiac Consultation",
+      "Preventive Cardiology"
+    ],
+    "headDoctor": "Dr. Ahmed Rahman",
+    "availableDoctors": 5,
+    "available": true
+  },
+  {
+    "id": 2,
+    "name": "Neurology",
+    "slug": "neurology",
+    "icon": "FaBrain",
+    "image": "/images/departments/neurology.jpg",
+    "shortDescription": "Expert diagnosis and treatment for brain and nervous system disorders.",
+    "description": "The Neurology Department specializes in diagnosing and treating disorders of the brain, spinal cord, and nervous system with advanced medical care.",
+    "services": [
+      "Stroke Management",
+      "Migraine Treatment",
+      "Epilepsy Care",
+      "Nerve Disorder Treatment",
+      "Neurological Consultation",
+      "Brain Health Assessment"
+    ],
+    "headDoctor": "Dr. Sarah Akter",
+    "availableDoctors": 4,
+    "available": true
+  },
+  {
+    "id": 3,
+    "name": "Pediatrics",
+    "slug": "pediatrics",
+    "icon": "FaBaby",
+    "image": "/images/departments/pediatrics.jpg",
+    "shortDescription": "Complete healthcare services for infants, children, and adolescents.",
+    "description": "Our Pediatrics Department provides compassionate healthcare for newborns, infants, children, and teenagers, ensuring healthy growth and development.",
+    "services": [
+      "Child Consultation",
+      "Vaccination",
+      "Growth Monitoring",
+      "Newborn Care",
+      "Nutrition Counseling",
+      "Pediatric Emergency Care"
+    ],
+    "headDoctor": "Dr. Mahmud Hasan",
+    "availableDoctors": 6,
+    "available": true
+  },
+  {
+    "id": 4,
+    "name": "Orthopedics",
+    "slug": "orthopedics",
+    "icon": "FaBone",
+    "image": "/images/departments/orthopedics.jpg",
+    "shortDescription": "Advanced treatment for bones, joints, muscles, and spine.",
+    "description": "The Orthopedics Department offers diagnosis, treatment, rehabilitation, and surgical care for bone, joint, muscle, and spine conditions.",
+    "services": [
+      "Bone Fracture Treatment",
+      "Joint Replacement Consultation",
+      "Sports Injury Care",
+      "Arthritis Management",
+      "Spine Care",
+      "Orthopedic Surgery Consultation"
+    ],
+    "headDoctor": "Dr. Imran Hossain",
+    "availableDoctors": 3,
+    "available": true
+  }
+]

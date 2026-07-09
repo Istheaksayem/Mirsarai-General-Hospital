@@ -1,0 +1,96 @@
+{
+  "emergency": {
+    "phone": "+880 1234-567890",
+    "badge": {
+      "en": "24/7 Emergency",
+      "bn": "২৪/৭ জরুরি সেবা"
+    },
+    "heading": {
+      "en": "Need Emergency Help?",
+      "bn": "জরুরি সাহায্য দরকার?"
+    },
+    "subheading": {
+      "en": "Call Now",
+      "bn": "এখনই কল করুন"
+    },
+    "description": {
+      "en": "Our emergency response team is available around the clock. Don't hesitate — call us immediately for urgent medical assistance.",
+      "bn": "আমাদের জরুরি প্রতিক্রিয়া দল সর্বক্ষণ উপলব্ধ। দেরি করবেন না — জরুরি চিকিৎসা সহায়তার জন্য আমাদের এখনই কল করুন।"
+    },
+    "quickInfo": [
+      { "en": "Immediate response", "bn": "তাৎক্ষণিক সাড়া" },
+      { "en": "Expert medical team", "bn": "বিশেষজ্ঞ চিকিৎসা দল" },
+      { "en": "Ambulance service", "bn": "অ্যাম্বুলেন্স সেবা" }
+    ]
+  },
+  "appointmentCTA": {
+    "badge": {
+      "en": "Easy Scheduling",
+      "bn": "সহজ সময়সূচী"
+    },
+    "heading": {
+      "en": "Book Your Appointment Today",
+      "bn": "আজই আপনার অ্যাপয়েন্টমেন্ট বুক করুন"
+    },
+    "description": {
+      "en": "Don't wait to prioritize your health. Schedule a consultation with our specialist doctors and take the first step towards a healthier life.",
+      "bn": "আপনার স্বাস্থ্যকে অগ্রাধিকার দিতে দেরি করবেন না। আমাদের বিশেষজ্ঞ ডাক্তারদের সাথে পরামর্শ নির্ধারণ করুন এবং সুস্বাস্থ্যের দিকে প্রথম পদক্ষেপ নিন।"
+    },
+    "primaryBtn": {
+      "en": "Book Appointment",
+      "bn": "অ্যাপয়েন্টমেন্ট বুক করুন",
+      "link": "/appointment"
+    },
+    "secondaryBtn": {
+      "en": "View Doctors",
+      "bn": "ডাক্তার দেখুন",
+      "link": "/doctors"
+    },
+    "features": [
+      { "en": "No waiting in queue", "bn": "লাইনে অপেক্ষা নেই" },
+      { "en": "Confirmed slot in minutes", "bn": "মিনিটে স্লট নিশ্চিত" },
+      { "en": "Reminder notifications", "bn": "রিমাইন্ডার বিজ্ঞপ্তি" },
+      { "en": "Easy rescheduling", "bn": "সহজ পুনর্নির্ধারণ" }
+    ]
+  },
+  "statistics": {
+    "sectionBadge": {
+      "en": "Our Impact",
+      "bn": "আমাদের অবদান"
+    },
+    "heading": {
+      "en": "Trusted by Thousands",
+      "bn": "হাজারো মানুষের বিশ্বাস"
+    },
+    "description": {
+      "en": "For over 18 years, we have been committed to delivering quality healthcare to the people of Mirsarai.",
+      "bn": "১৮ বছরেরও বেশি সময় ধরে, আমরা মীরসরাইয়ের মানুষদের কাছে মানসম্মত স্বাস্থ্যসেবা পৌঁছে দিতে প্রতিশ্রুতিবদ্ধ।"
+    },
+    "stats": [
+      {
+        "number": "25,000+",
+        "label": { "en": "Patients Served", "bn": "রোগী সেবা" },
+        "icon": "FaUsers",
+        "color": "#1E2B7A"
+      },
+      {
+        "number": "50+",
+        "label": { "en": "Specialist Doctors", "bn": "বিশেষজ্ঞ ডাক্তার" },
+        "icon": "FaUserMd",
+        "color": "#76BC21"
+      },
+      {
+        "number": "18+",
+        "label": { "en": "Years of Service", "bn": "বছরের সেবা" },
+        "icon": "FaAward",
+        "color": "#f59e0b"
+      },
+      {
+        "number": "24/7",
+        "label": { "en": "Emergency Support", "bn": "জরুরি সেবা" },
+        "icon": "FaAmbulance",
+        "color": "#ef4444"
+      }
+    ]
+  }
+}
