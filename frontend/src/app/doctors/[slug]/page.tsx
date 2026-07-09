@@ -94,41 +94,35 @@ export default function DoctorProfilePage({ params }: { params: Promise<{ slug: 
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/20 to-green-50/20 dark:from-gray-900 dark:via-gray-850 dark:to-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid lg:grid-cols-[380px_1fr] gap-8">
-          
-          {/* Left Sidebar - Doctor Profile Card */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-            className="space-y-6"
-          >
-            {/* Profile Card */}
-            <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
-              {/* Image */}
-              <div className="relative h-80 bg-gradient-to-b from-[#1E2B7A]/10 to-transparent">
-                <img
-                  src={doctor.image}
-                  alt={lang === "bn" ? doctor.name.bn : doctor.name.en}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                      lang === "bn" ? doctor.name.bn : doctor.name.en
-                    )}&background=1E2B7A&color=fff&size=512`;
-                  }}
-                />
-                {/* Status Badge */}
-                {doctor.available && (
-                  <div className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 bg-[#76BC21] text-white rounded-full text-xs font-bold shadow-lg">
-                    <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                    {lang === "bn" ? "সক্রিয়" : "Active"}
-                  </div>
-                )}
-                {/* Full-time Badge */}
-                <div className="absolute top-4 right-4 px-3 py-1.5 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm text-gray-600 dark:text-gray-300 rounded-full text-xs font-semibold">
-                  {lang === "bn" ? "পূর্ণকালীন" : "Full-time"}
+    <div className="min-h-screen bg-[#f8fafc] pt-12 pb-24 relative overflow-hidden">
+      {/* Decorative Blobs */}
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px] translate-x-1/3 -translate-y-1/3 pointer-events-none z-0"></div>
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-secondary/10 rounded-full blur-[100px] -translate-x-1/4 translate-y-1/4 pointer-events-none z-0"></div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+
+        {/* Profile Header Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 30, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.7, ease: "easeOut", type: "spring", bounce: 0.4 }}
+          className="bg-white/80 backdrop-blur-2xl rounded-[2rem] shadow-[0_8px_40px_rgb(0,0,0,0.06)] border border-white overflow-hidden mb-12 relative"
+        >
+          <div className="flex flex-col md:flex-row">
+            {/* Image */}
+            <div className="w-full md:w-1/3 lg:w-1/4 relative h-80 md:h-auto bg-gray-100">
+              <img
+                src={doctor.image}
+                alt={doctor.name}
+                className="w-full h-full object-cover object-top"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(doctor.name)}&background=0D8ABC&color=fff&size=512`;
+                }}
+              />
+              {doctor.available && (
+                <div className="absolute top-4 left-4 bg-green-500 text-white text-sm font-bold px-4 py-1.5 rounded-full z-20 shadow-md flex items-center gap-2">
+                  <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+                  Available Today
                 </div>
               </div>
 

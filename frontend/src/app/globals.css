@@ -5,49 +5,57 @@
 
 /* Premium Enterprise SaaS Design Tokens */
 :root {
-  --background: #f8fafc; /* Cool slate-50 light background */
-  --foreground: #090d1f; /* Obsidian midnight slate */
-  
-  --primary: #1E2B7A; /* MGH Corporate Navy Blue */
+  --background: #f8fafc;
+  /* Cool slate-50 light background */
+  --foreground: #090d1f;
+  /* Obsidian midnight slate */
+
+  --primary: #1E2B7A;
+  /* MGH Corporate Navy Blue */
   --primary-rgb: 30, 43, 122;
-  --secondary: #76BC21; /* Accent Clinical Lime Green */
+  --secondary: #76BC21;
+  /* Accent Clinical Lime Green */
   --secondary-rgb: 118, 188, 33;
-  --accent: #6366F1; /* SaaS Indigo Accent */
+  --accent: #6366F1;
+  /* SaaS Indigo Accent */
   --accent-rgb: 99, 102, 241;
-  --tertiary: #0ea5e9; /* Sky Blue for interactions */
-  
+  --tertiary: #0ea5e9;
+  /* Sky Blue for interactions */
+
   /* Radii - Consistent Radius System */
   --radius-xs: 4px;
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-xl: 24px;
-  
+
   /* Borders - Hairline borders */
-  --border-light: rgba(15, 23, 42, 0.06); 
-  --border-medium: rgba(15, 23, 42, 0.08); 
-  --border-dark: rgba(15, 23, 42, 0.12); 
-  
+  --border-light: rgba(15, 23, 42, 0.06);
+  --border-medium: rgba(15, 23, 42, 0.08);
+  --border-dark: rgba(15, 23, 42, 0.12);
+
   /* Soft Shadows - Multi-layered Ambient Shadows */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.03), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.04), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
-  
+
   /* Easing curves */
   --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .dark {
-  --background: #060913; /* Rich dark obsidian base */
-  --foreground: #f1f5f9; /* Soft light gray text */
-  
+  --background: #060913;
+  /* Rich dark obsidian base */
+  --foreground: #f1f5f9;
+  /* Soft light gray text */
+
   /* Translucent borders for dark mode grid align */
   --border-light: rgba(255, 255, 255, 0.04);
   --border-medium: rgba(255, 255, 255, 0.06);
   --border-dark: rgba(255, 255, 255, 0.1);
-  
+
   /* Soft Dark Shadows */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
   --shadow-md: 0 4px 20px 0 rgba(0, 0, 0, 0.35), 0 2px 8px 0 rgba(0, 0, 0, 0.2);
@@ -157,6 +165,7 @@ body {
     opacity: 0;
     transform: translateY(8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -168,8 +177,13 @@ body {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .animate-fadeIn {

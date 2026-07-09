@@ -69,14 +69,15 @@ export default function DoctorDirectoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-850 dark:to-gray-900 relative overflow-hidden pt-16 pb-24">
-      {/* Decorative blobs */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-[#1E2B7A]/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#76BC21]/5 rounded-full blur-3xl translate-x-1/3 translate-y-1/3 pointer-events-none" />
+    <div className="min-h-screen bg-[#f8fafc] relative overflow-hidden pt-16 pb-24">
+      {/* Decorative Blobs */}
+      <div className="absolute top-0 left-0 w-96 h-96 bg-primary/15 rounded-full blur-[100px] -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-secondary/10 rounded-full blur-[120px] translate-x-1/3 translate-y-1/3 pointer-events-none"></div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <motion.div
+      <div className="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Header Section */}
+        <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
