@@ -4,7 +4,7 @@
     "name": "Cardiology",
     "slug": "cardiology",
     "icon": "FaHeartPulse",
-    "image": "/images/departments/cardiology.jpg",
+    "image": "/images/departments/cardiology.png",
     "shortDescription": "Specialized care for heart and cardiovascular diseases.",
     "description": "Our Cardiology Department provides comprehensive diagnosis, treatment, and preventive care for heart and blood vessel diseases using modern technology and experienced cardiologists.",
     "services": [
@@ -24,7 +24,7 @@
     "name": "Neurology",
     "slug": "neurology",
     "icon": "FaBrain",
-    "image": "/images/departments/neurology.jpg",
+    "image": "/images/departments/neurology.png",
     "shortDescription": "Expert diagnosis and treatment for brain and nervous system disorders.",
     "description": "The Neurology Department specializes in diagnosing and treating disorders of the brain, spinal cord, and nervous system with advanced medical care.",
     "services": [
@@ -44,7 +44,7 @@
     "name": "Pediatrics",
     "slug": "pediatrics",
     "icon": "FaBaby",
-    "image": "/images/departments/pediatrics.jpg",
+    "image": "/images/departments/pediatrics.png",
     "shortDescription": "Complete healthcare services for infants, children, and adolescents.",
     "description": "Our Pediatrics Department provides compassionate healthcare for newborns, infants, children, and teenagers, ensuring healthy growth and development.",
     "services": [
@@ -64,7 +64,7 @@
     "name": "Orthopedics",
     "slug": "orthopedics",
     "icon": "FaBone",
-    "image": "/images/departments/orthopedics.jpg",
+    "image": "/images/departments/orthopedics.png",
     "shortDescription": "Advanced treatment for bones, joints, muscles, and spine.",
     "description": "The Orthopedics Department offers diagnosis, treatment, rehabilitation, and surgical care for bone, joint, muscle, and spine conditions.",
     "services": [

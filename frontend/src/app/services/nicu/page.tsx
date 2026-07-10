@@ -26,8 +26,8 @@ const NICUServicePage = () => {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--background)" }}>
         <div className="flex flex-col items-center gap-4 animate-fadeInSlide">
-          <div className="w-16 h-16 rounded-full border-4 border-[#ec4899] border-t-transparent animate-spin" />
-          <p className="font-semibold text-lg" style={{ color: "#ec4899" }}>Loading...</p>
+          <div className="w-16 h-16 rounded-full border-4 border-[var(--tertiary)] border-t-transparent animate-spin" />
+          <p className="font-semibold text-lg nicu-text-primary">Loading...</p>
         </div>
       </div>
     );
@@ -68,20 +68,17 @@ const NICUServicePage = () => {
         </div>
 
         {/* Decorative floating elements */}
-        <div className="absolute top-20 right-10 w-80 h-80 rounded-full opacity-15 blur-3xl" style={{ background: "#ec4899" }} />
-        <div className="absolute bottom-20 left-10 w-72 h-72 rounded-full opacity-20 blur-3xl" style={{ background: "#f472b6" }} />
+        <div className="absolute top-20 right-10 w-80 h-80 rounded-full opacity-15 blur-3xl" style={{ background: "var(--tertiary)" }} />
+        <div className="absolute bottom-20 left-10 w-72 h-72 rounded-full opacity-20 blur-3xl" style={{ background: "#0284c7" }} />
 
         <div className="relative z-10 max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left Content */}
             <div className="animate-fadeInSlide text-white">
               <div 
-                className="inline-flex items-center gap-3 px-5 py-2.5 mb-6"
+                className="nicu-badge inline-flex items-center gap-3 px-5 py-2.5 mb-6"
                 style={{
-                  background: "rgba(236, 72, 153, 0.2)",
                   borderRadius: "var(--radius-xl)",
-                  backdropFilter: "blur(10px)",
-                  border: "1px solid rgba(236, 72, 153, 0.3)"
                 }}
               >
                 <FaBaby size={20} />
@@ -98,11 +95,9 @@ const NICUServicePage = () => {
               <div className="flex flex-wrap gap-4">
                 <a
                   href="#services"
-                  className="inline-block px-8 py-4 font-bold text-white transition-all duration-300 hover:-translate-y-1 transform"
+                  className="nicu-gradient nicu-glow inline-block px-8 py-4 font-bold text-white transition-all duration-300 hover:-translate-y-1 transform"
                   style={{
-                    background: "linear-gradient(135deg, #ec4899, #f472b6)",
                     borderRadius: "var(--radius-lg)",
-                    boxShadow: "var(--shadow-xl)"
                   }}
                 >
                   Our NICU Services
@@ -159,10 +154,9 @@ const NICUServicePage = () => {
                 }}
               >
                 <div 
-                  className="w-16 h-16 flex items-center justify-center mx-auto mb-5 transition-all duration-300 group-hover:scale-110"
+                  className="nicu-gradient w-16 h-16 flex items-center justify-center mx-auto mb-5 transition-all duration-300 group-hover:scale-110"
                   style={{
                     borderRadius: "var(--radius-md)",
-                    background: "linear-gradient(135deg, #ec4899, #f472b6)"
                   }}
                 >
                   <Icon className="text-white" size={28} />
@@ -184,9 +178,8 @@ const NICUServicePage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <div className="relative animate-fadeInSlide order-2 lg:order-1">
             <div 
-              className="absolute -top-6 -left-6 w-full h-full"
+              className="nicu-gradient absolute -top-6 -left-6 w-full h-full"
               style={{
-                background: "linear-gradient(135deg, #ec4899, #f472b6)",
                 opacity: 0.1,
                 borderRadius: "var(--radius-xl)"
               }}
@@ -204,7 +197,7 @@ const NICUServicePage = () => {
 
           <div className="animate-fadeInSlide order-1 lg:order-2" style={{ animationDelay: "0.2s" }}>
             <h2 className="text-4xl md:text-5xl font-bold mb-8 leading-tight" style={{ color: "var(--color-primary)" }}>
-              Caring for Your <span style={{ color: "#ec4899" }}>Precious Little Ones</span>
+              Caring for Your <span className="nicu-text-primary">Precious Little Ones</span>
             </h2>
             <p 
               className="text-lg leading-relaxed mb-8"
@@ -221,13 +214,12 @@ const NICUServicePage = () => {
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-4">
                   <div 
-                    className="w-12 h-12 flex items-center justify-center flex-shrink-0"
+                    className="nicu-gradient-light w-12 h-12 flex items-center justify-center flex-shrink-0"
                     style={{
-                      background: "rgba(236, 72, 153, 0.1)",
                       borderRadius: "var(--radius-md)"
                     }}
                   >
-                    <item.icon style={{ color: "#ec4899" }} size={20} />
+                    <item.icon className="nicu-text-primary" size={20} />
                   </div>
                   <div>
                     <p className="font-semibold" style={{ color: "var(--color-primary)" }}>
@@ -247,7 +239,7 @@ const NICUServicePage = () => {
       {/* ── Services Grid ── */}
       <section className="py-24 px-4 relative overflow-hidden">
         <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-[#ec4899] blur-3xl" />
+          <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-[var(--tertiary)] blur-3xl" />
           <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-[#fbbf24] blur-3xl" />
         </div>
 
@@ -273,9 +265,8 @@ const NICUServicePage = () => {
               >
                 <div className="flex items-center gap-4 mb-6">
                   <div 
-                    className="w-12 h-12 flex items-center justify-center"
+                    className="nicu-gradient w-12 h-12 flex items-center justify-center"
                     style={{
-                      background: "linear-gradient(135deg, #ec4899, #f472b6)",
                       borderRadius: "var(--radius-md)"
                     }}
                   >
@@ -289,9 +280,8 @@ const NICUServicePage = () => {
                   {service.items.map((item, idx) => (
                     <li key={idx} className="flex items-start gap-3">
                       <FaCheckCircle 
-                        className="mt-1 flex-shrink-0" 
+                        className="nicu-text-primary mt-1 flex-shrink-0" 
                         size={16} 
-                        style={{ color: "#ec4899" }}
                       />
                       <span className="text-sm leading-relaxed" style={{ color: "var(--foreground)", opacity: 0.75 }}>
                         {item}
@@ -312,8 +302,7 @@ const NICUServicePage = () => {
               {nicu.equipment.map((item, i) => (
                 <div 
                   key={i} 
-                  className="text-center p-4 rounded-lg transition-all duration-300 hover:scale-105"
-                  style={{ background: "rgba(236, 72, 153, 0.05)" }}
+                  className="nicu-gradient-light text-center p-4 rounded-lg transition-all duration-300 hover:scale-105"
                 >
                   <p className="text-sm font-medium" style={{ color: "var(--foreground)", opacity: 0.8 }}>
                     {item}
@@ -328,16 +317,15 @@ const NICUServicePage = () => {
       {/* ── Statistics ── */}
       <section className="py-28 px-4 relative overflow-hidden">
         <div className="absolute inset-0 opacity-[0.03]">
-          <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-[#ec4899] blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-[#f472b6] blur-3xl" />
+          <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-[var(--tertiary)] blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-[#0284c7] blur-3xl" />
         </div>
         
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-16 animate-fadeInSlide">
             <div 
-              className="inline-block px-5 py-2 mb-6 text-sm font-bold tracking-wider uppercase text-white"
+              className="nicu-gradient inline-block px-5 py-2 mb-6 text-sm font-bold tracking-wider uppercase text-white"
               style={{
-                background: "linear-gradient(135deg, #ec4899, #f472b6)",
                 borderRadius: "var(--radius-xl)"
               }}
             >
@@ -355,22 +343,21 @@ const NICUServicePage = () => {
             {nicu.statistics.map((stat, i) => (
               <div
                 key={i}
-                className="premium-card text-center p-10 group hover:-translate-y-2 animate-fadeInSlide glow-effect"
+                className="nicu-glow-hover premium-card text-center p-10 group hover:-translate-y-2 animate-fadeInSlide"
                 style={{
                   animationDelay: `${i * 0.1}s`,
                   borderRadius: "var(--radius-lg)"
                 }}
               >
                 <div 
-                  className="w-14 h-14 flex items-center justify-center mx-auto mb-4 transition-transform duration-300 group-hover:scale-110"
+                  className="nicu-gradient w-14 h-14 flex items-center justify-center mx-auto mb-4 transition-transform duration-300 group-hover:scale-110"
                   style={{
-                    background: "linear-gradient(135deg, #ec4899, #f472b6)",
                     borderRadius: "var(--radius-md)"
                   }}
                 >
                   <FaBaby className="text-white" size={24} />
                 </div>
-                <p className="text-5xl font-extrabold mb-2 tracking-tight" style={{ color: "#ec4899" }}>
+                <p className="nicu-text-primary text-5xl font-extrabold mb-2 tracking-tight">
                   {stat.value}
                 </p>
                 <p className="text-sm font-medium tracking-wide" style={{ color: "var(--foreground)", opacity: 0.7 }}>
@@ -403,7 +390,7 @@ const NICUServicePage = () => {
                 animationDelay: `${i * 0.05}s`
               }}
             >
-              <FaCheckCircle className="flex-shrink-0 mt-1" size={20} style={{ color: "#ec4899" }} />
+              <FaCheckCircle className="nicu-text-primary flex-shrink-0 mt-1" size={20} />
               <p style={{ color: "var(--foreground)", opacity: 0.8 }}>{guideline}</p>
             </div>
           ))}
@@ -424,11 +411,9 @@ const NICUServicePage = () => {
           </p>
           <a
             href="/appointment"
-            className="inline-block text-white px-12 py-5 font-bold text-lg transition-all duration-500 hover:-translate-y-2 transform"
+            className="nicu-gradient nicu-glow inline-block text-white px-12 py-5 font-bold text-lg transition-all duration-500 hover:-translate-y-2 transform"
             style={{
-              background: "linear-gradient(135deg, #ec4899 0%, #f472b6 100%)",
               borderRadius: "var(--radius-xl)",
-              boxShadow: "var(--shadow-xl)"
             }}
           >
             Book Appointment
