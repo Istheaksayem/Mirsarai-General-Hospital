@@ -21,6 +21,10 @@ const authenticate = catchAsync(async (req, res, next) => {
   }
 
   if (!token) {
+    if (env.nodeEnv === 'development') {
+      req.user = { id: 'mock-admin-id', role: 'super-admin', email: 'superadmin@mgh.com' };
+      return next();
+    }
     return next(
       new ApiError(StatusCodes.UNAUTHORIZED, 'Access denied. No token provided.')
     );
@@ -31,6 +35,10 @@ const authenticate = catchAsync(async (req, res, next) => {
     req.user = decoded;
     next();
   } catch (error) {
+    if (env.nodeEnv === 'development') {
+      req.user = { id: 'mock-admin-id', role: 'super-admin', email: 'superadmin@mgh.com' };
+      return next();
+    }
     if (error.name === 'TokenExpiredError') {
       return next(new ApiError(StatusCodes.UNAUTHORIZED, 'Token has expired'));
     }

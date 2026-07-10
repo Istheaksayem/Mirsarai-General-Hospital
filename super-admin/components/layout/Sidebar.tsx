@@ -21,7 +21,7 @@ function NavLink({ item }: { item: NavItem }) {
   const isActive =
     item.href === pathname ||
     (item.href !== "/" && pathname.startsWith(item.href + "/")) ||
-    item.href === pathname;
+    (item.href === "/super-admin/cms" && pathname.startsWith("/super-admin/homepage"));
 
   return (
     <li>

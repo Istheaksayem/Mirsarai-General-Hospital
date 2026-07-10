@@ -44,9 +44,18 @@ interface HeroData {
 
 // ── Fetcher ────────────────────────────────────────────────────────────────
 const fetchHeroData = async (): Promise<HeroData> => {
-  const res = await fetch("/data/hero.json", { cache: "no-store" });
-  if (!res.ok) throw new Error("Failed to fetch hero data");
-  return res.json();
+  try {
+    const res = await fetch("http://localhost:5000/api/homepage/hero", { cache: "no-store" });
+    if (!res.ok) throw new Error("API responded with an error status");
+    const result = await res.json();
+    if (result.success && result.data) return result.data;
+    throw new Error(result.message || "Invalid API response");
+  } catch (error) {
+    console.warn("Backend API not reachable for hero data. Falling back to local data/hero.json", error);
+    const res = await fetch("/data/hero.json", { cache: "no-store" });
+    if (!res.ok) throw new Error("Failed to fetch fallback hero data");
+    return res.json();
+  }
 };
 
 // ── Skeleton ───────────────────────────────────────────────────────────────
