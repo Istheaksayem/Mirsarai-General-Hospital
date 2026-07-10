@@ -118,12 +118,13 @@ export default function DoctorDirectoryPage() {
                 <div className="relative h-72 overflow-hidden bg-gradient-to-b from-[#1E2B7A]/5 to-transparent">
                   <img
                     src={doctor.image}
-                    alt={lang === "bn" ? doctor.name.bn : doctor.name.en}
+                    alt={doctor.name ? (lang === "bn" ? doctor.name.bn : doctor.name.en) : "Doctor"}
                     className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-700"
                     onError={(e) => {
-                      e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                        lang === "bn" ? doctor.name.bn : doctor.name.en
-                      )}&background=1E2B7A&color=fff&size=512`;
+                      const fallbackName = doctor.name 
+                        ? (lang === "bn" ? doctor.name.bn : doctor.name.en)
+                        : "Doctor";
+                      e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(fallbackName)}&background=1E2B7A&color=fff&size=512`;
                     }}
                   />
                   {/* Available badge */}
@@ -135,21 +136,27 @@ export default function DoctorDirectoryPage() {
                   )}
                   {/* Department badge */}
                   <div className="absolute bottom-4 left-4 px-3 py-1.5 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full text-xs font-bold text-[#1E2B7A] dark:text-[#76BC21]">
-                    {lang === "bn" ? doctor.department.bn : doctor.department.en}
+                    {doctor.department 
+                      ? (lang === "bn" ? doctor.department.bn : doctor.department.en)
+                      : (lang === "bn" ? "বিভাগ" : "Department")
+                    }
                   </div>
                 </div>
 
                 {/* Content */}
                 <div className="p-6 flex flex-col flex-grow">
                   <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1 group-hover:text-[#1E2B7A] dark:group-hover:text-[#76BC21] transition-colors">
-                    {lang === "bn" ? doctor.name.bn : doctor.name.en}
+                    {doctor.name ? (lang === "bn" ? doctor.name.bn : doctor.name.en) : "Unknown Doctor"}
                   </h3>
                   <p className="text-[#76BC21] font-semibold text-sm flex items-center gap-1.5 mb-2">
                     <FaCheckCircle size={12} />
-                    {lang === "bn" ? doctor.specialization.bn : doctor.specialization.en}
+                    {doctor.specialization 
+                      ? (lang === "bn" ? doctor.specialization.bn : doctor.specialization.en)
+                      : (lang === "bn" ? "বিশেষজ্ঞ" : "Specialist")
+                    }
                   </p>
                   <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
-                    {doctor.qualification}
+                    {doctor.qualification || ""}
                   </p>
 
                   {/* Experience & Fee */}
@@ -159,13 +166,16 @@ export default function DoctorDirectoryPage() {
                         <FaCalendarAlt className="text-[#1E2B7A] dark:text-[#76BC21] text-xs" />
                       </div>
                       <span className="text-gray-600 dark:text-gray-400 font-medium">
-                        {lang === "bn" ? doctor.experience.bn : doctor.experience.en}
+                        {doctor.experience 
+                          ? (lang === "bn" ? doctor.experience.bn : doctor.experience.en)
+                          : (lang === "bn" ? "অভিজ্ঞ" : "Experienced")
+                        }
                       </span>
                     </div>
                     <div className="text-right">
                       <p className="text-xs text-gray-400">{lang === "bn" ? "পরামর্শ ফি" : "Fee"}</p>
                       <p className="text-lg font-bold text-[#1E2B7A] dark:text-[#76BC21]">
-                        ৳{doctor.consultationFee}
+                        ৳{doctor.consultationFee || 0}
                       </p>
                     </div>
                   </div>

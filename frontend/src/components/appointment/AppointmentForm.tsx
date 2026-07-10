@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FaUser,
@@ -14,20 +14,7 @@ import {
   FaArrowRight,
   FaArrowLeft,
 } from "react-icons/fa";
-
-const doctors = [
-  { name: "Dr. Sarah Jenkins", specialty: "Cardiology", slots: ["09:00 AM", "10:00 AM", "02:00 PM", "04:00 PM"] },
-  { name: "Dr. Michael Chen", specialty: "Orthopedics", slots: ["08:30 AM", "11:00 AM", "01:30 PM", "03:30 PM"] },
-  { name: "Dr. Emily Roberts", specialty: "Pediatrics", slots: ["09:30 AM", "10:30 AM", "02:30 PM", "05:00 PM"] },
-  { name: "Dr. James Wilson", specialty: "General Surgery", slots: ["08:00 AM", "11:30 AM", "01:00 PM", "04:30 PM"] },
-  { name: "Dr. Aisha Rahman", specialty: "Gynecology", slots: ["09:00 AM", "10:00 AM", "03:00 PM", "04:00 PM"] },
-  { name: "Dr. Robert Khan", specialty: "Neurology", slots: ["10:00 AM", "12:00 PM", "02:00 PM", "05:00 PM"] },
-];
-
-const departments = [
-  "Cardiology", "Orthopedics", "Pediatrics", "General Surgery",
-  "Gynecology", "Neurology", "Dermatology", "ENT", "Ophthalmology",
-];
+import { useDoctors } from "@/hooks/useDoctors";
 
 const steps = ["Personal Info", "Select Doctor", "Schedule", "Confirm"];
 
@@ -41,6 +28,25 @@ export default function AppointmentForm() {
   const [step, setStep] = useState(0);
   const [dir, setDir] = useState(1);
   const [submitted, setSubmitted] = useState(false);
+
+  const { data: rawDoctors, isLoading, error } = useDoctors();
+
+  const doctorsList = useMemo(() => {
+    if (!rawDoctors) return [];
+    return rawDoctors.map((d) => ({
+      name: d.name.en,
+      specialty: d.department.en,
+      image: d.image,
+      slots: d.id % 2 === 0
+        ? ["08:30 AM", "11:00 AM", "01:30 PM", "03:30 PM"]
+        : ["09:00 AM", "10:00 AM", "02:00 PM", "04:00 PM"],
+    }));
+  }, [rawDoctors]);
+
+  const departments = useMemo(() => {
+    if (!doctorsList.length) return [];
+    return Array.from(new Set(doctorsList.map((d) => d.specialty)));
+  }, [doctorsList]);
 
   const [form, setForm] = useState({
     fullName: "",
@@ -62,7 +68,7 @@ export default function AppointmentForm() {
     setErrors((e) => ({ ...e, [field]: "" }));
   };
 
-  const selectedDoctor = doctors.find((d) => d.name === form.doctor);
+  const selectedDoctor = doctorsList.find((d) => d.name === form.doctor);
 
   const validateStep = () => {
     const errs: Record<string, string> = {};
@@ -217,43 +223,61 @@ export default function AppointmentForm() {
               <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
                 <FaUserMd className="text-primary" /> Select Doctor & Department
               </h3>
-              <Field label="Department *" error={errors.department}>
-                <select id="department" value={form.department} onChange={(e) => { update("department", e.target.value); update("doctor", ""); }} className={`${inputCls(errors.department)} pl-4`}>
-                  <option value="">-- Select Department --</option>
-                  {departments.map((d) => <option key={d}>{d}</option>)}
-                </select>
-              </Field>
-              <div className="mt-5">
-                <p className="text-sm font-semibold text-gray-700 mb-3">Choose a Doctor *</p>
-                {errors.doctor && <p className="text-red-500 text-xs mb-2">{errors.doctor}</p>}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {doctors
-                    .filter((d) => !form.department || d.specialty === form.department)
-                    .map((d) => (
-                    <button
-                      key={d.name}
-                      type="button"
-                      onClick={() => update("doctor", d.name)}
-                      className={`flex items-center gap-4 p-4 rounded-xl border-2 text-left transition-all duration-200 ${
-                        form.doctor === d.name
-                          ? "border-primary bg-primary/5 shadow-md"
-                          : "border-gray-100 hover:border-primary/40 bg-white"
-                      }`}
-                    >
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-blue-400 flex items-center justify-center shrink-0">
-                        <FaUserMd className="text-white text-lg" />
-                      </div>
-                      <div>
-                        <p className="font-bold text-gray-800 text-sm">{d.name}</p>
-                        <p className="text-xs text-secondary font-medium">{d.specialty}</p>
-                      </div>
-                    </button>
-                  ))}
+              {isLoading ? (
+                <div className="flex flex-col items-center justify-center py-12 text-gray-500 bg-white/50 rounded-2xl border border-gray-100">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-3"></div>
+                  <p className="text-sm">Loading doctors...</p>
                 </div>
-                {doctors.filter((d) => !form.department || d.specialty === form.department).length === 0 && (
-                  <p className="text-gray-400 text-sm mt-4 text-center">No doctors found for selected department.</p>
-                )}
-              </div>
+              ) : error ? (
+                <div className="text-center py-12 text-red-500 bg-white/50 rounded-2xl border border-gray-100">
+                  <p className="text-sm font-semibold">Failed to load doctors.</p>
+                  <p className="text-xs text-gray-400 mt-1">Please try again later.</p>
+                </div>
+              ) : (
+                <>
+                  <Field label="Department *" error={errors.department}>
+                    <select id="department" value={form.department} onChange={(e) => { update("department", e.target.value); update("doctor", ""); }} className={`${inputCls(errors.department)} pl-4`}>
+                      <option value="">-- Select Department --</option>
+                      {departments.map((d) => <option key={d}>{d}</option>)}
+                    </select>
+                  </Field>
+                  <div className="mt-5">
+                    <p className="text-sm font-semibold text-gray-700 mb-3">Choose a Doctor *</p>
+                    {errors.doctor && <p className="text-red-500 text-xs mb-2">{errors.doctor}</p>}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {doctorsList
+                        .filter((d) => !form.department || d.specialty === form.department)
+                        .map((d) => (
+                        <button
+                          key={d.name}
+                          type="button"
+                          onClick={() => update("doctor", d.name)}
+                          className={`flex items-center gap-4 p-4 rounded-xl border-2 text-left transition-all duration-200 ${
+                            form.doctor === d.name
+                              ? "border-primary bg-primary/5 shadow-md"
+                              : "border-gray-100 hover:border-primary/40 bg-white"
+                          }`}
+                        >
+                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-blue-400 flex items-center justify-center shrink-0 overflow-hidden">
+                            {d.image ? (
+                              <img src={d.image} alt={d.name} className="w-full h-full object-cover" />
+                            ) : (
+                              <FaUserMd className="text-white text-lg" />
+                            )}
+                          </div>
+                          <div>
+                            <p className="font-bold text-gray-800 text-sm">{d.name}</p>
+                            <p className="text-xs text-secondary font-medium">{d.specialty}</p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                    {doctorsList.filter((d) => !form.department || d.specialty === form.department).length === 0 && (
+                      <p className="text-gray-400 text-sm mt-4 text-center">No doctors found for selected department.</p>
+                    )}
+                  </div>
+                </>
+              )}
             </motion.div>
           )}
 
@@ -305,7 +329,7 @@ export default function AppointmentForm() {
                     placeholder="Describe your symptoms or reason for visit (optional)..."
                     value={form.message}
                     onChange={(e) => update("message", e.target.value)}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none transition"
+                    className="w-full border border-gray-200/80 rounded-xl px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none transition bg-white/60 focus:bg-white backdrop-blur-sm shadow-inner"
                   />
                 </Field>
               </div>
@@ -381,7 +405,7 @@ export default function AppointmentForm() {
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 function inputCls(error?: string) {
-  return `w-full border ${error ? "border-red-400 ring-1 ring-red-300" : "border-gray-200"} rounded-xl pl-10 pr-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition bg-white`;
+  return `w-full border ${error ? "border-red-400 ring-1 ring-red-300" : "border-gray-200/80"} rounded-xl pl-10 pr-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 bg-white/60 focus:bg-white backdrop-blur-sm shadow-inner`;
 }
 
 function InputIcon({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
