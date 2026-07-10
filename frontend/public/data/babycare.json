@@ -1,0 +1,133 @@
+{
+  "babyCare": {
+    "id": 3,
+    "title": "Baby Care Center",
+    "subtitle": "Comprehensive Pediatric & Infant Healthcare",
+    "heroDescription": "Dedicated baby care services with expert pediatricians, child specialists, and nursing staff. We provide complete healthcare solutions for infants and children from birth to adolescence.",
+    "backgroundImage": "/images/baby-care.jpg",
+    "description": "Our Baby Care Center is designed to provide comprehensive healthcare services for newborns, infants, and children. From routine checkups to specialized treatments, our experienced pediatricians ensure your child receives the best medical care in a child-friendly environment.",
+    "features": [
+      {
+        "title": "Expert Pediatricians",
+        "description": "Highly qualified child specialists available",
+        "icon": "FaUserMd"
+      },
+      {
+        "title": "Vaccination Program",
+        "description": "Complete immunization schedule management",
+        "icon": "FaSyringe"
+      },
+      {
+        "title": "Child-Friendly",
+        "description": "Comfortable and welcoming environment for kids",
+        "icon": "FaSmile"
+      },
+      {
+        "title": "Parent Education",
+        "description": "Guidance on child care and nutrition",
+        "icon": "FaBook"
+      }
+    ],
+    "services": [
+      {
+        "category": "Routine Care",
+        "items": [
+          "Regular Health Checkups",
+          "Growth & Development Monitoring",
+          "Nutritional Assessment",
+          "Immunization Services",
+          "Vision & Hearing Screening",
+          "Dental Health Guidance",
+          "Behavioral Assessment",
+          "School Health Checkups"
+        ]
+      },
+      {
+        "category": "Medical Services",
+        "items": [
+          "Common Childhood Illnesses",
+          "Fever Management",
+          "Respiratory Infections",
+          "Diarrhea & Dehydration Treatment",
+          "Skin Conditions",
+          "Allergies & Asthma",
+          "Minor Injuries Treatment",
+          "Prescription Management"
+        ]
+      },
+      {
+        "category": "Specialized Care",
+        "items": [
+          "Neonatal Care",
+          "Premature Baby Follow-up",
+          "Chronic Disease Management",
+          "Nutritional Disorders",
+          "Growth Disorders",
+          "Developmental Delays",
+          "Genetic Counseling",
+          "Pediatric Surgery Referrals"
+        ]
+      },
+      {
+        "category": "Wellness Programs",
+        "items": [
+          "Breastfeeding Workshops",
+          "Infant Massage Training",
+          "Nutrition Counseling",
+          "Parenting Classes",
+          "First Aid Training",
+          "Child Safety Education"
+        ]
+      }
+    ],
+    "vaccinationSchedule": [
+      {
+        "age": "At Birth",
+        "vaccines": ["BCG", "OPV-0", "Hepatitis B-1"]
+      },
+      {
+        "age": "6 Weeks",
+        "vaccines": ["Pentavalent-1", "OPV-1", "PCV-1", "Rota-1"]
+      },
+      {
+        "age": "10 Weeks",
+        "vaccines": ["Pentavalent-2", "OPV-2", "PCV-2", "Rota-2"]
+      },
+      {
+        "age": "14 Weeks",
+        "vaccines": ["Pentavalent-3", "OPV-3", "PCV-3", "IPV-1"]
+      },
+      {
+        "age": "9 Months",
+        "vaccines": ["Measles-Rubella-1", "OPV-4"]
+      },
+      {
+        "age": "15 Months",
+        "vaccines": ["Measles-Rubella-2"]
+      }
+    ],
+    "statistics": [
+      {
+        "value": "2,000+",
+        "label": "Children Treated Monthly"
+      },
+      {
+        "value": "100%",
+        "label": "Vaccination Coverage"
+      },
+      {
+        "value": "10+",
+        "label": "Pediatric Specialists"
+      },
+      {
+        "value": "98%",
+        "label": "Parent Satisfaction"
+      }
+    ],
+    "workingHours": {
+      "weekdays": "8:00 AM - 8:00 PM",
+      "weekends": "9:00 AM - 5:00 PM",
+      "emergency": "24/7 Emergency Care Available"
+    }
+  }
+}

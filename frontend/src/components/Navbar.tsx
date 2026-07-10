@@ -15,15 +15,7 @@ type NavItem =
 
 const NAV_ITEMS: NavItem[] = [
   { type: "link", en: "Home", bn: "হোম", href: "/" },
-  {
-    type: "dropdown",
-    en: "Doctors",
-    bn: "ডাক্তার",
-    links: [
-      { en: "Doctor Directory", bn: "ডাক্তার তালিকা", href: "/doctors" },
-      { en: "Doctor Profiles", bn: "ডাক্তার প্রোফাইল", href: "/doctors/profiles" },
-    ],
-  },
+  { type: "link", en: "Doctors", bn: "ডাক্তার", href: "/doctors" },
   {
     type: "dropdown",
     en: "Services",
@@ -215,7 +207,7 @@ const Navbar = () => {
           </Link>
 
           {/* ── Desktop nav links (center) ── */}
-          <div className="hidden xl:flex flex-1 justify-center items-center h-full gap-0.5">
+          <div className="hidden xl:flex flex-1 justify-center items-center h-full gap-1">
             {NAV_ITEMS.map((item, idx) => (
               <React.Fragment key={item.en}>
                 {item.type === "dropdown" ? (
@@ -231,9 +223,8 @@ const Navbar = () => {
                     {lang === "bn" ? item.bn : item.en}
                   </Link>
                 )}
-                {/* red dot separator between items (not after last) */}
-                {idx < NAV_ITEMS.length - 1 && (
-                  <span className="text-[#ff4f4f] font-bold text-[16px] leading-none select-none">•</span>
+                {idx < NAV_ITEMS.length - 1 && item.type === "dropdown" && (
+                  <span className="text-primary font-bold text-[16px] leading-none select-none">•</span>
                 )}
               </React.Fragment>
             ))}
@@ -257,7 +248,7 @@ const Navbar = () => {
               </span>
             </Link>
 
-         
+
           </div>
 
           {/* ── Mobile right (lang toggle + hamburger) ── */}

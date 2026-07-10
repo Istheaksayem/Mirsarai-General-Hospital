@@ -1,0 +1,108 @@
+{
+  "nicu": {
+    "id": 2,
+    "title": "NICU & Baby Care",
+    "subtitle": "Specialized Neonatal Intensive Care Unit",
+    "heroDescription": "A dedicated unit providing specialized medical care for newborns, premature babies, and infants requiring intensive monitoring and treatment. Our NICU is equipped with advanced life-support systems and staffed by expert neonatologists and pediatric nurses.",
+    "backgroundImage": "/images/nicu-care.jpg",
+    "description": "Our Neonatal Intensive Care Unit (NICU) provides 24/7 specialized care for premature and critically ill newborns. With state-of-the-art equipment and a compassionate team of neonatologists, pediatric nurses, and support staff, we ensure the best possible care for your precious little ones.",
+    "features": [
+      {
+        "title": "24/7 Monitoring",
+        "description": "Round-the-clock supervision by trained medical staff",
+        "icon": "FaHeartbeat"
+      },
+      {
+        "title": "Advanced Equipment",
+        "description": "Ventilators, incubators, and monitoring systems",
+        "icon": "FaLaptopMedical"
+      },
+      {
+        "title": "Expert Team",
+        "description": "Specialized neonatologists and pediatric nurses",
+        "icon": "FaUserNurse"
+      },
+      {
+        "title": "Family Support",
+        "description": "Counseling and guidance for parents",
+        "icon": "FaHandHoldingHeart"
+      }
+    ],
+    "services": [
+      {
+        "category": "Neonatal Care",
+        "items": [
+          "Premature Baby Care",
+          "Low Birth Weight Management",
+          "Respiratory Distress Treatment",
+          "Neonatal Jaundice (Phototherapy)",
+          "Birth Asphyxia Management",
+          "Neonatal Sepsis Treatment",
+          "Temperature Regulation",
+          "Feeding Support (NG Tube, IV)"
+        ]
+      },
+      {
+        "category": "Baby Care Services",
+        "items": [
+          "Well Baby Checkups",
+          "Vaccination Programs",
+          "Growth Monitoring",
+          "Nutritional Counseling",
+          "Developmental Assessment",
+          "Newborn Screening Tests",
+          "Breastfeeding Support",
+          "Pediatric Consultations"
+        ]
+      },
+      {
+        "category": "Emergency Services",
+        "items": [
+          "Neonatal Resuscitation",
+          "Emergency Admissions",
+          "Critical Care Support",
+          "Ambulance Service",
+          "Transfer Facilities",
+          "On-call Pediatricians"
+        ]
+      }
+    ],
+    "equipment": [
+      "Neonatal Ventilators",
+      "Infant Incubators",
+      "Radiant Warmers",
+      "Phototherapy Units",
+      "Cardiac Monitors",
+      "Pulse Oximeters",
+      "Infusion Pumps",
+      "Bili Lights",
+      "Oxygen Supply System"
+    ],
+    "statistics": [
+      {
+        "value": "500+",
+        "label": "Babies Treated Annually"
+      },
+      {
+        "value": "95%",
+        "label": "Success Rate"
+      },
+      {
+        "value": "24/7",
+        "label": "Availability"
+      },
+      {
+        "value": "15+",
+        "label": "NICU Beds"
+      }
+    ],
+    "guidelines": [
+      "Parents can visit during designated hours (10 AM - 12 PM, 4 PM - 6 PM)",
+      "Only two visitors allowed at a time per baby",
+      "Proper hand hygiene mandatory before entering NICU",
+      "Mobile phones to be kept on silent mode",
+      "Photography requires permission from medical staff",
+      "Kangaroo Mother Care encouraged for stable babies"
+    ]
+  }
+}

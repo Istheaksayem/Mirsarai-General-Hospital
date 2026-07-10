@@ -7,8 +7,16 @@ import {
   FaStar,
   FaLightbulb,
   FaUserCheck,
+  FaBullseye,
+  FaEye,
+  FaRocket,
+  FaHandHoldingHeart,
 } from "react-icons/fa";
 import { motion } from "framer-motion";
+import { FiArrowRight, FiCheckCircle } from "react-icons/fi";
+import { useEffect, useRef } from "react";
+import { MdVerified } from "react-icons/md";
+import { BsFillHeartPulseFill } from "react-icons/bs";
 
 const valueIcons: Record<string, React.ElementType> = {
   Compassion: FaHeartbeat,
@@ -18,20 +26,26 @@ const valueIcons: Record<string, React.ElementType> = {
   "Patient First": FaUserCheck,
 };
 
-const valueColors = [
-  { bg: "bg-rose-50", icon: "text-rose-500", border: "border-rose-200" },
-  { bg: "bg-blue-50", icon: "text-blue-500", border: "border-blue-200" },
-  { bg: "bg-amber-50", icon: "text-amber-500", border: "border-amber-200" },
-  { bg: "bg-purple-50", icon: "text-purple-500", border: "border-purple-200" },
-  { bg: "bg-emerald-50", icon: "text-emerald-500", border: "border-emerald-200" },
-];
-
 const MissionVisionPage = () => {
   const { data, isLoading, isError } = useAboutData();
+  const parallaxRef = useRef<HTMLDivElement>(null);
+
+  // Parallax scrolling effect
+  useEffect(() => {
+    const handleScroll = () => {
+      if (parallaxRef.current) {
+        const scrolled = window.pageYOffset;
+        parallaxRef.current.style.transform = `translateY(${scrolled * 0.5}px)`;
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-16 h-16 rounded-full border-4 border-primary border-t-transparent animate-spin" />
           <p className="text-primary font-semibold text-lg">Loading...</p>
@@ -42,8 +56,17 @@ const MissionVisionPage = () => {
 
   if (isError || !data) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-red-500 text-lg font-medium">Failed to load Mission & Vision data.</p>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center p-8">
+          <div className="text-red-500 text-6xl mb-4">⚠️</div>
+          <p className="text-red-500 text-lg font-medium">Failed to load Mission & Vision data.</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="mt-4 px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
+          >
+            Retry
+          </button>
+        </div>
       </div>
     );
   }
@@ -52,115 +75,210 @@ const MissionVisionPage = () => {
 
   return (
     <main className="bg-white overflow-hidden">
-      {/* ── Hero Banner ── */}
-      <section className="relative bg-primary py-24 px-4 text-white text-center overflow-hidden">
-        <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full bg-secondary/15 blur-3xl" />
-        <div className="absolute -bottom-20 -left-20 w-72 h-72 rounded-full bg-tertiary/15 blur-3xl" />
-        <div className="relative z-10 max-w-3xl mx-auto">
-          <span className="inline-block px-4 py-1.5 rounded-full bg-tertiary/20 text-tertiary text-sm font-semibold tracking-wider uppercase mb-4">
-            Our Purpose
-          </span>
-          <h1 className="text-4xl md:text-6xl font-extrabold mb-4 leading-tight">
-            {missionVision.title}
-          </h1>
-          <p className="text-white/75 text-lg font-light">
-            The values and vision that drive everything we do.
-          </p>
+      {/* ══════════════════════════════════════════
+          HERO SECTION - SPLIT DESIGN
+          ══════════════════════════════════════════ */}
+      <section className="relative min-h-screen flex items-center overflow-hidden">
+        {/* Parallax Background */}
+        <div 
+          ref={parallaxRef}
+          className="absolute inset-0 w-full h-[120%] parallax-container"
+        >
+          <div 
+            className="absolute inset-0 bg-cover bg-center"
+            style={{
+              backgroundImage: `url('/about-us.jpg')`,
+            }}
+          />
+          <div className="absolute inset-0 bg-primary/30" />
+        </div>
+
+        {/* Animated Background Elements */}
+        <div className="absolute top-20 left-10 w-96 h-96 bg-secondary/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 right-10 w-80 h-80 bg-cyan-400/20 rounded-full blur-3xl animate-pulse delay-700" />
+        <div className="absolute top-1/2 left-1/3 w-64 h-64 bg-white/10 rounded-full blur-3xl animate-scale-pulse" />
+
+        {/* Hero Content - Split Layout */}
+        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full glass-card-dark text-secondary text-sm font-bold tracking-wider uppercase mb-8">
+              <MdVerified className="text-xl" />
+              <span>Our Purpose & Direction</span>
+            </div>
+            <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-6 leading-tight text-shadow-strong">
+              {missionVision.title}
+            </h1>
+            <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto leading-relaxed">
+              The values and vision that drive everything we do for your health and well-being.
+            </p>
+          </motion.div>
+
+          {/* Mission & Vision Cards - Side by Side */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+            {/* Mission Card */}
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="relative group"
+            >
+              <div className="glass-card rounded-3xl p-10 h-full hover-lift border-2 border-white/20">
+                {/* Icon Badge */}
+                <div className="inline-flex items-center gap-3 mb-6">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-secondary to-green-600 flex items-center justify-center shadow-xl animate-scale-pulse">
+                    <FaBullseye className="text-white text-3xl" />
+                  </div>
+                  <span className="text-xs font-bold text-primary uppercase tracking-wider bg-secondary/10 px-3 py-1 rounded-full">
+                    Mission
+                  </span>
+                </div>
+
+                <h2 className="text-3xl font-extrabold text-primary mb-4">
+                  {missionVision.mission.title}
+                </h2>
+                
+                <p className="text-gray-700 leading-relaxed text-lg mb-6">
+                  {missionVision.mission.description}
+                </p>
+
+                {/* Decorative Element */}
+                <div className="absolute bottom-10 right-10 w-24 h-24 border-4 border-secondary/20 rounded-full animate-rotate-slow" />
+              </div>
+            </motion.div>
+
+            {/* Vision Card */}
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+              className="relative group"
+            >
+              <div className="glass-card rounded-3xl p-10 h-full hover-lift border-2 border-white/20">
+                {/* Icon Badge */}
+                <div className="inline-flex items-center gap-3 mb-6">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-blue-900 flex items-center justify-center shadow-xl animate-scale-pulse">
+                    <FaEye className="text-white text-3xl" />
+                  </div>
+                  <span className="text-xs font-bold text-primary uppercase tracking-wider bg-primary/10 px-3 py-1 rounded-full">
+                    Vision
+                  </span>
+                </div>
+
+                <h2 className="text-3xl font-extrabold text-primary mb-4">
+                  {missionVision.vision.title}
+                </h2>
+                
+                <p className="text-gray-700 leading-relaxed text-lg mb-6">
+                  {missionVision.vision.description}
+                </p>
+
+                {/* Decorative Element */}
+                <div className="absolute bottom-10 right-10 w-24 h-24 border-4 border-primary/20 rounded-full animate-rotate-slow" />
+              </div>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce z-30">
+          <div className="w-6 h-10 rounded-full border-2 border-white/40 flex items-start justify-center p-2">
+            <div className="w-1 h-3 bg-white/60 rounded-full animate-scroll" />
+          </div>
         </div>
       </section>
 
-      {/* ── Mission & Vision Cards ── */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Mission */}
-          <motion.div 
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="relative group rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-500"
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-primary to-[#162060]" />
-            {/* decorative ring */}
-            <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/5" />
-            <div className="absolute -bottom-10 -left-10 w-48 h-48 rounded-full bg-secondary/10" />
-            <div className="relative z-10 p-10">
-              <div className="w-14 h-14 rounded-2xl bg-secondary/20 flex items-center justify-center mb-6">
-                <FaHeartbeat className="text-secondary" size={28} />
-              </div>
-              <h2 className="text-2xl font-bold text-white mb-4">
-                {missionVision.mission.title}
-              </h2>
-              <p className="text-white/80 leading-relaxed text-base">
-                {missionVision.mission.description}
-              </p>
-              {/* bottom accent line */}
-              <div className="mt-8 h-1 w-16 rounded-full bg-secondary group-hover:w-32 transition-all duration-500" />
-            </div>
-          </motion.div>
+      {/* ══════════════════════════════════════════
+          CORE VALUES - UNIQUE GRID LAYOUT
+          ══════════════════════════════════════════ */}
+      <section className="relative py-24 px-4 bg-gradient-to-br from-white via-blue-50/20 to-white overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 medical-pattern opacity-30" />
 
-          {/* Vision */}
-          <motion.div 
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-            className="relative group rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-500"
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-tertiary/90 to-[#008fa3]" />
-            <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/5" />
-            <div className="absolute -bottom-10 -left-10 w-48 h-48 rounded-full bg-white/10" />
-            <div className="relative z-10 p-10">
-              <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center mb-6">
-                <FaStar className="text-white" size={28} />
-              </div>
-              <h2 className="text-2xl font-bold text-white mb-4">
-                {missionVision.vision.title}
-              </h2>
-              <p className="text-white/85 leading-relaxed text-base">
-                {missionVision.vision.description}
-              </p>
-              <div className="mt-8 h-1 w-16 rounded-full bg-white/50 group-hover:w-32 transition-all duration-500" />
-            </div>
-          </motion.div>
-        </div>
-      </section>
+        {/* Decorative Blobs */}
+        <div className="absolute top-20 right-20 w-96 h-96 bg-secondary/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 left-20 w-80 h-80 bg-primary/10 rounded-full blur-3xl" />
 
-      {/* ── Core Values ── */}
-      <section className="bg-gray-50 py-20 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-14">
-            <span className="inline-block px-4 py-1.5 rounded-full bg-secondary/15 text-secondary text-sm font-semibold tracking-wider uppercase mb-3">
-              What We Stand For
-            </span>
-            <h2 className="text-3xl md:text-4xl font-bold text-primary">
+        <div className="max-w-7xl mx-auto relative z-10">
+          {/* Section Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
+            <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-secondary/10 text-secondary text-sm font-bold mb-6">
+              <FaStar className="animate-pulse" />
+              <span>What We Stand For</span>
+            </div>
+            <h2 className="text-5xl md:text-6xl font-extrabold text-primary mb-6">
               Our Core Values
             </h2>
-            <p className="text-gray-500 mt-3 max-w-xl mx-auto text-base">
+            <p className="text-gray-600 text-xl max-w-3xl mx-auto leading-relaxed">
               These principles guide every decision, treatment, and interaction we have with our patients.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Values Grid - Unique Layout */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {missionVision.coreValues.map((val: CoreValue, i: number) => {
               const Icon = valueIcons[val.title] || FaStar;
-              const color = valueColors[i % valueColors.length];
+              const gradients = [
+                "from-rose-500 to-pink-600",
+                "from-blue-600 to-primary",
+                "from-amber-500 to-orange-600",
+                "from-purple-500 to-purple-700",
+                "from-emerald-500 to-green-600",
+              ];
+              const bgColors = [
+                "bg-rose-50",
+                "bg-blue-50",
+                "bg-amber-50",
+                "bg-purple-50",
+                "bg-emerald-50",
+              ];
+
               return (
                 <motion.div
                   key={val.title}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-50px" }}
-                  transition={{ duration: 0.5, delay: i * 0.1, ease: "easeOut" }}
-                  className={`${color.bg} border ${color.border} rounded-2xl p-7 hover:shadow-lg transition duration-300 hover:-translate-y-1 group`}
+                  transition={{ duration: 0.5, delay: i * 0.1 }}
+                  className="group relative"
                 >
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center flex-shrink-0">
-                      <Icon className={`${color.icon}`} size={22} />
+                  {/* Card */}
+                  <div className={`${bgColors[i % bgColors.length]} rounded-3xl p-8 h-full hover-lift border-2 border-gray-100 hover:border-gray-200 transition-all duration-300`}>
+                    {/* Icon with Gradient Background */}
+                    <div className="relative mb-6">
+                      <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${gradients[i % gradients.length]} flex items-center justify-center shadow-xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}>
+                        <Icon className="text-white text-3xl" />
+                      </div>
+                      {/* Number Badge */}
+                      <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-white shadow-lg flex items-center justify-center">
+                        <span className="text-sm font-bold text-primary">{i + 1}</span>
+                      </div>
                     </div>
-                    <h3 className="text-lg font-bold text-gray-800">{val.title}</h3>
+
+                    {/* Content */}
+                    <h3 className="text-2xl font-bold text-primary mb-4 group-hover:text-secondary transition-colors">
+                      {val.title}
+                    </h3>
+                    <p className="text-gray-600 text-base leading-relaxed">
+                      {val.description}
+                    </p>
+
+                    {/* Check Icon */}
+                    <div className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-secondary">
+                      <FiCheckCircle />
+                      <span>Core Value</span>
+                    </div>
                   </div>
-                  <p className="text-gray-600 text-sm leading-relaxed">{val.description}</p>
                 </motion.div>
               );
             })}
@@ -168,45 +286,142 @@ const MissionVisionPage = () => {
         </div>
       </section>
 
-      {/* ── Divider with quote ── */}
-      <section className="bg-primary py-16 px-4 text-center relative overflow-hidden">
-        <div className="absolute inset-0 opacity-5 bg-[radial-gradient(circle_at_center,_#76BC21_1px,_transparent_1px)] bg-[size:32px_32px]" />
-        <div className="relative z-10 max-w-3xl mx-auto">
-          <p className="text-4xl text-white/20 font-serif mb-4">"</p>
-          <p className="text-white text-xl md:text-2xl font-light italic leading-relaxed">
-            Every patient who walks through our doors deserves the very best care — and that is what we promise.
-          </p>
-          <p className="text-secondary font-semibold mt-6 text-sm tracking-widest uppercase">
-            — Mirsarai General Hospital
-          </p>
+      {/* ══════════════════════════════════════════
+          COMMITMENT SECTION - WITH BACKGROUND
+          ══════════════════════════════════════════ */}
+      <section className="relative py-32 px-4 overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-fixed"
+            style={{
+              backgroundImage: `url('/about-us.jpg')`,
+            }}
+          />
+          <div className="absolute inset-0 bg-primary/60" />
+        </div>
+
+        {/* Decorative Elements */}
+        <div className="absolute top-10 left-10 w-80 h-80 bg-secondary/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-10 right-10 w-96 h-96 bg-cyan-400/20 rounded-full blur-3xl animate-pulse delay-1000" />
+
+        <div className="max-w-5xl mx-auto relative z-10 text-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            {/* Quote Icon */}
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full glass-card-dark mb-8">
+              <span className="text-5xl text-secondary">"</span>
+            </div>
+
+            <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-8 leading-tight text-shadow-strong">
+              Our Commitment to You
+            </h2>
+            
+            <p className="text-white/90 text-2xl md:text-3xl font-light italic leading-relaxed mb-6">
+              Every patient who walks through our doors deserves the very best care — and that is what we promise.
+            </p>
+
+            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full glass-card-dark text-secondary font-bold">
+              <BsFillHeartPulseFill className="animate-pulse" />
+              <span>Mirsarai General Hospital</span>
+            </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* ── CTA ── */}
-      <section className="py-20 px-4 text-center bg-white">
-        <motion.div 
+      {/* ══════════════════════════════════════════
+          WHY IT MATTERS SECTION
+          ══════════════════════════════════════════ */}
+      <section className="py-24 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-extrabold text-primary mb-6">
+              Why This Matters
+            </h2>
+            <p className="text-gray-600 text-xl max-w-3xl mx-auto">
+              Our mission and vision aren't just words — they're the foundation of every action we take.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                icon: FaHandHoldingHeart,
+                title: "Patient-Centered Care",
+                description: "Your health, comfort, and satisfaction are at the heart of everything we do.",
+                color: "from-red-500 to-pink-600"
+              },
+              {
+                icon: FaRocket,
+                title: "Continuous Innovation",
+                description: "We constantly evolve with the latest medical technology and treatment methods.",
+                color: "from-purple-500 to-purple-700"
+              },
+              {
+                icon: FaShieldAlt,
+                title: "Trust & Integrity",
+                description: "We maintain the highest ethical standards in all our medical practices.",
+                color: "from-blue-600 to-primary"
+              }
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className="text-center group"
+              >
+                <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center mx-auto mb-6 shadow-xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}>
+                  <item.icon className="text-white text-4xl" />
+                </div>
+                <h3 className="text-2xl font-bold text-primary mb-4">{item.title}</h3>
+                <p className="text-gray-600 text-base leading-relaxed">{item.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════
+          CTA SECTION
+          ══════════════════════════════════════════ */}
+      <section className="py-24 px-4 text-center bg-gradient-to-br from-gray-50 via-blue-50/30 to-white">
+        <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="max-w-xl mx-auto"
+          transition={{ duration: 0.6 }}
+          className="max-w-3xl mx-auto"
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
-            Experience Our Care
+          <h2 className="text-4xl md:text-5xl font-extrabold text-primary mb-6">
+            Experience Our Care Today
           </h2>
-          <p className="text-gray-500 mb-8 text-base">
-            Our mission is your health. Come and experience compassionate, world-class care today.
+          <p className="text-gray-600 text-xl mb-10 leading-relaxed">
+            Our mission is your health. Come and experience compassionate, world-class healthcare.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-wrap gap-6 justify-center">
             <a
               href="/appointment"
-              className="bg-primary text-white px-8 py-4 rounded-full font-bold text-base hover:bg-primary/90 transition duration-300 shadow-lg hover:-translate-y-0.5 transform"
+              className="inline-flex items-center gap-3 bg-secondary hover:bg-secondary/90 text-white px-10 py-5 rounded-full font-bold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 transform group"
             >
-              Book Appointment
+              <BsFillHeartPulseFill className="text-xl" />
+              Book an Appointment
+              <FiArrowRight className="text-xl group-hover:translate-x-2 transition-transform" />
             </a>
             <a
               href="/about"
-              className="border-2 border-primary text-primary px-8 py-4 rounded-full font-bold text-base hover:bg-primary/5 transition duration-300"
+              className="inline-flex items-center gap-3 bg-white hover:bg-gray-50 text-primary border-2 border-gray-200 hover:border-primary/30 px-10 py-5 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 transform"
             >
               ← Back to About Us
             </a>
