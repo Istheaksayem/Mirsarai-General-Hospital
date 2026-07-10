@@ -10,6 +10,7 @@ import { StatsCard } from "@/components/ui/StatsCard";
 import { StatsCardSkeleton } from "@/components/ui/Skeleton";
 import { useReports } from "@/lib/hooks/useReports";
 import type { Report } from "@/lib/services/api";
+import { createActionColumn } from "@/components/ui/ActionButtons";
 
 const statusVariant: Record<Report["status"], "warning" | "info" | "success"> = {
   pending: "warning",
@@ -73,6 +74,7 @@ const columns: Column<Record<string, unknown>>[] = [
       return <Badge variant={statusVariant[s] ?? "default"}>{r.status as string}</Badge>;
     },
   },
+  createActionColumn(),
 ];
 
 export default function LabReportsPage() {

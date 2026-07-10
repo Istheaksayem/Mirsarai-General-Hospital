@@ -6,6 +6,8 @@ import { SearchFilter, SelectFilter } from "@/components/ui/SearchFilter";
 import { DataTable, Column } from "@/components/ui/DataTable";
 import { Badge } from "@/components/ui/Badge";
 import { useReports } from "@/lib/hooks/useReports";
+import { createActionColumn } from "@/components/ui/ActionButtons";
+import Link from "next/link";
 
 const statusVariant = { pending: "warning", "in-progress": "info", completed: "success" } as const;
 
@@ -29,6 +31,7 @@ const columns: Column<Record<string, unknown>>[] = [
       return <Badge variant={statusVariant[s] ?? "default"}>{r.status as string}</Badge>;
     },
   },
+  createActionColumn({ basePath: "/super-admin/reports" }),
 ];
 
 export default function ReportsPage() {

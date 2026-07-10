@@ -8,6 +8,8 @@ import { DataTable, Column } from "@/components/ui/DataTable";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { useDepartments } from "@/lib/hooks/useDepartments";
+import { createActionColumn } from "@/components/ui/ActionButtons";
+import Link from "next/link";
 
 const columns: Column<Record<string, unknown>>[] = [
   {
@@ -31,6 +33,7 @@ const columns: Column<Record<string, unknown>>[] = [
     key: "status", header: "Status",
     cell: (r) => <Badge variant={r.status === "active" ? "success" : "warning"}>{r.status as string}</Badge>,
   },
+  createActionColumn({ basePath: "/super-admin/departments" }),
 ];
 
 export default function DepartmentsPage() {
@@ -49,7 +52,7 @@ export default function DepartmentsPage() {
   return (
     <div className="space-y-6">
       <PageHeader title="Department Management" description={`${data.length} departments`} icon={Building2}>
-        <Button size="sm"><Plus className="h-4 w-4 mr-1.5" />Add Department</Button>
+        <Link href="/super-admin/departments/add"><Button size="sm"><Plus className="h-4 w-4 mr-1.5" />Add Department</Button></Link>
       </PageHeader>
 
       <div className="grid grid-cols-3 gap-3">

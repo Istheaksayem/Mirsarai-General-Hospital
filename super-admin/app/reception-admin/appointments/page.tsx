@@ -7,6 +7,7 @@ import { DataTable, Column } from "@/components/ui/DataTable";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { useAppointments } from "@/lib/hooks/useAppointments";
+import { createActionColumn } from "@/components/ui/ActionButtons";
 
 const columns: Column<Record<string, unknown>>[] = [
   { key: "id", header: "ID", cell: (r) => <span className="font-mono text-xs text-gray-400">{r.id as string}</span> },
@@ -21,6 +22,7 @@ const columns: Column<Record<string, unknown>>[] = [
   { key: "date", header: "Date", cell: (r) => <div><p className="font-medium">{r.date as string}</p><p className="text-xs text-gray-400">{r.time as string}</p></div> },
   { key: "type", header: "Type", cell: (r) => <Badge variant="info">{r.type as string}</Badge> },
   { key: "status", header: "Status", cell: (r) => <Badge variant={r.status === "confirmed" ? "success" : r.status === "pending" ? "warning" : r.status === "cancelled" ? "danger" : "default"}>{r.status as string}</Badge> },
+  createActionColumn(),
 ];
 
 export default function ReceptionAppointmentsPage() {

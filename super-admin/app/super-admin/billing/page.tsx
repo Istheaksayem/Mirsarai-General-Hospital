@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/Button";
 import { useBilling } from "@/lib/hooks/useBilling";
 import { formatCurrency } from "@/lib/date-utils";
 import { type Invoice } from "@/lib/services/api";
+import { createActionColumn } from "@/components/ui/ActionButtons";
+import Link from "next/link";
 
 const statusVariant: Record<Invoice["status"], "success" | "warning" | "danger"> = {
   paid: "success", partial: "warning", unpaid: "danger",
@@ -29,6 +31,7 @@ const columns: Column<Record<string, unknown>>[] = [
     key: "dueDate", header: "Due Date",
     cell: (r) => <span className="text-sm text-gray-500 dark:text-gray-400">{r.dueDate as string}</span>,
   },
+  createActionColumn({ basePath: "/super-admin/billing" }),
 ];
 
 export default function BillingPage() {
@@ -49,7 +52,7 @@ export default function BillingPage() {
     <div className="space-y-6">
       <PageHeader title="Billing & Invoices" description={`${data.length} invoices`} icon={CreditCard}>
         <Button variant="outline" size="sm"><Download className="h-4 w-4 mr-1.5" />Export</Button>
-        <Button size="sm"><Plus className="h-4 w-4 mr-1.5" />New Invoice</Button>
+        <Link href="/super-admin/billing/add"><Button size="sm"><Plus className="h-4 w-4 mr-1.5" />New Invoice</Button></Link>
       </PageHeader>
 
       <div className="grid grid-cols-3 gap-3">
