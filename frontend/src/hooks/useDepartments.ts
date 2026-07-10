@@ -14,14 +14,43 @@ export interface Department {
   available: boolean;
 }
 
-const fetchDepartments = async (): Promise<Department[]> => {
+export interface HospitalStats {
+  patientsCount: string;
+  yearsOfService: string;
+}
+
+export interface DepartmentFeature {
+  icon: string;
+  title: string;
+  description: string;
+  color: string;
+  bg: string;
+}
+
+export interface Testimonial {
+  name: string;
+  department: string;
+  rating: number;
+  text: string;
+  avatar: string;
+  color: string;
+}
+
+export interface DepartmentsData {
+  departments: Department[];
+  hospitalStats: HospitalStats;
+  features: DepartmentFeature[];
+  testimonials: Testimonial[];
+}
+
+const fetchDepartments = async (): Promise<DepartmentsData> => {
   const res = await fetch("/data/departments.json");
   if (!res.ok) throw new Error("Failed to fetch departments data");
   return res.json();
 };
 
 export const useDepartments = () =>
-  useQuery<Department[]>({
+  useQuery<DepartmentsData>({
     queryKey: ["departments"],
     queryFn: fetchDepartments,
     staleTime: 0,
