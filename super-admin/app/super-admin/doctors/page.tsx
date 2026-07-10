@@ -9,6 +9,8 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { useDoctors } from "@/lib/hooks/useDoctors";
 import { type Doctor } from "@/lib/services/api";
+import { createActionColumn } from "@/components/ui/ActionButtons";
+import Link from "next/link";
 
 const columns: Column<Record<string, unknown>>[] = [
   {
@@ -37,6 +39,7 @@ const columns: Column<Record<string, unknown>>[] = [
       return <Badge variant={v as "success" | "warning" | "danger"}>{r.status as string}</Badge>;
     },
   },
+  createActionColumn({ basePath: "/super-admin/doctors" }),
 ];
 
 export default function DoctorsPage() {
@@ -54,7 +57,7 @@ export default function DoctorsPage() {
   return (
     <div className="space-y-6">
       <PageHeader title="Doctor Management" description={`${data.length} doctors on staff`} icon={Stethoscope}>
-        <Button size="sm"><UserPlus className="h-4 w-4 mr-1.5" />Add Doctor</Button>
+        <Link href="/super-admin/doctors/add"><Button size="sm"><UserPlus className="h-4 w-4 mr-1.5" />Add Doctor</Button></Link>
       </PageHeader>
 
       <div className="grid grid-cols-3 gap-3">

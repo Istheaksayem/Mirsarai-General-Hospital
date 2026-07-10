@@ -78,8 +78,9 @@ if (env.nodeEnv === 'development') {
 // ROUTES
 // ============================================
 
-// API Version 1
+// API Version 1 and general API routes
 app.use('/api/v1', routes);
+app.use('/api', routes);
 
 // Root endpoint
 app.get('/', (req, res) => {

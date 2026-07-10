@@ -1,6 +1,10 @@
+import { setServers } from 'node:dns/promises';
 import app from './src/app.js';
 import env from './src/config/env.js';
 import connectDatabase from './src/config/database.js';
+
+// Set custom DNS servers for reliable resolution (Cloudflare + Google)
+setServers(['1.1.1.1', '8.8.8.8']);
 
 /**
  * Start the Express server

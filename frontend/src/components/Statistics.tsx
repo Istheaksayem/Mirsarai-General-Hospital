@@ -23,9 +23,18 @@ interface HomepageData {
 }
 
 const fetchHomepage = async (): Promise<HomepageData> => {
-  const res = await fetch("/data/homepage.json", { cache: "no-store" });
-  if (!res.ok) throw new Error("Failed to fetch homepage data");
-  return res.json();
+  try {
+    const res = await fetch("http://localhost:5000/api/homepage", { cache: "no-store" });
+    if (!res.ok) throw new Error("API responded with an error status");
+    const result = await res.json();
+    if (result.success && result.data) return result.data;
+    throw new Error(result.message || "Invalid API response");
+  } catch (error) {
+    console.warn("Backend API not reachable for statistics data. Falling back to local data/homepage.json", error);
+    const res = await fetch("/data/homepage.json", { cache: "no-store" });
+    if (!res.ok) throw new Error("Failed to fetch fallback homepage data");
+    return res.json();
+  }
 };
 
 const iconMap: Record<string, React.ReactNode> = {

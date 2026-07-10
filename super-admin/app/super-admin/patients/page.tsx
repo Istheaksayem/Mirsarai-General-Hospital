@@ -1,13 +1,17 @@
 "use client";
-
 import { useState } from "react";
 import { Users, UserPlus, Download } from "lucide-react";
+import Link from "next/link";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SearchFilter, SelectFilter } from "@/components/ui/SearchFilter";
 import { DataTable, Column } from "@/components/ui/DataTable";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { usePatients } from "@/lib/hooks/usePatients";
+import { createActionColumn } from "@/components/ui/ActionButtons";
+import { RegisterPatientModal, type NewPatient } from "@/components/patients/RegisterPatientModal";
+import type { Patient } from "@/lib/services/api";
+
 const statusVariant: Record<string, "success" | "warning" | "info"> = {
   active: "success", inactive: "warning", admitted: "info",
 };
@@ -15,16 +19,14 @@ const statusVariant: Record<string, "success" | "warning" | "info"> = {
 const columns: Column<Record<string, unknown>>[] = [
   {
     key: "id", header: "Patient ID",
-    cell: (r) => <span className="font-mono text-xs text-gray-500 dark:text-gray-400">{r.id as string}</span>,
+    cell: (r) => <span className="font-mono text-xs font-bold text-[#1E2B7A] dark:text-blue-400">{r.id as string}</span>,
   },
   {
     key: "name", header: "Patient",
     cell: (r) => (
       <div className="flex items-center gap-3">
         <div className="h-8 w-8 shrink-0 rounded-full bg-[#1E2B7A]/10 dark:bg-[#1E2B7A]/20 flex items-center justify-center">
-          <span className="text-xs font-semibold text-[#1E2B7A] dark:text-blue-400">
-            {(r.name as string).charAt(0)}
-          </span>
+          <span className="text-xs font-semibold text-[#1E2B7A] dark:text-blue-400">{(r.name as string).charAt(0)}</span>
         </div>
         <div>
           <p className="font-medium text-gray-900 dark:text-gray-100">{r.name as string}</p>
@@ -38,22 +40,21 @@ const columns: Column<Record<string, unknown>>[] = [
   { key: "department", header: "Department" },
   {
     key: "status", header: "Status",
-    cell: (r) => (
-      <Badge variant={statusVariant[r.status as string] ?? "default"}>
-        {r.status as string}
-      </Badge>
-    ),
+    cell: (r) => <Badge variant={statusVariant[r.status as string] ?? "default"}>{r.status as string}</Badge>,
   },
   {
     key: "lastVisit", header: "Last Visit",
     cell: (r) => <span className="text-sm text-gray-500 dark:text-gray-400">{(r.lastVisit as string) || "—"}</span>,
   },
+  createActionColumn({ basePath: "/super-admin/patients" }),
 ];
 
 export default function PatientsPage() {
-  const { data = [], isLoading } = usePatients();
+  const { data: fetchedData = [], isLoading } = usePatients();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+
+  const data = [...fetchedData];
 
   const filtered = data.filter((p) => {
     const matchSearch = !search || p.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -66,7 +67,9 @@ export default function PatientsPage() {
     <div className="space-y-6">
       <PageHeader title="Patient Management" description={`${data.length} registered patients`} icon={Users}>
         <Button variant="outline" size="sm"><Download className="h-4 w-4 mr-1.5" />Export</Button>
-        <Button size="sm"><UserPlus className="h-4 w-4 mr-1.5" />Add Patient</Button>
+        <Link href="/super-admin/patients/add">
+          <Button size="sm"><UserPlus className="h-4 w-4 mr-1.5" />Add Patient</Button>
+        </Link>
       </PageHeader>
 
       {/* Stats strip */}
@@ -88,7 +91,11 @@ export default function PatientsPage() {
         <SearchFilter value={search} onChange={setSearch} placeholder="Search by name, ID or phone..." className="flex-1" />
         <SelectFilter
           value={statusFilter} onChange={setStatusFilter}
-          options={[{ label: "Active", value: "active" }, { label: "Admitted", value: "admitted" }, { label: "Inactive", value: "inactive" }]}
+          options={[
+            { label: "Active", value: "active" },
+            { label: "Admitted", value: "admitted" },
+            { label: "Inactive", value: "inactive" },
+          ]}
           placeholder="All Status"
         />
       </div>

@@ -18,33 +18,30 @@ import ApiError from '../utils/ApiError.js';
 const validate = (schema) => {
   return (req, res, next) => {
     try {
-      const validationData = {};
-
-      if (schema.body) validationData.body = req.body;
-      if (schema.query) validationData.query = req.query;
-      if (schema.params) validationData.params = req.params;
-
-      const parsed = schema.parse(validationData);
+      const parsed = schema.parse({
+        body: req.body,
+        query: req.query,
+        params: req.params,
+      });
 
       // Replace request data with validated data
-      if (parsed.body) req.body = parsed.body;
-      if (parsed.query) req.query = parsed.query;
-      if (parsed.params) req.params = parsed.params;
+      if (parsed.body !== undefined) req.body = parsed.body;
+      if (parsed.query !== undefined) req.query = parsed.query;
+      if (parsed.params !== undefined) req.params = parsed.params;
 
       next();
     } catch (error) {
       // Zod validation error
       if (error.name === 'ZodError') {
-        const errors = error.errors.map((err) => ({
+        const issues = error.issues || error.errors || [];
+        const errors = issues.map((err) => ({
           field: err.path.join('.'),
           message: err.message,
         }));
 
-        return next(
-          new ApiError(StatusCodes.BAD_REQUEST, 'Validation failed', true, {
-            errors,
-          })
-        );
+        const apiErr = new ApiError(StatusCodes.BAD_REQUEST, 'Validation failed');
+        apiErr.errors = errors;
+        return next(apiErr);
       }
 
       next(error);

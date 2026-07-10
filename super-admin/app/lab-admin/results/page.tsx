@@ -6,6 +6,7 @@ import { SearchFilter, SelectFilter } from "@/components/ui/SearchFilter";
 import { DataTable, Column } from "@/components/ui/DataTable";
 import { Badge } from "@/components/ui/Badge";
 import { useReports } from "@/lib/hooks/useReports";
+import { createActionColumn } from "@/components/ui/ActionButtons";
 
 const statusVariant = { pending: "warning", "in-progress": "info", completed: "success" } as const;
 
@@ -17,6 +18,7 @@ const columns: Column<Record<string, unknown>>[] = [
   { key: "requestDate", header: "Date" },
   { key: "completedDate", header: "Completed", cell: (r) => <span className="text-gray-400">{(r.completedDate as string) || "—"}</span> },
   { key: "status", header: "Status", cell: (r) => { const s = r.status as keyof typeof statusVariant; return <Badge variant={statusVariant[s] ?? "default"}>{r.status as string}</Badge>; } },
+  createActionColumn(),
 ];
 
 export default function LabResultsPage() {

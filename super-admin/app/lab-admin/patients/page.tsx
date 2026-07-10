@@ -6,6 +6,7 @@ import { SearchFilter } from "@/components/ui/SearchFilter";
 import { DataTable, Column } from "@/components/ui/DataTable";
 import { Badge } from "@/components/ui/Badge";
 import { usePatients } from "@/lib/hooks/usePatients";
+import { createActionColumn } from "@/components/ui/ActionButtons";
 
 const columns: Column<Record<string, unknown>>[] = [
   { key: "id", header: "Patient ID", cell: (r) => <span className="font-mono text-xs text-gray-400">{r.id as string}</span> },
@@ -15,6 +16,7 @@ const columns: Column<Record<string, unknown>>[] = [
   { key: "phone", header: "Phone" },
   { key: "bloodGroup", header: "Blood Group" },
   { key: "status", header: "Status", cell: (r) => <Badge variant={r.status === "active" ? "success" : r.status === "admitted" ? "info" : "warning"}>{r.status as string}</Badge> },
+  createActionColumn(),
 ];
 
 export default function LabPatientSearchPage() {

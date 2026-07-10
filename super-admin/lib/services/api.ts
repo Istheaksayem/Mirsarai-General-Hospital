@@ -120,3 +120,151 @@ export const getActivities = () => fetchMock<Activity[]>("activities.json");
 export const getWebsiteContent = () => fetchMock<WebsiteContent>("website-content.json");
 export const getLabTests = () => fetchMock<LabTest[]>("lab-tests.json");
 export const getPrescriptions = () => fetchMock<Prescription[]>("prescriptions.json");
+
+// ─── Real Backend APIs (Homepage & Hero CMS) ───────────────────────────
+
+export interface LocalizedString {
+  en: string;
+  bn: string;
+}
+
+export interface LinkButton {
+  en: string;
+  bn: string;
+  link: string;
+}
+
+export interface StatItem {
+  number: string;
+  label: LocalizedString;
+  icon: string;
+  color: string;
+}
+
+export interface HomepageData {
+  emergency: {
+    phone: string;
+    badge: LocalizedString;
+    heading: LocalizedString;
+    subheading: LocalizedString;
+    description: LocalizedString;
+    quickInfo: LocalizedString[];
+  };
+  appointmentCTA: {
+    badge: LocalizedString;
+    heading: LocalizedString;
+    description: LocalizedString;
+    primaryBtn: LinkButton;
+    secondaryBtn: LinkButton;
+    features: LocalizedString[];
+  };
+  statistics: {
+    sectionBadge: LocalizedString;
+    heading: LocalizedString;
+    description: LocalizedString;
+    stats: StatItem[];
+  };
+}
+
+export interface SlideButton {
+  label: LocalizedString;
+  link: string;
+  variant: string;
+}
+
+export interface HeroSlide {
+  id?: number;
+  slideNumber: string;
+  heading: LocalizedString;
+  description: LocalizedString;
+  image: string;
+  buttons: SlideButton[];
+}
+
+export interface SearchBarConfig {
+  enabled: boolean;
+  title: LocalizedString;
+  searchPlaceholder: LocalizedString;
+  locationPlaceholder: LocalizedString;
+  advancedSearchLink: LocalizedString;
+}
+
+export interface JoinTeamConfig {
+  enabled: boolean;
+  question: LocalizedString;
+  title: LocalizedString;
+  buttonLabel: LocalizedString;
+  buttonLink: string;
+  image: string;
+}
+
+export interface ShapeConfig {
+  color: string;
+  size: number;
+  position: Record<string, string>;
+  opacity: number;
+}
+
+export interface DecorativeShapesConfig {
+  enabled: boolean;
+  shapes: ShapeConfig[];
+}
+
+export interface HeroData {
+  slides: HeroSlide[];
+  searchBar: SearchBarConfig;
+  joinTeam: JoinTeamConfig;
+  decorativeShapes: DecorativeShapesConfig;
+}
+
+const BACKEND_API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+
+async function fetchReal<T>(path: string): Promise<T> {
+  const res = await fetch(`${BACKEND_API}/${path}`, {
+    cache: "no-store",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (!res.ok) {
+    const errorText = await res.text();
+    let errorMessage = `Failed to fetch ${path}`;
+    try {
+      const parsed = JSON.parse(errorText);
+      errorMessage = parsed.message || errorMessage;
+    } catch {}
+    throw new ApiError(res.status, errorMessage);
+  }
+  const result = await res.json();
+  return result.data as T;
+}
+
+async function saveReal<T>(path: string, data: Partial<T>, method: "PUT" | "PATCH"): Promise<T> {
+  const res = await fetch(`${BACKEND_API}/${path}`, {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const errorText = await res.text();
+    let errorMessage = `Failed to save ${path}`;
+    try {
+      const parsed = JSON.parse(errorText);
+      errorMessage = parsed.message || errorMessage;
+    } catch {}
+    throw new ApiError(res.status, errorMessage);
+  }
+  const result = await res.json();
+  return result.data as T;
+}
+
+export const getAdminHomepage = () => fetchReal<HomepageData>("homepage");
+export const updateAdminHomepage = (data: Partial<HomepageData>, method: "PUT" | "PATCH" = "PUT") =>
+  saveReal<HomepageData>("homepage", data, method);
+
+export const getAdminHero = () => fetchReal<HeroData>("homepage/hero");
+export const updateAdminHero = (data: Partial<HeroData>, method: "PUT" | "PATCH" = "PUT") =>
+  saveReal<HeroData>("homepage/hero", data, method);
+

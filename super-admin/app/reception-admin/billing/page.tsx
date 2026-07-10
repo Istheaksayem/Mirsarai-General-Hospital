@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { useBilling } from "@/lib/hooks/useBilling";
 import { formatCurrency } from "@/lib/date-utils";
 import { type Invoice } from "@/lib/services/api";
+import { createActionColumn } from "@/components/ui/ActionButtons";
 
 const sv: Record<Invoice["status"], "success" | "warning" | "danger"> = { paid: "success", partial: "warning", unpaid: "danger" };
 const columns: Column<Record<string, unknown>>[] = [
@@ -18,6 +19,7 @@ const columns: Column<Record<string, unknown>>[] = [
   { key: "paid", header: "Paid", cell: (r) => <span className="text-green-600 dark:text-green-400">{formatCurrency(r.paid as number)}</span> },
   { key: "due", header: "Due", cell: (r) => <span className={(r.due as number) > 0 ? "text-red-500 dark:text-red-400 font-medium" : "text-gray-400"}>{formatCurrency(r.due as number)}</span> },
   { key: "status", header: "Status", cell: (r) => <Badge variant={sv[r.status as Invoice["status"]]}>{r.status as string}</Badge> },
+  createActionColumn(),
 ];
 
 export default function ReceptionBillingPage() {

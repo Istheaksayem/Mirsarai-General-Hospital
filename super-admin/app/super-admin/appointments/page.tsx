@@ -9,6 +9,8 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { useAppointments } from "@/lib/hooks/useAppointments";
 import { type Appointment } from "@/lib/services/api";
+import { createActionColumn } from "@/components/ui/ActionButtons";
+import Link from "next/link";
 
 const statusVariant: Record<Appointment["status"], "success" | "warning" | "default" | "danger"> = {
   confirmed: "success", pending: "warning", completed: "default", cancelled: "danger",
@@ -47,6 +49,7 @@ const columns: Column<Record<string, unknown>>[] = [
   },
   { key: "type", header: "Type", cell: (r) => <Badge variant={typeVariant[r.type as Appointment["type"]]}>{r.type as string}</Badge> },
   { key: "status", header: "Status", cell: (r) => <Badge variant={statusVariant[r.status as Appointment["status"]]}>{r.status as string}</Badge> },
+  createActionColumn({ basePath: "/super-admin/appointments" }),
 ];
 
 export default function AppointmentsPage() {
@@ -70,7 +73,7 @@ export default function AppointmentsPage() {
   return (
     <div className="space-y-6">
       <PageHeader title="Appointments" description={`${data.length} total appointments`} icon={CalendarDays}>
-        <Button size="sm"><Plus className="h-4 w-4 mr-1.5" />New Appointment</Button>
+        <Link href="/super-admin/appointments/add"><Button size="sm"><Plus className="h-4 w-4 mr-1.5" />New Appointment</Button></Link>
       </PageHeader>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

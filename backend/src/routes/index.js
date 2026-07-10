@@ -57,13 +57,16 @@ router.get('/', (req, res) => {
 });
 
 // ============================================
-// MODULE ROUTES (will be added later)
+// MODULE ROUTES
 // ============================================
+import homepageRoutes from './homepage.routes.js';
 // import authRoutes from './auth.routes.js';
 // import userRoutes from './user.routes.js';
 // import doctorRoutes from './doctor.routes.js';
 // import patientRoutes from './patient.routes.js';
 // import appointmentRoutes from './appointment.routes.js';
+
+router.use('/homepage', homepageRoutes);
 
 // router.use('/auth', authRoutes);
 // router.use('/users', userRoutes);
