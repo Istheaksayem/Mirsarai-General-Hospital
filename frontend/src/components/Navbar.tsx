@@ -37,6 +37,16 @@ const NAV_ITEMS: NavItem[] = [
     ],
   },
   { type: "link", en: "Departments", bn: "বিভাগসমূহ", href: "/departments" },
+  {
+    type: "dropdown",
+    en: "Resources",
+    bn: "রিসোর্স",
+    links: [
+      { en: "Health Blog", bn: "স্বাস্থ্য ব্লগ", href: "/resources/health-blog" },
+      { en: "Emergency Info", bn: "জরুরি তথ্য", href: "/resources/emergency-info" },
+      { en: "FAQ", bn: "প্রশ্নোত্তর", href: "/resources/faq" },
+    ],
+  },
   { type: "link", en: "Appointment", bn: "অ্যাপয়েন্টমেন্ট", href: "/appointment" },
   { type: "link", en: "Contact", bn: "যোগাযোগ", href: "/contact" },
 ];
