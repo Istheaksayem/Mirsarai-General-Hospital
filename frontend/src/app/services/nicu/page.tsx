@@ -68,8 +68,8 @@ const NICUServicePage = () => {
         </div>
 
         {/* Decorative floating elements */}
-        <div className="absolute top-20 right-10 w-80 h-80 rounded-full opacity-15 blur-3xl" style={{ background: "var(--tertiary)" }} />
-        <div className="absolute bottom-20 left-10 w-72 h-72 rounded-full opacity-20 blur-3xl" style={{ background: "#0284c7" }} />
+        <div className="absolute top-20 right-10 w-80 h-80 rounded-full opacity-15 blur-3xl" style={{ background: "var(--color-primary)" }} />
+        <div className="absolute bottom-20 left-10 w-72 h-72 rounded-full opacity-20 blur-3xl" style={{ background: "var(--color-accent)" }} />
 
         <div className="relative z-10 max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -239,8 +239,8 @@ const NICUServicePage = () => {
       {/* ── Services Grid ── */}
       <section className="py-24 px-4 relative overflow-hidden">
         <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-[var(--tertiary)] blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-[#fbbf24] blur-3xl" />
+          <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-[var(--color-primary)] blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-[var(--color-secondary)] blur-3xl" />
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10">
@@ -317,8 +317,8 @@ const NICUServicePage = () => {
       {/* ── Statistics ── */}
       <section className="py-28 px-4 relative overflow-hidden">
         <div className="absolute inset-0 opacity-[0.03]">
-          <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-[var(--tertiary)] blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-[#0284c7] blur-3xl" />
+          <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-[var(--color-primary)] blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-[var(--color-accent)] blur-3xl" />
         </div>
         
         <div className="max-w-7xl mx-auto relative z-10">

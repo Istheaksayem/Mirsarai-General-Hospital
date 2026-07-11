@@ -61,7 +61,7 @@ const DiagnosticServicePage = () => {
 
         {/* Decorative floating elements */}
         <div className="absolute top-20 left-10 w-72 h-72 rounded-full opacity-20 blur-3xl" style={{ background: "var(--color-accent)" }} />
-        <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full opacity-15 blur-3xl" style={{ background: "#a78bfa" }} />
+        <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full opacity-15 blur-3xl" style={{ background: "var(--color-secondary)" }} />
 
         <div className="relative z-10 max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -82,7 +82,7 @@ const DiagnosticServicePage = () => {
                 </span>
               </div>
               <h1 className="text-5xl md:text-6xl font-extrabold mb-6 leading-tight tracking-tight">
-                {diagnostic.title}
+                <span style={{ color: "var(--color-secondary)" }}>{diagnostic.title}</span>
               </h1>
               <p className="text-lg md:text-xl text-white/90 leading-relaxed mb-8">
                 {diagnostic.heroDescription}
@@ -92,7 +92,7 @@ const DiagnosticServicePage = () => {
                   href="#services"
                   className="inline-block px-8 py-4 font-bold text-white transition-all duration-300 hover:-translate-y-1 transform"
                   style={{
-                    background: "linear-gradient(135deg, var(--color-accent), #a78bfa)",
+                    background: "linear-gradient(135deg, var(--color-primary), var(--color-secondary))",
                     borderRadius: "var(--radius-lg)",
                     boxShadow: "var(--shadow-xl)"
                   }}
@@ -154,7 +154,7 @@ const DiagnosticServicePage = () => {
                   className="w-16 h-16 flex items-center justify-center mx-auto mb-5 transition-all duration-300 group-hover:scale-110"
                   style={{
                     borderRadius: "var(--radius-md)",
-                    background: "linear-gradient(135deg, var(--color-accent), #a78bfa)"
+                    background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))"
                   }}
                 >
                   <Icon className="text-white" size={28} />
@@ -176,7 +176,7 @@ const DiagnosticServicePage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <div className="animate-fadeInSlide">
             <h2 className="text-4xl md:text-5xl font-bold mb-8 leading-tight" style={{ color: "var(--color-primary)" }}>
-              Advanced <span style={{ color: "var(--color-accent)" }}>Diagnostic</span> Solutions
+              Advanced <span style={{ color: "var(--color-secondary)" }}>Diagnostic</span> Solutions
             </h2>
             <p 
               className="text-lg leading-relaxed mb-8"
@@ -190,11 +190,11 @@ const DiagnosticServicePage = () => {
                 <div 
                   className="w-12 h-12 flex items-center justify-center flex-shrink-0"
                   style={{
-                    background: "rgba(139, 92, 246, 0.1)",
+                    background: "rgba(var(--color-primary-rgb), 0.1)",
                     borderRadius: "var(--radius-md)"
                   }}
                 >
-                  <FaClock style={{ color: "var(--color-accent)" }} size={20} />
+                  <FaClock style={{ color: "var(--color-primary)" }} size={20} />
                 </div>
                 <div>
                   <p className="font-semibold" style={{ color: "var(--color-primary)" }}>
@@ -210,11 +210,11 @@ const DiagnosticServicePage = () => {
                 <div 
                   className="w-12 h-12 flex items-center justify-center flex-shrink-0"
                   style={{
-                    background: "rgba(239, 68, 68, 0.1)",
+                    background: "rgba(var(--color-secondary-rgb), 0.1)",
                     borderRadius: "var(--radius-md)"
                   }}
                 >
-                  <FaHeartbeat style={{ color: "#ef4444" }} size={20} />
+                  <FaHeartbeat style={{ color: "var(--color-secondary)" }} size={20} />
                 </div>
                 <div>
                   <p className="font-semibold" style={{ color: "var(--color-primary)" }}>
@@ -232,7 +232,7 @@ const DiagnosticServicePage = () => {
             <div 
               className="absolute -top-6 -right-6 w-full h-full"
               style={{
-                background: "linear-gradient(135deg, var(--color-accent), #a78bfa)",
+                background: "linear-gradient(135deg, var(--color-primary), var(--color-secondary))",
                 opacity: 0.1,
                 borderRadius: "var(--radius-xl)"
               }}
@@ -253,8 +253,8 @@ const DiagnosticServicePage = () => {
       {/* ── Services Grid ── */}
       <section className="py-24 px-4 relative overflow-hidden">
         <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-[var(--color-accent)] blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-[var(--color-primary)] blur-3xl" />
+          <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-[var(--color-primary)] blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-[var(--color-secondary)] blur-3xl" />
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10">
@@ -281,7 +281,7 @@ const DiagnosticServicePage = () => {
                   <div 
                     className="w-12 h-12 flex items-center justify-center"
                     style={{
-                      background: "linear-gradient(135deg, var(--color-accent), #a78bfa)",
+                      background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))",
                       borderRadius: "var(--radius-md)"
                     }}
                   >
@@ -297,7 +297,7 @@ const DiagnosticServicePage = () => {
                       <FaCheckCircle 
                         className="mt-1 flex-shrink-0" 
                         size={16} 
-                        style={{ color: "var(--color-accent)" }}
+                        style={{ color: "var(--color-secondary)" }}
                       />
                       <span className="text-sm leading-relaxed" style={{ color: "var(--foreground)", opacity: 0.75 }}>
                         {test}
@@ -314,8 +314,8 @@ const DiagnosticServicePage = () => {
       {/* ── Statistics ── */}
       <section className="py-28 px-4 relative overflow-hidden">
         <div className="absolute inset-0 opacity-[0.03]">
-          <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-[var(--color-accent)] blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-[var(--color-primary)] blur-3xl" />
+          <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-[var(--color-primary)] blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-[var(--color-secondary)] blur-3xl" />
         </div>
         
         <div className="max-w-7xl mx-auto relative z-10">
@@ -323,7 +323,7 @@ const DiagnosticServicePage = () => {
             <div 
               className="inline-block px-5 py-2 mb-6 text-sm font-bold tracking-wider uppercase"
               style={{
-                background: "linear-gradient(135deg, var(--color-accent), #a78bfa)",
+                background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))",
                 color: "white",
                 borderRadius: "var(--radius-xl)"
               }}
@@ -351,13 +351,13 @@ const DiagnosticServicePage = () => {
                 <div 
                   className="w-14 h-14 flex items-center justify-center mx-auto mb-4 transition-transform duration-300 group-hover:scale-110"
                   style={{
-                    background: "linear-gradient(135deg, var(--color-accent), #a78bfa)",
+                    background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))",
                     borderRadius: "var(--radius-md)"
                   }}
                 >
                   <FaFlask className="text-white" size={24} />
                 </div>
-                <p className="text-5xl font-extrabold mb-2 tracking-tight" style={{ color: "var(--color-accent)" }}>
+                <p className="text-5xl font-extrabold mb-2 tracking-tight" style={{ color: "var(--color-primary)" }}>
                   {stat.value}
                 </p>
                 <p className="text-sm font-medium tracking-wide" style={{ color: "var(--foreground)", opacity: 0.7 }}>
@@ -385,7 +385,7 @@ const DiagnosticServicePage = () => {
             href="/appointment"
             className="inline-block text-white px-12 py-5 font-bold text-lg transition-all duration-500 hover:-translate-y-2 transform"
             style={{
-              background: "linear-gradient(135deg, var(--color-accent) 0%, #a78bfa 100%)",
+              background: "linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%)",
               borderRadius: "var(--radius-xl)",
               boxShadow: "var(--shadow-xl)"
             }}
