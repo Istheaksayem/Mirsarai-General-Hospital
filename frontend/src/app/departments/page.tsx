@@ -60,26 +60,35 @@ export default function DepartmentsPage() {
   // Derive stats dynamically from departments data
   const totalDoctors = departments.reduce((sum, d) => sum + d.availableDoctors, 0);
   const stats = [
-    { value: `${departments.length}+`,    label: "Departments",       icon: FaIcons5.FaHospital },
-    { value: `${totalDoctors}+`,          label: "Expert Doctors",    icon: FiUsers },
-    { value: hospitalStats.patientsCount, label: "Patients Treated",  icon: FiHeart },
-    { value: hospitalStats.yearsOfService,label: "Years of Service",  icon: FiAward },
+    { value: `${departments.length}+`, label: "Departments", icon: FaIcons5.FaHospital },
+    { value: `${totalDoctors}+`, label: "Expert Doctors", icon: FiUsers },
+    { value: hospitalStats.patientsCount, label: "Patients Treated", icon: FiHeart },
+    { value: hospitalStats.yearsOfService, label: "Years of Service", icon: FiAward },
   ];
 
   return (
     <main className="min-h-screen bg-gray-50/30 pt-8 pb-20">
       {/* ── Header Banner ── */}
-      <div className="bg-primary/5 py-12 mb-8">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Our <span className="text-primary">Departments</span>
-          </h1>
-          <p className="text-gray-600 max-w-2xl mx-auto text-lg">
-            Comprehensive medical care across various specialties, equipped with
-            modern technology and experienced professionals.
-          </p>
+      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden mb-8">
+        {/* Background Image */}
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/about-us.jpg')" }}
+        />
+        <div className="absolute inset-0 bg-black/60" />
+
+        {/* Hero Content */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="border-l-4 border-orange-500 pl-6 animate-slide-up">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-4 tracking-tight">
+              Our Departments
+            </h1>
+            <div className="flex items-center text-xs md:text-sm font-bold tracking-widest uppercase text-gray-300 gap-3">
+              <span className="text-white">DEPARTMENTS</span>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
 
       {/* ── Stats Bar ── */}
       <div className="bg-white border-b border-gray-100 shadow-sm mb-8">
@@ -122,11 +131,10 @@ export default function DepartmentsPage() {
                 {/* All Departments */}
                 <button
                   onClick={() => setSelectedDept(null)}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 text-left ${
-                    selectedDept === null
-                      ? "bg-primary text-white shadow-md font-semibold"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-primary font-medium"
-                  }`}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 text-left ${selectedDept === null
+                    ? "bg-primary text-white shadow-md font-semibold"
+                    : "text-gray-600 hover:bg-gray-50 hover:text-primary font-medium"
+                    }`}
                 >
                   <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                     <FaIcons5.FaHospital
@@ -145,11 +153,10 @@ export default function DepartmentsPage() {
                     <button
                       key={dept.id}
                       onClick={() => setSelectedDept(dept.slug)}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 text-left ${
-                        isSelected
-                          ? "bg-primary text-white shadow-md font-semibold"
-                          : "text-gray-600 hover:bg-gray-50 hover:text-primary font-medium"
-                      }`}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 text-left ${isSelected
+                        ? "bg-primary text-white shadow-md font-semibold"
+                        : "text-gray-600 hover:bg-gray-50 hover:text-primary font-medium"
+                        }`}
                     >
                       <div
                         className="w-10 h-10 rounded-lg flex-shrink-0 overflow-hidden relative"

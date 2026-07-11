@@ -60,8 +60,8 @@ const MissionVisionPage = () => {
         <div className="text-center p-8">
           <div className="text-red-500 text-6xl mb-4">⚠️</div>
           <p className="text-red-500 text-lg font-medium">Failed to load Mission & Vision data.</p>
-          <button 
-            onClick={() => window.location.reload()} 
+          <button
+            onClick={() => window.location.reload()}
             className="mt-4 px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
           >
             Retry
@@ -76,119 +76,32 @@ const MissionVisionPage = () => {
   return (
     <main className="bg-white overflow-hidden">
       {/* ══════════════════════════════════════════
-          HERO SECTION - SPLIT DESIGN
+          HERO SECTION - STANDARD BANNER
           ══════════════════════════════════════════ */}
-      <section className="relative min-h-screen flex items-center overflow-hidden">
-        {/* Parallax Background */}
-        <div 
-          ref={parallaxRef}
-          className="absolute inset-0 w-full h-[120%] parallax-container"
-        >
-          <div 
-            className="absolute inset-0 bg-cover bg-center"
-            style={{
-              backgroundImage: `url('/about-us.jpg')`,
-            }}
-          />
-          <div className="absolute inset-0 bg-primary/30" />
-        </div>
+      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+        {/* Background Image Layer */}
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url('/about-us.jpg')` }}
+        />
+        <div className="absolute inset-0 bg-black/60" />
 
-        {/* Animated Background Elements */}
-        <div className="absolute top-20 left-10 w-96 h-96 bg-secondary/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-20 right-10 w-80 h-80 bg-cyan-400/20 rounded-full blur-3xl animate-pulse delay-700" />
-        <div className="absolute top-1/2 left-1/3 w-64 h-64 bg-white/10 rounded-full blur-3xl animate-scale-pulse" />
-
-        {/* Hero Content - Split Layout */}
-        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
-          <motion.div
+        {/* Hero Content */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div 
+            className="border-l-4 border-orange-500 pl-6"
             initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
           >
-            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full glass-card-dark text-secondary text-sm font-bold tracking-wider uppercase mb-8">
-              <MdVerified className="text-xl" />
-              <span>Our Purpose & Direction</span>
-            </div>
-            <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-6 leading-tight text-shadow-strong">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-4 tracking-tight">
               {missionVision.title}
             </h1>
-            <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto leading-relaxed">
-              The values and vision that drive everything we do for your health and well-being.
-            </p>
+            <div className="flex items-center text-xs md:text-sm font-bold tracking-widest uppercase text-gray-300 gap-3">
+              <span className="text-white">MISSION & VISION</span>
+            </div>
           </motion.div>
-
-          {/* Mission & Vision Cards - Side by Side */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-            {/* Mission Card */}
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className="relative group"
-            >
-              <div className="glass-card rounded-3xl p-10 h-full hover-lift border-2 border-white/20">
-                {/* Icon Badge */}
-                <div className="inline-flex items-center gap-3 mb-6">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-secondary to-green-600 flex items-center justify-center shadow-xl animate-scale-pulse">
-                    <FaBullseye className="text-white text-3xl" />
-                  </div>
-                  <span className="text-xs font-bold text-primary uppercase tracking-wider bg-secondary/10 px-3 py-1 rounded-full">
-                    Mission
-                  </span>
-                </div>
-
-                <h2 className="text-3xl font-extrabold text-primary mb-4">
-                  {missionVision.mission.title}
-                </h2>
-                
-                <p className="text-gray-700 leading-relaxed text-lg mb-6">
-                  {missionVision.mission.description}
-                </p>
-
-                {/* Decorative Element */}
-                <div className="absolute bottom-10 right-10 w-24 h-24 border-4 border-secondary/20 rounded-full animate-rotate-slow" />
-              </div>
-            </motion.div>
-
-            {/* Vision Card */}
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.5 }}
-              className="relative group"
-            >
-              <div className="glass-card rounded-3xl p-10 h-full hover-lift border-2 border-white/20">
-                {/* Icon Badge */}
-                <div className="inline-flex items-center gap-3 mb-6">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-blue-900 flex items-center justify-center shadow-xl animate-scale-pulse">
-                    <FaEye className="text-white text-3xl" />
-                  </div>
-                  <span className="text-xs font-bold text-primary uppercase tracking-wider bg-primary/10 px-3 py-1 rounded-full">
-                    Vision
-                  </span>
-                </div>
-
-                <h2 className="text-3xl font-extrabold text-primary mb-4">
-                  {missionVision.vision.title}
-                </h2>
-                
-                <p className="text-gray-700 leading-relaxed text-lg mb-6">
-                  {missionVision.vision.description}
-                </p>
-
-                {/* Decorative Element */}
-                <div className="absolute bottom-10 right-10 w-24 h-24 border-4 border-primary/20 rounded-full animate-rotate-slow" />
-              </div>
-            </motion.div>
-          </div>
-        </div>
-
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce z-30">
-          <div className="w-6 h-10 rounded-full border-2 border-white/40 flex items-start justify-center p-2">
-            <div className="w-1 h-3 bg-white/60 rounded-full animate-scroll" />
-          </div>
         </div>
       </section>
 
@@ -292,7 +205,7 @@ const MissionVisionPage = () => {
       <section className="relative py-32 px-4 overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0">
-          <div 
+          <div
             className="absolute inset-0 bg-cover bg-center bg-fixed"
             style={{
               backgroundImage: `url('/about-us.jpg')`,
@@ -320,7 +233,7 @@ const MissionVisionPage = () => {
             <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-8 leading-tight text-shadow-strong">
               Our Commitment to You
             </h2>
-            
+
             <p className="text-white/90 text-2xl md:text-3xl font-light italic leading-relaxed mb-6">
               Every patient who walks through our doors deserves the very best care — and that is what we promise.
             </p>

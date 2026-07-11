@@ -13,7 +13,9 @@ import {
   FaCheckCircle,
   FaArrowRight,
   FaArrowLeft,
+  FaDownload,
 } from "react-icons/fa";
+import jsPDF from "jspdf";
 import { useDoctors } from "@/hooks/useDoctors";
 
 const steps = ["Personal Info", "Select Doctor", "Schedule", "Confirm"];
@@ -105,6 +107,111 @@ export default function AppointmentForm() {
     setSubmitted(true);
   };
 
+  const downloadPDF = () => {
+    const doc = new jsPDF();
+    
+    // Header
+    doc.setFillColor(26, 115, 232);
+    doc.rect(0, 0, 210, 40, "F");
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(24);
+    doc.text("Mirsarai General Hospital", 105, 15, { align: "center" });
+    
+    doc.setFontSize(12);
+    doc.text("Appointment Confirmation", 105, 25, { align: "center" });
+    doc.text("Mirsarai, Chattogram, Bangladesh", 105, 32, { align: "center" });
+    
+    // Reset colors
+    doc.setTextColor(0, 0, 0);
+    
+    // Appointment Details
+    let yPos = 55;
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.text("Appointment Details", 20, yPos);
+    
+    yPos += 10;
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "normal");
+    
+    // Patient Information
+    doc.setFont("helvetica", "bold");
+    doc.text("Patient Information:", 20, yPos);
+    yPos += 8;
+    doc.setFont("helvetica", "normal");
+    
+    doc.text(`Full Name: ${form.fullName}`, 25, yPos);
+    yPos += 7;
+    doc.text(`Phone: ${form.phone}`, 25, yPos);
+    yPos += 7;
+    
+    if (form.email) {
+      doc.text(`Email: ${form.email}`, 25, yPos);
+      yPos += 7;
+    }
+    
+    if (form.age) {
+      doc.text(`Age: ${form.age}`, 25, yPos);
+      yPos += 7;
+    }
+    
+    doc.text(`Gender: ${form.gender}`, 25, yPos);
+    yPos += 12;
+    
+    // Appointment Details
+    doc.setFont("helvetica", "bold");
+    doc.text("Appointment Details:", 20, yPos);
+    yPos += 8;
+    doc.setFont("helvetica", "normal");
+    
+    doc.text(`Department: ${form.department}`, 25, yPos);
+    yPos += 7;
+    doc.text(`Doctor: ${form.doctor}`, 25, yPos);
+    yPos += 7;
+    doc.text(`Date: ${form.date}`, 25, yPos);
+    yPos += 7;
+    doc.text(`Time: ${form.time}`, 25, yPos);
+    yPos += 12;
+    
+    // Additional Notes
+    if (form.message) {
+      doc.setFont("helvetica", "bold");
+      doc.text("Additional Notes:", 20, yPos);
+      yPos += 8;
+      doc.setFont("helvetica", "normal");
+      
+      const splitMessage = doc.splitTextToSize(form.message, 170);
+      doc.text(splitMessage, 25, yPos);
+      yPos += splitMessage.length * 7 + 10;
+    }
+    
+    // Important Information Box
+    doc.setDrawColor(26, 115, 232);
+    doc.setLineWidth(0.5);
+    doc.rect(20, yPos, 170, 30);
+    
+    yPos += 8;
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "bold");
+    doc.text("Important Information:", 25, yPos);
+    yPos += 6;
+    doc.setFont("helvetica", "normal");
+    doc.text("• Please arrive 10 minutes early for your appointment", 25, yPos);
+    yPos += 5;
+    doc.text("• Bring a valid ID and any previous medical records", 25, yPos);
+    yPos += 5;
+    doc.text("• Contact us at +01969997799 for any changes", 25, yPos);
+    
+    // Footer
+    doc.setFontSize(8);
+    doc.setTextColor(128, 128, 128);
+    doc.text("Generated on: " + new Date().toLocaleString(), 105, 280, { align: "center" });
+    
+    // Save PDF
+    doc.save(`Appointment_${form.fullName.replace(/\s+/g, "_")}_${form.date}.pdf`);
+  };
+
   // Min date: today
   const today = new Date().toISOString().split("T")[0];
 
@@ -126,12 +233,21 @@ export default function AppointmentForm() {
         <p className="text-gray-500 mb-8">
           📅 <strong>{form.date}</strong> at <strong>{form.time}</strong>
         </p>
-        <div className="bg-blue-50 border border-blue-100 rounded-2xl px-6 py-4 text-sm text-blue-700 max-w-sm">
+        <div className="bg-blue-50 border border-blue-100 rounded-2xl px-6 py-4 text-sm text-blue-700 max-w-sm mb-8">
           A confirmation will be sent to your phone{form.email ? " and email" : ""}. Please arrive 10 minutes early.
         </div>
+        
+        {/* Download PDF Button */}
+        <button
+          onClick={downloadPDF}
+          className="flex items-center gap-2 px-8 py-3.5 rounded-xl bg-primary text-white font-bold text-sm hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all duration-200 mb-4"
+        >
+          <FaDownload /> Download Appointment PDF
+        </button>
+        
         <button
           onClick={() => { setSubmitted(false); setStep(0); setForm({ fullName: "", phone: "", email: "", age: "", gender: "", department: "", doctor: "", date: "", time: "", message: "" }); }}
-          className="mt-8 text-primary underline underline-offset-4 text-sm hover:opacity-75 transition"
+          className="text-primary underline underline-offset-4 text-sm hover:opacity-75 transition"
         >
           Book another appointment
         </button>
