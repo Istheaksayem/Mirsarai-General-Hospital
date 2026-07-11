@@ -32,6 +32,8 @@ const NAV_ITEMS: NavItem[] = [
     links: [
       { en: "About Us", bn: "আমাদের পরিচয়", href: "/about" },
       { en: "Mission & Vision", bn: "লক্ষ্য ও দর্শন", href: "/about/mission-vision" },
+      { en: "Gallery", bn: "গ্যালারি", href: "/about/gallery" },
+      { en: "Career", bn: "ক্যারিয়ার", href: "/about/career" },
     ],
   },
   { type: "link", en: "Departments", bn: "বিভাগসমূহ", href: "/departments" },

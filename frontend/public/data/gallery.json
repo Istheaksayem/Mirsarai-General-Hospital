@@ -1,0 +1,256 @@
+{
+  "hero": {
+    "title": {
+      "en": "Our Gallery",
+      "bn": "আমাদের গ্যালারি"
+    },
+    "subtitle": {
+      "en": "A Glimpse Into Our World-Class Facilities",
+      "bn": "আমাদের বিশ্বমানের সুবিধাগুলির একটি ঝলক"
+    },
+    "description": {
+      "en": "Explore our state-of-the-art medical facilities, dedicated team, and the compassionate care we provide to our patients.",
+      "bn": "আমাদের অত্যাধুনিক চিকিৎসা সুবিধা, নিবেদিত দল এবং আমাদের রোগীদের প্রদান করা সহানুভূতিশীল যত্ন অন্বেষণ করুন।"
+    }
+  },
+  "categories": [
+    {
+      "id": "facilities",
+      "title": {
+        "en": "Hospital Facilities",
+        "bn": "হাসপাতাল সুবিধা"
+      },
+      "description": {
+        "en": "Modern medical equipment and comfortable patient areas",
+        "bn": "আধুনিক চিকিৎসা সরঞ্জাম এবং আরামদায়ক রোগী এলাকা"
+      }
+    },
+    {
+      "id": "departments",
+      "title": {
+        "en": "Departments",
+        "bn": "বিভাগসমূহ"
+      },
+      "description": {
+        "en": "Specialized departments with advanced technology",
+        "bn": "উন্নত প্রযুক্তি সহ বিশেষায়িত বিভাগ"
+      }
+    },
+    {
+      "id": "team",
+      "title": {
+        "en": "Our Team",
+        "bn": "আমাদের দল"
+      },
+      "description": {
+        "en": "Dedicated healthcare professionals at your service",
+        "bn": "আপনার সেবায় নিবেদিত স্বাস্থ্যসেবা পেশাদার"
+      }
+    },
+    {
+      "id": "events",
+      "title": {
+        "en": "Events & Activities",
+        "bn": "ইভেন্ট এবং কার্যক্রম"
+      },
+      "description": {
+        "en": "Community health programs and hospital events",
+        "bn": "সম্প্রদায় স্বাস্থ্য কর্মসূচি এবং হাসপাতাল ইভেন্ট"
+      }
+    }
+  ],
+  "images": [
+    {
+      "id": 1,
+      "category": "facilities",
+      "src": "/hospital-banner.jpg",
+      "title": {
+        "en": "Main Hospital Building",
+        "bn": "প্রধান হাসপাতাল ভবন"
+      },
+      "description": {
+        "en": "Our modern hospital building with state-of-the-art facilities",
+        "bn": "অত্যাধুনিক সুবিধা সহ আমাদের আধুনিক হাসপাতাল ভবন"
+      }
+    },
+    {
+      "id": 2,
+      "category": "facilities",
+      "src": "/about-us.jpg",
+      "title": {
+        "en": "Patient Care Unit",
+        "bn": "রোগী পরিচর্যা ইউনিট"
+      },
+      "description": {
+        "en": "Comfortable and well-equipped patient rooms",
+        "bn": "আরামদায়ক এবং সুসজ্জিত রোগী কক্ষ"
+      }
+    },
+    {
+      "id": 3,
+      "category": "departments",
+      "src": "/images/departments/cardiology.png",
+      "title": {
+        "en": "Cardiology Department",
+        "bn": "হৃদরোগ বিভাগ"
+      },
+      "description": {
+        "en": "Advanced cardiac care equipment and facilities",
+        "bn": "উন্নত কার্ডিয়াক যত্ন সরঞ্জাম এবং সুবিধা"
+      }
+    },
+    {
+      "id": 4,
+      "category": "departments",
+      "src": "/images/departments/neurology.png",
+      "title": {
+        "en": "Neurology Department",
+        "bn": "স্নায়ুরোগ বিভাগ"
+      },
+      "description": {
+        "en": "Specialized neurological care and diagnostics",
+        "bn": "বিশেষায়িত স্নায়বিক যত্ন এবং ডায়াগনস্টিকস"
+      }
+    },
+    {
+      "id": 5,
+      "category": "departments",
+      "src": "/images/departments/orthopedics.png",
+      "title": {
+        "en": "Orthopedics Department",
+        "bn": "অর্থোপেডিক্স বিভাগ"
+      },
+      "description": {
+        "en": "Modern orthopedic surgery and rehabilitation",
+        "bn": "আধুনিক অর্থোপেডিক সার্জারি এবং পুনর্বাসন"
+      }
+    },
+    {
+      "id": 6,
+      "category": "departments",
+      "src": "/images/departments/pediatrics.png",
+      "title": {
+        "en": "Pediatrics Department",
+        "bn": "শিশু বিভাগ"
+      },
+      "description": {
+        "en": "Child-friendly environment with specialized pediatric care",
+        "bn": "বিশেষায়িত শিশু যত্ন সহ শিশু-বান্ধব পরিবেশ"
+      }
+    },
+    {
+      "id": 7,
+      "category": "team",
+      "src": "/hospital-banner.jpg",
+      "title": {
+        "en": "Medical Team Meeting",
+        "bn": "চিকিৎসা দলের বৈঠক"
+      },
+      "description": {
+        "en": "Our doctors collaborating for better patient care",
+        "bn": "আমাদের ডাক্তাররা ভাল রোগী যত্নের জন্য সহযোগিতা করছেন"
+      }
+    },
+    {
+      "id": 8,
+      "category": "team",
+      "src": "/about-us.jpg",
+      "title": {
+        "en": "Nursing Staff",
+        "bn": "নার্সিং কর্মীরা"
+      },
+      "description": {
+        "en": "Dedicated nurses providing compassionate care",
+        "bn": "সহানুভূতিশীল যত্ন প্রদানকারী নিবেদিত নার্সরা"
+      }
+    },
+    {
+      "id": 9,
+      "category": "events",
+      "src": "/hospital-banner.jpg",
+      "title": {
+        "en": "Health Camp",
+        "bn": "স্বাস্থ্য শিবির"
+      },
+      "description": {
+        "en": "Free health checkup camp for the community",
+        "bn": "সম্প্রদায়ের জন্য বিনামূল্যে স্বাস্থ্য পরীক্ষা শিবির"
+      }
+    },
+    {
+      "id": 10,
+      "category": "events",
+      "src": "/about-us.jpg",
+      "title": {
+        "en": "Awareness Program",
+        "bn": "সচেতনতা কর্মসূচি"
+      },
+      "description": {
+        "en": "Health awareness program for local community",
+        "bn": "স্থানীয় সম্প্রদায়ের জন্য স্বাস্থ্য সচেতনতা কর্মসূচি"
+      }
+    },
+    {
+      "id": 11,
+      "category": "facilities",
+      "src": "/hospital-banner.jpg",
+      "title": {
+        "en": "Emergency Department",
+        "bn": "জরুরি বিভাগ"
+      },
+      "description": {
+        "en": "24/7 emergency services with rapid response team",
+        "bn": "দ্রুত প্রতিক্রিয়া দল সহ ২৪/৭ জরুরি সেবা"
+      }
+    },
+    {
+      "id": 12,
+      "category": "facilities",
+      "src": "/about-us.jpg",
+      "title": {
+        "en": "Diagnostic Lab",
+        "bn": "ডায়াগনস্টিক ল্যাব"
+      },
+      "description": {
+        "en": "Advanced diagnostic equipment for accurate testing",
+        "bn": "সঠিক পরীক্ষার জন্য উন্নত ডায়াগনস্টিক সরঞ্জাম"
+      }
+    }
+  ],
+  "stats": {
+    "title": {
+      "en": "Our Achievements",
+      "bn": "আমাদের অর্জন"
+    },
+    "items": [
+      {
+        "number": "50+",
+        "label": {
+          "en": "Expert Doctors",
+          "bn": "বিশেষজ্ঞ ডাক্তার"
+        }
+      },
+      {
+        "number": "100+",
+        "label": {
+          "en": "Hospital Beds",
+          "bn": "হাসপাতাল বিছানা"
+        }
+      },
+      {
+        "number": "10,000+",
+        "label": {
+          "en": "Happy Patients",
+          "bn": "সন্তুষ্ট রোগী"
+        }
+      },
+      {
+        "number": "15+",
+        "label": {
+          "en": "Departments",
+          "bn": "বিভাগসমূহ"
+        }
+      }
+    ]
+  }
+}
