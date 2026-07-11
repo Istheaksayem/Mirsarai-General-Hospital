@@ -1,0 +1,210 @@
+{
+  "hero": {
+    "title": {
+      "en": "Health Blog",
+      "bn": "স্বাস্থ্য ব্লগ"
+    },
+    "subtitle": {
+      "en": "Expert Health Tips & Medical Insights",
+      "bn": "বিশেষজ্ঞ স্বাস্থ্য পরামর্শ এবং চিকিৎসা তথ্য"
+    },
+    "description": {
+      "en": "Stay informed with the latest health articles, medical tips, and wellness advice from our expert healthcare professionals.",
+      "bn": "আমাদের বিশেষজ্ঞ স্বাস্থ্যসেবা পেশাদারদের থেকে সর্বশেষ স্বাস্থ্য নিবন্ধ, চিকিৎসা পরামর্শ এবং সুস্থতা পরামর্শ সম্পর্কে অবগত থাকুন।"
+    },
+    "image": "/about-us.jpg"
+  },
+  "categories": [
+    {
+      "id": "all",
+      "name": {
+        "en": "All Posts",
+        "bn": "সব পোস্ট"
+      }
+    },
+    {
+      "id": "general-health",
+      "name": {
+        "en": "General Health",
+        "bn": "সাধারণ স্বাস্থ্য"
+      }
+    },
+    {
+      "id": "nutrition",
+      "name": {
+        "en": "Nutrition",
+        "bn": "পুষ্টি"
+      }
+    },
+    {
+      "id": "child-care",
+      "name": {
+        "en": "Child Care",
+        "bn": "শিশু যত্ন"
+      }
+    },
+    {
+      "id": "mental-health",
+      "name": {
+        "en": "Mental Health",
+        "bn": "মানসিক স্বাস্থ্য"
+      }
+    }
+  ],
+  "posts": [
+    {
+      "id": 1,
+      "category": "general-health",
+      "title": {
+        "en": "10 Tips for a Healthy Heart",
+        "bn": "সুস্থ হৃদযন্ত্রের জন্য ১০টি টিপস"
+      },
+      "excerpt": {
+        "en": "Maintaining heart health is crucial for overall wellbeing. Learn essential tips to keep your heart healthy.",
+        "bn": "সামগ্রিক সুস্থতার জন্য হৃদযন্ত্রের স্বাস্থ্য বজায় রাখা অত্যন্ত গুরুত্বপূর্ণ। আপনার হৃদযন্ত্র সুস্থ রাখতে প্রয়োজনীয় টিপস শিখুন।"
+      },
+      "author": {
+        "en": "Dr. Ahmed Rahman",
+        "bn": "ডা. আহমেদ রহমান"
+      },
+      "date": "2024-01-15",
+      "readTime": {
+        "en": "5 min read",
+        "bn": "৫ মিনিট পড়া"
+      },
+      "image": "/hospital-banner.jpg"
+    },
+    {
+      "id": 2,
+      "category": "nutrition",
+      "title": {
+        "en": "Balanced Diet: Key to Good Health",
+        "bn": "সুষম খাদ্য: ভালো স্বাস্থ্যের চাবিকাঠি"
+      },
+      "excerpt": {
+        "en": "Discover the importance of a balanced diet and how it impacts your overall health and wellness.",
+        "bn": "সুষম খাদ্যের গুরুত্ব এবং এটি কীভাবে আপনার সামগ্রিক স্বাস্থ্য এবং সুস্থতাকে প্রভাবিত করে তা আবিষ্কার করুন।"
+      },
+      "author": {
+        "en": "Dr. Fatima Begum",
+        "bn": "ডা. ফাতিমা বেগম"
+      },
+      "date": "2024-01-12",
+      "readTime": {
+        "en": "7 min read",
+        "bn": "৭ মিনিট পড়া"
+      },
+      "image": "/about-us.jpg"
+    },
+    {
+      "id": 3,
+      "category": "child-care",
+      "title": {
+        "en": "Essential Vaccines for Children",
+        "bn": "শিশুদের জন্য প্রয়োজনীয় টিকা"
+      },
+      "excerpt": {
+        "en": "Learn about the important vaccines every child needs to stay healthy and protected from diseases.",
+        "bn": "প্রতিটি শিশুর সুস্থ থাকতে এবং রোগ থেকে সুরক্ষিত থাকার জন্য প্রয়োজনীয় গুরুত্বপূর্ণ টিকা সম্পর্কে জানুন।"
+      },
+      "author": {
+        "en": "Dr. Kamal Hossain",
+        "bn": "ডা. কামাল হোসেন"
+      },
+      "date": "2024-01-10",
+      "readTime": {
+        "en": "6 min read",
+        "bn": "৬ মিনিট পড়া"
+      },
+      "image": "/hospital-banner.jpg"
+    },
+    {
+      "id": 4,
+      "category": "mental-health",
+      "title": {
+        "en": "Managing Stress in Daily Life",
+        "bn": "দৈনন্দিন জীবনে মানসিক চাপ পরিচালনা"
+      },
+      "excerpt": {
+        "en": "Effective strategies to manage stress and maintain mental wellness in your everyday routine.",
+        "bn": "আপনার প্রতিদিনের রুটিনে মানসিক চাপ পরিচালনা এবং মানসিক সুস্থতা বজায় রাখার কার্যকর কৌশল।"
+      },
+      "author": {
+        "en": "Dr. Nazia Islam",
+        "bn": "ডা. নাজিয়া ইসলাম"
+      },
+      "date": "2024-01-08",
+      "readTime": {
+        "en": "8 min read",
+        "bn": "৮ মিনিট পড়া"
+      },
+      "image": "/about-us.jpg"
+    },
+    {
+      "id": 5,
+      "category": "general-health",
+      "title": {
+        "en": "Importance of Regular Health Checkups",
+        "bn": "নিয়মিত স্বাস্থ্য পরীক্ষার গুরুত্ব"
+      },
+      "excerpt": {
+        "en": "Regular health checkups can help detect problems before they start and improve treatment outcomes.",
+        "bn": "নিয়মিত স্বাস্থ্য পরীক্ষা সমস্যা শুরু হওয়ার আগে সনাক্ত করতে এবং চিকিৎসার ফলাফল উন্নত করতে সাহায্য করতে পারে।"
+      },
+      "author": {
+        "en": "Dr. Shakil Ahmed",
+        "bn": "ডা. শাকিল আহমেদ"
+      },
+      "date": "2024-01-05",
+      "readTime": {
+        "en": "5 min read",
+        "bn": "৫ মিনিট পড়া"
+      },
+      "image": "/hospital-banner.jpg"
+    },
+    {
+      "id": 6,
+      "category": "nutrition",
+      "title": {
+        "en": "Superfoods for Immunity Boost",
+        "bn": "রোগ প্রতিরোধ ক্ষমতা বৃদ্ধির জন্য সুপারফুড"
+      },
+      "excerpt": {
+        "en": "Discover natural superfoods that can strengthen your immune system and keep you healthy.",
+        "bn": "প্রাকৃতিক সুপারফুড আবিষ্কার করুন যা আপনার রোগ প্রতিরোধ ক্ষমতা শক্তিশালী করতে এবং আপনাকে সুস্থ রাখতে পারে।"
+      },
+      "author": {
+        "en": "Dr. Rukhsana Parvin",
+        "bn": "ডা. রুখসানা পারভীন"
+      },
+      "date": "2024-01-03",
+      "readTime": {
+        "en": "6 min read",
+        "bn": "৬ মিনিট পড়া"
+      },
+      "image": "/about-us.jpg"
+    }
+  ],
+  "tags": [
+    {
+      "en": "Health Tips",
+      "bn": "স্বাস্থ্য টিপস"
+    },
+    {
+      "en": "Wellness",
+      "bn": "সুস্থতা"
+    },
+    {
+      "en": "Prevention",
+      "bn": "প্রতিরোধ"
+    },
+    {
+      "en": "Lifestyle",
+      "bn": "জীবনযাত্রা"
+    },
+    {
+      "en": "Medical Advice",
+      "bn": "চিকিৎসা পরামর্শ"
+    }
+  ]
+}

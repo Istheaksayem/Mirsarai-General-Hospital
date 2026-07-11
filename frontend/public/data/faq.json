@@ -1,0 +1,185 @@
+{
+  "hero": {
+    "title": {
+      "en": "Frequently Asked Questions",
+      "bn": "প্রায়শই জিজ্ঞাসিত প্রশ্ন"
+    },
+    "subtitle": {
+      "en": "Find Answers to Common Questions",
+      "bn": "সাধারণ প্রশ্নের উত্তর খুঁজুন"
+    },
+    "description": {
+      "en": "Browse through our comprehensive FAQ section to find answers to the most commonly asked questions about our services, facilities, and procedures.",
+      "bn": "আমাদের সেবা, সুবিধা এবং পদ্ধতি সম্পর্কে সবচেয়ে সাধারণভাবে জিজ্ঞাসিত প্রশ্নের উত্তর খুঁজে পেতে আমাদের ব্যাপক FAQ বিভাগ ব্রাউজ করুন।"
+    },
+    "image": "/hospital-banner.jpg"
+  },
+  "categories": [
+    {
+      "id": "general",
+      "name": {
+        "en": "General",
+        "bn": "সাধারণ"
+      },
+      "icon": "FaQuestionCircle"
+    },
+    {
+      "id": "appointments",
+      "name": {
+        "en": "Appointments",
+        "bn": "অ্যাপয়েন্টমেন্ট"
+      },
+      "icon": "FaCalendarCheck"
+    },
+    {
+      "id": "services",
+      "name": {
+        "en": "Services",
+        "bn": "সেবাসমূহ"
+      },
+      "icon": "FaHospital"
+    },
+    {
+      "id": "billing",
+      "name": {
+        "en": "Billing & Insurance",
+        "bn": "বিলিং এবং বীমা"
+      },
+      "icon": "FaMoneyBillWave"
+    }
+  ],
+  "faqs": [
+    {
+      "id": 1,
+      "category": "general",
+      "question": {
+        "en": "What are your hospital visiting hours?",
+        "bn": "আপনার হাসপাতালের দেখা করার সময় কি?"
+      },
+      "answer": {
+        "en": "Our visiting hours are from 10:00 AM to 8:00 PM daily. However, ICU and critical care units have restricted visiting hours from 4:00 PM to 6:00 PM. We request visitors to follow all hospital protocols.",
+        "bn": "আমাদের দেখা করার সময় প্রতিদিন সকাল ১০:০০ টা থেকে রাত ৮:০০ টা পর্যন্ত। তবে আইসিইউ এবং ক্রিটিক্যাল কেয়ার ইউনিটগুলিতে বিকাল ৪:০০ থেকে ৬:০০ পর্যন্ত সীমিত দেখা করার সময় রয়েছে। আমরা দর্শকদের সমস্ত হাসপাতাল প্রোটোকল অনুসরণ করতে অনুরোধ করি।"
+      }
+    },
+    {
+      "id": 2,
+      "category": "general",
+      "question": {
+        "en": "Do you have 24/7 emergency services?",
+        "bn": "আপনার কি ২৪/৭ জরুরি সেবা আছে?"
+      },
+      "answer": {
+        "en": "Yes, our emergency department is open 24 hours a day, 7 days a week. We have a dedicated team of emergency physicians, nurses, and support staff available around the clock to handle all medical emergencies.",
+        "bn": "হ্যাঁ, আমাদের জরুরি বিভাগ দিনে ২৪ ঘন্টা, সপ্তাহে ৭ দিন খোলা থাকে। সমস্ত চিকিৎসা জরুরী অবস্থা পরিচালনা করার জন্য আমাদের একটি নিবেদিত জরুরি চিকিৎসক, নার্স এবং সহায়ক কর্মীদের দল চব্বিশ ঘন্টা উপলব্ধ।"
+      }
+    },
+    {
+      "id": 3,
+      "category": "appointments",
+      "question": {
+        "en": "How can I book an appointment?",
+        "bn": "আমি কিভাবে একটি অ্যাপয়েন্টমেন্ট বুক করতে পারি?"
+      },
+      "answer": {
+        "en": "You can book an appointment through our website, by calling our helpline at +880 1234-567890, or by visiting the hospital reception. Online booking is available 24/7 for your convenience.",
+        "bn": "আপনি আমাদের ওয়েবসাইটের মাধ্যমে, +৮৮০ ১২৩৪-৫৬৭৮৯০ এ আমাদের হেল্পলাইনে কল করে, বা হাসপাতাল রিসেপশনে গিয়ে একটি অ্যাপয়েন্টমেন্ট বুক করতে পারেন। আপনার সুবিধার জন্য অনলাইন বুকিং ২৪/৭ উপলব্ধ।"
+      }
+    },
+    {
+      "id": 4,
+      "category": "appointments",
+      "question": {
+        "en": "Can I cancel or reschedule my appointment?",
+        "bn": "আমি কি আমার অ্যাপয়েন্টমেন্ট বাতিল বা পুনঃনির্ধারণ করতে পারি?"
+      },
+      "answer": {
+        "en": "Yes, you can cancel or reschedule your appointment by calling us at least 24 hours before your scheduled time. You can also manage your appointments through your online patient portal.",
+        "bn": "হ্যাঁ, আপনি আপনার নির্ধারিত সময়ের কমপক্ষে ২৪ ঘন্টা আগে আমাদের কল করে আপনার অ্যাপয়েন্টমেন্ট বাতিল বা পুনঃনির্ধারণ করতে পারেন। আপনি আপনার অনলাইন রোগী পোর্টালের মাধ্যমে আপনার অ্যাপয়েন্টমেন্টগুলি পরিচালনা করতে পারেন।"
+      }
+    },
+    {
+      "id": 5,
+      "category": "services",
+      "question": {
+        "en": "What diagnostic services do you offer?",
+        "bn": "আপনি কি ডায়াগনস্টিক সেবা অফার করেন?"
+      },
+      "answer": {
+        "en": "We offer comprehensive diagnostic services including laboratory tests, X-rays, CT scans, MRI, ultrasound, ECG, echocardiography, and various specialized tests. Our state-of-the-art equipment ensures accurate and timely results.",
+        "bn": "আমরা ল্যাবরেটরি পরীক্ষা, এক্স-রে, সিটি স্ক্যান, এমআরআই, আল্ট্রাসাউন্ড, ইসিজি, ইকোকার্ডিওগ্রাফি এবং বিভিন্ন বিশেষায়িত পরীক্ষা সহ ব্যাপক ডায়াগনস্টিক সেবা অফার করি। আমাদের অত্যাধুনিক সরঞ্জাম সঠিক এবং সময়মতো ফলাফল নিশ্চিত করে।"
+      }
+    },
+    {
+      "id": 6,
+      "category": "services",
+      "question": {
+        "en": "Do you have a pharmacy in the hospital?",
+        "bn": "হাসপাতালে কি ফার্মেসি আছে?"
+      },
+      "answer": {
+        "en": "Yes, we have a fully-stocked pharmacy located on the ground floor of the hospital. It operates 24/7 and stocks all commonly prescribed medications and medical supplies.",
+        "bn": "হ্যাঁ, হাসপাতালের নিচতলায় আমাদের একটি সম্পূর্ণ-স্টক করা ফার্মেসি রয়েছে। এটি ২৪/৭ কাজ করে এবং সমস্ত সাধারণভাবে নির্ধারিত ওষুধ এবং চিকিৎসা সরবরাহ স্টক করে।"
+      }
+    },
+    {
+      "id": 7,
+      "category": "billing",
+      "question": {
+        "en": "What payment methods do you accept?",
+        "bn": "আপনি কি পেমেন্ট পদ্ধতি গ্রহণ করেন?"
+      },
+      "answer": {
+        "en": "We accept cash, credit/debit cards, mobile banking (bKash, Nagad), and bank transfers. We also work with major insurance companies for direct billing.",
+        "bn": "আমরা নগদ, ক্রেডিট/ডেবিট কার্ড, মোবাইল ব্যাংকিং (বিকাশ, নগদ), এবং ব্যাংক ট্রান্সফার গ্রহণ করি। আমরা সরাসরি বিলিংয়ের জন্য প্রধান বীমা কোম্পানিগুলির সাথে কাজ করি।"
+      }
+    },
+    {
+      "id": 8,
+      "category": "billing",
+      "question": {
+        "en": "Do you accept health insurance?",
+        "bn": "আপনি কি স্বাস্থ্য বীমা গ্রহণ করেন?"
+      },
+      "answer": {
+        "en": "Yes, we accept most major health insurance plans. Please bring your insurance card and identification when you visit. Our billing department can help verify your coverage and process claims.",
+        "bn": "হ্যাঁ, আমরা বেশিরভাগ প্রধান স্বাস্থ্য বীমা পরিকল্পনা গ্রহণ করি। আপনি যখন আসবেন তখন দয়া করে আপনার বীমা কার্ড এবং পরিচয়পত্র আনুন। আমাদের বিলিং বিভাগ আপনার কভারেজ যাচাই করতে এবং দাবি প্রক্রিয়া করতে সাহায্য করতে পারে।"
+      }
+    },
+    {
+      "id": 9,
+      "category": "general",
+      "question": {
+        "en": "Is parking available at the hospital?",
+        "bn": "হাসপাতালে কি পার্কিং সুবিধা আছে?"
+      },
+      "answer": {
+        "en": "Yes, we have ample parking space for patients and visitors. The parking area is secure and monitored 24/7. There is a nominal parking fee for extended stays.",
+        "bn": "হ্যাঁ, রোগী এবং দর্শকদের জন্য আমাদের যথেষ্ট পার্কিং স্পেস আছে। পার্কিং এলাকা নিরাপদ এবং ২৪/৭ মনিটর করা হয়। দীর্ঘ থাকার জন্য একটি নামমাত্র পার্কিং ফি আছে।"
+      }
+    },
+    {
+      "id": 10,
+      "category": "services",
+      "question": {
+        "en": "Do you provide ambulance services?",
+        "bn": "আপনি কি অ্যাম্বুলেন্স সেবা প্রদান করেন?"
+      },
+      "answer": {
+        "en": "Yes, we have a fleet of fully-equipped ambulances available 24/7 for emergency transportation. Call 999 or our emergency hotline for immediate assistance.",
+        "bn": "হ্যাঁ, জরুরি পরিবহনের জন্য আমাদের ২৪/৭ উপলব্ধ সম্পূর্ণ-সজ্জিত অ্যাম্বুলেন্সের একটি বহর রয়েছে। তাৎক্ষণিক সহায়তার জন্য ৯৯৯ বা আমাদের জরুরি হটলাইনে কল করুন।"
+      }
+    }
+  ],
+  "contactInfo": {
+    "title": {
+      "en": "Still Have Questions?",
+      "bn": "এখনও প্রশ্ন আছে?"
+    },
+    "description": {
+      "en": "If you couldn't find the answer you're looking for, please contact us and we'll be happy to help.",
+      "bn": "আপনি যে উত্তর খুঁজছেন তা যদি খুঁজে না পান, অনুগ্রহ করে আমাদের সাথে যোগাযোগ করুন এবং আমরা সাহায্য করতে খুশি হব।"
+    },
+    "phone": "+880 1234-567890",
+    "email": "info@mirsaraihospital.com"
+  }
+}
