@@ -24,7 +24,7 @@ export default function PatientNotifications() {
   const markOne = (id: number) => setItems(i => i.map(n => n.id === id ? { ...n, read: true } : n));
 
   return (
-    <div className="space-y-4 max-w-2xl">
+    <div className="space-y-4 w-full">
       <div className="flex items-center justify-between">
         <p className="text-sm text-slate-500 dark:text-slate-400">{unread} unread notifications</p>
         {unread > 0 && (

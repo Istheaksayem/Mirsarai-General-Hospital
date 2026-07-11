@@ -48,7 +48,7 @@ const timeline = [
 
 export default function MedicalTimeline() {
   return (
-    <div className="space-y-4 max-w-2xl">
+    <div className="space-y-4 w-full">
       <p className="text-sm text-slate-500 dark:text-slate-400">{timeline.length} events in your medical history</p>
 
       <div className="relative">

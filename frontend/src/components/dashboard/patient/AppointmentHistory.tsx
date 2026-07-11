@@ -16,7 +16,7 @@ const statusStyle: Record<string, string> = {
 
 export default function AppointmentHistory() {
   return (
-    <div className="space-y-4 max-w-3xl">
+    <div className="space-y-4 w-full">
       <p className="text-sm text-slate-500 dark:text-slate-400">{history.length} past appointments</p>
       <div className="bg-white dark:bg-[#0f1524] rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden">
         <table className="w-full text-sm">

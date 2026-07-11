@@ -19,7 +19,7 @@ export default function ViewInvoicePage({ params }: { params: Promise<{ id: stri
   if (!inv) return <div className="p-16 text-center text-gray-400">Invoice not found</div>;
 
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="space-y-6 w-full">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button onClick={() => router.push("/super-admin/billing")} className="flex h-9 w-9 items-center justify-center rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">

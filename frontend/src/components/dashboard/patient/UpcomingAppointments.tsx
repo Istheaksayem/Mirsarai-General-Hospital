@@ -15,7 +15,7 @@ const statusStyle: Record<string, string> = {
 
 export default function UpcomingAppointments() {
   return (
-    <div className="space-y-4 max-w-3xl">
+    <div className="space-y-4 w-full">
       <div className="flex items-center justify-between">
         <p className="text-sm text-slate-500 dark:text-slate-400">{appointments.length} upcoming appointments</p>
         <button className="px-4 py-2 bg-[#1E2B7A] hover:bg-[#76BC21] text-white rounded-xl text-xs font-bold transition-all">

@@ -18,7 +18,7 @@ export default function PatientProfile() {
   const [address, setAddress] = useState(patient.address);
 
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="space-y-6 w-full">
       {/* Header card */}
       <div className="bg-white dark:bg-[#0f1524] rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden">
         <div className="h-20 bg-gradient-to-r from-[#1E2B7A] to-[#243282]" />
