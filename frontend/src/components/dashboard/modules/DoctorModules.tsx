@@ -70,8 +70,8 @@ export default function DoctorModules({ activeModule }: ModuleProps) {
   const isLoading = dashboardQuery.isLoading || appointmentsQuery.isLoading || patientsQuery.isLoading;
   if (isLoading) return <SkeletonLoader type="card" cardsCount={4} />;
 
-  const dashData = dashboardQuery.data || {};
-  const stats    = dashData.statistics || {};
+  const dashData = (dashboardQuery.data || {}) as Record<string, unknown>;
+  const stats    = ((dashData.statistics as Record<string, string | number>) || {});
 
   const containerVariants = { hidden: {}, visible: { transition: { staggerChildren: 0.07 } } };
   const cardVariants      = { hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0, transition: { duration: 0.3 } } };
