@@ -1,23 +1,63 @@
+"use client";
+
 import React from 'react';
 import { FaMapMarkerAlt, FaPhoneAlt, FaEnvelope, FaPaperPlane } from 'react-icons/fa';
-
-export const metadata = {
-  title: 'Contact Us - Mirsarai General Hospital',
-  description: 'Get in touch with Mirsarai General Hospital Baby Care & Diagnostic Center. We are here to help you 24/7.',
-};
+import { useContactData } from '@/hooks/useContactData';
 
 export default function ContactPage() {
-  return (
-    <div className="min-h-screen bg-gray-50 pt-24 pb-20">
-      {/* Header Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 text-center">
-        <h1 className="text-4xl md:text-5xl font-extrabold text-primary mb-4 tracking-tight">
-          Get In <span className="text-secondary">Touch</span>
-        </h1>
-        <p className="text-gray-500 max-w-2xl mx-auto text-lg">
-          We are here to provide you with the best medical care. Reach out to us for any inquiries, appointments, or emergency assistance.
-        </p>
+  const { data, isLoading, isError } = useContactData();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50/50">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary"></div>
       </div>
+    );
+  }
+
+  if (isError || !data) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center text-red-500 bg-gray-50 pt-24 pb-20">
+        <div className="text-6xl mb-4">⚠️</div>
+        <p className="text-lg font-medium">Failed to load Contact data.</p>
+        <button 
+          onClick={() => window.location.reload()} 
+          className="mt-4 px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 pb-20">
+      {/* Header Section (Banner) */}
+      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden mb-16">
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/about-us.jpg')" }}
+        />
+        <div className="absolute inset-0 bg-black/60" />
+
+        {/* Hero Content */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="border-l-4 border-orange-500 pl-6 animate-slide-up">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-4 tracking-tight">
+              {data.header.title}
+            </h1>
+            <div className="flex items-center text-xs md:text-sm font-bold tracking-widest uppercase text-gray-300 gap-3">
+              <a href="/" className="text-orange-500 hover:text-orange-400 transition-colors">HOME</a>
+              <span>→</span>
+              <span className="text-white">CONTACT US</span>
+            </div>
+          </div>
+          <p className="text-gray-300 max-w-2xl text-lg mt-6 pl-6">
+            {data.header.subtitle}
+          </p>
+        </div>
+      </section>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8">
@@ -25,7 +65,7 @@ export default function ContactPage() {
           {/* Contact Information Cards */}
           <div className="space-y-8">
             <h2 className="text-2xl font-bold text-gray-800 mb-6 border-l-4 border-secondary pl-4">
-              Contact Information
+              {data.contactInfo.title}
             </h2>
             
             {/* Address Card */}
@@ -37,19 +77,11 @@ export default function ContactPage() {
                 <h3 className="text-lg font-bold text-gray-800 mb-4">Our Address</h3>
                 
                 <div className="space-y-4">
-                  {/* Bengali Address */}
-                  <div className="border-b border-gray-100 pb-4">
-                    <p className="text-gray-700 leading-relaxed">
-                      <strong className="text-primary block text-[15px] mb-1">মীরসরাই জেনারেল হাসপাতাল বেবি কেয়ার এন্ড ডায়াগনস্টিক সেন্টার</strong>
-                      ঠিকানা: থানার বিপরীতে, মীরসরাই পৌরসদর, চট্টগ্রাম।
-                    </p>
-                  </div>
-                  
                   {/* English Address */}
                   <div>
                     <p className="text-gray-700 leading-relaxed">
-                      <strong className="text-primary block text-[15px] mb-1">Mirsarai General Hospital Baby Care & Diagnostic Center</strong>
-                      Address: Opposite the Police Station, Mirsarai Pourosodor, Chittagong.
+                      <strong className="text-primary block text-[15px] mb-1">{data.contactInfo.address.name}</strong>
+                      {data.contactInfo.address.location}
                     </p>
                   </div>
                 </div>
@@ -65,10 +97,7 @@ export default function ContactPage() {
               <div>
                 <h3 className="text-lg font-bold text-gray-800 mb-2">24/7 Hotline</h3>
                 <p className="text-gray-600 text-lg font-medium">
-                  01969-997799 <span className="text-gray-400 text-sm ml-2 font-normal">(English)</span>
-                </p>
-                <p className="text-gray-600 text-lg font-medium mt-1">
-                  ০১৯৬৯-৯৯৭৭৯৯ <span className="text-gray-400 text-sm ml-2 font-normal">(বাংলা)</span>
+                  {data.contactInfo.hotline.number} <span className="text-gray-400 text-sm ml-2 font-normal">(English)</span>
                 </p>
               </div>
             </div>
@@ -80,8 +109,8 @@ export default function ContactPage() {
               </div>
               <div>
                 <h3 className="text-lg font-bold text-gray-800 mb-2">Email Address</h3>
-                <a href="mailto:mirsaraigeneralhospital@gmail.com" className="text-gray-600 hover:text-tertiary transition-colors duration-300 break-all text-lg">
-                  mirsaraigeneralhospital@gmail.com
+                <a href={`mailto:${data.contactInfo.email.address}`} className="text-gray-600 hover:text-tertiary transition-colors duration-300 break-all text-lg">
+                  {data.contactInfo.email.address}
                 </a>
               </div>
             </div>
@@ -94,7 +123,7 @@ export default function ContactPage() {
             <div className="absolute bottom-0 left-0 w-40 h-40 bg-tertiary/10 rounded-full blur-3xl -ml-20 -mb-20"></div>
             
             <h2 className="text-2xl font-bold text-gray-800 mb-6 relative z-10">
-              Send us a Message
+              {data.form.title}
             </h2>
             
             <form className="space-y-6 relative z-10">
@@ -154,3 +183,4 @@ export default function ContactPage() {
     </div>
   );
 }
+

@@ -1,0 +1,22 @@
+{
+  "header": {
+    "title": "Get In Touch",
+    "subtitle": "We are here to provide you with the best medical care. Reach out to us for any inquiries, appointments, or emergency assistance."
+  },
+  "contactInfo": {
+    "title": "Contact Information",
+    "address": {
+      "name": "Mirsarai General Hospital Baby Care & Diagnostic Center",
+      "location": "Address: Opposite the Police Station, Mirsarai Pourosodor, Chittagong."
+    },
+    "hotline": {
+      "number": "01969-997799"
+    },
+    "email": {
+      "address": "mirsaraigeneralhospital@gmail.com"
+    }
+  },
+  "form": {
+    "title": "Send us a Message"
+  }
+}

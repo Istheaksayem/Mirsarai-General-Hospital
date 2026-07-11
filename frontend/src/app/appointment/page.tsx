@@ -21,30 +21,24 @@ export default function AppointmentPage() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* ── Hero Banner ── */}
-      <section className="relative overflow-hidden py-24 text-center text-white border-b border-white/10 shadow-lg">
-        {/* Premium background image */}
+      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+        {/* Background Image */}
         <div
-          className="absolute inset-0 bg-cover bg-center pointer-events-none"
+          className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: "url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1920&q=80')" }}
         />
-        {/* Dark overlay for text readability */}
-        <div className="absolute inset-0 bg-black/60 pointer-events-none" />
+        <div className="absolute inset-0 bg-black/60" />
 
-        {/* Decorative blobs */}
-        <div className="absolute -top-20 -left-20 w-80 h-80 bg-white/5 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-[#76BC21]/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-10 right-40 w-40 h-40 bg-[#00BCD4]/20 rounded-full blur-2xl pointer-events-none" />
-
+        {/* Hero Content */}
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <span className="inline-block bg-white/10 text-white text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-5 border border-white/20 backdrop-blur-sm shadow-inner">
-            Online Appointment Booking
-          </span>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-5 leading-tight tracking-tight drop-shadow-sm">
-            Book Your <span className="text-[#76BC21] text-shadow-glow">Appointment</span> Today
-          </h1>
-          <p className="text-blue-100 text-lg md:text-xl max-w-2xl mx-auto font-light leading-relaxed">
-            Schedule a consultation with our world-class medical specialists in just a few simple steps.
-          </p>
+          <div className="border-l-4 border-orange-500 pl-6 animate-slide-up">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-4 tracking-tight">
+              Book Appointment
+            </h1>
+            <div className="flex items-center text-xs md:text-sm font-bold tracking-widest uppercase text-gray-300 gap-3">
+              <span className="text-white">APPOINTMENT</span>
+            </div>
+          </div>
         </div>
       </section>
 
