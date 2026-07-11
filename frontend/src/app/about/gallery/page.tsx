@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
@@ -22,6 +22,13 @@ interface Category {
   description: { en: string; bn: string };
 }
 
+interface SEOConfig {
+  metaTitle: { en: string; bn: string };
+  metaDescription: { en: string; bn: string };
+  keywords: { en: string; bn: string };
+  ogImage: string;
+}
+
 interface GalleryData {
   hero: {
     title: { en: string; bn: string };
@@ -37,13 +44,23 @@ interface GalleryData {
       label: { en: string; bn: string };
     }>;
   };
+  seo?: SEOConfig;
 }
 
 // ── Fetch Gallery Data ─────────────────────────────────────────────────────
 const fetchGalleryData = async (): Promise<GalleryData> => {
-  const res = await fetch("/data/gallery.json");
-  if (!res.ok) throw new Error("Failed to fetch gallery data");
-  return res.json();
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+  try {
+    const res = await fetch(`${apiUrl}/about/gallery`, { cache: "no-store" });
+    if (!res.ok) throw new Error("Failed to fetch from backend");
+    const result = await res.json();
+    return result.data;
+  } catch (error) {
+    console.warn("Backend API not reachable for gallery data. Falling back to local data/gallery.json", error);
+    const res = await fetch("/data/gallery.json", { cache: "no-store" });
+    if (!res.ok) throw new Error("Failed to fetch fallback gallery data");
+    return res.json();
+  }
 };
 
 // ── Main Gallery Page ──────────────────────────────────────────────────────
@@ -57,6 +74,24 @@ const GalleryPage = () => {
     queryKey: ["gallery"],
     queryFn: fetchGalleryData,
   });
+
+  // Dynamic SEO Meta tags
+  useEffect(() => {
+    if (data?.seo) {
+      const seo = data.seo;
+      document.title = lang === "bn" ? seo.metaTitle.bn : seo.metaTitle.en;
+      
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) {
+        metaDesc.setAttribute("content", lang === "bn" ? seo.metaDescription.bn : seo.metaDescription.en);
+      }
+      
+      const metaKeywords = document.querySelector('meta[name="keywords"]');
+      if (metaKeywords) {
+        metaKeywords.setAttribute("content", lang === "bn" ? seo.keywords.bn : seo.keywords.en);
+      }
+    }
+  }, [data, lang]);
 
   if (isLoading) {
     return (

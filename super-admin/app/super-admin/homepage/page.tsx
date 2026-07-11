@@ -309,8 +309,8 @@ export default function EditHomepageCMS() {
         {/* Quick Info Items */}
         <div className="space-y-3 pt-3 border-t border-gray-100 dark:border-gray-800">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200">Emergency Quick Bullet Points</h3>
-            <Button size="xs" variant="outline" onClick={handleAddQuickInfo} className="text-xs">
+            <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200">Emergency Quick Info</h3>
+            <Button size="sm" variant="outline" onClick={handleAddQuickInfo} className="text-xs h-7 px-2 border-dashed">
               <Plus className="h-3 w-3 mr-1" /> Add Item
             </Button>
           </div>
@@ -425,7 +425,7 @@ export default function EditHomepageCMS() {
         <div className="space-y-3 pt-3 border-t border-gray-100 dark:border-gray-800">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200">CTA Advantages / Features</h3>
-            <Button size="xs" variant="outline" onClick={handleAddFeature} className="text-xs">
+            <Button size="sm" variant="outline" onClick={handleAddFeature} className="text-xs h-7 px-2 border-dashed">
               <Plus className="h-3 w-3 mr-1" /> Add Feature
             </Button>
           </div>
@@ -494,7 +494,7 @@ export default function EditHomepageCMS() {
         <div className="space-y-3 pt-3 border-t border-gray-100 dark:border-gray-800">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200">Counters & Statistics</h3>
-            <Button size="xs" variant="outline" onClick={handleAddStat} className="text-xs">
+            <Button size="sm" variant="outline" onClick={handleAddStat} className="text-xs h-7 px-2 border-dashed">
               <Plus className="h-3 w-3 mr-1" /> Add Counter
             </Button>
           </div>

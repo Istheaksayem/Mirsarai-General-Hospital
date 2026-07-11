@@ -92,15 +92,15 @@ export default function ReceptionAdminModules({ activeModule }: ModuleProps) {
       return (
         <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6">
           <motion.div variants={cardVariants} className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-            <StatsCard title="Today's Appointments"  value={stats.todayAppointments  || "0"} icon={<FiCalendar size={18}/>}  trend={stats.todayAppointmentsTrend} />
-            <StatsCard title="Checked-In"            value={stats.checkedIn          || "0"} icon={<FiCheckCircle size={18}/>} trend={stats.checkedInTrend}       colorClass="text-emerald-500" />
-            <StatsCard title="In Queue"              value={stats.waiting            || "0"} icon={<FiClock size={18}/>}     trend={stats.waitingTrend}           colorClass="text-amber-500" />
-            <StatsCard title="Today Billing"         value={`৳${stats.totalBillingToday?.toLocaleString() || "0"}`} icon={<FiDollarSign size={18}/>} trend={stats.totalBillingTodayTrend} />
+            <StatsCard title="Today's Appointments"  value={stats.todayAppointments  || "0"} icon={<FiCalendar size={18}/>}  trend={Number(stats.todayAppointmentsTrend) || 0} />
+            <StatsCard title="Checked-In"            value={stats.checkedIn          || "0"} icon={<FiCheckCircle size={18}/>} trend={Number(stats.checkedInTrend) || 0}       colorClass="text-emerald-500" />
+            <StatsCard title="In Queue"              value={stats.waiting            || "0"} icon={<FiClock size={18}/>}     trend={Number(stats.waitingTrend) || 0}           colorClass="text-amber-500" />
+            <StatsCard title="Today Billing"         value={`৳${stats.totalBillingToday?.toLocaleString() || "0"}`} icon={<FiDollarSign size={18}/>} trend={Number(stats.totalBillingTodayTrend) || 0} />
           </motion.div>
 
           <motion.div variants={cardVariants} className="grid grid-cols-1 lg:grid-cols-3 gap-5">
             <div className="lg:col-span-2">
-              <AreaChart data={dashData.appointmentTrend || []} title="Appointment Volume — Last 7 Days" color="blue" />
+              <AreaChart data={(dashData.appointmentTrend as any) || []} title="Appointment Volume — Last 7 Days" color="blue" />
             </div>
             {/* Quick Actions Panel */}
             <div className="glass-panel rounded-2xl p-5">
@@ -127,7 +127,7 @@ export default function ReceptionAdminModules({ activeModule }: ModuleProps) {
           <motion.div variants={cardVariants} className="glass-panel rounded-2xl p-5">
             <h3 className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-4">Live Queue</h3>
             <div className="space-y-2">
-              {(dashData.recentQueue || []).slice(0, 5).map((q: any) => (
+              {((dashData.recentQueue as any[]) || []).slice(0, 5).map((q: any) => (
                 <div key={q.id} className="flex items-center justify-between py-2.5 border-b border-gray-100/40 dark:border-slate-700/30 last:border-0">
                   <div className="flex items-center gap-3">
                     <span className="w-8 h-8 rounded-lg bg-primary/10 dark:bg-accent/10 text-primary dark:text-accent flex items-center justify-center text-xs font-black">#{q.tokenNumber}</span>
@@ -240,7 +240,7 @@ export default function ReceptionAdminModules({ activeModule }: ModuleProps) {
           <div className="glass-panel rounded-2xl p-5">
             <h3 className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-4">Live Token Queue</h3>
             <div className="space-y-2">
-              {(dashData.recentQueue || []).map((q: any) => (
+              {((dashData.recentQueue as any[]) || []).map((q: any) => (
                 <motion.div key={q.id} layout
                   className="flex items-center justify-between p-4 rounded-xl bg-gray-50/60 dark:bg-slate-800/30 border border-gray-100/40 dark:border-slate-700/30 hover:shadow-sm transition-all duration-200"
                 >
@@ -259,7 +259,7 @@ export default function ReceptionAdminModules({ activeModule }: ModuleProps) {
                   </div>
                 </motion.div>
               ))}
-              {(!dashData.recentQueue || dashData.recentQueue.length === 0) && <EmptyState />}
+              {(!dashData.recentQueue || (dashData.recentQueue as any[]).length === 0) && <EmptyState />}
             </div>
           </div>
         </div>
@@ -270,7 +270,7 @@ export default function ReceptionAdminModules({ activeModule }: ModuleProps) {
       return (
         <div className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <StatsCard title="Today Collected"   value={`৳${stats.totalBillingToday?.toLocaleString() || "0"}`} icon={<FiDollarSign size={18}/>}  trend={stats.totalBillingTodayTrend} />
+            <StatsCard title="Today Collected"   value={`৳${stats.totalBillingToday?.toLocaleString() || "0"}`} icon={<FiDollarSign size={18}/>}  trend={Number(stats.totalBillingTodayTrend) || 0} />
             <StatsCard title="Pending Invoices"  value="18"  icon={<FiFileText size={18}/>}   trend={-8.2} colorClass="text-amber-500" />
             <StatsCard title="Paid This Month"   value="342" icon={<FiCheckCircle size={18}/>} trend={22.4} colorClass="text-emerald-500" />
           </div>
@@ -283,7 +283,7 @@ export default function ReceptionAdminModules({ activeModule }: ModuleProps) {
               { header: "Date",       accessor: "date"        },
               { header: "Status",     accessor: (i: any) => <StatusBadge status={i.paymentStatus} /> },
             ]}
-            data={(dashData.billingRecords || []).map((b: any) => ({ ...b, patientName: b.patientName || "Patient" }))}
+            data={((dashData.billingRecords as any[]) || []).map((b: any) => ({ ...b, patientName: b.patientName || "Patient" }))}
             searchKey="patientName"
             filterKey="paymentStatus"
             filterOptions={[

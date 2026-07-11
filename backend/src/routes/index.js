@@ -60,6 +60,7 @@ router.get('/', (req, res) => {
 // MODULE ROUTES
 // ============================================
 import homepageRoutes from './homepage.routes.js';
+import aboutCMSRoutes from './aboutCMS.routes.js';
 // import authRoutes from './auth.routes.js';
 // import userRoutes from './user.routes.js';
 // import doctorRoutes from './doctor.routes.js';
@@ -67,6 +68,7 @@ import homepageRoutes from './homepage.routes.js';
 // import appointmentRoutes from './appointment.routes.js';
 
 router.use('/homepage', homepageRoutes);
+router.use('/about', aboutCMSRoutes);
 
 // router.use('/auth', authRoutes);
 // router.use('/users', userRoutes);

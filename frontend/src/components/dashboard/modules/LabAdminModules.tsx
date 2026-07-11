@@ -89,21 +89,21 @@ export default function LabAdminModules({ activeModule }: ModuleProps) {
       return (
         <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6">
           <motion.div variants={cardVariants} className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-            <StatsCard title="Tests Today"         value={stats.testsToday          || "0"} icon={<FiActivity size={18}/>}     trend={stats.testsTodayTrend} />
-            <StatsCard title="Pending Reports"     value={stats.pendingReports      || "0"} icon={<FiClock size={18}/>}        trend={stats.pendingReportsTrend}   colorClass="text-amber-500" />
-            <StatsCard title="Completed Reports"   value={stats.completedReports    || "0"} icon={<FiCheckCircle size={18}/>}  trend={stats.completedReportsTrend} colorClass="text-emerald-500" />
-            <StatsCard title="Avg. Turnaround"     value={`${stats.averageTurnaround || "0"}h`} icon={<FiRefreshCw size={18}/>} trend={stats.averageTurnaroundTrend} colorClass="text-cyan-500" />
+            <StatsCard title="Tests Today"         value={stats.testsToday          || "0"} icon={<FiActivity size={18}/>}     trend={Number(stats.testsTodayTrend) || 0} />
+            <StatsCard title="Pending Reports"     value={stats.pendingReports      || "0"} icon={<FiClock size={18}/>}        trend={Number(stats.pendingReportsTrend) || 0}   colorClass="text-amber-500" />
+            <StatsCard title="Completed Reports"   value={stats.completedReports    || "0"} icon={<FiCheckCircle size={18}/>}  trend={Number(stats.completedReportsTrend) || 0} colorClass="text-emerald-500" />
+            <StatsCard title="Avg. Turnaround"     value={`${stats.averageTurnaround || "0"}h`} icon={<FiRefreshCw size={18}/>} trend={Number(stats.averageTurnaroundTrend) || 0} colorClass="text-cyan-500" />
           </motion.div>
 
           <motion.div variants={cardVariants} className="grid grid-cols-1 lg:grid-cols-3 gap-5">
             <div className="lg:col-span-2">
-              <AreaChart data={dashData.testTrend || []} title="Test Volume — Last 7 Days" color="cyan" />
+              <AreaChart data={(dashData.testTrend as any) || []} title="Test Volume — Last 7 Days" color="cyan" />
             </div>
             {/* Test category breakdown */}
             <div className="glass-panel rounded-2xl p-5">
               <h3 className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-4">Test Categories</h3>
               <div className="space-y-4">
-                {(dashData.testCategoryBreakdown || [
+                {((dashData.testCategoryBreakdown as any[]) || [
                   { name: "Blood Tests",    count: 140, pct: 42 },
                   { name: "Urine Analysis", count: 86,  pct: 26 },
                   { name: "Imaging",        count: 64,  pct: 19 },
@@ -132,7 +132,7 @@ export default function LabAdminModules({ activeModule }: ModuleProps) {
           <motion.div variants={cardVariants} className="glass-panel rounded-2xl p-5">
             <h3 className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-4">Recent Lab Results</h3>
             <div className="divide-y divide-gray-100/40 dark:divide-slate-700/30">
-              {(dashData.recentTests || []).slice(0, 5).map((t: any) => (
+              {((dashData.recentTests as any[]) || []).slice(0, 5).map((t: any) => (
                 <div key={t.id} className="py-3 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center">
