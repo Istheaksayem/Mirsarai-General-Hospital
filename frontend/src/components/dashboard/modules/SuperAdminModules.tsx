@@ -83,8 +83,8 @@ export default function SuperAdminModules({ activeModule }: ModuleProps) {
 
   if (isLoading) return <SkeletonLoader type="card" cardsCount={4} />;
 
-  const dashData  = dashboardQuery.data  || {};
-  const stats     = dashData.statistics  || {};
+  const dashData  = (dashboardQuery.data || {}) as Record<string, unknown>;
+  const stats     = ((dashData.statistics as Record<string, string | number>) || {});
   const activities = activitiesQuery.data || [];
 
   // Shared container animation
@@ -212,32 +212,32 @@ export default function SuperAdminModules({ activeModule }: ModuleProps) {
                       <span className="text-[9px] font-black uppercase tracking-widest text-gray-400">{k}</span>
                       <p className="font-bold text-gray-900 dark:text-white text-xs">{v}</p>
                     </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
-          </Drawer>
-        </div>
-      );
-
-    /* ─── DOCTOR MANAGEMENT ──────────────────────────────────────── */
-    case "Doctor Management":
-      return (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <p className="text-xs text-gray-400 dark:text-slate-500 font-semibold">{doctorsQuery.data?.length || 0} doctors on roster</p>
-            <button className="flex items-center gap-2 px-4 py-2 bg-primary text-white dark:bg-accent dark:text-slate-900 rounded-xl text-xs font-black shadow-sm hover:opacity-90 transition cursor-pointer">
-              <FiPlus size={13}/> Onboard Doctor
-            </button>
+              )}
+            </Drawer>
           </div>
-          <DataTable
-            columns={[
-              { header: "Name",       accessor: "name"             },
-              { header: "Specialty",  accessor: "specialty"        },
-              { header: "Department", accessor: "department"       },
-              { header: "Fee",        accessor: (i: any) => `৳${i.consultationFee}` },
-              { header: "Rating",     accessor: (i: any) => <span className="text-amber-500 font-black">★ {i.rating}</span> },
-              { header: "Status",     accessor: (i: any) => <StatusBadge status={i.status} /> },
+        );
+
+      /* ─── DOCTOR MANAGEMENT ──────────────────────────────────────── */
+      case "Doctor Management":
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-gray-400 dark:text-slate-500 font-semibold">{doctorsQuery.data?.length || 0} doctors on roster</p>
+              <button className="flex items-center gap-2 px-4 py-2 bg-primary text-white dark:bg-accent dark:text-slate-900 rounded-xl text-xs font-black shadow-sm hover:opacity-90 transition cursor-pointer">
+                <FiPlus size={13}/> Onboard Doctor
+              </button>
+            </div>
+            <DataTable
+              columns={[
+                { header: "Name",       accessor: "name"             },
+                { header: "Specialty",  accessor: "specialty"        },
+                { header: "Department", accessor: "department"       },
+                { header: "Fee",        accessor: (i: any) => `৳${i.consultationFee}` },
+                { header: "Rating",     accessor: (i: any) => <span className="text-amber-500 font-black">★ {i.rating}</span> },
+                { header: "Status",     accessor: (i: any) => <StatusBadge status={i.status} /> },
             ]}
             data={doctorsQuery.data || []}
             searchKey="name"

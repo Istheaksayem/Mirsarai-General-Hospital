@@ -97,8 +97,10 @@ export class ApiError extends Error {
 
 // ─── Base Fetcher ─────────────────────────────────────────────────────────────
 
+const MOCK_BASE = "/mock-data";
+
 async function fetchMock<T>(path: string): Promise<T> {
-  const res = await fetch(`/mock-data/${path}`, { cache: "no-store" });
+  const res = await fetch(`${MOCK_BASE}/${path}`, { cache: "no-store" });
   if (!res.ok) throw new ApiError(res.status, `Failed to fetch ${path}: ${res.statusText}`);
   return res.json() as Promise<T>;
 }

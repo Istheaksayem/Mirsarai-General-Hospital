@@ -73,8 +73,8 @@ export default function ReceptionAdminModules({ activeModule }: ModuleProps) {
   const isLoading = dashboardQuery.isLoading || patientsQuery.isLoading || appointmentsQuery.isLoading;
   if (isLoading) return <SkeletonLoader type="card" cardsCount={4} />;
 
-  const dashData = dashboardQuery.data || {};
-  const stats    = dashData.statistics || {};
+  const dashData = (dashboardQuery.data || {}) as Record<string, unknown>;
+  const stats    = ((dashData.statistics as Record<string, string | number>) || {});
 
   const cardVariants = {
     hidden:  { opacity: 0, y: 12 },
