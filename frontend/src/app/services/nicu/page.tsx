@@ -1,10 +1,10 @@
 "use client";
 
 import { useNICUService } from "@/hooks/useNICUService";
-import { 
-  FaHeartbeat, 
-  FaLaptopMedical, 
-  FaUserNurse, 
+import {
+  FaHeartbeat,
+  FaLaptopMedical,
+  FaUserNurse,
   FaHandHoldingHeart,
   FaBaby,
   FaShieldAlt,
@@ -45,9 +45,9 @@ const NICUServicePage = () => {
 
   return (
     <main className="overflow-hidden" style={{ background: "var(--background)" }}>
-      {/* ── Hero Section with Background Image ── */}
-      <section className="relative py-40 px-4 overflow-hidden">
-        {/* Background Image with Minimal Overlay */}
+      {/* ── Hero Banner ── */}
+      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+        {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <img
             src={nicu.backgroundImage}
@@ -58,82 +58,17 @@ const NICUServicePage = () => {
                 "https://images.unsplash.com/photo-1631815588090-d4bfec5b1ccb?w=1920&h=800&fit=crop";
             }}
           />
-          {/* Light overlay for text readability */}
-          <div 
-            className="absolute inset-0" 
-            style={{ 
-              background: "linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.6) 100%)" 
-            }} 
-          />
+          <div className="absolute inset-0 bg-black/60" />
         </div>
 
-        {/* Decorative floating elements */}
-        <div className="absolute top-20 right-10 w-80 h-80 rounded-full opacity-15 blur-3xl" style={{ background: "var(--color-primary)" }} />
-        <div className="absolute bottom-20 left-10 w-72 h-72 rounded-full opacity-20 blur-3xl" style={{ background: "var(--color-accent)" }} />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="border-l-4 border-orange-500 pl-6 animate-fadeInSlide">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-4 tracking-tight">
+              {nicu.title}
+            </h1>
+            <div className="flex items-center text-xs md:text-sm font-bold tracking-widest uppercase text-gray-300 gap-3">
 
-        <div className="relative z-10 max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Left Content */}
-            <div className="animate-fadeInSlide text-white">
-              <div 
-                className="nicu-badge inline-flex items-center gap-3 px-5 py-2.5 mb-6"
-                style={{
-                  borderRadius: "var(--radius-xl)",
-                }}
-              >
-                <FaBaby size={20} />
-                <span className="text-sm font-semibold tracking-wider uppercase">
-                  Neonatal Intensive Care
-                </span>
-              </div>
-              <h1 className="text-5xl md:text-6xl font-extrabold mb-6 leading-tight tracking-tight">
-                {nicu.title}
-              </h1>
-              <p className="text-lg md:text-xl text-white/90 leading-relaxed mb-8">
-                {nicu.heroDescription}
-              </p>
-              <div className="flex flex-wrap gap-4">
-                <a
-                  href="#services"
-                  className="nicu-gradient nicu-glow inline-block px-8 py-4 font-bold text-white transition-all duration-300 hover:-translate-y-1 transform"
-                  style={{
-                    borderRadius: "var(--radius-lg)",
-                  }}
-                >
-                  Our NICU Services
-                </a>
-                <a
-                  href="/appointment"
-                  className="inline-block px-8 py-4 font-bold text-white transition-all duration-300 hover:-translate-y-1 transform"
-                  style={{
-                    background: "rgba(255, 255, 255, 0.1)",
-                    backdropFilter: "blur(10px)",
-                    borderRadius: "var(--radius-lg)",
-                    border: "2px solid rgba(255, 255, 255, 0.3)"
-                  }}
-                >
-                  Contact Us
-                </a>
-              </div>
-            </div>
-
-            {/* Right Stats Cards */}
-            <div className="grid grid-cols-2 gap-4 animate-fadeInSlide" style={{ animationDelay: "0.2s" }}>
-              {nicu.statistics.map((stat, i) => (
-                <div
-                  key={i}
-                  className="glass-panel p-6 text-center hover:-translate-y-2 transition-all duration-300"
-                  style={{
-                    borderRadius: "var(--radius-lg)",
-                    background: "rgba(255, 255, 255, 0.1)",
-                    backdropFilter: "blur(20px)",
-                    border: "1px solid rgba(255, 255, 255, 0.2)"
-                  }}
-                >
-                  <p className="text-4xl font-extrabold text-white mb-1">{stat.value}</p>
-                  <p className="text-white/80 text-sm font-medium">{stat.label}</p>
-                </div>
-              ))}
+              <span className="text-white">NICU</span>
             </div>
           </div>
         </div>
@@ -153,7 +88,7 @@ const NICUServicePage = () => {
                   animationDelay: `${index * 0.1}s`
                 }}
               >
-                <div 
+                <div
                   className="nicu-gradient w-16 h-16 flex items-center justify-center mx-auto mb-5 transition-all duration-300 group-hover:scale-110"
                   style={{
                     borderRadius: "var(--radius-md)",
@@ -177,7 +112,7 @@ const NICUServicePage = () => {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <div className="relative animate-fadeInSlide order-2 lg:order-1">
-            <div 
+            <div
               className="nicu-gradient absolute -top-6 -left-6 w-full h-full"
               style={{
                 opacity: 0.1,
@@ -199,13 +134,13 @@ const NICUServicePage = () => {
             <h2 className="text-4xl md:text-5xl font-bold mb-8 leading-tight" style={{ color: "var(--color-primary)" }}>
               Caring for Your <span className="nicu-text-primary">Precious Little Ones</span>
             </h2>
-            <p 
+            <p
               className="text-lg leading-relaxed mb-8"
               style={{ color: "var(--foreground)", opacity: 0.75 }}
             >
               {nicu.description}
             </p>
-            
+
             <div className="space-y-4">
               {[
                 { icon: FaBaby, title: "Specialized Equipment", desc: "Modern incubators & ventilators" },
@@ -213,7 +148,7 @@ const NICUServicePage = () => {
                 { icon: FaHeartbeat, title: "24/7 Monitoring", desc: "Continuous care & supervision" }
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-4">
-                  <div 
+                  <div
                     className="nicu-gradient-light w-12 h-12 flex items-center justify-center flex-shrink-0"
                     style={{
                       borderRadius: "var(--radius-md)"
@@ -264,7 +199,7 @@ const NICUServicePage = () => {
                 }}
               >
                 <div className="flex items-center gap-4 mb-6">
-                  <div 
+                  <div
                     className="nicu-gradient w-12 h-12 flex items-center justify-center"
                     style={{
                       borderRadius: "var(--radius-md)"
@@ -279,9 +214,9 @@ const NICUServicePage = () => {
                 <ul className="space-y-3">
                   {service.items.map((item, idx) => (
                     <li key={idx} className="flex items-start gap-3">
-                      <FaCheckCircle 
-                        className="nicu-text-primary mt-1 flex-shrink-0" 
-                        size={16} 
+                      <FaCheckCircle
+                        className="nicu-text-primary mt-1 flex-shrink-0"
+                        size={16}
                       />
                       <span className="text-sm leading-relaxed" style={{ color: "var(--foreground)", opacity: 0.75 }}>
                         {item}
@@ -300,8 +235,8 @@ const NICUServicePage = () => {
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
               {nicu.equipment.map((item, i) => (
-                <div 
-                  key={i} 
+                <div
+                  key={i}
                   className="nicu-gradient-light text-center p-4 rounded-lg transition-all duration-300 hover:scale-105"
                 >
                   <p className="text-sm font-medium" style={{ color: "var(--foreground)", opacity: 0.8 }}>
@@ -320,10 +255,10 @@ const NICUServicePage = () => {
           <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-[var(--color-primary)] blur-3xl" />
           <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-[var(--color-accent)] blur-3xl" />
         </div>
-        
+
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-16 animate-fadeInSlide">
-            <div 
+            <div
               className="nicu-gradient inline-block px-5 py-2 mb-6 text-sm font-bold tracking-wider uppercase text-white"
               style={{
                 borderRadius: "var(--radius-xl)"
@@ -349,7 +284,7 @@ const NICUServicePage = () => {
                   borderRadius: "var(--radius-lg)"
                 }}
               >
-                <div 
+                <div
                   className="nicu-gradient w-14 h-14 flex items-center justify-center mx-auto mb-4 transition-transform duration-300 group-hover:scale-110"
                   style={{
                     borderRadius: "var(--radius-md)"
@@ -379,13 +314,13 @@ const NICUServicePage = () => {
             Please follow these guidelines to ensure the safety of all babies
           </p>
         </div>
-        
+
         <div className="space-y-4">
           {nicu.guidelines.map((guideline, i) => (
-            <div 
-              key={i} 
+            <div
+              key={i}
               className="premium-card p-6 flex items-start gap-4 animate-fadeInSlide"
-              style={{ 
+              style={{
                 borderRadius: "var(--radius-md)",
                 animationDelay: `${i * 0.05}s`
               }}
@@ -403,7 +338,7 @@ const NICUServicePage = () => {
           <h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight tracking-tight" style={{ color: "var(--color-primary)" }}>
             Need NICU Consultation?
           </h2>
-          <p 
+          <p
             className="text-lg mb-12 leading-relaxed max-w-xl mx-auto"
             style={{ color: "var(--foreground)", opacity: 0.7 }}
           >
