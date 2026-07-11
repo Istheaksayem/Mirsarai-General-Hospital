@@ -21,17 +21,19 @@ export default function AppointmentPage() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* ── Hero Banner ── */}
-      <section className="relative overflow-hidden bg-gradient-to-r from-primary/95 to-primary/80 py-24 text-center text-white border-b border-white/10 shadow-lg">
-        {/* Decorative blobs & Background pattern */}
+      <section className="relative overflow-hidden py-24 text-center text-white border-b border-white/10 shadow-lg">
+        {/* Premium background image */}
+        <div
+          className="absolute inset-0 bg-cover bg-center pointer-events-none"
+          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1920&q=80')" }}
+        />
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0 bg-black/60 pointer-events-none" />
+
+        {/* Decorative blobs */}
         <div className="absolute -top-20 -left-20 w-80 h-80 bg-white/5 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-[#76BC21]/20 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute top-10 right-40 w-40 h-40 bg-[#00BCD4]/20 rounded-full blur-2xl pointer-events-none" />
-
-        {/* Premium overlay image to set medical context */}
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-15 mix-blend-overlay pointer-events-none"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1920&q=80')" }}
-        />
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <span className="inline-block bg-white/10 text-white text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-5 border border-white/20 backdrop-blur-sm shadow-inner">
