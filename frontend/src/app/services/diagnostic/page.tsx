@@ -3,6 +3,7 @@
 import { useDiagnosticService } from "@/hooks/useDiagnosticService";
 import { FaMicroscope, FaClock, FaUserMd, FaCheckCircle, FaFlask, FaHeartbeat } from "react-icons/fa";
 import { MdScience } from "react-icons/md";
+import { motion } from "framer-motion";
 
 const iconMap: Record<string, any> = {
   FaMicroscope,
@@ -11,13 +12,20 @@ const iconMap: Record<string, any> = {
   FaCheckCircle,
 };
 
+const fadeUp = {
+  initial: { opacity: 0, y: 20 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true },
+  transition: { duration: 0.5 },
+};
+
 const DiagnosticServicePage = () => {
   const { data, isLoading, isError } = useDiagnosticService();
 
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--background)" }}>
-        <div className="flex flex-col items-center gap-4 animate-fadeInSlide">
+        <div className="flex flex-col items-center gap-4">
           <div className="w-16 h-16 rounded-full border-4 border-[var(--color-accent)] border-t-transparent animate-spin" />
           <p className="font-semibold text-lg" style={{ color: "var(--color-accent)" }}>Loading...</p>
         </div>
@@ -54,15 +62,17 @@ const DiagnosticServicePage = () => {
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="border-l-4 border-orange-500 pl-6 animate-fadeInSlide">
+          <motion.div 
+            className="border-l-4 border-orange-500 pl-6"
+            {...fadeUp}
+          >
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-4 tracking-tight">
               {diagnostic.title}
             </h1>
             <div className="flex items-center text-xs md:text-sm font-bold tracking-widest uppercase text-gray-300 gap-3">
-
               <span className="text-white">DIAGNOSTIC</span>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -72,13 +82,16 @@ const DiagnosticServicePage = () => {
           {diagnostic.features.map((feature, index) => {
             const Icon = iconMap[feature.icon] || FaMicroscope;
             return (
-              <div
+              <motion.div
                 key={index}
                 className="glass-panel p-8 text-center group hover:-translate-y-2 transition-all duration-500"
                 style={{
                   borderRadius: "var(--radius-lg)",
-                  animationDelay: `${index * 0.1}s`
                 }}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
               >
                 <div
                   className="w-16 h-16 flex items-center justify-center mx-auto mb-5 transition-all duration-300 group-hover:scale-110"
@@ -95,7 +108,7 @@ const DiagnosticServicePage = () => {
                 <p className="text-sm leading-relaxed" style={{ color: "var(--foreground)", opacity: 0.7 }}>
                   {feature.description}
                 </p>
-              </div>
+              </motion.div>
             );
           })}
         </div>
@@ -104,7 +117,7 @@ const DiagnosticServicePage = () => {
       {/* ── About Section ── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          <div className="animate-fadeInSlide">
+          <motion.div {...fadeUp}>
             <h2 className="text-4xl md:text-5xl font-bold mb-8 leading-tight" style={{ color: "var(--color-primary)" }}>
               Advanced <span style={{ color: "var(--color-secondary)" }}>Diagnostic</span> Solutions
             </h2>
@@ -156,9 +169,15 @@ const DiagnosticServicePage = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="relative animate-fadeInSlide" style={{ animationDelay: "0.2s" }}>
+          <motion.div 
+            className="relative" 
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
             <div
               className="absolute -top-6 -right-6 w-full h-full"
               style={{
@@ -176,7 +195,7 @@ const DiagnosticServicePage = () => {
                 boxShadow: "var(--shadow-xl)"
               }}
             />
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -188,24 +207,27 @@ const DiagnosticServicePage = () => {
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10">
-          <div className="text-center mb-16 animate-fadeInSlide">
+          <motion.div className="text-center mb-16" {...fadeUp}>
             <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight" style={{ color: "var(--color-primary)" }}>
               Our Laboratory Services
             </h2>
             <p className="text-lg max-w-2xl mx-auto" style={{ color: "var(--foreground)", opacity: 0.7 }}>
               Comprehensive diagnostic testing across multiple specialties
             </p>
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {diagnostic.services.map((service, index) => (
-              <div
+              <motion.div
                 key={index}
                 className="premium-card p-8 hover:scale-[1.02] transition-all duration-300"
                 style={{
                   borderRadius: "var(--radius-lg)",
-                  animationDelay: `${index * 0.1}s`
                 }}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
               >
                 <div className="flex items-center gap-4 mb-6">
                   <div
@@ -235,7 +257,7 @@ const DiagnosticServicePage = () => {
                     </li>
                   ))}
                 </ul>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -249,7 +271,7 @@ const DiagnosticServicePage = () => {
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10">
-          <div className="text-center mb-16 animate-fadeInSlide">
+          <motion.div className="text-center mb-16" {...fadeUp}>
             <div
               className="inline-block px-5 py-2 mb-6 text-sm font-bold tracking-wider uppercase"
               style={{
@@ -266,17 +288,20 @@ const DiagnosticServicePage = () => {
             <p className="text-lg max-w-2xl mx-auto leading-relaxed" style={{ color: "var(--foreground)", opacity: 0.7 }}>
               Trusted by thousands for accurate and timely diagnostic services
             </p>
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {diagnostic.statistics.map((stat, i) => (
-              <div
+              <motion.div
                 key={i}
-                className="premium-card text-center p-10 group hover:-translate-y-2 animate-fadeInSlide glow-effect"
+                className="premium-card text-center p-10 group hover:-translate-y-2 glow-effect"
                 style={{
-                  animationDelay: `${i * 0.1}s`,
                   borderRadius: "var(--radius-lg)"
                 }}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
               >
                 <div
                   className="w-14 h-14 flex items-center justify-center mx-auto mb-4 transition-transform duration-300 group-hover:scale-110"
@@ -293,7 +318,7 @@ const DiagnosticServicePage = () => {
                 <p className="text-sm font-medium tracking-wide" style={{ color: "var(--foreground)", opacity: 0.7 }}>
                   {stat.label}
                 </p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -301,7 +326,7 @@ const DiagnosticServicePage = () => {
 
       {/* ── CTA Section ── */}
       <section className="py-28 px-4 text-center">
-        <div className="max-w-3xl mx-auto animate-fadeInSlide">
+        <motion.div className="max-w-3xl mx-auto" {...fadeUp}>
           <h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight tracking-tight" style={{ color: "var(--color-primary)" }}>
             Need Diagnostic Services?
           </h2>
@@ -322,7 +347,7 @@ const DiagnosticServicePage = () => {
           >
             Book Diagnostic Test
           </a>
-        </div>
+        </motion.div>
       </section>
     </main>
   );

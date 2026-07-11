@@ -6,8 +6,16 @@ import { FiCheckCircle, FiArrowRight, FiTarget, FiEye } from "react-icons/fi";
 import { MdLocalHospital, MdSecurity } from "react-icons/md";
 import { useEffect, useRef } from "react";
 import { BsFillHeartPulseFill } from "react-icons/bs";
+import { motion } from "framer-motion";
 
 const statIcons = [FaUserMd, FaUsers, FaSmile, FaAward];
+
+const fadeUp = {
+  initial: { opacity: 0, y: 30 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true },
+  transition: { duration: 0.6 },
+};
 
 const AboutPage = () => {
   const { data, isLoading, isError } = useAboutData();
@@ -71,15 +79,17 @@ const AboutPage = () => {
 
         {/* Hero Content */}
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="border-l-4 border-orange-500 pl-6 animate-slide-up">
+          <motion.div 
+            className="border-l-4 border-orange-500 pl-6"
+            {...fadeUp}
+          >
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-4 tracking-tight">
               {about.title}
             </h1>
             <div className="flex items-center text-xs md:text-sm font-bold tracking-widest uppercase text-gray-300 gap-3">
-
               <span className="text-white">ABOUT US</span>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -94,7 +104,13 @@ const AboutPage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
 
             {/* Left - Image Collage */}
-            <div className="relative">
+            <motion.div 
+              className="relative"
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
               {/* Main Large Image */}
               <div className="relative rounded-3xl overflow-hidden shadow-2xl hover-lift">
                 <div
@@ -120,31 +136,45 @@ const AboutPage = () => {
               </div>
 
               {/* Small Floating Images */}
-              <div className="absolute -top-8 -right-8 w-40 h-40 rounded-2xl overflow-hidden shadow-xl border-4 border-white animate-float">
+              <motion.div 
+                className="absolute -top-8 -right-8 w-40 h-40 rounded-2xl overflow-hidden shadow-xl border-4 border-white"
+                animate={{ y: [0, -10, 0] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              >
                 <div
                   className="w-full h-full bg-cover bg-center"
                   style={{
                     backgroundImage: `url('/hospital-banner.jpg')`,
                   }}
                 />
-              </div>
+              </motion.div>
 
-              <div className="absolute -bottom-8 -left-8 w-48 h-48 rounded-2xl overflow-hidden shadow-xl border-4 border-white animate-float delay-500">
+              <motion.div 
+                className="absolute -bottom-8 -left-8 w-48 h-48 rounded-2xl overflow-hidden shadow-xl border-4 border-white"
+                animate={{ y: [0, 10, 0] }}
+                transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+              >
                 <div
                   className="w-full h-full bg-cover bg-center"
                   style={{
                     backgroundImage: `url('/hospital-banner.jpg')`,
                   }}
                 />
-              </div>
+              </motion.div>
 
               {/* Decorative Elements */}
               <div className="absolute -top-4 -left-4 w-24 h-24 border-4 border-secondary/30 rounded-full animate-rotate-slow" />
               <div className="absolute -bottom-4 -right-4 w-32 h-32 border-4 border-primary/20 rounded-full animate-rotate-slow" />
-            </div>
+            </motion.div>
 
             {/* Right - Content */}
-            <div className="space-y-8">
+            <motion.div 
+              className="space-y-8"
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
               <div>
                 <span className="inline-block px-4 py-2 rounded-full bg-secondary/10 text-secondary text-sm font-bold mb-4">
                   ✨ Our Story
@@ -164,15 +194,19 @@ const AboutPage = () => {
               {/* Feature List with Icons */}
               <div className="space-y-4">
                 {about.content.map((point, i) => (
-                  <div
+                  <motion.div
                     key={i}
                     className="group flex items-start gap-4 p-4 rounded-xl bg-gradient-to-r from-blue-50 to-transparent hover:from-blue-100 hover:shadow-md transition-all duration-300"
+                    initial={{ opacity: 0, x: 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4, delay: i * 0.1 }}
                   >
                     <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-primary to-blue-900 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                       <FiCheckCircle className="text-white" size={20} />
                     </div>
                     <p className="text-gray-700 text-base leading-relaxed pt-1">{point}</p>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
 
@@ -185,7 +219,7 @@ const AboutPage = () => {
                 Our Mission & Vision
                 <FiArrowRight className="group-hover:translate-x-2 transition-transform" />
               </a>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -210,7 +244,7 @@ const AboutPage = () => {
         <div className="absolute bottom-20 right-20 w-96 h-96 bg-cyan-400/20 rounded-full blur-3xl animate-pulse delay-1000" />
 
         <div className="max-w-6xl mx-auto relative z-10">
-          <div className="text-center mb-16">
+          <motion.div className="text-center mb-16" {...fadeUp}>
             <span className="inline-block px-6 py-2 rounded-full glass-card-dark text-secondary text-sm font-bold mb-6">
               Why Choose Us
             </span>
@@ -220,7 +254,7 @@ const AboutPage = () => {
             <p className="text-white/90 text-xl max-w-2xl mx-auto">
               We combine expertise, compassion, and modern technology to deliver exceptional healthcare.
             </p>
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
@@ -243,16 +277,20 @@ const AboutPage = () => {
                 color: "from-red-500 via-pink-600 to-pink-700"
               }
             ].map((item, i) => (
-              <div
+              <motion.div
                 key={i}
                 className="group glass-card rounded-3xl p-8 hover:scale-105 transition-all duration-500 hover:shadow-2xl"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
               >
                 <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center mb-6 group-hover:rotate-6 group-hover:scale-110 transition-all duration-300 shadow-xl`}>
                   <item.icon className="text-white text-4xl" />
                 </div>
                 <h3 className="text-2xl font-bold text-primary mb-4">{item.title}</h3>
                 <p className="text-gray-600 leading-relaxed text-lg">{item.description}</p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -263,22 +301,26 @@ const AboutPage = () => {
           ══════════════════════════════════════════ */}
       <section className="py-20 px-4 bg-gradient-to-br from-gray-50 via-blue-50/30 to-white">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
+          <motion.div className="text-center mb-12" {...fadeUp}>
             <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
               Our Impact in Numbers
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto text-lg">
               Over a decade of service, we've grown stronger with each patient we've cared for.
             </p>
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {about.statistics.map((stat, i) => {
               const Icon = statIcons[i];
               return (
-                <div
+                <motion.div
                   key={i}
                   className="group bg-white rounded-3xl p-8 text-center border-2 border-gray-100 hover:border-secondary/50 hover:shadow-2xl transition-all duration-300 hover:-translate-y-3 transform"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: i * 0.1 }}
                 >
                   <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-secondary/20 to-secondary/10 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">
                     <Icon className="text-secondary text-3xl" />
@@ -287,7 +329,7 @@ const AboutPage = () => {
                     {stat.value}
                   </p>
                   <p className="text-gray-600 text-base font-semibold">{stat.title}</p>
-                </div>
+                </motion.div>
               );
             })}
           </div>
@@ -309,7 +351,7 @@ const AboutPage = () => {
           <div className="absolute inset-0 bg-gradient-to-br from-white/95 via-blue-50/95 to-white/95" />
         </div>
 
-        <div className="max-w-4xl mx-auto relative z-10">
+        <motion.div className="max-w-4xl mx-auto relative z-10" {...fadeUp}>
           <div className="inline-block mb-6">
             <div className="flex items-center gap-3 bg-secondary/10 border border-secondary/20 px-6 py-3 rounded-full backdrop-blur-sm">
               <BsFillHeartPulseFill className="text-secondary text-2xl animate-pulse" />
@@ -341,7 +383,7 @@ const AboutPage = () => {
               Contact Us
             </a>
           </div>
-        </div>
+        </motion.div>
       </section>
     </main>
   );

@@ -20,8 +20,8 @@ export default function ContactPage() {
       <div className="min-h-screen flex flex-col items-center justify-center text-red-500 bg-gray-50 pt-24 pb-20">
         <div className="text-6xl mb-4">⚠️</div>
         <p className="text-lg font-medium">Failed to load Contact data.</p>
-        <button 
-          onClick={() => window.location.reload()} 
+        <button
+          onClick={() => window.location.reload()}
           className="mt-4 px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
         >
           Retry
@@ -35,7 +35,7 @@ export default function ContactPage() {
       {/* Header Section (Banner) */}
       <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden mb-16">
         {/* Background Image */}
-        <div 
+        <div
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: "url('/about-us.jpg')" }}
         />
@@ -48,8 +48,7 @@ export default function ContactPage() {
               {data.header.title}
             </h1>
             <div className="flex items-center text-xs md:text-sm font-bold tracking-widest uppercase text-gray-300 gap-3">
-              <a href="/" className="text-orange-500 hover:text-orange-400 transition-colors">HOME</a>
-              <span>→</span>
+
               <span className="text-white">CONTACT US</span>
             </div>
           </div>
@@ -61,13 +60,13 @@ export default function ContactPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8">
-          
+
           {/* Contact Information Cards */}
           <div className="space-y-8">
             <h2 className="text-2xl font-bold text-gray-800 mb-6 border-l-4 border-secondary pl-4">
               {data.contactInfo.title}
             </h2>
-            
+
             {/* Address Card */}
             <div className="bg-white rounded-2xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.05)] hover:shadow-[0_4px_25px_rgba(30,43,122,0.1)] transition-all duration-300 border border-gray-100 flex items-start group">
               <div className="bg-primary/5 p-4 rounded-full text-primary group-hover:bg-primary group-hover:text-white transition-colors duration-300 mr-6 mt-1">
@@ -75,7 +74,7 @@ export default function ContactPage() {
               </div>
               <div>
                 <h3 className="text-lg font-bold text-gray-800 mb-4">Our Address</h3>
-                
+
                 <div className="space-y-4">
                   {/* English Address */}
                   <div>
@@ -121,38 +120,38 @@ export default function ContactPage() {
             {/* Decorative bg elements */}
             <div className="absolute top-0 right-0 w-40 h-40 bg-secondary/10 rounded-full blur-3xl -mr-20 -mt-20"></div>
             <div className="absolute bottom-0 left-0 w-40 h-40 bg-tertiary/10 rounded-full blur-3xl -ml-20 -mb-20"></div>
-            
+
             <h2 className="text-2xl font-bold text-gray-800 mb-6 relative z-10">
               {data.form.title}
             </h2>
-            
+
             <form className="space-y-6 relative z-10">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
-                  <input 
-                    type="text" 
-                    id="name" 
+                  <input
+                    type="text"
+                    id="name"
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary/50 focus:border-secondary outline-none transition-all duration-300 bg-gray-50 focus:bg-white"
                     placeholder="John Doe"
                   />
                 </div>
                 <div>
                   <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-                  <input 
-                    type="tel" 
-                    id="phone" 
+                  <input
+                    type="tel"
+                    id="phone"
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary/50 focus:border-secondary outline-none transition-all duration-300 bg-gray-50 focus:bg-white"
                     placeholder="01xxxxxxxxx"
                   />
                 </div>
               </div>
-              
+
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">Email Address (Optional)</label>
-                <input 
-                  type="email" 
-                  id="email" 
+                <input
+                  type="email"
+                  id="email"
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary/50 focus:border-secondary outline-none transition-all duration-300 bg-gray-50 focus:bg-white"
                   placeholder="john@example.com"
                 />
@@ -160,16 +159,16 @@ export default function ContactPage() {
 
               <div>
                 <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">Your Message</label>
-                <textarea 
-                  id="message" 
+                <textarea
+                  id="message"
                   rows={4}
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary/50 focus:border-secondary outline-none transition-all duration-300 bg-gray-50 focus:bg-white resize-none"
                   placeholder="How can we help you?"
                 ></textarea>
               </div>
 
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-4 rounded-xl shadow-lg shadow-primary/30 hover:shadow-primary/50 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center space-x-2 group"
               >
                 <span>Send Message</span>

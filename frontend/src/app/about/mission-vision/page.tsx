@@ -88,15 +88,20 @@ const MissionVisionPage = () => {
 
         {/* Hero Content */}
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="border-l-4 border-orange-500 pl-6">
+          <motion.div 
+            className="border-l-4 border-orange-500 pl-6"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-4 tracking-tight">
               {missionVision.title}
             </h1>
             <div className="flex items-center text-xs md:text-sm font-bold tracking-widest uppercase text-gray-300 gap-3">
-
               <span className="text-white">MISSION & VISION</span>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
