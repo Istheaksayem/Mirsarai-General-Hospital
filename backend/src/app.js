@@ -1,3 +1,4 @@
+import path from 'path';
 import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
@@ -10,6 +11,9 @@ import routes from './routes/index.js';
 import { errorConverter, errorHandler, notFound } from './middlewares/error.middleware.js';
 
 const app = express();
+
+// Serve uploads folder statically
+app.use('/uploads', express.static(path.join(process.cwd(), 'public/uploads')));
 
 // ============================================
 // SECURITY MIDDLEWARE

@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { Globe, Edit3, CheckCircle2, XCircle, Settings } from "lucide-react";
+import { Globe, Edit3, CheckCircle2, XCircle, Settings, Info, Target, ImageIcon, Briefcase } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
@@ -23,12 +23,51 @@ export default function CMSPage() {
         <Button size="sm" onClick={() => router.push("/super-admin/homepage")}>Manage Homepage</Button>
       </PageHeader>
 
+      {/* About Pages CMS */}
+      <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-sm space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 dark:bg-blue-900/20 text-[#1E2B7A] dark:text-blue-400">
+            <Info className="h-5 w-5" />
+          </div>
+          <div>
+            <h2 className="font-bold text-gray-900 dark:text-gray-100 text-sm">About Pages CMS</h2>
+            <p className="text-xs text-gray-400 mt-0.5">Manage all About Us sub-pages — content, images, visibility, SEO</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {[
+            { label: "About Us", desc: "Hero, story, statistics, features & CTA", href: "/super-admin/cms/about-us", Icon: Info, color: "blue" },
+            { label: "Mission & Vision", desc: "Mission, vision, core values & commitment", href: "/super-admin/cms/mission-vision", Icon: Target, color: "emerald" },
+            { label: "Gallery", desc: "Photo categories, gallery images & stats", href: "/super-admin/cms/gallery", Icon: ImageIcon, color: "purple" },
+            { label: "Career", desc: "Job listings, benefits & application process", href: "/super-admin/cms/career", Icon: Briefcase, color: "orange" },
+          ].map(({ label, desc, href, Icon, color }) => (
+            <div
+              key={href}
+              onClick={() => router.push(href)}
+              className="flex items-center justify-between rounded-xl border border-gray-100 dark:border-gray-800 px-4 py-3 hover:shadow-md hover:border-gray-200 dark:hover:border-gray-700 transition-all cursor-pointer group bg-gray-50/50 dark:bg-gray-800/30"
+            >
+              <div className="flex items-center gap-3">
+                <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-${color}-50 dark:bg-${color}-900/20 text-${color}-600 dark:text-${color}-400 group-hover:scale-110 transition-transform`}>
+                  <Icon className="h-4.5 w-4.5" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-gray-900 dark:text-gray-100">{label}</p>
+                  <p className="text-xs text-gray-400">{desc}</p>
+                </div>
+              </div>
+              <Edit3 className="h-4 w-4 text-gray-400 group-hover:text-[#1E2B7A] dark:group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all" />
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* CMS Sub-sections Quick Selector */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div 
           onClick={() => router.push("/super-admin/homepage/hero")}
           className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 flex items-center justify-between shadow-sm hover:shadow-md transition-all cursor-pointer group"
         >
+
           <div className="flex items-center gap-3.5">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 dark:bg-blue-900/20 text-[#1E2B7A] dark:text-blue-400 group-hover:scale-110 transition-transform">
               <Globe className="h-5.5 w-5.5" />

@@ -85,15 +85,15 @@ export default function DoctorModules({ activeModule }: ModuleProps) {
       return (
         <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6">
           <motion.div variants={cardVariants} className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-            <StatsCard title="Today's Patients"     value={stats.todayPatients     || "0"} icon={<FiUsers size={18}/>}     trend={stats.todayPatientsTrend} />
-            <StatsCard title="Appointments Today"   value={stats.appointmentsToday || "0"} icon={<FiCalendar size={18}/>}  trend={stats.appointmentsTodayTrend} colorClass="text-blue-500" />
-            <StatsCard title="Completed Consults"   value={stats.completedConsults || "0"} icon={<FiCheckCircle size={18}/>} trend={stats.completedConsultsTrend} colorClass="text-emerald-500" />
-            <StatsCard title="Prescriptions Issued" value={stats.prescriptionsIssued || "0"} icon={<FiFileText size={18}/>}  trend={stats.prescriptionsIssuedTrend} colorClass="text-purple-500" />
+            <StatsCard title="Today's Patients"     value={stats.todayPatients     || "0"} icon={<FiUsers size={18}/>}     trend={Number(stats.todayPatientsTrend) || 0} />
+            <StatsCard title="Appointments Today"   value={stats.appointmentsToday || "0"} icon={<FiCalendar size={18}/>}  trend={Number(stats.appointmentsTodayTrend) || 0} colorClass="text-blue-500" />
+            <StatsCard title="Completed Consults"   value={stats.completedConsults || "0"} icon={<FiCheckCircle size={18}/>} trend={Number(stats.completedConsultsTrend) || 0} colorClass="text-emerald-500" />
+            <StatsCard title="Prescriptions Issued" value={stats.prescriptionsIssued || "0"} icon={<FiFileText size={18}/>}  trend={Number(stats.prescriptionsIssuedTrend) || 0} colorClass="text-purple-500" />
           </motion.div>
 
           <motion.div variants={cardVariants} className="grid grid-cols-1 lg:grid-cols-3 gap-5">
             <div className="lg:col-span-2">
-              <AreaChart data={dashData.consultationHistory || []} title="Consultation Load — Last 7 Days" color="purple" />
+              <AreaChart data={(dashData.consultationHistory as any) || []} title="Consultation Load" />
             </div>
             {/* Today's schedule mini */}
             <div className="glass-panel rounded-2xl p-5 flex flex-col">

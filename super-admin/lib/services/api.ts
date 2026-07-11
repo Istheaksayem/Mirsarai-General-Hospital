@@ -234,7 +234,7 @@ async function fetchReal<T>(path: string): Promise<T> {
     try {
       const parsed = JSON.parse(errorText);
       errorMessage = parsed.message || errorMessage;
-    } catch {}
+    } catch { }
     throw new ApiError(res.status, errorMessage);
   }
   const result = await res.json();
@@ -255,7 +255,7 @@ async function saveReal<T>(path: string, data: Partial<T>, method: "PUT" | "PATC
     try {
       const parsed = JSON.parse(errorText);
       errorMessage = parsed.message || errorMessage;
-    } catch {}
+    } catch { }
     throw new ApiError(res.status, errorMessage);
   }
   const result = await res.json();
@@ -269,4 +269,149 @@ export const updateAdminHomepage = (data: Partial<HomepageData>, method: "PUT" |
 export const getAdminHero = () => fetchReal<HeroData>("homepage/hero");
 export const updateAdminHero = (data: Partial<HeroData>, method: "PUT" | "PATCH" = "PUT") =>
   saveReal<HeroData>("homepage/hero", data, method);
+
+// ─── About CMS Types ───────────────────────────────────────────────────
+
+export interface SectionConfig {
+  isVisible: boolean;
+  order: number;
+}
+
+export interface SeoConfig {
+  metaTitle: LocalizedString;
+  metaDescription: LocalizedString;
+  keywords: LocalizedString;
+  ogImage: string;
+}
+
+export interface AboutUsStat {
+  title: LocalizedString;
+  value: string;
+}
+
+export interface AboutUsData {
+  _id?: string;
+  title: LocalizedString;
+  subtitle: LocalizedString;
+  description: LocalizedString;
+  content: LocalizedString[];
+  statistics: AboutUsStat[];
+  image: string;
+  features: LocalizedString[];
+  sections: Record<string, SectionConfig>;
+  seo: SeoConfig;
+  createdBy?: string;
+  updatedBy?: string;
+}
+
+export interface CoreValue {
+  title: LocalizedString;
+  description: LocalizedString;
+}
+
+export interface MissionVisionData {
+  _id?: string;
+  title: LocalizedString;
+  mission: { title: LocalizedString; description: LocalizedString };
+  vision: { title: LocalizedString; description: LocalizedString };
+  coreValues: CoreValue[];
+  image: string;
+  sections: Record<string, SectionConfig>;
+  seo: SeoConfig;
+  createdBy?: string;
+  updatedBy?: string;
+}
+
+export interface GalleryCategory {
+  id: string;
+  title: LocalizedString;
+  description: LocalizedString;
+}
+
+export interface GalleryImage {
+  id: number;
+  category: string;
+  src: string;
+  title: LocalizedString;
+  description: LocalizedString;
+}
+
+export interface GalleryStatItem {
+  number: string;
+  label: LocalizedString;
+}
+
+export interface GalleryData {
+  _id?: string;
+  hero: { title: LocalizedString; subtitle: LocalizedString; description: LocalizedString };
+  categories: GalleryCategory[];
+  images: GalleryImage[];
+  stats: { title: LocalizedString; items: GalleryStatItem[] };
+  sections: Record<string, SectionConfig>;
+  seo: SeoConfig;
+  createdBy?: string;
+  updatedBy?: string;
+}
+
+export interface CareerBenefit {
+  icon: string;
+  title: LocalizedString;
+  description: LocalizedString;
+}
+
+export interface CareerPosition {
+  id: number;
+  title: LocalizedString;
+  department: LocalizedString;
+  type: LocalizedString;
+  experience: LocalizedString;
+  description: LocalizedString;
+}
+
+export interface CareerStep {
+  step: number;
+  title: LocalizedString;
+  description: LocalizedString;
+}
+
+export interface CareerData {
+  _id?: string;
+  hero: { title: LocalizedString; subtitle: LocalizedString; description: LocalizedString; image: string };
+  whyJoinUs: { title: LocalizedString; benefits: CareerBenefit[] };
+  openPositions: CareerPosition[];
+  applicationProcess: { title: LocalizedString; steps: CareerStep[] };
+  contact: { title: LocalizedString; description: LocalizedString; email: string; phone: string };
+  sections: Record<string, SectionConfig>;
+  seo: SeoConfig;
+  createdBy?: string;
+  updatedBy?: string;
+}
+
+// ─── About CMS API Functions ────────────────────────────────────────────
+
+export const getAboutUs = () => fetchReal<AboutUsData>("about/us");
+export const updateAboutUs = (data: Partial<AboutUsData>) => saveReal<AboutUsData>("about/us", data, "PUT");
+
+export const getMissionVision = () => fetchReal<MissionVisionData>("about/mission-vision");
+export const updateMissionVision = (data: Partial<MissionVisionData>) => saveReal<MissionVisionData>("about/mission-vision", data, "PUT");
+
+export const getGalleryData = () => fetchReal<GalleryData>("about/gallery");
+export const updateGalleryData = (data: Partial<GalleryData>) => saveReal<GalleryData>("about/gallery", data, "PUT");
+
+export const getCareerData = () => fetchReal<CareerData>("about/career");
+export const updateCareerData = (data: Partial<CareerData>) => saveReal<CareerData>("about/career", data, "PUT");
+
+// Image upload helper
+export async function uploadCmsImage(base64Data: string): Promise<string> {
+  const res = await fetch(`${BACKEND_API}/about/upload`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ base64Data }),
+  });
+  if (!res.ok) {
+    throw new ApiError(res.status, "Failed to upload image");
+  }
+  const result = await res.json();
+  return result.data.url;
+}
 

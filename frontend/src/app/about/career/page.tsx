@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
@@ -12,7 +12,6 @@ import {
   FaUsers,
   FaBriefcase,
   FaClock,
-  FaUserTie,
   FaEnvelope,
   FaPhone,
   FaCheckCircle,
@@ -40,6 +39,13 @@ interface Step {
   description: { en: string; bn: string };
 }
 
+interface SEOConfig {
+  metaTitle: { en: string; bn: string };
+  metaDescription: { en: string; bn: string };
+  keywords: { en: string; bn: string };
+  ogImage: string;
+}
+
 interface CareerData {
   hero: {
     title: { en: string; bn: string };
@@ -62,6 +68,7 @@ interface CareerData {
     email: string;
     phone: string;
   };
+  seo?: SEOConfig;
 }
 
 // ── Icon Mapper ────────────────────────────────────────────────────────────
@@ -74,9 +81,18 @@ const iconMap: { [key: string]: React.ElementType } = {
 
 // ── Fetch Career Data ──────────────────────────────────────────────────────
 const fetchCareerData = async (): Promise<CareerData> => {
-  const res = await fetch("/data/career.json");
-  if (!res.ok) throw new Error("Failed to fetch career data");
-  return res.json();
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+  try {
+    const res = await fetch(`${apiUrl}/about/career`, { cache: "no-store" });
+    if (!res.ok) throw new Error("Failed to fetch from backend");
+    const result = await res.json();
+    return result.data;
+  } catch (error) {
+    console.warn("Backend API not reachable for career data. Falling back to local data/career.json", error);
+    const res = await fetch("/data/career.json", { cache: "no-store" });
+    if (!res.ok) throw new Error("Failed to fetch fallback career data");
+    return res.json();
+  }
 };
 
 // ── Main Career Page ───────────────────────────────────────────────────────
@@ -95,6 +111,24 @@ const CareerPage = () => {
     queryKey: ["career"],
     queryFn: fetchCareerData,
   });
+
+  // Dynamic SEO Meta tags
+  useEffect(() => {
+    if (data?.seo) {
+      const seo = data.seo;
+      document.title = lang === "bn" ? seo.metaTitle.bn : seo.metaTitle.en;
+      
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) {
+        metaDesc.setAttribute("content", lang === "bn" ? seo.metaDescription.bn : seo.metaDescription.en);
+      }
+      
+      const metaKeywords = document.querySelector('meta[name="keywords"]');
+      if (metaKeywords) {
+        metaKeywords.setAttribute("content", lang === "bn" ? seo.keywords.bn : seo.keywords.en);
+      }
+    }
+  }, [data, lang]);
 
   if (isLoading) {
     return (
@@ -123,7 +157,6 @@ const CareerPage = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
     console.log("Form submitted:", formData);
   };
 

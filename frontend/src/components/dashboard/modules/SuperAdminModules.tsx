@@ -105,16 +105,16 @@ export default function SuperAdminModules({ activeModule }: ModuleProps) {
         <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6">
           {/* KPI Row */}
           <motion.div variants={cardVariants} className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-            <StatsCard title="Total Patients"      value={stats.totalPatients?.toLocaleString() || "0"} icon={<FiUsers size={18}/>}      trend={stats.totalPatientsTrend}      progress={82} />
-            <StatsCard title="Active Doctors"      value={stats.totalDoctors || "0"}                   icon={<FiActivity size={18}/>}    trend={stats.totalDoctorsTrend}       colorClass="text-emerald-500" />
-            <StatsCard title="Departments"         value={stats.activeDepartments || "0"}              icon={<FiBriefcase size={18}/>}   trend={stats.activeDepartmentsTrend} />
-            <StatsCard title="Monthly Revenue"     value={`৳${stats.totalRevenue?.toLocaleString() || "0"}`} icon={<FiTrendingUp size={18}/>} trend={stats.totalRevenueTrend} colorClass="text-amber-500" />
+            <StatsCard title="Total Patients"      value={stats.totalPatients?.toLocaleString() || "0"} icon={<FiUsers size={18}/>}      trend={Number(stats.totalPatientsTrend) || 0}      progress={82} />
+            <StatsCard title="Active Doctors"      value={stats.totalDoctors || "0"}                   icon={<FiActivity size={18}/>}    trend={Number(stats.totalDoctorsTrend) || 0}       colorClass="text-emerald-500" />
+            <StatsCard title="Departments"         value={stats.activeDepartments || "0"}              icon={<FiBriefcase size={18}/>}   trend={Number(stats.activeDepartmentsTrend) || 0} />
+            <StatsCard title="Monthly Revenue"     value={`৳${stats.totalRevenue?.toLocaleString() || "0"}`} icon={<FiTrendingUp size={18}/>} trend={Number(stats.totalRevenueTrend) || 0} colorClass="text-amber-500" />
           </motion.div>
 
           {/* Charts row */}
           <motion.div variants={cardVariants} className="grid grid-cols-1 lg:grid-cols-3 gap-5">
             <div className="lg:col-span-2">
-              <AreaChart data={dashData.revenueOverview || []} title="Revenue Overview — Last 6 Months" color="cyan" />
+              <AreaChart data={(dashData.revenueOverview as any) || []} title="Revenue Overview — Last 6 Months" color="cyan" />
             </div>
             <DonutChart
               data={[
@@ -130,14 +130,14 @@ export default function SuperAdminModules({ activeModule }: ModuleProps) {
           {/* Activity + Department performance */}
           <motion.div variants={cardVariants} className="grid grid-cols-1 lg:grid-cols-3 gap-5">
             <div className="lg:col-span-2">
-              <RecentActivity activities={activities} title="System Audit Log" />
+              <RecentActivity activities={(activities as any[])} title="System Audit Log" />
             </div>
             <div className="glass-panel rounded-2xl p-5">
               <h3 className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-4">
                 Dept. Efficiency
               </h3>
               <div className="space-y-4">
-                {(dashData.departmentPerformance || []).slice(0, 5).map((d: any) => (
+                {((dashData.departmentPerformance as any[]) || []).slice(0, 5).map((d: any) => (
                   <div key={d.id}>
                     <div className="flex justify-between text-xs font-bold mb-1.5">
                       <span className="text-gray-700 dark:text-slate-300">{d.name}</span>
