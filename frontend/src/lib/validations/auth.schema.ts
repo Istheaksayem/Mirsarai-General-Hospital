@@ -35,3 +35,12 @@ export const loginSchema = z.object({
 });
 
 export type LoginFormValues = z.infer<typeof loginSchema>;
+
+export const otpSchema = z.object({
+  otp: z
+    .string()
+    .length(6, "OTP must be exactly 6 characters")
+    .regex(/^\d+$/, "OTP must contain only numbers"),
+});
+
+export type OtpFormValues = z.infer<typeof otpSchema>;
