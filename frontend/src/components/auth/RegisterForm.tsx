@@ -10,11 +10,13 @@ import SubmitButton from "./SubmitButton";
 import GoogleButton from "./GoogleButton";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { registerSchema, RegisterFormValues } from "@/lib/validations/auth.schema";
+import { registerSchema, RegisterFormValues, otpSchema, OtpFormValues } from "@/lib/validations/auth.schema";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 const RegisterForm = () => {
+  const [step, setStep] = useState<1 | 2>(1);
+  const [registeredData, setRegisteredData] = useState<{ email: string, password: string } | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
   const router = useRouter();
 
@@ -24,6 +26,14 @@ const RegisterForm = () => {
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
+  });
+
+  const {
+    register: registerOtp,
+    handleSubmit: handleOtpSubmit,
+    formState: { errors: otpErrors, isSubmitting: isOtpSubmitting },
+  } = useForm<OtpFormValues>({
+    resolver: zodResolver(otpSchema),
   });
 
   const onSubmit = async (data: RegisterFormValues) => {
@@ -47,11 +57,41 @@ const RegisterForm = () => {
         return;
       }
 
-      // If registration is successful, log them in automatically using NextAuth
+      // Registration successful, move to OTP step
+      setRegisteredData({ email: data.email, password: data.password });
+      setStep(2);
+      setServerError(null);
+    } catch (error: any) {
+      setServerError("An error occurred. Please try again.");
+    }
+  };
+
+  const onOtpVerification = async (data: OtpFormValues) => {
+    setServerError(null);
+    if (!registeredData) return;
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/verify-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: registeredData.email,
+          otp: data.otp,
+        }),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        setServerError(result.message || "OTP verification failed");
+        return;
+      }
+
+      // If OTP verification is successful, log them in automatically using NextAuth
       const signInResult = await signIn("credentials", {
         redirect: false,
-        email: data.email,
-        password: data.password,
+        email: registeredData.email,
+        password: registeredData.password,
       });
 
       if (signInResult?.error) {
@@ -74,8 +114,14 @@ const RegisterForm = () => {
       className="w-full max-w-lg mx-auto"
     >
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-extrabold text-gray-900 mb-2">Create Your Account</h2>
-        <p className="text-gray-500 font-medium">Join our hospital portal to access healthcare services.</p>
+        <h2 className="text-3xl font-extrabold text-gray-900 mb-2">
+          {step === 1 ? "Create Your Account" : "Verify Your Email"}
+        </h2>
+        <p className="text-gray-500 font-medium">
+          {step === 1
+            ? "Join our hospital portal to access healthcare services."
+            : `We've sent a 6-digit OTP to ${registeredData?.email}. Please enter it below.`}
+        </p>
       </div>
 
       {serverError && (
@@ -84,81 +130,105 @@ const RegisterForm = () => {
         </div>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-        <AuthInput
-          label="Full Name"
-          placeholder="Enter your full name"
-          icon={<FaUser />}
-          registration={register("fullName")}
-          error={errors.fullName?.message}
-        />
+      {step === 1 ? (
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <AuthInput
+            label="Full Name"
+            placeholder="Enter your full name"
+            icon={<FaUser />}
+            registration={register("fullName")}
+            error={errors.fullName?.message}
+          />
 
-        <AuthInput
-          label="Email Address"
-          type="email"
-          placeholder="Enter your email"
-          icon={<FaEnvelope />}
-          registration={register("email")}
-          error={errors.email?.message}
-        />
+          <AuthInput
+            label="Email Address"
+            type="email"
+            placeholder="Enter your email"
+            icon={<FaEnvelope />}
+            registration={register("email")}
+            error={errors.email?.message}
+          />
 
-        <AuthInput
-          label="Phone Number"
-          type="tel"
-          placeholder="Enter your phone number"
-          icon={<FaPhone />}
-          registration={register("phone")}
-          error={errors.phone?.message}
-        />
+          <AuthInput
+            label="Phone Number"
+            type="tel"
+            placeholder="Enter your phone number"
+            icon={<FaPhone />}
+            registration={register("phone")}
+            error={errors.phone?.message}
+          />
 
-        <PasswordInput
-          label="Password"
-          placeholder="Create password"
-          registration={register("password")}
-          error={errors.password?.message}
-        />
+          <PasswordInput
+            label="Password"
+            placeholder="Create password"
+            registration={register("password")}
+            error={errors.password?.message}
+          />
 
-        <PasswordInput
-          label="Confirm Password"
-          placeholder="Confirm password"
-          registration={register("confirmPassword")}
-          error={errors.confirmPassword?.message}
-        />
+          <PasswordInput
+            label="Confirm Password"
+            placeholder="Confirm password"
+            registration={register("confirmPassword")}
+            error={errors.confirmPassword?.message}
+          />
 
-        <div className="mb-8 pt-2">
-          <label className="flex items-start text-sm text-gray-600 cursor-pointer">
-            <input
-              type="checkbox"
-              className="mt-1 w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary/50 mr-3"
-              {...register("terms")}
-            />
-            <span className="leading-tight">
-              I agree to the <a href="#" className="text-primary hover:underline">Terms & Conditions</a> and <a href="#" className="text-primary hover:underline">Privacy Policy</a>.
-            </span>
-          </label>
-          {errors.terms && <p className="mt-1 text-sm text-red-500">{errors.terms.message}</p>}
-        </div>
-
-        <SubmitButton text={isSubmitting ? "Creating Account..." : "Create Account"} />
-
-        <div className="relative my-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-200"></div>
+          <div className="mb-8 pt-2">
+            <label className="flex items-start text-sm text-gray-600 cursor-pointer">
+              <input
+                type="checkbox"
+                className="mt-1 w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary/50 mr-3"
+                {...register("terms")}
+              />
+              <span className="leading-tight">
+                I agree to the <a href="#" className="text-primary hover:underline">Terms & Conditions</a> and <a href="#" className="text-primary hover:underline">Privacy Policy</a>.
+              </span>
+            </label>
+            {errors.terms && <p className="mt-1 text-sm text-red-500">{errors.terms.message}</p>}
           </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-4 bg-white text-gray-500 font-medium">OR</span>
+
+          <SubmitButton text={isSubmitting ? "Sending OTP..." : "Create Account"} />
+
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-4 bg-white text-gray-500 font-medium">OR</span>
+            </div>
           </div>
-        </div>
 
-        <GoogleButton />
-      </form>
+          <GoogleButton />
+        </form>
+      ) : (
+        <form onSubmit={handleOtpSubmit(onOtpVerification)} className="space-y-5">
+          <AuthInput
+            label="One-Time Password (OTP)"
+            // placeholder="Enter 6-digit OTP"
+            icon={<FaEnvelope />}
+            registration={registerOtp("otp")}
+            error={otpErrors.otp?.message}
+          />
 
-      <p className="text-center mt-8 text-gray-600 font-medium">
-        Already have an account?{" "}
-        <Link href="/login" className="text-primary hover:text-primary/80 font-bold transition-colors">
-          Sign In
-        </Link>
-      </p>
+          <SubmitButton text={isOtpSubmitting ? "Verifying..." : "Verify & Complete Registration"} />
+
+          <button
+            type="button"
+            onClick={() => setStep(1)}
+            className="w-full mt-4 py-2 text-sm text-gray-500 hover:text-primary transition-colors"
+          >
+            Go back to registration form
+          </button>
+        </form>
+      )}
+
+      {step === 1 && (
+        <p className="text-center mt-8 text-gray-600 font-medium">
+          Already have an account?{" "}
+          <Link href="/login" className="text-primary hover:text-primary/80 font-bold transition-colors">
+            Sign In
+          </Link>
+        </p>
+      )}
     </motion.div>
   );
 };
