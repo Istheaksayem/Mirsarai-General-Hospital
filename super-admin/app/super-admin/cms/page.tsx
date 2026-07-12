@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { Globe, Edit3, CheckCircle2, XCircle, Settings, Info, Target, ImageIcon, Briefcase } from "lucide-react";
+import { Globe, Edit3, CheckCircle2, XCircle, Settings, Info, Target, ImageIcon, Briefcase, Building2, Stethoscope, Layers } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
@@ -30,8 +30,8 @@ export default function CMSPage() {
             <Info className="h-5 w-5" />
           </div>
           <div>
-            <h2 className="font-bold text-gray-900 dark:text-gray-100 text-sm">About Pages CMS</h2>
-            <p className="text-xs text-gray-400 mt-0.5">Manage all About Us sub-pages — content, images, visibility, SEO</p>
+            <h2 className="font-bold text-gray-900 dark:text-gray-100 text-sm">Website Sections CMS</h2>
+            <p className="text-xs text-gray-400 mt-0.5">Manage sub-pages — content, images, visibility, SEO</p>
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -40,6 +40,11 @@ export default function CMSPage() {
             { label: "Mission & Vision", desc: "Mission, vision, core values & commitment", href: "/super-admin/cms/mission-vision", Icon: Target, color: "emerald" },
             { label: "Gallery", desc: "Photo categories, gallery images & stats", href: "/super-admin/cms/gallery", Icon: ImageIcon, color: "purple" },
             { label: "Career", desc: "Job listings, benefits & application process", href: "/super-admin/cms/career", Icon: Briefcase, color: "orange" },
+            { label: "Departments Page", desc: "Manage layout, statistics, features, testimonials & CTA", href: "/super-admin/cms/departments", Icon: Building2, color: "indigo" },
+            { label: "Individual Departments", desc: "Manage department profiles, services, media & SEO", href: "/super-admin/departments", Icon: Building2, color: "indigo" },
+            { label: "Doctor CMS Hub", desc: "CMS view — visibility toggles, featured, quick actions", href: "/super-admin/cms/doctors", Icon: Stethoscope, color: "teal" },
+            { label: "Individual Doctors", desc: "Manage doctor profiles, schedule, contact & SEO", href: "/super-admin/doctors", Icon: Stethoscope, color: "teal" },
+            { label: "Specializations", desc: "Manage doctor specialization terms linked to departments", href: "/super-admin/cms/specializations", Icon: Layers, color: "rose" },
           ].map(({ label, desc, href, Icon, color }) => (
             <div
               key={href}

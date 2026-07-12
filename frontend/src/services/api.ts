@@ -51,17 +51,23 @@ export async function fetchServices() {
 }
 
 // ── Doctors (public list) ─────────────────────────────────────────────────────
-// Currently: /data/doctors.json
-// Future:    GET /api/v1/doctors/public
+// Live: GET /api/v1/doctors — falls back to /data/doctors.json on error
 export async function fetchDoctors() {
-  return fetchFromJson("doctors.json");
+  try {
+    return await fetchFromApi("doctors");
+  } catch {
+    return fetchFromJson("doctors.json");
+  }
 }
 
 // ── Departments (public list) ─────────────────────────────────────────────────
-// Currently: /data/departments.json
-// Future:    GET /api/v1/departments
+// Live: GET /api/v1/departments — falls back to /data/departments.json on error
 export async function fetchDepartments() {
-  return fetchFromJson("departments.json");
+  try {
+    return await fetchFromApi("departments");
+  } catch {
+    return fetchFromJson("departments.json");
+  }
 }
 
 // ── About data ────────────────────────────────────────────────────────────────
@@ -130,4 +136,33 @@ export async function fetchWebsiteContent() {
   const res = await fetch("/mock-data/website-content.json", { cache: "no-store" });
   if (!res.ok) throw new Error("Failed to fetch website CMS content");
   return res.json();
+}
+
+// ── Appointment submission ─────────────────────────────────────────────────────
+export interface AppointmentSubmitData {
+  patientName: string;
+  patientPhone: string;
+  patientEmail?: string;
+  patientAge?: number;
+  patientGender?: string;
+  doctor: string;
+  department?: string;
+  service?: string;
+  date: string;
+  time: string;
+  reason?: string;
+}
+
+export async function submitAppointment(data: AppointmentSubmitData) {
+  const res = await fetch(`${API_URL}/appointments`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: "Failed to book appointment" }));
+    throw new Error(err.message || "Failed to book appointment");
+  }
+  const json = await res.json();
+  return json.data;
 }

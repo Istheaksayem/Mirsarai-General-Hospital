@@ -21,6 +21,7 @@ const NAV_ITEMS: NavItem[] = [
     en: "Services",
     bn: "সেবাসমূহ",
     links: [
+      { en: "All Services", bn: "সকল সেবা", href: "/services" },
       { en: "Diagnostic Services", bn: "ডায়াগনস্টিক সেবা", href: "/services/diagnostic" },
       { en: "NICU & Baby Care", bn: "এনআইসিইউ ও শিশু সেবা", href: "/services/nicu" },
     ],

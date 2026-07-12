@@ -2,14 +2,11 @@
 
 import { useDiagnosticService } from "@/hooks/useDiagnosticService";
 import { FaMicroscope, FaClock, FaUserMd, FaCheckCircle, FaFlask, FaHeartbeat } from "react-icons/fa";
-import { MdScience } from "react-icons/md";
+import { MdScience, MdLocalHospital } from "react-icons/md";
 import { motion } from "framer-motion";
 
 const iconMap: Record<string, any> = {
-  FaMicroscope,
-  FaClock,
-  FaUserMd,
-  FaCheckCircle,
+  FaMicroscope, FaClock, FaUserMd, FaCheckCircle, FaFlask, FaHeartbeat, MdScience, MdLocalHospital,
 };
 
 const fadeUp = {
@@ -47,7 +44,6 @@ const DiagnosticServicePage = () => {
     <main className="overflow-hidden" style={{ background: "var(--background)" }}>
       {/* ── Hero Banner ── */}
       <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
-        {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <img
             src={diagnostic.backgroundImage}
@@ -60,12 +56,8 @@ const DiagnosticServicePage = () => {
           />
           <div className="absolute inset-0 bg-black/60" />
         </div>
-
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div 
-            className="border-l-4 border-orange-500 pl-6"
-            {...fadeUp}
-          >
+          <motion.div className="border-l-4 border-orange-500 pl-6" {...fadeUp}>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-4 tracking-tight">
               {diagnostic.title}
             </h1>
@@ -78,36 +70,37 @@ const DiagnosticServicePage = () => {
 
       {/* ── Features Grid ── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 -mt-16 relative z-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {diagnostic.features.map((feature, index) => {
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {diagnostic.features.map((feature: any, index: number) => {
             const Icon = iconMap[feature.icon] || FaMicroscope;
             return (
               <motion.div
                 key={index}
-                className="glass-panel p-8 text-center group hover:-translate-y-2 transition-all duration-500"
-                style={{
-                  borderRadius: "var(--radius-lg)",
-                }}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="group relative bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-7 border border-gray-100 dark:border-gray-700 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden"
               >
-                <div
-                  className="w-16 h-16 flex items-center justify-center mx-auto mb-5 transition-all duration-300 group-hover:scale-110"
-                  style={{
-                    borderRadius: "var(--radius-md)",
-                    background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))"
-                  }}
-                >
-                  <Icon className="text-white" size={28} />
+                <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-primary)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
+                <div className="relative z-10">
+                  <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-5 text-white shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:rotate-3"
+                    style={{
+                      background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))",
+                    }}
+                  >
+                    <Icon size={24} />
+                  </div>
+                  <h3 className="text-lg font-bold mb-2" style={{ color: "var(--color-primary)" }}>
+                    {feature.title}
+                  </h3>
+                  <p className="text-sm leading-relaxed text-gray-500 dark:text-gray-400">
+                    {feature.description}
+                  </p>
                 </div>
-                <h3 className="text-lg font-bold mb-3" style={{ color: "var(--color-primary)" }}>
-                  {feature.title}
-                </h3>
-                <p className="text-sm leading-relaxed" style={{ color: "var(--foreground)", opacity: 0.7 }}>
-                  {feature.description}
-                </p>
+                <div className="absolute -bottom-6 -right-6 w-16 h-16 rounded-full opacity-0 group-hover:opacity-10 transition-all duration-500"
+                  style={{ background: "var(--color-accent)", filter: "blur(12px)" }}
+                />
               </motion.div>
             );
           })}
@@ -121,79 +114,47 @@ const DiagnosticServicePage = () => {
             <h2 className="text-4xl md:text-5xl font-bold mb-8 leading-tight" style={{ color: "var(--color-primary)" }}>
               Advanced <span style={{ color: "var(--color-secondary)" }}>Diagnostic</span> Solutions
             </h2>
-            <p
-              className="text-lg leading-relaxed mb-8"
-              style={{ color: "var(--foreground)", opacity: 0.75 }}
-            >
+            <p className="text-lg leading-relaxed mb-8 text-gray-600 dark:text-gray-400">
               {diagnostic.description}
             </p>
-
             <div className="space-y-4">
-              <div className="flex items-center gap-4">
-                <div
-                  className="w-12 h-12 flex items-center justify-center flex-shrink-0"
-                  style={{
-                    background: "rgba(var(--color-primary-rgb), 0.1)",
-                    borderRadius: "var(--radius-md)"
-                  }}
+              <div className="flex items-center gap-4 p-3 rounded-xl hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-colors">
+                <div className="w-12 h-12 flex items-center justify-center rounded-[var(--radius-md)]"
+                  style={{ background: "rgba(var(--color-primary-rgb), 0.1)" }}
                 >
                   <FaClock style={{ color: "var(--color-primary)" }} size={20} />
                 </div>
                 <div>
-                  <p className="font-semibold" style={{ color: "var(--color-primary)" }}>
-                    Working Hours
-                  </p>
-                  <p className="text-sm" style={{ color: "var(--foreground)", opacity: 0.6 }}>
-                    {diagnostic.workingHours.weekdays} (Weekdays)
-                  </p>
+                  <p className="font-semibold" style={{ color: "var(--color-primary)" }}>Working Hours</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{diagnostic.workingHours.weekdays} (Weekdays)</p>
                 </div>
               </div>
-
-              <div className="flex items-center gap-4">
-                <div
-                  className="w-12 h-12 flex items-center justify-center flex-shrink-0"
-                  style={{
-                    background: "rgba(var(--color-secondary-rgb), 0.1)",
-                    borderRadius: "var(--radius-md)"
-                  }}
+              <div className="flex items-center gap-4 p-3 rounded-xl hover:bg-green-50/50 dark:hover:bg-green-900/10 transition-colors">
+                <div className="w-12 h-12 flex items-center justify-center rounded-[var(--radius-md)]"
+                  style={{ background: "rgba(var(--color-secondary-rgb), 0.1)" }}
                 >
                   <FaHeartbeat style={{ color: "var(--color-secondary)" }} size={20} />
                 </div>
                 <div>
-                  <p className="font-semibold" style={{ color: "var(--color-primary)" }}>
-                    Emergency Services
-                  </p>
-                  <p className="text-sm" style={{ color: "var(--foreground)", opacity: 0.6 }}>
-                    {diagnostic.workingHours.emergency}
-                  </p>
+                  <p className="font-semibold" style={{ color: "var(--color-primary)" }}>Emergency Services</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{diagnostic.workingHours.emergency}</p>
                 </div>
               </div>
             </div>
           </motion.div>
-
-          <motion.div 
-            className="relative" 
+          <motion.div className="relative"
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <div
-              className="absolute -top-6 -right-6 w-full h-full"
-              style={{
-                background: "linear-gradient(135deg, var(--color-primary), var(--color-secondary))",
-                opacity: 0.1,
-                borderRadius: "var(--radius-xl)"
-              }}
+            <div className="absolute -top-6 -right-6 w-full h-full opacity-10 rounded-[var(--radius-xl)]"
+              style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-secondary))" }}
             />
             <img
               src="https://images.unsplash.com/photo-1579154204601-01588f351e67?w=800&h=600&fit=crop"
               alt="Laboratory"
-              className="relative z-10 w-full h-[500px] object-cover"
-              style={{
-                borderRadius: "var(--radius-xl)",
-                boxShadow: "var(--shadow-xl)"
-              }}
+              className="relative z-10 w-full h-[400px] lg:h-[500px] object-cover rounded-[var(--radius-xl)] shadow-xl"
             />
           </motion.div>
         </div>
@@ -205,60 +166,70 @@ const DiagnosticServicePage = () => {
           <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-[var(--color-primary)] blur-3xl" />
           <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-[var(--color-secondary)] blur-3xl" />
         </div>
-
         <div className="max-w-7xl mx-auto relative z-10">
           <motion.div className="text-center mb-16" {...fadeUp}>
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight" style={{ color: "var(--color-primary)" }}>
+            <div className="inline-block px-5 py-2 mb-6 text-sm font-bold tracking-wider uppercase text-white rounded-full"
+              style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}
+            >
               Our Laboratory Services
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight" style={{ color: "var(--color-primary)" }}>
+              Comprehensive Diagnostic Testing
             </h2>
-            <p className="text-lg max-w-2xl mx-auto" style={{ color: "var(--foreground)", opacity: 0.7 }}>
-              Comprehensive diagnostic testing across multiple specialties
+            <p className="text-lg max-w-2xl mx-auto text-gray-500 dark:text-gray-400">
+              Accurate testing across multiple specialties with fast turnaround
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {diagnostic.services.map((service, index) => (
-              <motion.div
-                key={index}
-                className="premium-card p-8 hover:scale-[1.02] transition-all duration-300"
-                style={{
-                  borderRadius: "var(--radius-lg)",
-                }}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                <div className="flex items-center gap-4 mb-6">
-                  <div
-                    className="w-12 h-12 flex items-center justify-center"
-                    style={{
-                      background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))",
-                      borderRadius: "var(--radius-md)"
-                    }}
-                  >
-                    <MdScience className="text-white" size={24} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {diagnostic.services.map((service: any, index: number) => {
+              const Icon = iconMap[service.icon] || MdScience;
+              const accent = service.accent || "var(--color-primary)";
+              return (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="group relative bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden"
+                >
+                  <div className="absolute left-0 top-0 bottom-0 w-1.5 transition-all duration-500 group-hover:w-2"
+                    style={{ background: accent }}
+                  />
+                  <div className="p-6 lg:p-7">
+                    <div className="flex items-center gap-3 mb-5">
+                      <div className="w-11 h-11 rounded-xl flex items-center justify-center text-white shadow-md transition-all duration-300 group-hover:scale-110"
+                        style={{ background: `linear-gradient(135deg, ${accent}, ${accent}dd)` }}
+                      >
+                        <Icon size={20} />
+                      </div>
+                      <h3 className="text-lg font-bold" style={{ color: "var(--color-primary)" }}>
+                        {service.category}
+                      </h3>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {service.tests?.map((test: string, idx: number) => (
+                        <span
+                          key={idx}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all duration-200 hover:scale-105"
+                          style={{
+                            background: `${accent}10`,
+                            color: accent,
+                          }}
+                        >
+                          <FaCheckCircle size={10} />
+                          {test}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                  <h3 className="text-2xl font-bold" style={{ color: "var(--color-primary)" }}>
-                    {service.category}
-                  </h3>
-                </div>
-                <ul className="grid grid-cols-1 gap-3">
-                  {service.tests?.map((test, idx) => (
-                    <li key={idx} className="flex items-start gap-3">
-                      <FaCheckCircle
-                        className="mt-1 flex-shrink-0"
-                        size={16}
-                        style={{ color: "var(--color-secondary)" }}
-                      />
-                      <span className="text-sm leading-relaxed" style={{ color: "var(--foreground)", opacity: 0.75 }}>
-                        {test}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
-            ))}
+                  <div className="absolute -bottom-8 -right-8 w-20 h-20 rounded-full opacity-0 group-hover:opacity-20 transition-all duration-500"
+                    style={{ background: accent, filter: "blur(16px)" }}
+                  />
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -269,80 +240,63 @@ const DiagnosticServicePage = () => {
           <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-[var(--color-primary)] blur-3xl" />
           <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-[var(--color-secondary)] blur-3xl" />
         </div>
-
         <div className="max-w-7xl mx-auto relative z-10">
           <motion.div className="text-center mb-16" {...fadeUp}>
-            <div
-              className="inline-block px-5 py-2 mb-6 text-sm font-bold tracking-wider uppercase"
-              style={{
-                background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))",
-                color: "white",
-                borderRadius: "var(--radius-xl)"
-              }}
+            <div className="inline-block px-5 py-2 mb-6 text-sm font-bold tracking-wider uppercase text-white rounded-full"
+              style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}
             >
               Our Impact
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight" style={{ color: "var(--color-primary)" }}>
               Excellence in Numbers
             </h2>
-            <p className="text-lg max-w-2xl mx-auto leading-relaxed" style={{ color: "var(--foreground)", opacity: 0.7 }}>
+            <p className="text-lg max-w-2xl mx-auto text-gray-500 dark:text-gray-400">
               Trusted by thousands for accurate and timely diagnostic services
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {diagnostic.statistics.map((stat, i) => (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+            {diagnostic.statistics.map((stat: any, i: number) => (
               <motion.div
                 key={i}
-                className="premium-card text-center p-10 group hover:-translate-y-2 glow-effect"
-                style={{
-                  borderRadius: "var(--radius-lg)"
-                }}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
+                className="relative bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-8 text-center shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden group"
               >
-                <div
-                  className="w-14 h-14 flex items-center justify-center mx-auto mb-4 transition-transform duration-300 group-hover:scale-110"
-                  style={{
-                    background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))",
-                    borderRadius: "var(--radius-md)"
-                  }}
-                >
-                  <FaFlask className="text-white" size={24} />
+                <div className="absolute inset-0 bg-gradient-to-b from-[var(--color-primary)]/5 to-transparent" />
+                <div className="relative z-10">
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 transition-transform duration-300 group-hover:scale-110"
+                    style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}
+                  >
+                    <FaFlask className="text-white" size={20} />
+                  </div>
+                  <p className="text-4xl font-extrabold mb-2 tracking-tight" style={{ color: "var(--color-primary)" }}>
+                    {stat.value}
+                  </p>
+                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{stat.label}</p>
                 </div>
-                <p className="text-5xl font-extrabold mb-2 tracking-tight" style={{ color: "var(--color-primary)" }}>
-                  {stat.value}
-                </p>
-                <p className="text-sm font-medium tracking-wide" style={{ color: "var(--foreground)", opacity: 0.7 }}>
-                  {stat.label}
-                </p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── CTA Section ── */}
+      {/* ── CTA ── */}
       <section className="py-28 px-4 text-center">
         <motion.div className="max-w-3xl mx-auto" {...fadeUp}>
           <h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight tracking-tight" style={{ color: "var(--color-primary)" }}>
             Need Diagnostic Services?
           </h2>
-          <p
-            className="text-lg mb-12 leading-relaxed max-w-xl mx-auto"
-            style={{ color: "var(--foreground)", opacity: 0.7 }}
-          >
+          <p className="text-lg mb-12 leading-relaxed max-w-xl mx-auto text-gray-500 dark:text-gray-400">
             Book your test today or visit our diagnostic center for immediate service
           </p>
           <a
-            href="/appointment"
-            className="inline-block text-white px-12 py-5 font-bold text-lg transition-all duration-500 hover:-translate-y-2 transform"
+            href="/appointment?service=diagnostic"
+            className="inline-block text-white px-12 py-5 font-bold text-lg transition-all duration-500 hover:-translate-y-2 transform rounded-[var(--radius-xl)] shadow-xl hover:shadow-2xl"
             style={{
               background: "linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%)",
-              borderRadius: "var(--radius-xl)",
-              boxShadow: "var(--shadow-xl)"
             }}
           >
             Book Diagnostic Test

@@ -7,6 +7,7 @@ export interface User {
   role: Role;
   avatar?: string;
   department?: string;
+  doctorRef?: string;
 }
 
 export interface AuthState {

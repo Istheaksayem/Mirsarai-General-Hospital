@@ -24,7 +24,7 @@ const valueIcons: Record<string, React.ElementType> = {
   Excellence: FaStar,
   Innovation: FaLightbulb,
   "Patient First": FaUserCheck,
-};
+};  
 
 const MissionVisionPage = () => {
   const { data, isLoading, isError } = useAboutData();

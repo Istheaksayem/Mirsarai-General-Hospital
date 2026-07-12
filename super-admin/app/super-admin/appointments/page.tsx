@@ -7,23 +7,22 @@ import { SearchFilter, SelectFilter } from "@/components/ui/SearchFilter";
 import { DataTable, Column } from "@/components/ui/DataTable";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { useAppointments } from "@/lib/hooks/useAppointments";
-import { type Appointment } from "@/lib/services/api";
+import { useCmsAppointments } from "@/lib/hooks/useCmsAppointments";
 import { createActionColumn } from "@/components/ui/ActionButtons";
 import Link from "next/link";
 
-const statusVariant: Record<Appointment["status"], "success" | "warning" | "default" | "danger"> = {
-  confirmed: "success", pending: "warning", completed: "default", cancelled: "danger",
+const statusVariant: Record<string, "success" | "warning" | "default" | "danger"> = {
+  confirmed: "success", pending: "warning", completed: "default", cancelled: "danger", "no-show": "danger",
 };
 
-const typeVariant: Record<Appointment["type"], "info" | "default" | "success"> = {
+const typeVariant: Record<string, "info" | "default" | "success"> = {
   new: "info", "follow-up": "default", consultation: "success",
 };
 
 const columns: Column<Record<string, unknown>>[] = [
   {
-    key: "id", header: "ID",
-    cell: (r) => <span className="font-mono text-xs text-gray-400">{r.id as string}</span>,
+    key: "_id", header: "ID",
+    cell: (r) => <span className="font-mono text-xs text-gray-400">{(r._id as string)?.slice(-6)}</span>,
   },
   {
     key: "patientName", header: "Patient",
@@ -35,44 +34,60 @@ const columns: Column<Record<string, unknown>>[] = [
     ),
   },
   {
-    key: "doctorName", header: "Doctor",
-    cell: (r) => (
-      <div>
-        <p className="font-medium text-gray-900 dark:text-gray-100">{r.doctorName as string}</p>
-        <p className="text-xs text-gray-400">{r.department as string}</p>
-      </div>
-    ),
+    key: "doctor", header: "Doctor",
+    cell: (r) => {
+      const doc = r.doctor as Record<string, any> | undefined;
+      return (
+        <div>
+          <p className="font-medium text-gray-900 dark:text-gray-100">{doc?.name?.en || "—"}</p>
+          <p className="text-xs text-gray-400">{doc?.department?.en || r.department as string || "—"}</p>
+        </div>
+      );
+    },
   },
   {
     key: "date", header: "Date & Time",
-    cell: (r) => <div><p className="font-medium">{r.date as string}</p><p className="text-xs text-gray-400">{r.time as string}</p></div>,
+    cell: (r) => {
+      const d = r.date as string;
+      const formatted = d ? new Date(d).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "—";
+      return <div><p className="font-medium">{formatted}</p><p className="text-xs text-gray-400">{r.time as string}</p></div>;
+    },
   },
-  { key: "type", header: "Type", cell: (r) => <Badge variant={typeVariant[r.type as Appointment["type"]]}>{r.type as string}</Badge> },
-  { key: "status", header: "Status", cell: (r) => <Badge variant={statusVariant[r.status as Appointment["status"]]}>{r.status as string}</Badge> },
+  {
+    key: "type", header: "Type",
+    cell: (r) => <Badge variant={typeVariant[r.type as string] || "info"}>{r.type as string}</Badge>,
+  },
+  {
+    key: "status", header: "Status",
+    cell: (r) => <Badge variant={statusVariant[r.status as string] || "default"}>{r.status as string}</Badge>,
+  },
   createActionColumn({ basePath: "/super-admin/appointments" }),
 ];
 
 export default function AppointmentsPage() {
-  const { data = [], isLoading } = useAppointments();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [page, setPage] = useState(1);
 
-  const filtered = data.filter((a) => {
-    const ms = !search || a.patientName.toLowerCase().includes(search.toLowerCase()) || a.doctorName.toLowerCase().includes(search.toLowerCase());
-    const mst = !statusFilter || a.status === statusFilter;
-    return ms && mst;
-  }) as unknown as Record<string, unknown>[];
+  const params: Record<string, string> = { page: String(page), limit: "10" };
+  if (statusFilter) params.status = statusFilter;
+  if (search) params.search = search;
+
+  const { data, isLoading } = useCmsAppointments(params);
+
+  const appointments = data?.data || [];
+  const total = data?.total || 0;
 
   const counts = {
-    confirmed: data.filter(a => a.status === "confirmed").length,
-    pending: data.filter(a => a.status === "pending").length,
-    completed: data.filter(a => a.status === "completed").length,
-    cancelled: data.filter(a => a.status === "cancelled").length,
+    confirmed: appointments.filter((a: any) => a.status === "confirmed").length,
+    pending: appointments.filter((a: any) => a.status === "pending").length,
+    completed: appointments.filter((a: any) => a.status === "completed").length,
+    cancelled: appointments.filter((a: any) => a.status === "cancelled").length,
   };
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Appointments" description={`${data.length} total appointments`} icon={CalendarDays}>
+      <PageHeader title="Appointments" description={`${total} total appointments`} icon={CalendarDays}>
         <Link href="/super-admin/appointments/add"><Button size="sm"><Plus className="h-4 w-4 mr-1.5" />New Appointment</Button></Link>
       </PageHeader>
 
@@ -98,13 +113,20 @@ export default function AppointmentsPage() {
             { label: "Pending", value: "pending" },
             { label: "Completed", value: "completed" },
             { label: "Cancelled", value: "cancelled" },
+            { label: "No Show", value: "no-show" },
           ]}
           placeholder="All Status"
         />
       </div>
 
       <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-4">
-        <DataTable data={filtered} columns={columns} isLoading={isLoading} pageSize={8} emptyTitle="No appointments found" />
+        <DataTable
+          data={appointments as unknown as Record<string, unknown>[]}
+          columns={columns}
+          isLoading={isLoading}
+          pageSize={10}
+          emptyTitle="No appointments found"
+        />
       </div>
     </div>
   );
