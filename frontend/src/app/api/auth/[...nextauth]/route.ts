@@ -1,62 +1,78 @@
-import NextAuth from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
-const handler = NextAuth({
+export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "text", placeholder: "you@example.com" },
-        password: { label: "Password", type: "password" }
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
       },
-      async authorize(credentials, req) {
-        // Add logic here to look up the user from the credentials supplied
-        // Usually, this means calling your backend API
-        try {
-          const res = await fetch(process.env.NEXT_PUBLIC_BACKEND_URL + "/api/auth/login", {
-            method: 'POST',
-            body: JSON.stringify(credentials),
-            headers: { "Content-Type": "application/json" }
-          });
-          
-          const user = await res.json();
-    
-          if (res.ok && user) {
-            // Any object returned will be saved in `user` property of the JWT
-            return user;
-          } else {
-            // If you return null then an error will be displayed advising the user to check their details.
-            return null;
-          }
-        } catch (error) {
-          console.error("Auth error:", error);
-          return null;
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("Invalid credentials");
         }
-      }
-    })
+
+        try {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/login`, {
+            method: "POST",
+            body: JSON.stringify({
+              email: credentials.email,
+              password: credentials.password,
+            }),
+            headers: { "Content-Type": "application/json" },
+          });
+
+          const data = await res.json();
+
+          if (res.ok && data.success && data.data.user) {
+            // Return user object mixed with token so it can be saved in session
+            return {
+              id: data.data.user._id,
+              name: data.data.user.fullName,
+              email: data.data.user.email,
+              role: data.data.user.role,
+              token: data.data.token,
+            } as any;
+          }
+
+          // Return null if user data could not be retrieved
+          throw new Error(data.message || "Authentication failed");
+        } catch (error: any) {
+          throw new Error(error.message || "Authentication failed");
+        }
+      },
+    }),
   ],
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
   callbacks: {
     async jwt({ token, user }) {
-      // Persist the user object or token to the token right after signin
       if (user) {
-        token.user = user;
+        token.id = user.id;
+        token.role = (user as any).role;
+        token.accessToken = (user as any).token;
       }
       return token;
     },
     async session({ session, token }) {
-      // Send properties to the client, like an access_token from a provider.
-      if (token.user) {
-        session.user = token.user;
+      if (token && session.user) {
+        (session.user as any).id = token.id;
+        (session.user as any).role = token.role;
+        (session as any).accessToken = token.accessToken;
       }
       return session;
-    }
-  },
-  session: {
-    strategy: "jwt",
+    },
   },
   pages: {
-    signIn: '/login', // Adjust this to your custom login page route if you have one
-  }
-});
+    signIn: "/login",
+  },
+  secret: process.env.NEXTAUTH_SECRET,
+};
+
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };

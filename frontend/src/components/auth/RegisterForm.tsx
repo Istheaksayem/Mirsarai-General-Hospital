@@ -1,28 +1,69 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaUser, FaEnvelope, FaPhone } from "react-icons/fa";
+import { zodResolver } from "@hookform/resolvers/zod";
 import AuthInput from "./AuthInput";
 import PasswordInput from "./PasswordInput";
 import SubmitButton from "./SubmitButton";
 import GoogleButton from "./GoogleButton";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { registerSchema, RegisterFormValues } from "@/lib/validations/auth.schema";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const RegisterForm = () => {
+  const [serverError, setServerError] = useState<string | null>(null);
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm();
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
+  });
 
-  const password = watch("password");
+  const onSubmit = async (data: RegisterFormValues) => {
+    setServerError(null);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName: data.fullName,
+          email: data.email,
+          phone: data.phone,
+          password: data.password,
+        }),
+      });
 
-  const onSubmit = (data: any) => {
-    console.log("Register Data:", data);
-    // TODO: Implement NextAuth registration
+      const result = await res.json();
+
+      if (!res.ok) {
+        setServerError(result.message || "Registration failed");
+        return;
+      }
+
+      // If registration is successful, log them in automatically using NextAuth
+      const signInResult = await signIn("credentials", {
+        redirect: false,
+        email: data.email,
+        password: data.password,
+      });
+
+      if (signInResult?.error) {
+        setServerError("Registration successful, but auto-login failed. Please sign in manually.");
+        setTimeout(() => router.push("/login"), 2000);
+      } else {
+        router.push("/dashboard"); // Redirect to appropriate page
+        router.refresh();
+      }
+    } catch (error: any) {
+      setServerError("An error occurred. Please try again.");
+    }
   };
 
   return (
@@ -37,13 +78,19 @@ const RegisterForm = () => {
         <p className="text-gray-500 font-medium">Join our hospital portal to access healthcare services.</p>
       </div>
 
+      {serverError && (
+        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded text-sm text-center">
+          {serverError}
+        </div>
+      )}
+
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <AuthInput
           label="Full Name"
           placeholder="Enter your full name"
           icon={<FaUser />}
-          registration={register("fullName", { required: "Full name is required" })}
-          error={errors.fullName?.message as string}
+          registration={register("fullName")}
+          error={errors.fullName?.message}
         />
 
         <AuthInput
@@ -51,14 +98,8 @@ const RegisterForm = () => {
           type="email"
           placeholder="Enter your email"
           icon={<FaEnvelope />}
-          registration={register("email", {
-            required: "Email is required",
-            pattern: {
-              value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-              message: "Invalid email address",
-            },
-          })}
-          error={errors.email?.message as string}
+          registration={register("email")}
+          error={errors.email?.message}
         />
 
         <AuthInput
@@ -66,34 +107,22 @@ const RegisterForm = () => {
           type="tel"
           placeholder="Enter your phone number"
           icon={<FaPhone />}
-          registration={register("phone", {
-            required: "Phone number is required",
-            pattern: {
-              value: /^\+?[0-9\s-]{7,15}$/,
-              message: "Invalid phone number",
-            },
-          })}
-          error={errors.phone?.message as string}
+          registration={register("phone")}
+          error={errors.phone?.message}
         />
 
         <PasswordInput
           label="Password"
           placeholder="Create password"
-          registration={register("password", {
-            required: "Password is required",
-            minLength: { value: 6, message: "Minimum 6 characters" },
-          })}
-          error={errors.password?.message as string}
+          registration={register("password")}
+          error={errors.password?.message}
         />
 
         <PasswordInput
           label="Confirm Password"
           placeholder="Confirm password"
-          registration={register("confirmPassword", {
-            required: "Please confirm password",
-            validate: (value) => value === password || "Passwords do not match",
-          })}
-          error={errors.confirmPassword?.message as string}
+          registration={register("confirmPassword")}
+          error={errors.confirmPassword?.message}
         />
 
         <div className="mb-8 pt-2">
@@ -101,16 +130,16 @@ const RegisterForm = () => {
             <input
               type="checkbox"
               className="mt-1 w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary/50 mr-3"
-              {...register("terms", { required: "You must agree to the terms" })}
+              {...register("terms")}
             />
             <span className="leading-tight">
               I agree to the <a href="#" className="text-primary hover:underline">Terms & Conditions</a> and <a href="#" className="text-primary hover:underline">Privacy Policy</a>.
             </span>
           </label>
-          {errors.terms && <p className="mt-1 text-sm text-red-500">{errors.terms.message as string}</p>}
+          {errors.terms && <p className="mt-1 text-sm text-red-500">{errors.terms.message}</p>}
         </div>
 
-        <SubmitButton text="Create Account" />
+        <SubmitButton text={isSubmitting ? "Creating Account..." : "Create Account"} />
 
         <div className="relative my-6">
           <div className="absolute inset-0 flex items-center">
