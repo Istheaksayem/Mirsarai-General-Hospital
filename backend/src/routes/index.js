@@ -61,7 +61,7 @@ router.get('/', (req, res) => {
 // ============================================
 import homepageRoutes from './homepage.routes.js';
 import aboutCMSRoutes from './aboutCMS.routes.js';
-// import authRoutes from './auth.routes.js';
+import authRoutes from './auth.routes.js';
 // import userRoutes from './user.routes.js';
 // import doctorRoutes from './doctor.routes.js';
 // import patientRoutes from './patient.routes.js';
@@ -70,7 +70,7 @@ import aboutCMSRoutes from './aboutCMS.routes.js';
 router.use('/homepage', homepageRoutes);
 router.use('/about', aboutCMSRoutes);
 
-// router.use('/auth', authRoutes);
+router.use('/auth', authRoutes);
 // router.use('/users', userRoutes);
 // router.use('/doctors', doctorRoutes);
 // router.use('/patients', patientRoutes);

@@ -1,28 +1,69 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { FaUser, FaEnvelope, FaPhone, FaCalendarAlt, FaVenusMars, FaTint, FaMapMarkerAlt } from "react-icons/fa";
+import { FaUser, FaEnvelope, FaPhone } from "react-icons/fa";
+import { zodResolver } from "@hookform/resolvers/zod";
 import AuthInput from "./AuthInput";
 import PasswordInput from "./PasswordInput";
 import SubmitButton from "./SubmitButton";
 import GoogleButton from "./GoogleButton";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { registerSchema, RegisterFormValues } from "@/lib/validations/auth.schema";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const RegisterForm = () => {
+  const [serverError, setServerError] = useState<string | null>(null);
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm();
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
+  });
 
-  const password = watch("password");
+  const onSubmit = async (data: RegisterFormValues) => {
+    setServerError(null);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName: data.fullName,
+          email: data.email,
+          phone: data.phone,
+          password: data.password,
+        }),
+      });
 
-  const onSubmit = (data: any) => {
-    console.log("Register Data:", data);
-    // TODO: Implement NextAuth registration
+      const result = await res.json();
+
+      if (!res.ok) {
+        setServerError(result.message || "Registration failed");
+        return;
+      }
+
+      // If registration is successful, log them in automatically using NextAuth
+      const signInResult = await signIn("credentials", {
+        redirect: false,
+        email: data.email,
+        password: data.password,
+      });
+
+      if (signInResult?.error) {
+        setServerError("Registration successful, but auto-login failed. Please sign in manually.");
+        setTimeout(() => router.push("/login"), 2000);
+      } else {
+        router.push("/dashboard"); // Redirect to appropriate page
+        router.refresh();
+      }
+    } catch (error: any) {
+      setServerError("An error occurred. Please try again.");
+    }
   };
 
   return (
@@ -30,164 +71,75 @@ const RegisterForm = () => {
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.6, delay: 0.2 }}
-      className="w-full max-w-lg mx-auto max-h-[80vh] overflow-y-auto pr-2 custom-scrollbar"
+      className="w-full max-w-lg mx-auto"
     >
       <div className="text-center mb-8">
         <h2 className="text-3xl font-extrabold text-gray-900 mb-2">Create Your Account</h2>
         <p className="text-gray-500 font-medium">Join our hospital portal to access healthcare services.</p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-1">
+      {serverError && (
+        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded text-sm text-center">
+          {serverError}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <AuthInput
           label="Full Name"
           placeholder="Enter your full name"
           icon={<FaUser />}
-          registration={register("fullName", { required: "Full name is required" })}
-          error={errors.fullName?.message as string}
+          registration={register("fullName")}
+          error={errors.fullName?.message}
         />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
-          <AuthInput
-            label="Email Address"
-            type="email"
-            placeholder="Enter your email"
-            icon={<FaEnvelope />}
-            registration={register("email", {
-              required: "Email is required",
-              pattern: {
-                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                message: "Invalid email address",
-              },
-            })}
-            error={errors.email?.message as string}
-          />
-          <AuthInput
-            label="Phone Number"
-            type="tel"
-            placeholder="Enter your phone number"
-            icon={<FaPhone />}
-            registration={register("phone", {
-              required: "Phone number is required",
-              pattern: {
-                value: /^\+?[0-9\s-]{7,15}$/,
-                message: "Invalid phone number",
-              },
-            })}
-            error={errors.phone?.message as string}
-          />
-        </div>
+        <AuthInput
+          label="Email Address"
+          type="email"
+          placeholder="Enter your email"
+          icon={<FaEnvelope />}
+          registration={register("email")}
+          error={errors.email?.message}
+        />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
-          <AuthInput
-            label="Date of Birth"
-            type="date"
-            icon={<FaCalendarAlt />}
-            registration={register("dob", { required: "Date of Birth is required" })}
-            error={errors.dob?.message as string}
-          />
+        <AuthInput
+          label="Phone Number"
+          type="tel"
+          placeholder="Enter your phone number"
+          icon={<FaPhone />}
+          registration={register("phone")}
+          error={errors.phone?.message}
+        />
 
-          <div className="mb-5 relative">
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Gender</label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                <FaVenusMars />
-              </div>
-              <select
-                {...register("gender", { required: "Gender is required" })}
-                className={`w-full pl-10 pr-4 py-3 rounded-xl border ${
-                  errors.gender ? "border-red-500" : "border-gray-200"
-                } focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/20 bg-gray-50/50 hover:bg-white text-gray-800 transition-all appearance-none`}
-              >
-                <option value="">Select Gender</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
-            {errors.gender && <p className="mt-1 text-sm text-red-500">{errors.gender.message as string}</p>}
-          </div>
-        </div>
+        <PasswordInput
+          label="Password"
+          placeholder="Create password"
+          registration={register("password")}
+          error={errors.password?.message}
+        />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
-          <PasswordInput
-            label="Password"
-            placeholder="Create password"
-            registration={register("password", {
-              required: "Password is required",
-              minLength: { value: 6, message: "Minimum 6 characters" },
-            })}
-            error={errors.password?.message as string}
-          />
-          <PasswordInput
-            label="Confirm Password"
-            placeholder="Confirm password"
-            registration={register("confirmPassword", {
-              required: "Please confirm password",
-              validate: (value) => value === password || "Passwords do not match",
-            })}
-            error={errors.confirmPassword?.message as string}
-          />
-        </div>
+        <PasswordInput
+          label="Confirm Password"
+          placeholder="Confirm password"
+          registration={register("confirmPassword")}
+          error={errors.confirmPassword?.message}
+        />
 
-        <div className="mb-5 relative">
-          <label className="block text-sm font-semibold text-gray-700 mb-1.5">Blood Group</label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-red-400">
-              <FaTint />
-            </div>
-            <select
-              {...register("bloodGroup", { required: "Blood group is required" })}
-              className={`w-full pl-10 pr-4 py-3 rounded-xl border ${
-                errors.bloodGroup ? "border-red-500" : "border-gray-200"
-              } focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/20 bg-gray-50/50 hover:bg-white text-gray-800 transition-all appearance-none`}
-            >
-              <option value="">Select Blood Group</option>
-              <option value="A+">A+</option>
-              <option value="A-">A-</option>
-              <option value="B+">B+</option>
-              <option value="B-">B-</option>
-              <option value="AB+">AB+</option>
-              <option value="AB-">AB-</option>
-              <option value="O+">O+</option>
-              <option value="O-">O-</option>
-            </select>
-          </div>
-          {errors.bloodGroup && <p className="mt-1 text-sm text-red-500">{errors.bloodGroup.message as string}</p>}
-        </div>
-
-        <div className="mb-6 relative">
-          <label className="block text-sm font-semibold text-gray-700 mb-1.5">Address</label>
-          <div className="relative">
-            <div className="absolute top-3 left-3 flex items-center pointer-events-none text-gray-400">
-              <FaMapMarkerAlt />
-            </div>
-            <textarea
-              placeholder="Enter your full address"
-              rows={3}
-              {...register("address", { required: "Address is required" })}
-              className={`w-full pl-10 pr-4 py-3 rounded-xl border ${
-                errors.address ? "border-red-500" : "border-gray-200"
-              } focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/20 bg-gray-50/50 hover:bg-white text-gray-800 transition-all resize-none`}
-            ></textarea>
-          </div>
-          {errors.address && <p className="mt-1 text-sm text-red-500">{errors.address.message as string}</p>}
-        </div>
-
-        <div className="mb-8">
+        <div className="mb-8 pt-2">
           <label className="flex items-start text-sm text-gray-600 cursor-pointer">
             <input
               type="checkbox"
               className="mt-1 w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary/50 mr-3"
-              {...register("terms", { required: "You must agree to the terms" })}
+              {...register("terms")}
             />
             <span className="leading-tight">
               I agree to the <a href="#" className="text-primary hover:underline">Terms & Conditions</a> and <a href="#" className="text-primary hover:underline">Privacy Policy</a>.
             </span>
           </label>
-          {errors.terms && <p className="mt-1 text-sm text-red-500">{errors.terms.message as string}</p>}
+          {errors.terms && <p className="mt-1 text-sm text-red-500">{errors.terms.message}</p>}
         </div>
 
-        <SubmitButton text="Create Account" />
+        <SubmitButton text={isSubmitting ? "Creating Account..." : "Create Account"} />
 
         <div className="relative my-6">
           <div className="absolute inset-0 flex items-center">
@@ -201,25 +153,12 @@ const RegisterForm = () => {
         <GoogleButton />
       </form>
 
-      <p className="text-center mt-8 text-gray-600 font-medium pb-4">
+      <p className="text-center mt-8 text-gray-600 font-medium">
         Already have an account?{" "}
         <Link href="/login" className="text-primary hover:text-primary/80 font-bold transition-colors">
           Sign In
         </Link>
       </p>
-
-      <style jsx global>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background-color: #cbd5e1;
-          border-radius: 20px;
-        }
-      `}</style>
     </motion.div>
   );
 };

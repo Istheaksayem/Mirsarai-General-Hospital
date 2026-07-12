@@ -1,25 +1,49 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaEnvelope } from "react-icons/fa";
+import { zodResolver } from "@hookform/resolvers/zod";
 import AuthInput from "./AuthInput";
 import PasswordInput from "./PasswordInput";
 import SubmitButton from "./SubmitButton";
 import GoogleButton from "./GoogleButton";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { loginSchema, LoginFormValues } from "@/lib/validations/auth.schema";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const LoginForm = () => {
+  const [serverError, setServerError] = useState<string | null>(null);
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
-    formState: { errors },
-  } = useForm();
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+  });
 
-  const onSubmit = (data: any) => {
-    console.log("Login Data:", data);
-    // TODO: Implement NextAuth login
+  const onSubmit = async (data: LoginFormValues) => {
+    setServerError(null);
+    try {
+      const res = await signIn("credentials", {
+        redirect: false,
+        email: data.email,
+        password: data.password,
+      });
+
+      if (res?.error) {
+        setServerError(res.error);
+      } else {
+        router.push("/dashboard"); // Adjust to your desired post-login route
+        router.refresh();
+      }
+    } catch (error) {
+      setServerError("An unexpected error occurred.");
+    }
   };
 
   return (
@@ -34,29 +58,27 @@ const LoginForm = () => {
         <p className="text-gray-500 font-medium">Sign in to continue</p>
       </div>
 
+      {serverError && (
+        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded text-sm text-center">
+          {serverError}
+        </div>
+      )}
+
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <AuthInput
           label="Email Address"
           type="email"
           placeholder="Enter your email"
           icon={<FaEnvelope />}
-          registration={register("email", {
-            required: "Email is required",
-            pattern: {
-              value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-              message: "Invalid email address",
-            },
-          })}
-          error={errors.email?.message as string}
+          registration={register("email")}
+          error={errors.email?.message}
         />
 
         <PasswordInput
           label="Password"
           placeholder="Enter your password"
-          registration={register("password", {
-            required: "Password is required",
-          })}
-          error={errors.password?.message as string}
+          registration={register("password")}
+          error={errors.password?.message}
         />
 
         <div className="flex items-center justify-between mt-2 mb-6">
@@ -73,7 +95,7 @@ const LoginForm = () => {
           </a>
         </div>
 
-        <SubmitButton text="Sign In" />
+        <SubmitButton text={isSubmitting ? "Signing In..." : "Sign In"} />
 
         <div className="relative my-8">
           <div className="absolute inset-0 flex items-center">
