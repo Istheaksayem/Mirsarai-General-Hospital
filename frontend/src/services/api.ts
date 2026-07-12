@@ -137,3 +137,32 @@ export async function fetchWebsiteContent() {
   if (!res.ok) throw new Error("Failed to fetch website CMS content");
   return res.json();
 }
+
+// ── Appointment submission ─────────────────────────────────────────────────────
+export interface AppointmentSubmitData {
+  patientName: string;
+  patientPhone: string;
+  patientEmail?: string;
+  patientAge?: number;
+  patientGender?: string;
+  doctor: string;
+  department?: string;
+  service?: string;
+  date: string;
+  time: string;
+  reason?: string;
+}
+
+export async function submitAppointment(data: AppointmentSubmitData) {
+  const res = await fetch(`${API_URL}/appointments`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: "Failed to book appointment" }));
+    throw new Error(err.message || "Failed to book appointment");
+  }
+  const json = await res.json();
+  return json.data;
+}

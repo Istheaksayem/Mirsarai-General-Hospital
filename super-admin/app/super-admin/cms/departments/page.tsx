@@ -15,6 +15,8 @@ import { LanguageTabs } from "@/components/cms/LanguageTabs";
 import { LocalizedInput, LocalizedTextarea, SectionDivider } from "@/components/cms/LocalizedFields";
 import { FormField, FormInput } from "@/components/ui/FormPage";
 
+const emptyBilingual = () => ({ en: "", bn: "" });
+
 export default function DepartmentsCmsPage() {
   const router = useRouter();
   const [data, setData] = useState<CmsDepartmentsPage | null>(null);

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FaUser,
@@ -14,9 +14,12 @@ import {
   FaArrowRight,
   FaArrowLeft,
   FaDownload,
+  FaSpinner,
 } from "react-icons/fa";
 import jsPDF from "jspdf";
 import { useDoctors } from "@/hooks/useDoctors";
+import { useCreateAppointment } from "@/hooks/useCreateAppointment";
+import { useSearchParams } from "next/navigation";
 
 const steps = ["Personal Info", "Select Doctor", "Schedule", "Confirm"];
 
@@ -27,19 +30,26 @@ const stepVariants: any = {
 };
 
 export default function AppointmentForm() {
+  const searchParams = useSearchParams();
+  const preselectedService = searchParams.get("service");
+
   const [step, setStep] = useState(0);
   const [dir, setDir] = useState(1);
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { data: rawDoctors, isLoading, error } = useDoctors();
+  const createAppointment = useCreateAppointment();
 
   const doctorsList = useMemo(() => {
     if (!rawDoctors) return [];
     return rawDoctors.map((d) => ({
+      _id: d._id,
       name: d.name.en,
       specialty: d.department.en,
       image: d.image,
-      slots: d.id % 2 === 0
+      slots: d._id
         ? ["08:30 AM", "11:00 AM", "01:30 PM", "03:30 PM"]
         : ["09:00 AM", "10:00 AM", "02:00 PM", "04:00 PM"],
     }));
@@ -70,7 +80,25 @@ export default function AppointmentForm() {
     setErrors((e) => ({ ...e, [field]: "" }));
   };
 
-  const selectedDoctor = doctorsList.find((d) => d.name === form.doctor);
+  const selectedDoctor = useMemo(
+    () => doctorsList.find((d) => d.name === form.doctor),
+    [doctorsList, form.doctor]
+  );
+
+  const selectedDoctorId = useMemo(() => {
+    if (!rawDoctors) return "";
+    const d = rawDoctors.find((d) => d.name.en === form.doctor);
+    return d?._id || "";
+  }, [rawDoctors, form.doctor]);
+
+  useEffect(() => {
+    if (!preselectedService || !departments.length) return;
+    const decoded = decodeURIComponent(preselectedService).toLowerCase();
+    const match = departments.find((d) => d.toLowerCase() === decoded);
+    if (match) {
+      update("department", match);
+    }
+  }, [preselectedService, departments]);
 
   const validateStep = () => {
     const errs: Record<string, string> = {};
@@ -103,68 +131,72 @@ export default function AppointmentForm() {
     setStep((s) => s - 1);
   };
 
-  const handleSubmit = () => {
-    setSubmitted(true);
+  const handleSubmit = async () => {
+    if (!selectedDoctorId) {
+      setSubmitError("Selected doctor is missing. Please go back and select a doctor.");
+      return;
+    }
+    setIsSubmitting(true);
+    setSubmitError("");
+    try {
+      await createAppointment.mutateAsync({
+        patientName: form.fullName,
+        patientPhone: form.phone,
+        patientEmail: form.email || undefined,
+        patientAge: form.age ? Number(form.age) : undefined,
+        patientGender: form.gender.toLowerCase(),
+        doctor: selectedDoctorId,
+        department: form.department,
+        service: preselectedService || undefined,
+        date: form.date,
+        time: form.time,
+        reason: form.message || undefined,
+      });
+      setSubmitted(true);
+    } catch (err: any) {
+      setSubmitError(err.message || "Failed to book appointment. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const downloadPDF = () => {
     const doc = new jsPDF();
-    
-    // Header
     doc.setFillColor(26, 115, 232);
     doc.rect(0, 0, 210, 40, "F");
-    
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(24);
     doc.text("Mirsarai General Hospital", 105, 15, { align: "center" });
-    
     doc.setFontSize(12);
     doc.text("Appointment Confirmation", 105, 25, { align: "center" });
     doc.text("Mirsarai, Chattogram, Bangladesh", 105, 32, { align: "center" });
-    
-    // Reset colors
     doc.setTextColor(0, 0, 0);
-    
-    // Appointment Details
+
     let yPos = 55;
     doc.setFontSize(16);
     doc.setFont("helvetica", "bold");
     doc.text("Appointment Details", 20, yPos);
-    
     yPos += 10;
     doc.setFontSize(11);
     doc.setFont("helvetica", "normal");
-    
-    // Patient Information
+
     doc.setFont("helvetica", "bold");
     doc.text("Patient Information:", 20, yPos);
     yPos += 8;
     doc.setFont("helvetica", "normal");
-    
     doc.text(`Full Name: ${form.fullName}`, 25, yPos);
     yPos += 7;
     doc.text(`Phone: ${form.phone}`, 25, yPos);
     yPos += 7;
-    
-    if (form.email) {
-      doc.text(`Email: ${form.email}`, 25, yPos);
-      yPos += 7;
-    }
-    
-    if (form.age) {
-      doc.text(`Age: ${form.age}`, 25, yPos);
-      yPos += 7;
-    }
-    
+    if (form.email) { doc.text(`Email: ${form.email}`, 25, yPos); yPos += 7; }
+    if (form.age) { doc.text(`Age: ${form.age}`, 25, yPos); yPos += 7; }
     doc.text(`Gender: ${form.gender}`, 25, yPos);
     yPos += 12;
-    
-    // Appointment Details
+
     doc.setFont("helvetica", "bold");
     doc.text("Appointment Details:", 20, yPos);
     yPos += 8;
     doc.setFont("helvetica", "normal");
-    
     doc.text(`Department: ${form.department}`, 25, yPos);
     yPos += 7;
     doc.text(`Doctor: ${form.doctor}`, 25, yPos);
@@ -173,24 +205,20 @@ export default function AppointmentForm() {
     yPos += 7;
     doc.text(`Time: ${form.time}`, 25, yPos);
     yPos += 12;
-    
-    // Additional Notes
+
     if (form.message) {
       doc.setFont("helvetica", "bold");
       doc.text("Additional Notes:", 20, yPos);
       yPos += 8;
       doc.setFont("helvetica", "normal");
-      
       const splitMessage = doc.splitTextToSize(form.message, 170);
       doc.text(splitMessage, 25, yPos);
       yPos += splitMessage.length * 7 + 10;
     }
-    
-    // Important Information Box
+
     doc.setDrawColor(26, 115, 232);
     doc.setLineWidth(0.5);
     doc.rect(20, yPos, 170, 30);
-    
     yPos += 8;
     doc.setFontSize(10);
     doc.setFont("helvetica", "bold");
@@ -202,17 +230,14 @@ export default function AppointmentForm() {
     doc.text("• Bring a valid ID and any previous medical records", 25, yPos);
     yPos += 5;
     doc.text("• Contact us at +01969997799 for any changes", 25, yPos);
-    
-    // Footer
+
     doc.setFontSize(8);
     doc.setTextColor(128, 128, 128);
     doc.text("Generated on: " + new Date().toLocaleString(), 105, 280, { align: "center" });
-    
-    // Save PDF
+
     doc.save(`Appointment_${form.fullName.replace(/\s+/g, "_")}_${form.date}.pdf`);
   };
 
-  // Min date: today
   const today = new Date().toISOString().split("T")[0];
 
   if (submitted) {
@@ -236,15 +261,14 @@ export default function AppointmentForm() {
         <div className="bg-blue-50 border border-blue-100 rounded-2xl px-6 py-4 text-sm text-blue-700 max-w-sm mb-8">
           A confirmation will be sent to your phone{form.email ? " and email" : ""}. Please arrive 10 minutes early.
         </div>
-        
-        {/* Download PDF Button */}
+
         <button
           onClick={downloadPDF}
           className="flex items-center gap-2 px-8 py-3.5 rounded-xl bg-primary text-white font-bold text-sm hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all duration-200 mb-4"
         >
           <FaDownload /> Download Appointment PDF
         </button>
-        
+
         <button
           onClick={() => { setSubmitted(false); setStep(0); setForm({ fullName: "", phone: "", email: "", age: "", gender: "", department: "", doctor: "", date: "", time: "", message: "" }); }}
           className="text-primary underline underline-offset-4 text-sm hover:opacity-75 transition"
@@ -257,7 +281,6 @@ export default function AppointmentForm() {
 
   return (
     <div className="w-full">
-      {/* Stepper */}
       <div className="flex items-center justify-between mb-10">
         {steps.map((label, i) => (
           <React.Fragment key={i}>
@@ -284,7 +307,18 @@ export default function AppointmentForm() {
         ))}
       </div>
 
-      {/* Step Content */}
+      {preselectedService && form.department && (
+        <div className="mb-6 px-4 py-3 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/40 text-sm text-blue-700 dark:text-blue-300">
+          Service pre-selected: <strong>{decodeURIComponent(preselectedService)}</strong>. You can change the department below if needed.
+        </div>
+      )}
+
+      {submitError && (
+        <div className="mb-6 px-4 py-3 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 text-sm text-red-600 dark:text-red-400">
+          {submitError}
+        </div>
+      )}
+
       <div className="overflow-hidden min-h-[320px]">
         <AnimatePresence mode="wait" custom={dir}>
           {step === 0 && (
@@ -486,12 +520,11 @@ export default function AppointmentForm() {
         </AnimatePresence>
       </div>
 
-      {/* Navigation Buttons */}
       <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-100">
         <button
           type="button"
           onClick={goPrev}
-          disabled={step === 0}
+          disabled={step === 0 || isSubmitting}
           className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-medium text-sm hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition"
         >
           <FaArrowLeft className="text-xs" /> Back
@@ -508,17 +541,20 @@ export default function AppointmentForm() {
           <button
             type="button"
             onClick={handleSubmit}
-            className="flex items-center gap-2 px-8 py-2.5 rounded-xl bg-secondary text-white font-bold text-sm hover:bg-secondary/90 shadow-md hover:shadow-lg transition-all duration-200"
+            disabled={isSubmitting}
+            className="flex items-center gap-2 px-8 py-2.5 rounded-xl bg-secondary text-white font-bold text-sm hover:bg-secondary/90 shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            <FaCheckCircle /> Confirm Appointment
+            {isSubmitting ? (
+              <><FaSpinner className="animate-spin" /> Booking...</>
+            ) : (
+              <><FaCheckCircle /> Confirm Appointment</>
+            )}
           </button>
         )}
       </div>
     </div>
   );
 }
-
-// ── Helpers ──────────────────────────────────────────────────────────────────
 
 function inputCls(error?: string) {
   return `w-full border ${error ? "border-red-400 ring-1 ring-red-300" : "border-gray-200/80"} rounded-xl pl-10 pr-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 bg-white/60 focus:bg-white backdrop-blur-sm shadow-inner`;

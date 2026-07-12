@@ -58,64 +58,36 @@ export interface DepartmentsData {
 // ── Fetchers ──────────────────────────────────────────────────────────────────
 
 const fetchDepartments = async (lang = "en"): Promise<Department[]> => {
-  try {
-    const res = await fetch(`${API_URL}/departments?lang=${lang}`, {
-      cache: "no-store",
-    });
-    if (!res.ok) throw new Error("API unavailable");
-    const json = await res.json();
-    return json.data as Department[];
-  } catch {
-    // Fallback to static JSON
-    const fallback = await fetch("/data/departments.json");
-    if (!fallback.ok) throw new Error("Failed to fetch departments data");
-    const data = await fallback.json();
-    return data.departments as Department[];
-  }
+  const res = await fetch(`${API_URL}/departments?lang=${lang}`, {
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error("Failed to fetch departments");
+  const json = await res.json();
+  return json.data as Department[];
 };
 
 const fetchDepartmentsData = async (lang = "en"): Promise<DepartmentsData> => {
-  try {
-    const depts = await fetchDepartments(lang);
-    const pageConfigRes = await fetch(`${API_URL}/departments/page-config?lang=${lang}`, { cache: "no-store" });
-    if (!pageConfigRes.ok) throw new Error("Page config API unavailable");
-    const json = await pageConfigRes.json();
-    const pageData = json.data;
+  const [depts, pageConfigRes] = await Promise.all([
+    fetchDepartments(lang),
+    fetch(`${API_URL}/departments/page-config?lang=${lang}`, { cache: "no-store" }),
+  ]);
 
-    return {
-      departments: depts,
-      hospitalStats: pageData.hospitalStats || { patientsCount: "15K+", yearsOfService: "10+" },
-      features: pageData.features || [],
-      testimonials: pageData.testimonials || [],
-      cta: pageData.cta || {
-        title: "Need Medical Assistance?",
-        description: "Our specialists are ready to help. Book an appointment today and get the care you deserve.",
-        primaryBtn: { label: "Book Appointment", link: "/appointment" },
-        secondaryBtn: { label: "View Our Doctors", link: "/doctors" },
-      },
-    };
-  } catch (err) {
-    console.warn("Falling back to static departments.json:", err);
-    const [depts, staticData] = await Promise.all([
-      fetchDepartments(lang),
-      fetch("/data/departments.json")
-        .then((r) => r.json())
-        .catch(() => ({ departments: [], hospitalStats: {}, features: [], testimonials: [] })),
-    ]);
+  if (!pageConfigRes.ok) throw new Error("Failed to fetch departments page config");
+  const json = await pageConfigRes.json();
+  const pageData = json.data;
 
-    return {
-      departments: depts,
-      hospitalStats: staticData.hospitalStats || { patientsCount: "5000+", yearsOfService: "15+" },
-      features: staticData.features || [],
-      testimonials: staticData.testimonials || [],
-      cta: {
-        title: "Need Medical Assistance?",
-        description: "Our specialists are ready to help. Book an appointment today and get the care you deserve.",
-        primaryBtn: { label: "Book Appointment", link: "/appointment" },
-        secondaryBtn: { label: "View Our Doctors", link: "/doctors" },
-      },
-    };
-  }
+  return {
+    departments: depts,
+    hospitalStats: pageData.hospitalStats || { patientsCount: "15K+", yearsOfService: "10+" },
+    features: pageData.features || [],
+    testimonials: pageData.testimonials || [],
+    cta: pageData.cta || {
+      title: "Need Medical Assistance?",
+      description: "Our specialists are ready to help. Book an appointment today and get the care you deserve.",
+      primaryBtn: { label: "Book Appointment", link: "/appointment" },
+      secondaryBtn: { label: "View Our Doctors", link: "/doctors" },
+    },
+  };
 };
 
 const fetchDepartmentBySlug = async (slug: string, lang = "en"): Promise<Department> => {

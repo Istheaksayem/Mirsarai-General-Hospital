@@ -500,10 +500,24 @@ export interface DoctorQueryParams {
 
 // ─── Doctor CMS API ───────────────────────────────────────────────────────────
 
+function getAuthHeaders(): Record<string, string> {
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (typeof window !== "undefined") {
+    try {
+      const raw = sessionStorage.getItem("mgh_admin_user");
+      if (raw) {
+        const user = JSON.parse(raw);
+        if (user.token) headers["Authorization"] = `Bearer ${user.token}`;
+      }
+    } catch {}
+  }
+  return headers;
+}
+
 async function fetchAdminReal<T>(path: string): Promise<T> {
   const res = await fetch(`${BACKEND_API}/${path}`, {
     cache: "no-store",
-    headers: { "Content-Type": "application/json" },
+    headers: getAuthHeaders(),
   });
   if (!res.ok) {
     const errorText = await res.text();
@@ -518,7 +532,7 @@ async function fetchAdminReal<T>(path: string): Promise<T> {
 async function mutateAdminReal<T>(path: string, data: unknown, method: "POST" | "PUT" | "PATCH" | "DELETE" = "PUT"): Promise<T> {
   const res = await fetch(`${BACKEND_API}/${path}`, {
     method,
-    headers: { "Content-Type": "application/json" },
+    headers: getAuthHeaders(),
     body: data !== undefined ? JSON.stringify(data) : undefined,
   });
   if (!res.ok) {
@@ -680,3 +694,62 @@ export const patchCmsSpecialization = (id: string, data: Partial<CmsSpecializati
 export const deleteCmsSpecialization = (id: string) => mutateAdminReal<null>(`admin/specializations/${id}`, undefined, "DELETE");
 export const reorderCmsSpecializations = (updates: { id: string; displayOrder: number }[]) =>
   mutateAdminReal<null>("admin/specializations/reorder", updates, "PATCH");
+
+// ─── Appointment CMS Types ────────────────────────────────────────────────────
+
+export interface CmsAppointmentDoctor {
+  _id: string;
+  name: BilingualField;
+  designation: BilingualField;
+  image?: string;
+  department: BilingualField;
+}
+
+export interface CmsAppointment {
+  _id: string;
+  patientName: string;
+  patientPhone: string;
+  patientEmail?: string;
+  patientAge?: number;
+  patientGender?: string;
+  doctor: CmsAppointmentDoctor;
+  department?: string;
+  service?: string;
+  date: string;
+  time: string;
+  type: "new" | "follow-up" | "consultation";
+  status: "pending" | "confirmed" | "cancelled" | "completed" | "no-show";
+  reason?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CmsAppointmentListResponse {
+  data: CmsAppointment[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+// ─── Appointment CMS API ──────────────────────────────────────────────────────
+
+export const getCmsAppointments = (params: Record<string, string> = {}) => {
+  const q = new URLSearchParams(params).toString();
+  return fetchAdminReal<CmsAppointmentListResponse>(`admin/appointments${q ? `?${q}` : ""}`);
+};
+
+export const getCmsAppointmentById = (id: string) =>
+  fetchAdminReal<{ data: CmsAppointment }>(`admin/appointments/${id}`);
+
+export const createCmsAppointment = (data: Partial<CmsAppointment>) =>
+  mutateAdminReal<CmsAppointment>("admin/appointments", data, "POST");
+
+export const updateCmsAppointment = (id: string, data: Partial<CmsAppointment>) =>
+  mutateAdminReal<CmsAppointment>(`admin/appointments/${id}`, data, "PUT");
+
+export const deleteCmsAppointment = (id: string) =>
+  mutateAdminReal<null>(`admin/appointments/${id}`, undefined, "DELETE");
+
+export const updateCmsAppointmentStatus = (id: string, status: string) =>
+  mutateAdminReal<CmsAppointment>(`admin/appointments/${id}/status`, { status }, "PATCH");

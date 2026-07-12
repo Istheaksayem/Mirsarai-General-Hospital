@@ -1,86 +1,68 @@
 [
   {
     "id": 1,
-    "title": {
-      "en": "Emergency Care",
-      "bn": "জরুরি সেবা"
-    },
-    "description": {
-      "en": "24/7 rapid response and comprehensive emergency medical services.",
-      "bn": "২৪/৭ দ্রুত সাড়া এবং সার্বিক জরুরি চিকিৎসা সেবা।"
-    },
+    "title": { "en": "Emergency Care", "bn": "জরুরি সেবা" },
+    "description": { "en": "24/7 rapid response and comprehensive emergency medical services.", "bn": "২৪/৭ দ্রুত সাড়া এবং সার্বিক জরুরি চিকিৎসা সেবা।" },
     "icon": "FaAmbulance",
     "color": "#ef4444",
-    "link": "/services/emergency"
+    "gradient": "from-red-500 to-rose-600",
+    "link": "/services/emergency",
+    "highlights": ["24/7 Available", "Rapid Response", "Life Support"],
+    "tagline": "When Every Second Counts"
   },
   {
     "id": 2,
-    "title": {
-      "en": "General Medicine",
-      "bn": "সাধারণ চিকিৎসা"
-    },
-    "description": {
-      "en": "Expert diagnosis, treatment, and management of adult health conditions.",
-      "bn": "প্রাপ্তবয়স্কদের স্বাস্থ্য সমস্যার বিশেষজ্ঞ নির্ণয়, চিকিৎসা এবং ব্যবস্থাপনা।"
-    },
+    "title": { "en": "General Medicine", "bn": "সাধারণ চিকিৎসা" },
+    "description": { "en": "Expert diagnosis, treatment, and management of adult health conditions.", "bn": "প্রাপ্তবয়স্কদের স্বাস্থ্য সমস্যার বিশেষজ্ঞ নির্ণয়, চিকিৎসা এবং ব্যবস্থাপনা।" },
     "icon": "FaStethoscope",
     "color": "#1E2B7A",
-    "link": "/departments"
+    "gradient": "from-[#1E2B7A] to-blue-800",
+    "link": "/departments",
+    "highlights": ["Expert Physicians", "Comprehensive Care", "Preventive Health"],
+    "tagline": "Complete Adult Healthcare"
   },
   {
     "id": 3,
-    "title": {
-      "en": "Cardiology",
-      "bn": "হৃদরোগ বিশেষজ্ঞ"
-    },
-    "description": {
-      "en": "Advanced cardiac care, diagnostics, and heart disease management.",
-      "bn": "উন্নত হৃদরোগ সেবা, রোগ নির্ণয় এবং হৃদরোগ ব্যবস্থাপনা।"
-    },
+    "title": { "en": "Cardiology", "bn": "হৃদরোগ বিশেষজ্ঞ" },
+    "description": { "en": "Advanced cardiac care, diagnostics, and heart disease management.", "bn": "উন্নত হৃদরোগ সেবা, রোগ নির্ণয় এবং হৃদরোগ ব্যবস্থাপনা।" },
     "icon": "FaHeartbeat",
     "color": "#f59e0b",
-    "link": "/departments"
+    "gradient": "from-amber-500 to-orange-600",
+    "link": "/departments",
+    "highlights": ["ECG & Echo", "Heart Surgery", "Cardiac Rehab"],
+    "tagline": "Your Heart, Our Commitment"
   },
   {
     "id": 4,
-    "title": {
-      "en": "Orthopedics",
-      "bn": "অর্থোপেডিক্স"
-    },
-    "description": {
-      "en": "Specialized care for bones, joints, ligaments, tendons, and muscles.",
-      "bn": "হাড়, জয়েন্ট, লিগামেন্ট, টেন্ডন এবং পেশীর বিশেষ সেবা।"
-    },
+    "title": { "en": "Orthopedics", "bn": "অর্থোপেডিক্স" },
+    "description": { "en": "Specialized care for bones, joints, ligaments, tendons, and muscles.", "bn": "হাড়, জয়েন্ট, লিগামেন্ট, টেন্ডন এবং পেশীর বিশেষ সেবা।" },
     "icon": "FaBone",
     "color": "#76BC21",
-    "link": "/departments"
+    "gradient": "from-[#76BC21] to-green-600",
+    "link": "/departments",
+    "highlights": ["Joint Replacement", "Fracture Care", "Sports Medicine"],
+    "tagline": "Moving You Forward"
   },
   {
     "id": 5,
-    "title": {
-      "en": "Pediatrics",
-      "bn": "শিশু বিশেষজ্ঞ"
-    },
-    "description": {
-      "en": "Compassionate and expert medical care for infants, children, and adolescents.",
-      "bn": "শিশু, বাচ্চা এবং কিশোরদের জন্য যত্নশীল এবং বিশেষজ্ঞ চিকিৎসা সেবা।"
-    },
+    "title": { "en": "Pediatrics", "bn": "শিশু বিশেষজ্ঞ" },
+    "description": { "en": "Compassionate and expert medical care for infants, children, and adolescents.", "bn": "শিশু, বাচ্চা এবং কিশোরদের জন্য যত্নশীল এবং বিশেষজ্ঞ চিকিৎসা সেবা।" },
     "icon": "FaBaby",
     "color": "#ec4899",
-    "link": "/services/nicu"
+    "gradient": "from-pink-500 to-rose-500",
+    "link": "/services/nicu",
+    "highlights": ["Child Specialists", "Vaccination", "Growth Tracking"],
+    "tagline": "Caring for Little Lives"
   },
   {
     "id": 6,
-    "title": {
-      "en": "Laboratory Services",
-      "bn": "পরীক্ষাগার সেবা"
-    },
-    "description": {
-      "en": "State-of-the-art diagnostic testing with accurate and fast results.",
-      "bn": "অত্যাধুনিক ডায়াগনস্টিক পরীক্ষা এবং দ্রুত ও নির্ভুল ফলাফল।"
-    },
+    "title": { "en": "Laboratory Services", "bn": "পরীক্ষাগার সেবা" },
+    "description": { "en": "State-of-the-art diagnostic testing with accurate and fast results.", "bn": "অত্যাধুনিক ডায়াগনস্টিক পরীক্ষা এবং দ্রুত ও নির্ভুল ফলাফল।" },
     "icon": "FaMicroscope",
     "color": "#8b5cf6",
-    "link": "/services/diagnostic"
+    "gradient": "from-violet-500 to-purple-600",
+    "link": "/services/diagnostic",
+    "highlights": ["100+ Tests", "Digital Reports", "Quality Assured"],
+    "tagline": "Precision You Can Trust"
   }
 ]

@@ -1,23 +1,38 @@
 "use client";
 
 import { useBabyCare } from "@/hooks/useBabyCare";
-import { 
-  FaUserMd, 
-  FaSyringe, 
-  FaSmile, 
+import {
+  FaUserMd,
+  FaSyringe,
+  FaSmile,
   FaBook,
   FaBaby,
   FaHeartbeat,
   FaCheckCircle,
-  FaClock
+  FaClock,
+  FaShieldAlt,
+  FaStar,
 } from "react-icons/fa";
 import { MdChildCare } from "react-icons/md";
+import { motion } from "framer-motion";
 
 const iconMap: Record<string, any> = {
   FaUserMd,
   FaSyringe,
   FaSmile,
   FaBook,
+  FaBaby,
+  FaHeartbeat,
+  FaCheckCircle,
+  FaShieldAlt,
+  FaStar,
+};
+
+const fadeUp = {
+  initial: { opacity: 0, y: 20 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true },
+  transition: { duration: 0.5 },
 };
 
 const BabyCarePage = () => {
@@ -26,7 +41,7 @@ const BabyCarePage = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--background)" }}>
-        <div className="flex flex-col items-center gap-4 animate-fadeInSlide">
+        <div className="flex flex-col items-center gap-4">
           <div className="w-16 h-16 rounded-full border-4 border-[var(--color-secondary)] border-t-transparent animate-spin" />
           <p className="font-semibold text-lg" style={{ color: "var(--color-secondary)" }}>Loading...</p>
         </div>
@@ -46,9 +61,8 @@ const BabyCarePage = () => {
 
   return (
     <main className="overflow-hidden" style={{ background: "var(--background)" }}>
-      {/* ── Hero Section with Background Image ── */}
-      <section className="relative py-40 px-4 overflow-hidden">
-        {/* Background Image with Minimal Overlay */}
+      {/* ── Hero Section ── */}
+      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
             src={babyCare.backgroundImage}
@@ -59,122 +73,54 @@ const BabyCarePage = () => {
                 "https://images.unsplash.com/photo-1555252333-9f8e92e65df9?w=1920&h=800&fit=crop";
             }}
           />
-          {/* Light overlay for text readability */}
-          <div 
-            className="absolute inset-0" 
-            style={{ 
-              background: "linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.55) 100%)" 
-            }} 
-          />
+          <div className="absolute inset-0 bg-black/60" />
         </div>
-
-        {/* Decorative floating elements */}
-        <div className="absolute top-20 left-10 w-72 h-72 rounded-full opacity-20 blur-3xl" style={{ background: "var(--color-secondary)" }} />
-        <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full opacity-15 blur-3xl" style={{ background: "#8bc34a" }} />
-
-        <div className="relative z-10 max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Left Content */}
-            <div className="animate-fadeInSlide text-white">
-              <div 
-                className="inline-flex items-center gap-3 px-5 py-2.5 mb-6"
-                style={{
-                  background: "rgba(118, 188, 33, 0.2)",
-                  borderRadius: "var(--radius-xl)",
-                  backdropFilter: "blur(10px)",
-                  border: "1px solid rgba(118, 188, 33, 0.3)"
-                }}
-              >
-                <FaBaby size={20} />
-                <span className="text-sm font-semibold tracking-wider uppercase">
-                  Pediatric Excellence
-                </span>
-              </div>
-              <h1 className="text-5xl md:text-6xl font-extrabold mb-6 leading-tight tracking-tight">
-                {babyCare.title}
-              </h1>
-              <p className="text-lg md:text-xl text-white/90 leading-relaxed mb-8">
-                {babyCare.heroDescription}
-              </p>
-              <div className="flex flex-wrap gap-4">
-                <a
-                  href="#services"
-                  className="inline-block px-8 py-4 font-bold text-white transition-all duration-300 hover:-translate-y-1 transform"
-                  style={{
-                    background: "linear-gradient(135deg, var(--color-secondary), #8bc34a)",
-                    borderRadius: "var(--radius-lg)",
-                    boxShadow: "var(--shadow-xl)"
-                  }}
-                >
-                  Our Services
-                </a>
-                <a
-                  href="/appointment"
-                  className="inline-block px-8 py-4 font-bold text-white transition-all duration-300 hover:-translate-y-1 transform"
-                  style={{
-                    background: "rgba(255, 255, 255, 0.1)",
-                    backdropFilter: "blur(10px)",
-                    borderRadius: "var(--radius-lg)",
-                    border: "2px solid rgba(255, 255, 255, 0.3)"
-                  }}
-                >
-                  Book Appointment
-                </a>
-              </div>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div className="border-l-4 border-[var(--color-secondary)] pl-6" {...fadeUp}>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-4 tracking-tight">
+              {babyCare.title}
+            </h1>
+            <div className="flex items-center text-xs md:text-sm font-bold tracking-widest uppercase text-gray-300 gap-3">
+              <span className="text-white">BABY CARE</span>
             </div>
-
-            {/* Right Stats Cards */}
-            <div className="grid grid-cols-2 gap-4 animate-fadeInSlide" style={{ animationDelay: "0.2s" }}>
-              {babyCare.statistics.map((stat, i) => (
-                <div
-                  key={i}
-                  className="glass-panel p-6 text-center hover:-translate-y-2 transition-all duration-300"
-                  style={{
-                    borderRadius: "var(--radius-lg)",
-                    background: "rgba(255, 255, 255, 0.1)",
-                    backdropFilter: "blur(20px)",
-                    border: "1px solid rgba(255, 255, 255, 0.2)"
-                  }}
-                >
-                  <p className="text-4xl font-extrabold text-white mb-1">{stat.value}</p>
-                  <p className="text-white/80 text-sm font-medium">{stat.label}</p>
-                </div>
-              ))}
-            </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ── Features Grid ── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 -mt-16 relative z-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {babyCare.features.map((feature, index) => {
             const Icon = iconMap[feature.icon] || FaBaby;
             return (
-              <div
+              <motion.div
                 key={index}
-                className="glass-panel p-8 text-center group hover:-translate-y-2 transition-all duration-500 animate-fadeInSlide"
-                style={{
-                  borderRadius: "var(--radius-lg)",
-                  animationDelay: `${index * 0.1}s`
-                }}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="group relative bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-7 border border-gray-100 dark:border-gray-700 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden"
               >
-                <div 
-                  className="w-16 h-16 flex items-center justify-center mx-auto mb-5 transition-all duration-300 group-hover:scale-110"
-                  style={{
-                    borderRadius: "var(--radius-md)",
-                    background: "linear-gradient(135deg, var(--color-secondary), #8bc34a)"
-                  }}
-                >
-                  <Icon className="text-white" size={28} />
+                <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-secondary)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
+                <div className="relative z-10">
+                  <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-5 text-white shadow-lg transition-all duration-300 group-hover:scale-110"
+                    style={{
+                      background: "linear-gradient(135deg, var(--color-secondary), #8bc34a)",
+                    }}
+                  >
+                    <Icon size={24} />
+                  </div>
+                  <h3 className="text-lg font-bold mb-2" style={{ color: "var(--color-primary)" }}>
+                    {feature.title}
+                  </h3>
+                  <p className="text-sm leading-relaxed text-gray-500 dark:text-gray-400">
+                    {feature.description}
+                  </p>
                 </div>
-                <h3 className="text-lg font-bold mb-3" style={{ color: "var(--color-primary)" }}>
-                  {feature.title}
-                </h3>
-                <p className="text-sm leading-relaxed" style={{ color: "var(--foreground)", opacity: 0.7 }}>
-                  {feature.description}
-                </p>
-              </div>
+                <div className="absolute -bottom-6 -right-6 w-16 h-16 rounded-full opacity-0 group-hover:opacity-10 transition-all duration-500"
+                  style={{ background: "var(--color-secondary)", filter: "blur(12px)" }}
+                />
+              </motion.div>
             );
           })}
         </div>
@@ -183,91 +129,53 @@ const BabyCarePage = () => {
       {/* ── About Section ── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          <div className="animate-fadeInSlide">
+          <motion.div {...fadeUp}>
             <h2 className="text-4xl md:text-5xl font-bold mb-8 leading-tight" style={{ color: "var(--color-primary)" }}>
               Complete <span style={{ color: "var(--color-secondary)" }}>Pediatric Healthcare</span>
             </h2>
-            <p 
-              className="text-lg leading-relaxed mb-8"
-              style={{ color: "var(--foreground)", opacity: 0.75 }}
-            >
+            <p className="text-lg leading-relaxed mb-8 text-gray-600 dark:text-gray-400">
               {babyCare.description}
             </p>
-            
-            <div className="space-y-4 mb-8">
-              <div className="flex items-center gap-4">
-                <div 
-                  className="w-12 h-12 flex items-center justify-center flex-shrink-0"
-                  style={{
-                    background: "rgba(118, 188, 33, 0.1)",
-                    borderRadius: "var(--radius-md)"
-                  }}
+            <div className="space-y-4">
+              <div className="flex items-center gap-4 p-3 rounded-xl hover:bg-green-50/50 dark:hover:bg-green-900/10 transition-colors">
+                <div className="w-12 h-12 flex items-center justify-center rounded-[var(--radius-md)]"
+                  style={{ background: "rgba(var(--color-secondary), 0.1)" }}
                 >
                   <FaClock style={{ color: "var(--color-secondary)" }} size={20} />
                 </div>
                 <div>
-                  <p className="font-semibold" style={{ color: "var(--color-primary)" }}>
-                    Working Hours
-                  </p>
-                  <p className="text-sm" style={{ color: "var(--foreground)", opacity: 0.6 }}>
-                    {babyCare.workingHours.weekdays} (Weekdays)
-                  </p>
+                  <p className="font-semibold" style={{ color: "var(--color-primary)" }}>Working Hours</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{babyCare.workingHours.weekdays} (Weekdays)</p>
                 </div>
               </div>
-              
-              <div className="flex items-center gap-4">
-                <div 
-                  className="w-12 h-12 flex items-center justify-center flex-shrink-0"
-                  style={{
-                    background: "rgba(239, 68, 68, 0.1)",
-                    borderRadius: "var(--radius-md)"
-                  }}
+              <div className="flex items-center gap-4 p-3 rounded-xl hover:bg-red-50/50 dark:hover:bg-red-900/10 transition-colors">
+                <div className="w-12 h-12 flex items-center justify-center rounded-[var(--radius-md)]"
+                  style={{ background: "rgba(239, 68, 68, 0.1)" }}
                 >
                   <FaHeartbeat style={{ color: "#ef4444" }} size={20} />
                 </div>
                 <div>
-                  <p className="font-semibold" style={{ color: "var(--color-primary)" }}>
-                    Emergency Care
-                  </p>
-                  <p className="text-sm" style={{ color: "var(--foreground)", opacity: 0.6 }}>
-                    {babyCare.workingHours.emergency}
-                  </p>
+                  <p className="font-semibold" style={{ color: "var(--color-primary)" }}>Emergency Care</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{babyCare.workingHours.emergency}</p>
                 </div>
               </div>
             </div>
-
-            <a
-              href="/appointment"
-              className="inline-flex items-center gap-3 px-8 py-4 font-semibold text-base text-white transition-all duration-300 hover:-translate-y-1 transform"
-              style={{
-                background: "var(--color-secondary)",
-                borderRadius: "var(--radius-xl)",
-                boxShadow: "var(--shadow-lg)"
-              }}
-            >
-              Book Pediatric Appointment →
-            </a>
-          </div>
-
-          <div className="relative animate-fadeInSlide" style={{ animationDelay: "0.2s" }}>
-            <div 
-              className="absolute -top-6 -right-6 w-full h-full"
-              style={{
-                background: "linear-gradient(135deg, var(--color-secondary), #8bc34a)",
-                opacity: 0.1,
-                borderRadius: "var(--radius-xl)"
-              }}
+          </motion.div>
+          <motion.div className="relative"
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <div className="absolute -top-6 -right-6 w-full h-full opacity-10 rounded-[var(--radius-xl)]"
+              style={{ background: "linear-gradient(135deg, var(--color-secondary), #8bc34a)" }}
             />
             <img
               src="https://images.unsplash.com/photo-1555252333-9f8e92e65df9?w=800&h=600&fit=crop"
               alt="Baby Care"
-              className="relative z-10 w-full h-[500px] object-cover"
-              style={{
-                borderRadius: "var(--radius-xl)",
-                boxShadow: "var(--shadow-xl)"
-              }}
+              className="relative z-10 w-full h-[400px] lg:h-[500px] object-cover rounded-[var(--radius-xl)] shadow-xl"
             />
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -275,105 +183,134 @@ const BabyCarePage = () => {
       <section className="py-24 px-4 relative overflow-hidden">
         <div className="absolute inset-0 opacity-5">
           <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-[var(--color-secondary)] blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-[#fbbf24] blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-[#8bc34a] blur-3xl" />
         </div>
-
         <div className="max-w-7xl mx-auto relative z-10">
-          <div className="text-center mb-16 animate-fadeInSlide">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight" style={{ color: "var(--color-primary)" }}>
-              Our Baby Care Services
+          <motion.div className="text-center mb-16" {...fadeUp}>
+            <div className="inline-block px-5 py-2 mb-6 text-sm font-bold tracking-wider uppercase text-white rounded-full"
+              style={{ background: "linear-gradient(135deg, var(--color-secondary), #8bc34a)" }}
+            >
+              Our Services
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight" style={{ color: "var(--color-primary)" }}>
+              Comprehensive Baby Care Services
             </h2>
-            <p className="text-lg max-w-2xl mx-auto" style={{ color: "var(--foreground)", opacity: 0.7 }}>
-              Comprehensive healthcare for infants, children, and adolescents
+            <p className="text-lg max-w-2xl mx-auto text-gray-500 dark:text-gray-400">
+              Complete healthcare for infants, children, and adolescents
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {babyCare.services.map((service, index) => (
-              <div
-                key={index}
-                className="premium-card p-8 hover:scale-[1.02] transition-all duration-300 animate-fadeInSlide"
-                style={{
-                  borderRadius: "var(--radius-lg)",
-                  animationDelay: `${index * 0.1}s`
-                }}
-              >
-                <div className="flex items-center gap-4 mb-6">
-                  <div 
-                    className="w-12 h-12 flex items-center justify-center"
-                    style={{
-                      background: "linear-gradient(135deg, var(--color-secondary), #8bc34a)",
-                      borderRadius: "var(--radius-md)"
-                    }}
-                  >
-                    <MdChildCare className="text-white" size={24} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {babyCare.services.map((service, index) => {
+              const accent = "var(--color-secondary)";
+              return (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="group relative bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden"
+                >
+                  <div className="absolute left-0 top-0 bottom-0 w-1.5 transition-all duration-500 group-hover:w-2"
+                    style={{ background: accent }}
+                  />
+                  <div className="p-6 lg:p-7">
+                    <div className="flex items-center gap-3 mb-5">
+                      <div className="w-11 h-11 rounded-xl flex items-center justify-center text-white shadow-md transition-all duration-300 group-hover:scale-110"
+                        style={{ background: `linear-gradient(135deg, ${accent}, #8bc34a)` }}
+                      >
+                        <MdChildCare size={20} />
+                      </div>
+                      <h3 className="text-lg font-bold" style={{ color: "var(--color-primary)" }}>
+                        {service.category}
+                      </h3>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {service.items?.map((item, idx) => (
+                        <span
+                          key={idx}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all duration-200 hover:scale-105"
+                          style={{
+                            background: `${accent}10`,
+                            color: accent,
+                          }}
+                        >
+                          <FaCheckCircle size={10} />
+                          {item}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                  <h3 className="text-2xl font-bold" style={{ color: "var(--color-primary)" }}>
-                    {service.category}
-                  </h3>
-                </div>
-                <ul className="grid grid-cols-1 gap-3">
-                  {service.items.map((item, idx) => (
-                    <li key={idx} className="flex items-start gap-3">
-                      <FaCheckCircle 
-                        className="mt-1 flex-shrink-0" 
-                        size={16} 
-                        style={{ color: "var(--color-secondary)" }}
-                      />
-                      <span className="text-sm leading-relaxed" style={{ color: "var(--foreground)", opacity: 0.75 }}>
-                        {item}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+                  <div className="absolute -bottom-8 -right-8 w-20 h-20 rounded-full opacity-0 group-hover:opacity-20 transition-all duration-500"
+                    style={{ background: accent, filter: "blur(16px)" }}
+                  />
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* ── Vaccination Schedule ── */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-        <div className="text-center mb-16 animate-fadeInSlide">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight" style={{ color: "var(--color-primary)" }}>
-            Vaccination Schedule
-          </h2>
-          <p className="text-lg max-w-2xl mx-auto" style={{ color: "var(--foreground)", opacity: 0.7 }}>
-            Complete immunization program for your child's health protection
-          </p>
+      <section className="py-24 px-4 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-0 right-1/4 w-96 h-96 rounded-full bg-[#8bc34a] blur-3xl" />
+          <div className="absolute bottom-0 left-1/4 w-96 h-96 rounded-full bg-[var(--color-secondary)] blur-3xl" />
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {babyCare.vaccinationSchedule.map((schedule, i) => (
-            <div
-              key={i}
-              className="glass-panel p-6 hover:-translate-y-1 transition-all duration-300 animate-fadeInSlide"
-              style={{
-                borderRadius: "var(--radius-lg)",
-                animationDelay: `${i * 0.1}s`
-              }}
+        <div className="max-w-7xl mx-auto relative z-10">
+          <motion.div className="text-center mb-16" {...fadeUp}>
+            <div className="inline-block px-5 py-2 mb-6 text-sm font-bold tracking-wider uppercase text-white rounded-full"
+              style={{ background: "linear-gradient(135deg, var(--color-secondary), #8bc34a)" }}
             >
-              <div 
-                className="inline-block px-4 py-2 mb-4 font-bold text-white"
-                style={{
-                  background: "linear-gradient(135deg, var(--color-secondary), #8bc34a)",
-                  borderRadius: "var(--radius-md)"
-                }}
-              >
-                {schedule.age}
-              </div>
-              <ul className="space-y-2">
-                {schedule.vaccines.map((vaccine, idx) => (
-                  <li key={idx} className="flex items-center gap-2">
-                    <FaCheckCircle style={{ color: "var(--color-secondary)" }} size={14} />
-                    <span className="text-sm" style={{ color: "var(--foreground)", opacity: 0.8 }}>
-                      {vaccine}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+              Immunization Program
             </div>
-          ))}
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight" style={{ color: "var(--color-primary)" }}>
+              Vaccination Schedule
+            </h2>
+            <p className="text-lg max-w-2xl mx-auto text-gray-500 dark:text-gray-400">
+              Complete immunization program for your child&apos;s health protection
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {babyCare.vaccinationSchedule.map((schedule, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className="group relative bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 overflow-hidden"
+              >
+                <div className="h-1.5 w-full"
+                  style={{ background: "linear-gradient(90deg, var(--color-secondary), #8bc34a)" }}
+                />
+                <div className="p-6">
+                  <div className="inline-block px-4 py-1.5 mb-4 text-sm font-bold text-white rounded-lg"
+                    style={{ background: "linear-gradient(135deg, var(--color-secondary), #8bc34a)" }}
+                  >
+                    {schedule.age}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {schedule.vaccines.map((vaccine, idx) => (
+                      <span
+                        key={idx}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all duration-200 hover:scale-105"
+                        style={{
+                          background: "rgba(var(--color-secondary-rgb), 0.1)",
+                          color: "var(--color-secondary)",
+                        }}
+                      >
+                        <FaCheckCircle size={10} />
+                        {vaccine}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -383,81 +320,68 @@ const BabyCarePage = () => {
           <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-[var(--color-secondary)] blur-3xl" />
           <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-[#8bc34a] blur-3xl" />
         </div>
-        
         <div className="max-w-7xl mx-auto relative z-10">
-          <div className="text-center mb-16 animate-fadeInSlide">
-            <div 
-              className="inline-block px-5 py-2 mb-6 text-sm font-bold tracking-wider uppercase text-white"
-              style={{
-                background: "linear-gradient(135deg, var(--color-secondary), #8bc34a)",
-                borderRadius: "var(--radius-xl)"
-              }}
+          <motion.div className="text-center mb-16" {...fadeUp}>
+            <div className="inline-block px-5 py-2 mb-6 text-sm font-bold tracking-wider uppercase text-white rounded-full"
+              style={{ background: "linear-gradient(135deg, var(--color-secondary), #8bc34a)" }}
             >
               Our Impact
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight" style={{ color: "var(--color-primary)" }}>
               Trusted by Families
             </h2>
-            <p className="text-lg max-w-2xl mx-auto leading-relaxed" style={{ color: "var(--foreground)", opacity: 0.7 }}>
+            <p className="text-lg max-w-2xl mx-auto text-gray-500 dark:text-gray-400">
               Providing exceptional pediatric care with compassion and expertise
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
             {babyCare.statistics.map((stat, i) => (
-              <div
+              <motion.div
                 key={i}
-                className="premium-card text-center p-10 group hover:-translate-y-2 animate-fadeInSlide glow-effect"
-                style={{
-                  animationDelay: `${i * 0.1}s`,
-                  borderRadius: "var(--radius-lg)"
-                }}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className="relative bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-8 text-center shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden group"
               >
-                <div 
-                  className="w-14 h-14 flex items-center justify-center mx-auto mb-4 transition-transform duration-300 group-hover:scale-110"
-                  style={{
-                    background: "linear-gradient(135deg, var(--color-secondary), #8bc34a)",
-                    borderRadius: "var(--radius-md)"
-                  }}
-                >
-                  <FaBaby className="text-white" size={24} />
+                <div className="absolute inset-0 bg-gradient-to-b from-[var(--color-secondary)]/5 to-transparent" />
+                <div className="relative z-10">
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 transition-transform duration-300 group-hover:scale-110"
+                    style={{ background: "linear-gradient(135deg, var(--color-secondary), #8bc34a)" }}
+                  >
+                    <FaBaby className="text-white" size={20} />
+                  </div>
+                  <p className="text-4xl font-extrabold mb-2 tracking-tight" style={{ color: "var(--color-secondary)" }}>
+                    {stat.value}
+                  </p>
+                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{stat.label}</p>
                 </div>
-                <p className="text-5xl font-extrabold mb-2 tracking-tight" style={{ color: "var(--color-secondary)" }}>
-                  {stat.value}
-                </p>
-                <p className="text-sm font-medium tracking-wide" style={{ color: "var(--foreground)", opacity: 0.7 }}>
-                  {stat.label}
-                </p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── CTA Section ── */}
+      {/* ── CTA ── */}
       <section className="py-28 px-4 text-center">
-        <div className="max-w-3xl mx-auto animate-fadeInSlide">
+        <motion.div className="max-w-3xl mx-auto" {...fadeUp}>
           <h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight tracking-tight" style={{ color: "var(--color-primary)" }}>
-            Your Child's Health is Our Priority
+            Your Child&apos;s Health is Our Priority
           </h2>
-          <p 
-            className="text-lg mb-12 leading-relaxed max-w-xl mx-auto"
-            style={{ color: "var(--foreground)", opacity: 0.7 }}
-          >
+          <p className="text-lg mb-12 leading-relaxed max-w-xl mx-auto text-gray-500 dark:text-gray-400">
             Schedule an appointment with our experienced pediatricians for routine checkups or consultations
           </p>
           <a
-            href="/appointment"
-            className="inline-block text-white px-12 py-5 font-bold text-lg transition-all duration-500 hover:-translate-y-2 transform"
+            href="/appointment?service=baby-care"
+            className="inline-block text-white px-12 py-5 font-bold text-lg transition-all duration-500 hover:-translate-y-2 transform rounded-[var(--radius-xl)] shadow-xl hover:shadow-2xl"
             style={{
               background: "linear-gradient(135deg, var(--color-secondary) 0%, #8bc34a 100%)",
-              borderRadius: "var(--radius-xl)",
-              boxShadow: "var(--shadow-xl)"
             }}
           >
             Book Appointment Now
           </a>
-        </div>
+        </motion.div>
       </section>
     </main>
   );

@@ -11,6 +11,11 @@ import adminDepartmentRoutes from './admin/department.admin.routes.js';
 import adminSpecializationRoutes from './admin/specialization.admin.routes.js';
 import aboutCMSRoutes from './aboutCMS.routes.js';
 import homepageRoutes from './homepage.routes.js';
+import authRoutes from './auth.routes.js';
+import appointmentRoutes from './appointment.routes.js';
+import adminAppointmentRoutes from './admin/appointment.admin.routes.js';
+import serviceRoutes from './service.routes.js';
+import adminServiceRoutes from './admin/service.admin.routes.js';
 import { authenticate, authorize } from '../middlewares/auth.middleware.js';
 import catchAsync from '../utils/catchAsync.js';
 import { sendSuccess } from '../utils/ApiResponse.js';
@@ -59,6 +64,11 @@ router.get('/', (req, res) => {
 router.use('/doctors', doctorRoutes);
 router.use('/departments', departmentRoutes);
 router.use('/specializations', specializationRoutes);
+router.use('/appointments', appointmentRoutes);
+router.use('/services', serviceRoutes);
+
+// ── Auth Routes ───────────────────────────────────────────────────────────────
+router.use('/auth', authRoutes);
 
 // ── CMS & Content Routes ───────────────────────────────────────────────────────
 router.use('/about', aboutCMSRoutes);
@@ -68,6 +78,8 @@ router.use('/homepage', homepageRoutes);
 router.use('/admin/doctors', authenticate, authorize('super-admin'), adminDoctorRoutes);
 router.use('/admin/departments', authenticate, authorize('super-admin'), adminDepartmentRoutes);
 router.use('/admin/specializations', authenticate, authorize('super-admin'), adminSpecializationRoutes);
+router.use('/admin/appointments', authenticate, authorize('super-admin'), adminAppointmentRoutes);
+router.use('/admin/services', authenticate, authorize('super-admin'), adminServiceRoutes);
 
 /**
  * @route  POST /api/v1/admin/upload

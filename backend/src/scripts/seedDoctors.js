@@ -15,6 +15,7 @@ import Doctor from '../models/doctor.model.js';
 import Department from '../models/department.model.js';
 import Specialization from '../models/specialization.model.js';
 import DepartmentsPage from '../models/departmentsPage.model.js';
+import User from '../models/user.model.js';
 
 // MongoDB URI
 const mongoURI = process.env.MONGODB_URI;
@@ -294,6 +295,50 @@ const seed = async () => {
       }
     });
     console.log('- Seeded Departments Page layout CMS settings.');
+
+    // 6. Seed Users
+    console.log('Seeding users...');
+    await User.deleteMany({});
+
+    const allDoctors = await Doctor.find({});
+    const firstDoctor = allDoctors[0];
+
+    const mockUsers = [
+      {
+        email: 'superadmin@mgh.com',
+        password: 'admin123',
+        name: 'Arif Hossain',
+        role: 'super-admin',
+        department: 'Administration',
+      },
+      {
+        email: 'reception@mgh.com',
+        password: 'admin123',
+        name: 'Fatema Khatun',
+        role: 'reception-admin',
+        department: 'Reception',
+      },
+      {
+        email: 'lab@mgh.com',
+        password: 'admin123',
+        name: 'Rahim Uddin',
+        role: 'lab-admin',
+        department: 'Laboratory',
+      },
+      {
+        email: 'doctor@mgh.com',
+        password: 'admin123',
+        name: 'Dr. Nasrin Begum',
+        role: 'doctor',
+        doctorRef: firstDoctor?._id || null,
+        department: firstDoctor?.department?.en || 'General Medicine',
+      },
+    ];
+
+    for (const u of mockUsers) {
+      await User.create(u);
+      console.log(`- Created User: ${u.email} (${u.role})`);
+    }
 
     console.log('Database seeding completed successfully!');
   } catch (error) {

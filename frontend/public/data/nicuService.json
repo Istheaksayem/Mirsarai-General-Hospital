@@ -7,94 +7,51 @@
     "backgroundImage": "/images/nicu-care.jpg",
     "description": "Our Neonatal Intensive Care Unit (NICU) provides 24/7 specialized care for premature and critically ill newborns. With state-of-the-art equipment and a compassionate team of neonatologists, pediatric nurses, and support staff, we ensure the best possible care for your precious little ones.",
     "features": [
-      {
-        "title": "24/7 Monitoring",
-        "description": "Round-the-clock supervision by trained medical staff",
-        "icon": "FaHeartbeat"
-      },
-      {
-        "title": "Advanced Equipment",
-        "description": "Ventilators, incubators, and monitoring systems",
-        "icon": "FaLaptopMedical"
-      },
-      {
-        "title": "Expert Team",
-        "description": "Specialized neonatologists and pediatric nurses",
-        "icon": "FaUserNurse"
-      },
-      {
-        "title": "Family Support",
-        "description": "Counseling and guidance for parents",
-        "icon": "FaHandHoldingHeart"
-      }
+      { "title": "24/7 Monitoring", "description": "Round-the-clock supervision by trained medical staff", "icon": "FaHeartbeat" },
+      { "title": "Advanced Equipment", "description": "Ventilators, incubators, and monitoring systems", "icon": "FaLaptopMedical" },
+      { "title": "Expert Team", "description": "Specialized neonatologists and pediatric nurses", "icon": "FaUserNurse" },
+      { "title": "Family Support", "description": "Counseling and guidance for parents", "icon": "FaHandHoldingHeart" }
     ],
     "services": [
       {
         "category": "Neonatal Care",
+        "icon": "FaBaby",
+        "accent": "#f59e0b",
         "items": [
-          "Premature Baby Care",
-          "Low Birth Weight Management",
-          "Respiratory Distress Treatment",
-          "Neonatal Jaundice (Phototherapy)",
-          "Birth Asphyxia Management",
-          "Neonatal Sepsis Treatment",
-          "Temperature Regulation",
-          "Feeding Support (NG Tube, IV)"
+          "Premature Baby Care", "Low Birth Weight Management", "Respiratory Distress Treatment",
+          "Neonatal Jaundice (Phototherapy)", "Birth Asphyxia Management", "Neonatal Sepsis Treatment",
+          "Temperature Regulation", "Feeding Support (NG Tube, IV)"
         ]
       },
       {
         "category": "Baby Care Services",
+        "icon": "FaHeartbeat",
+        "accent": "#ec4899",
         "items": [
-          "Well Baby Checkups",
-          "Vaccination Programs",
-          "Growth Monitoring",
-          "Nutritional Counseling",
-          "Developmental Assessment",
-          "Newborn Screening Tests",
-          "Breastfeeding Support",
-          "Pediatric Consultations"
+          "Well Baby Checkups", "Vaccination Programs", "Growth Monitoring",
+          "Nutritional Counseling", "Developmental Assessment", "Newborn Screening Tests",
+          "Breastfeeding Support", "Pediatric Consultations"
         ]
       },
       {
         "category": "Emergency Services",
+        "icon": "FaAmbulance",
+        "accent": "#ef4444",
         "items": [
-          "Neonatal Resuscitation",
-          "Emergency Admissions",
-          "Critical Care Support",
-          "Ambulance Service",
-          "Transfer Facilities",
-          "On-call Pediatricians"
+          "Neonatal Resuscitation", "Emergency Admissions", "Critical Care Support",
+          "Ambulance Service", "Transfer Facilities", "On-call Pediatricians"
         ]
       }
     ],
     "equipment": [
-      "Neonatal Ventilators",
-      "Infant Incubators",
-      "Radiant Warmers",
-      "Phototherapy Units",
-      "Cardiac Monitors",
-      "Pulse Oximeters",
-      "Infusion Pumps",
-      "Bili Lights",
-      "Oxygen Supply System"
+      "Neonatal Ventilators", "Infant Incubators", "Radiant Warmers", "Phototherapy Units",
+      "Cardiac Monitors", "Pulse Oximeters", "Infusion Pumps", "Bili Lights", "Oxygen Supply System"
     ],
     "statistics": [
-      {
-        "value": "500+",
-        "label": "Babies Treated Annually"
-      },
-      {
-        "value": "95%",
-        "label": "Success Rate"
-      },
-      {
-        "value": "24/7",
-        "label": "Availability"
-      },
-      {
-        "value": "15+",
-        "label": "NICU Beds"
-      }
+      { "value": "500+", "label": "Babies Treated Annually" },
+      { "value": "95%", "label": "Success Rate" },
+      { "value": "24/7", "label": "Availability" },
+      { "value": "15+", "label": "NICU Beds" }
     ],
     "guidelines": [
       "Parents can visit during designated hours (10 AM - 12 PM, 4 PM - 6 PM)",

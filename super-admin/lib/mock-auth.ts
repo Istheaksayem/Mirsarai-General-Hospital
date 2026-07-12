@@ -37,6 +37,7 @@ const MOCK_USERS: Array<User & { password: string }> = [
     role: "doctor",
     avatar: "",
     department: "General Medicine",
+    doctorRef: "doc_nasrin_id",
   },
 ];
 

@@ -41,7 +41,9 @@ export default function CMSPage() {
             { label: "Gallery", desc: "Photo categories, gallery images & stats", href: "/super-admin/cms/gallery", Icon: ImageIcon, color: "purple" },
             { label: "Career", desc: "Job listings, benefits & application process", href: "/super-admin/cms/career", Icon: Briefcase, color: "orange" },
             { label: "Departments Page", desc: "Manage layout, statistics, features, testimonials & CTA", href: "/super-admin/cms/departments", Icon: Building2, color: "indigo" },
-            { label: "Doctor CMS Hub", desc: "Manage doctors, profiles, schedule, media & SEO", href: "/super-admin/cms/doctors", Icon: Stethoscope, color: "teal" },
+            { label: "Individual Departments", desc: "Manage department profiles, services, media & SEO", href: "/super-admin/departments", Icon: Building2, color: "indigo" },
+            { label: "Doctor CMS Hub", desc: "CMS view — visibility toggles, featured, quick actions", href: "/super-admin/cms/doctors", Icon: Stethoscope, color: "teal" },
+            { label: "Individual Doctors", desc: "Manage doctor profiles, schedule, contact & SEO", href: "/super-admin/doctors", Icon: Stethoscope, color: "teal" },
             { label: "Specializations", desc: "Manage doctor specialization terms linked to departments", href: "/super-admin/cms/specializations", Icon: Layers, color: "rose" },
           ].map(({ label, desc, href, Icon, color }) => (
             <div
