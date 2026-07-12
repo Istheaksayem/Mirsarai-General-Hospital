@@ -1,61 +1,22 @@
 "use client";
 
 import React, { use } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { notFound } from "next/navigation";
 import { motion } from "framer-motion";
 import {
-  FaGraduationCap,
-  FaBriefcase,
-  FaMoneyBillWave,
-  FaClock,
-  FaCheckCircle,
-  FaGlobe,
-  FaPhoneAlt,
-  FaEnvelope,
-  FaCalendarAlt,
-  FaMapMarkerAlt,
-  FaStar,
-  FaEdit,
-  FaUserMd,
+  FaGraduationCap, FaBriefcase, FaMoneyBillWave, FaClock,
+  FaCheckCircle, FaGlobe, FaPhoneAlt, FaEnvelope,
+  FaCalendarAlt, FaMapMarkerAlt, FaStar, FaUserMd,
 } from "react-icons/fa";
 import { useLanguage } from "@/context/LanguageContext";
+import { useDoctors } from "@/hooks/useDoctors";
 import Link from "next/link";
-
-interface Doctor {
-  id: number;
-  name: { en: string; bn: string };
-  slug: string;
-  specialization: { en: string; bn: string };
-  qualification: string;
-  experience: { en: string; bn: string };
-  department: { en: string; bn: string };
-  designation: { en: string; bn: string };
-  image: string;
-  phone: string;
-  email: string;
-  chamberTime: { en: string; bn: string };
-  consultationFee: number;
-  languages: string[];
-  about: { en: string; bn: string };
-  services: Array<{ en: string; bn: string }>;
-  available: boolean;
-}
-
-const fetchDoctors = async (): Promise<Doctor[]> => {
-  const res = await fetch("/data/doctors.json", { cache: "no-store" });
-  if (!res.ok) throw new Error("Failed to fetch doctors");
-  return res.json();
-};
 
 export default function DoctorProfilePage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = use(params);
   const { lang } = useLanguage();
 
-  const { data: doctors, isLoading, isError } = useQuery({
-    queryKey: ["doctors"],
-    queryFn: fetchDoctors,
-  });
+  const { data: doctors, isLoading, isError } = useDoctors();
 
   if (isLoading) {
     return (

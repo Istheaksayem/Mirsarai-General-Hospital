@@ -51,17 +51,23 @@ export async function fetchServices() {
 }
 
 // ── Doctors (public list) ─────────────────────────────────────────────────────
-// Currently: /data/doctors.json
-// Future:    GET /api/v1/doctors/public
+// Live: GET /api/v1/doctors — falls back to /data/doctors.json on error
 export async function fetchDoctors() {
-  return fetchFromJson("doctors.json");
+  try {
+    return await fetchFromApi("doctors");
+  } catch {
+    return fetchFromJson("doctors.json");
+  }
 }
 
 // ── Departments (public list) ─────────────────────────────────────────────────
-// Currently: /data/departments.json
-// Future:    GET /api/v1/departments
+// Live: GET /api/v1/departments — falls back to /data/departments.json on error
 export async function fetchDepartments() {
-  return fetchFromJson("departments.json");
+  try {
+    return await fetchFromApi("departments");
+  } catch {
+    return fetchFromJson("departments.json");
+  }
 }
 
 // ── About data ────────────────────────────────────────────────────────────────

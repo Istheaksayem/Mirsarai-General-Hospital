@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDepartments } from "@/hooks/useDepartments";
+import { useLanguage } from "@/context/LanguageContext";
 import * as FaIcons from "react-icons/fa6";
 import * as FaIcons5 from "react-icons/fa";
 import {
@@ -29,7 +30,8 @@ const featureIconMap: Record<string, React.ElementType> = {
 };
 
 export default function DepartmentsPage() {
-  const { data, isLoading, error } = useDepartments();
+  const { lang } = useLanguage();
+  const { data, isLoading, error } = useDepartments(lang);
   const [selectedDept, setSelectedDept] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -49,7 +51,7 @@ export default function DepartmentsPage() {
     );
   }
 
-  const { departments, hospitalStats, features, testimonials } = data;
+  const { departments, hospitalStats, features, testimonials, cta } = data;
 
   const filteredDepartments = departments.filter((dept) =>
     dept.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -407,16 +409,14 @@ export default function DepartmentsPage() {
             className="rounded-3xl p-10 md:p-14 text-center"
             style={{ background: "linear-gradient(135deg, var(--primary) 0%, #2d3f9e 100%)" }}
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Need Medical Assistance?</h2>
-            <p className="text-white/80 max-w-xl mx-auto mb-8 text-lg">
-              Our specialists are ready to help. Book an appointment today and get the care you deserve.
-            </p>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">{cta.title}</h2>
+            <p className="text-white/80 max-w-xl mx-auto mb-8 text-lg">{cta.description}</p>
             <div className="flex flex-wrap gap-4 justify-center">
-              <a href="/appointment" className="inline-block px-8 py-4 rounded-xl font-bold text-primary bg-white hover:bg-gray-50 transition-colors shadow-lg text-base">
-                Book Appointment
+              <a href={cta.primaryBtn.link} className="inline-block px-8 py-4 rounded-xl font-bold text-primary bg-white hover:bg-gray-50 transition-colors shadow-lg text-base">
+                {cta.primaryBtn.label}
               </a>
-              <a href="/doctors" className="inline-block px-8 py-4 rounded-xl font-bold text-white border-2 border-white/40 hover:bg-white/10 transition-colors text-base">
-                View Our Doctors
+              <a href={cta.secondaryBtn.link} className="inline-block px-8 py-4 rounded-xl font-bold text-white border-2 border-white/40 hover:bg-white/10 transition-colors text-base">
+                {cta.secondaryBtn.label}
               </a>
             </div>
           </div>

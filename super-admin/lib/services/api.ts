@@ -415,3 +415,268 @@ export async function uploadCmsImage(base64Data: string): Promise<string> {
   return result.data.url;
 }
 
+// ─── Doctor CMS Types ──────────────────────────────────────────────────────────
+
+export interface BilingualField {
+  en: string;
+  bn: string;
+}
+
+export interface TimeSlot {
+  day: string;
+  startTime: string;
+  endTime: string;
+  type: "online" | "offline" | "both";
+}
+
+export interface SocialLink {
+  platform: string;
+  url: string;
+}
+
+export interface DoctorSeo {
+  metaTitle: BilingualField;
+  metaDescription: BilingualField;
+  keywords: string[];
+}
+
+export interface CmsDoctor {
+  _id: string;
+  slug: string;
+  name: BilingualField;
+  designation: BilingualField;
+  specialization: BilingualField;
+  department: BilingualField;
+  qualification: string;
+  experience: { years: number; label: BilingualField };
+  registrationNumber: string;
+  languages: string[];
+  about: BilingualField;
+  services: BilingualField[];
+  consultationFee: number;
+  chamberTime: BilingualField;
+  chamberAddress: BilingualField;
+  address: BilingualField;
+  timeSlots: TimeSlot[];
+  availableDays: string[];
+  onlineConsultation: boolean;
+  offlineConsultation: boolean;
+  appointmentAvailable: boolean;
+  phone: string;
+  email: string;
+  image: string;
+  bannerImage: string;
+  galleryImages: string[];
+  patientsCount: number;
+  rating: number;
+  joinDate: string;
+  status: "active" | "on-leave" | "inactive";
+  available: boolean;
+  featured: boolean;
+  displayOrder: number;
+  isVisible: boolean;
+  seo: DoctorSeo;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CmsDoctorListResponse {
+  doctors: CmsDoctor[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface DoctorQueryParams {
+  page?: number;
+  limit?: number;
+  status?: string;
+  department?: string;
+  featured?: boolean;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+}
+
+// ─── Doctor CMS API ───────────────────────────────────────────────────────────
+
+async function fetchAdminReal<T>(path: string): Promise<T> {
+  const res = await fetch(`${BACKEND_API}/${path}`, {
+    cache: "no-store",
+    headers: { "Content-Type": "application/json" },
+  });
+  if (!res.ok) {
+    const errorText = await res.text();
+    let errorMessage = `Failed to fetch ${path}`;
+    try { const parsed = JSON.parse(errorText); errorMessage = parsed.message || errorMessage; } catch {}
+    throw new ApiError(res.status, errorMessage);
+  }
+  const result = await res.json();
+  return result as T;
+}
+
+async function mutateAdminReal<T>(path: string, data: unknown, method: "POST" | "PUT" | "PATCH" | "DELETE" = "PUT"): Promise<T> {
+  const res = await fetch(`${BACKEND_API}/${path}`, {
+    method,
+    headers: { "Content-Type": "application/json" },
+    body: data !== undefined ? JSON.stringify(data) : undefined,
+  });
+  if (!res.ok) {
+    const errorText = await res.text();
+    let errorMessage = `Failed to ${method} ${path}`;
+    try { const parsed = JSON.parse(errorText); errorMessage = parsed.message || errorMessage; } catch {}
+    throw new ApiError(res.status, errorMessage);
+  }
+  const result = await res.json();
+  return result.data as T;
+}
+
+export const getCmsDoctors = (params: DoctorQueryParams = {}) => {
+  const q = new URLSearchParams(params as Record<string, string>).toString();
+  return fetchAdminReal<{ data: CmsDoctor[]; total: number; page: number; limit: number; }>(`admin/doctors${q ? `?${q}` : ""}`);
+};
+export const getCmsDoctorById = (id: string) => fetchAdminReal<{ data: CmsDoctor }>(`admin/doctors/${id}`);
+export const createCmsDoctor = (data: Partial<CmsDoctor>) => mutateAdminReal<CmsDoctor>("admin/doctors", data, "POST");
+export const updateCmsDoctor = (id: string, data: Partial<CmsDoctor>) => mutateAdminReal<CmsDoctor>(`admin/doctors/${id}`, data, "PUT");
+export const patchCmsDoctor = (id: string, data: Partial<CmsDoctor>) => mutateAdminReal<CmsDoctor>(`admin/doctors/${id}`, data, "PATCH");
+export const deleteCmsDoctor = (id: string) => mutateAdminReal<null>(`admin/doctors/${id}`, undefined, "DELETE");
+export const toggleCmsDoctorVisibility = (id: string) => mutateAdminReal<CmsDoctor>(`admin/doctors/${id}/toggle-visibility`, {}, "PATCH");
+export const toggleCmsDoctorFeatured = (id: string) => mutateAdminReal<CmsDoctor>(`admin/doctors/${id}/toggle-featured`, {}, "PATCH");
+export const reorderCmsDoctors = (updates: { id: string; displayOrder: number }[]) =>
+  mutateAdminReal<null>("admin/doctors/reorder", updates, "PATCH");
+
+// ─── Department CMS Types ─────────────────────────────────────────────────────
+
+export interface DeptService {
+  en: string;
+  bn: string;
+}
+
+export interface DeptSeo {
+  metaTitle: BilingualField;
+  metaDescription: BilingualField;
+  keywords: string[];
+}
+
+export interface CmsDepartment {
+  _id: string;
+  slug: string;
+  name: BilingualField;
+  icon: string;
+  image: string;
+  shortDescription: BilingualField;
+  description: BilingualField;
+  services: DeptService[];
+  headDoctor: BilingualField;
+  availableDoctors: number;
+  available: boolean;
+  displayOrder: number;
+  isVisible: boolean;
+  seo: DeptSeo;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CmsDepartmentListResponse {
+  data: CmsDepartment[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+// ─── Department CMS API ───────────────────────────────────────────────────────
+
+export const getCmsDepartments = (params: { page?: number; limit?: number; search?: string } = {}) => {
+  const q = new URLSearchParams(params as Record<string, string>).toString();
+  return fetchAdminReal<{ data: CmsDepartment[]; total: number; page: number; limit: number }>(`admin/departments${q ? `?${q}` : ""}`);
+};
+export const getCmsDepartmentById = (id: string) => fetchAdminReal<{ data: CmsDepartment }>(`admin/departments/${id}`);
+export const createCmsDepartment = (data: Partial<CmsDepartment>) => mutateAdminReal<CmsDepartment>("admin/departments", data, "POST");
+export const updateCmsDepartment = (id: string, data: Partial<CmsDepartment>) => mutateAdminReal<CmsDepartment>(`admin/departments/${id}`, data, "PUT");
+export const patchCmsDepartment = (id: string, data: Partial<CmsDepartment>) => mutateAdminReal<CmsDepartment>(`admin/departments/${id}`, data, "PATCH");
+export const deleteCmsDepartment = (id: string) => mutateAdminReal<null>(`admin/departments/${id}`, undefined, "DELETE");
+export const toggleCmsDeptVisibility = (id: string) => mutateAdminReal<CmsDepartment>(`admin/departments/${id}/toggle-visibility`, {}, "PATCH");
+export const reorderCmsDepartments = (updates: { id: string; displayOrder: number }[]) =>
+  mutateAdminReal<null>("admin/departments/reorder", updates, "PATCH");
+
+// ─── Departments Page CMS Types ───────────────────────────────────────────────
+
+export interface CmsFeature {
+  icon: string;
+  title: BilingualField;
+  description: BilingualField;
+  color: string;
+  bg: string;
+  isVisible: boolean;
+  displayOrder: number;
+}
+
+export interface CmsTestimonial {
+  name: string;
+  department: string;
+  rating: number;
+  text: BilingualField;
+  avatar: string;
+  color: string;
+  isVisible: boolean;
+  displayOrder: number;
+}
+
+export interface CmsDepartmentsPage {
+  _id?: string;
+  title: BilingualField;
+  subtitle: BilingualField;
+  hospitalStats: {
+    patientsCount: string;
+    yearsOfService: string;
+  };
+  features: CmsFeature[];
+  testimonials: CmsTestimonial[];
+  cta: {
+    title: BilingualField;
+    description: BilingualField;
+    primaryBtn: { label: BilingualField; link: string };
+    secondaryBtn: { label: BilingualField; link: string };
+  };
+  seo: {
+    metaTitle: BilingualField;
+    metaDescription: BilingualField;
+  };
+}
+
+// ─── Departments Page CMS API ─────────────────────────────────────────────────
+
+export const getCmsDepartmentsPageConfig = () => fetchAdminReal<{ data: CmsDepartmentsPage }>("admin/departments/page-config");
+export const updateCmsDepartmentsPageConfig = (data: Partial<CmsDepartmentsPage>) => mutateAdminReal<CmsDepartmentsPage>("admin/departments/page-config", data, "PUT");
+
+// ─── Specialization CMS Types ─────────────────────────────────────────────────
+
+export interface CmsSpecialization {
+  _id: string;
+  name: BilingualField;
+  slug: string;
+  departmentSlug: string;
+  description: BilingualField;
+  isVisible: boolean;
+  displayOrder: number;
+  seo: {
+    metaTitle: BilingualField;
+    metaDescription: BilingualField;
+  };
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+// ─── Specialization CMS API ─────────────────────────────────────────────────
+
+export const getCmsSpecializations = (params: { page?: number; limit?: number; search?: string; departmentSlug?: string } = {}) => {
+  const q = new URLSearchParams(params as Record<string, string>).toString();
+  return fetchAdminReal<{ data: CmsSpecialization[]; total: number; page: number; limit: number }>(`admin/specializations${q ? `?${q}` : ""}`);
+};
+export const getCmsSpecializationById = (id: string) => fetchAdminReal<{ data: CmsSpecialization }>(`admin/specializations/${id}`);
+export const createCmsSpecialization = (data: Partial<CmsSpecialization>) => mutateAdminReal<CmsSpecialization>("admin/specializations", data, "POST");
+export const updateCmsSpecialization = (id: string, data: Partial<CmsSpecialization>) => mutateAdminReal<CmsSpecialization>(`admin/specializations/${id}`, data, "PUT");
+export const patchCmsSpecialization = (id: string, data: Partial<CmsSpecialization>) => mutateAdminReal<CmsSpecialization>(`admin/specializations/${id}`, data, "PATCH");
+export const deleteCmsSpecialization = (id: string) => mutateAdminReal<null>(`admin/specializations/${id}`, undefined, "DELETE");
+export const reorderCmsSpecializations = (updates: { id: string; displayOrder: number }[]) =>
+  mutateAdminReal<null>("admin/specializations/reorder", updates, "PATCH");

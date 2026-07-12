@@ -1,43 +1,14 @@
 "use client";
 
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
-import Link from "next/link";
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { FaUserMd, FaCalendarAlt, FaCheckCircle } from "react-icons/fa";
 import { useLanguage } from "@/context/LanguageContext";
-
-interface Doctor {
-  id: number;
-  name: { en: string; bn: string };
-  slug: string;
-  specialization: { en: string; bn: string };
-  qualification: string;
-  experience: { en: string; bn: string };
-  department: { en: string; bn: string };
-  designation: { en: string; bn: string };
-  image: string;
-  phone: string;
-  email: string;
-  chamberTime: { en: string; bn: string };
-  consultationFee: number;
-  languages: string[];
-  about: { en: string; bn: string };
-  services: Array<{ en: string; bn: string }>;
-  available: boolean;
-}
-
-const fetchDoctors = async (): Promise<Doctor[]> => {
-  const res = await fetch("/data/doctors.json", { cache: "no-store" });
-  if (!res.ok) throw new Error("Failed to fetch doctors");
-  return res.json();
-};
+import { useDoctors } from "@/hooks/useDoctors";
 
 export default function DoctorDirectoryPage() {
-  const { data: doctors, isLoading, isError } = useQuery({
-    queryKey: ["doctors"],
-    queryFn: fetchDoctors,
-  });
+  const { data: doctors, isLoading, isError } = useDoctors();
   const { lang } = useLanguage();
 
   if (isLoading) {
@@ -106,7 +77,7 @@ export default function DoctorDirectoryPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {doctors.map((doctor, index) => (
             <motion.div
-              key={doctor.id}
+              key={doctor._id || doctor.slug || index}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
