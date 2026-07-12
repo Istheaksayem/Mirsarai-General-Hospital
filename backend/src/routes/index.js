@@ -60,12 +60,16 @@ router.get('/', (req, res) => {
   });
 });
 
-// ── Public Routes ──────────────────────────────────────────────────────────────
-router.use('/doctors', doctorRoutes);
-router.use('/departments', departmentRoutes);
-router.use('/specializations', specializationRoutes);
-router.use('/appointments', appointmentRoutes);
-router.use('/services', serviceRoutes);
+// ============================================
+// MODULE ROUTES
+// ============================================
+import homepageRoutes from './homepage.routes.js';
+import aboutCMSRoutes from './aboutCMS.routes.js';
+import authRoutes from './auth.routes.js';
+// import userRoutes from './user.routes.js';
+// import doctorRoutes from './doctor.routes.js';
+// import patientRoutes from './patient.routes.js';
+// import appointmentRoutes from './appointment.routes.js';
 
 // ── Auth Routes ───────────────────────────────────────────────────────────────
 router.use('/auth', authRoutes);
@@ -74,40 +78,10 @@ router.use('/auth', authRoutes);
 router.use('/about', aboutCMSRoutes);
 router.use('/homepage', homepageRoutes);
 
-// ── Admin CMS Routes (authenticated) ──────────────────────────────────────────
-router.use('/admin/doctors', authenticate, authorize('super-admin'), adminDoctorRoutes);
-router.use('/admin/departments', authenticate, authorize('super-admin'), adminDepartmentRoutes);
-router.use('/admin/specializations', authenticate, authorize('super-admin'), adminSpecializationRoutes);
-router.use('/admin/appointments', authenticate, authorize('super-admin'), adminAppointmentRoutes);
-router.use('/admin/services', authenticate, authorize('super-admin'), adminServiceRoutes);
-
-/**
- * @route  POST /api/v1/admin/upload
- * @desc   Upload an image (base64) and return the public URL
- * @access Admin
- */
-router.post('/admin/upload', authenticate, authorize('super-admin'), catchAsync(async (req, res) => {
-  const { image } = req.body;
-  if (!image) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Missing image data');
-  }
-
-  const mimeTypeMatch = image.match(/data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+);base64,/);
-  if (!mimeTypeMatch) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid base64 image encoding');
-  }
-
-  const extension = mimeTypeMatch[1].split('/')[1] || 'png';
-  const base64Data = image.replace(/^data:image\/[a-z]+;base64,/, '');
-  const filename = `${crypto.randomBytes(16).toString('hex')}.${extension}`;
-  const uploadDir = path.join(process.cwd(), 'public/uploads');
-
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-  }
-
-  fs.writeFileSync(path.join(uploadDir, filename), base64Data, 'base64');
-  sendSuccess(res, StatusCodes.OK, { url: `/uploads/${filename}` }, 'Image uploaded successfully');
-}));
+router.use('/auth', authRoutes);
+// router.use('/users', userRoutes);
+// router.use('/doctors', doctorRoutes);
+// router.use('/patients', patientRoutes);
+// router.use('/appointments', appointmentRoutes);
 
 export default router;

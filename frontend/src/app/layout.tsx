@@ -5,6 +5,7 @@ import QueryProvider from "@/components/QueryProvider";
 import ThemeProvider from "@/components/ThemeProvider";
 import LayoutContent from "@/components/LayoutContent";
 import LenisProvider from "@/components/LenisProvider";
+import AuthProvider from "@/components/auth/AuthProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,13 +34,15 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col font-sans bg-background text-foreground transition-colors duration-300">
-        <QueryProvider>
-          <LenisProvider>
-            <ThemeProvider>
-              <LayoutContent>{children}</LayoutContent>
-            </ThemeProvider>
-          </LenisProvider>
-        </QueryProvider>
+        <AuthProvider>
+          <QueryProvider>
+            <LenisProvider>
+              <ThemeProvider>
+                <LayoutContent>{children}</LayoutContent>
+              </ThemeProvider>
+            </LenisProvider>
+          </QueryProvider>
+        </AuthProvider>
       </body>
     </html>
   );

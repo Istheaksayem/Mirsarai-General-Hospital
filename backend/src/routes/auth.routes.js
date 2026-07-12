@@ -1,13 +1,12 @@
 import express from 'express';
-import { authenticate, authorize } from '../middlewares/auth.middleware.js';
-import validate from '../middlewares/validate.middleware.js';
-import { loginSchema, registerSchema } from '../validators/auth.validator.js';
-import { login, register, getMe } from '../controllers/auth.controller.js';
+import { registerUser, verifyOTP, loginUser, getMe } from '../controllers/auth.controller.js';
+import { authenticate } from '../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
-router.post('/login', validate(loginSchema), login);
-router.post('/register', authenticate, authorize('super-admin'), validate(registerSchema), register);
+router.post('/register', registerUser);
+router.post('/verify-otp', verifyOTP);
+router.post('/login', loginUser);
 router.get('/me', authenticate, getMe);
 
 export default router;
