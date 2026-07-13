@@ -753,3 +753,77 @@ export const deleteCmsAppointment = (id: string) =>
 
 export const updateCmsAppointmentStatus = (id: string, status: string) =>
   mutateAdminReal<CmsAppointment>(`admin/appointments/${id}/status`, { status }, "PATCH");
+
+// ─── Service Page CMS Types ─────────────────────────────────────────────────
+
+export interface ServicePageFeature {
+  title: BilingualField;
+  description: BilingualField;
+  icon: string;
+}
+
+export interface ServicePageCategory {
+  category: BilingualField;
+  icon: string;
+  accent: string;
+  tests: BilingualField[];
+  items: BilingualField[];
+}
+
+export interface ServicePageWorkingHours {
+  weekdays: string;
+  weekends: string;
+  emergency: BilingualField;
+}
+
+export interface ServicePageStat {
+  value: string;
+  label: BilingualField;
+}
+
+export interface ServicePageGuideline {
+  en: string;
+  bn: string;
+}
+
+export interface ServicePageVaccinationEntry {
+  age: BilingualField;
+  vaccines: string[];
+}
+
+export interface ServicePageSeo {
+  metaTitle: BilingualField;
+  metaDescription: BilingualField;
+}
+
+export type ServicePageType = "diagnostic" | "nicu";
+
+export interface ServicePageData {
+  _id?: string;
+  type: ServicePageType;
+  title: BilingualField;
+  subtitle: BilingualField;
+  heroDescription: BilingualField;
+  backgroundImage: string;
+  description: BilingualField;
+  features: ServicePageFeature[];
+  services: ServicePageCategory[];
+  workingHours?: ServicePageWorkingHours;
+  statistics: ServicePageStat[];
+  equipment: BilingualField[];
+  guidelines: ServicePageGuideline[];
+  vaccinationSchedule: ServicePageVaccinationEntry[];
+  seo?: ServicePageSeo;
+  createdBy?: string;
+  updatedBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+// ─── Service Page CMS API ───────────────────────────────────────────────────
+
+export const getServicePageData = (type: string) =>
+  fetchAdminReal<{ data: ServicePageData }>(`admin/service-page/${type}`);
+
+export const updateServicePageData = (type: string, data: Partial<ServicePageData>) =>
+  mutateAdminReal<ServicePageData>(`admin/service-page/${type}`, data, "PUT");

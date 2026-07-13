@@ -1,5 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+
 export interface Feature {
   title: string;
   description: string;
@@ -10,6 +12,8 @@ export interface ServiceCategory {
   category: string;
   tests?: string[];
   items?: string[];
+  icon: string;
+  accent: string;
 }
 
 export interface Statistic {
@@ -24,7 +28,7 @@ export interface WorkingHours {
 }
 
 export interface DiagnosticService {
-  id: number;
+  type: string;
   title: string;
   subtitle: string;
   heroDescription: string;
@@ -36,19 +40,16 @@ export interface DiagnosticService {
   statistics: Statistic[];
 }
 
-export interface DiagnosticData {
-  diagnostic: DiagnosticService;
-}
-
-const fetchDiagnosticService = async (): Promise<DiagnosticData> => {
-  const res = await fetch("/data/diagnosticService.json");
+const fetchDiagnosticService = async (lang = "en"): Promise<DiagnosticService> => {
+  const res = await fetch(`${API_URL}/service-page/diagnostic-services?lang=${lang}`, { cache: "no-store" });
   if (!res.ok) throw new Error("Failed to fetch diagnostic service data");
-  return res.json();
+  const json = await res.json();
+  return json.data as DiagnosticService;
 };
 
-export const useDiagnosticService = () =>
-  useQuery<DiagnosticData>({
-    queryKey: ["diagnosticService"],
-    queryFn: fetchDiagnosticService,
+export const useDiagnosticService = (lang = "en") =>
+  useQuery<DiagnosticService>({
+    queryKey: ["diagnosticServices", lang],
+    queryFn: () => fetchDiagnosticService(lang),
     staleTime: 1000 * 60 * 15,
   });
