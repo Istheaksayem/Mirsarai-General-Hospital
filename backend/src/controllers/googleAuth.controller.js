@@ -44,7 +44,6 @@ export const googleAuth = async (req, res) => {
         isVerified: true,
         role: 'patient', // Default role
         isActive: true,
-        phone: '', // Will be required to complete profile later
       });
     }
 

@@ -14,6 +14,14 @@ const envSchema = z.object({
   CLIENT_URL: z.string().url().default('http://localhost:3000'),
   RATE_LIMIT_WINDOW_MS: z.string().default('900000'),
   RATE_LIMIT_MAX_REQUESTS: z.string().default('100'),
+
+  // SMTP (Email)
+  SMTP_HOST: z.string().min(1, 'SMTP host is required'),
+  SMTP_PORT: z.string().default('587'),
+  SMTP_USER: z.string().min(1, 'SMTP user is required'),
+  SMTP_PASS: z.string().min(1, 'SMTP password is required'),
+  FROM_EMAIL: z.string().email('Invalid from email'),
+  FROM_EMAIL_NAME: z.string().default('General Hospital'),
 });
 
 // Validate environment variables
@@ -45,5 +53,13 @@ export default {
   rateLimit: {
     windowMs: parseInt(env.RATE_LIMIT_WINDOW_MS, 10),
     maxRequests: parseInt(env.RATE_LIMIT_MAX_REQUESTS, 10),
+  },
+  smtp: {
+    host: env.SMTP_HOST,
+    port: parseInt(env.SMTP_PORT, 10),
+    user: env.SMTP_USER,
+    pass: env.SMTP_PASS,
+    fromEmail: env.FROM_EMAIL,
+    fromName: env.FROM_EMAIL_NAME,
   },
 };
