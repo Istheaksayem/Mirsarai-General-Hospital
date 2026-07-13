@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { FaEnvelope } from "react-icons/fa";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,9 +13,9 @@ import { motion } from "framer-motion";
 import { loginSchema, LoginFormValues } from "@/lib/validations/auth.schema";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 const LoginForm = () => {
-  const [serverError, setServerError] = useState<string | null>(null);
   const router = useRouter();
 
   const {
@@ -27,8 +27,54 @@ const LoginForm = () => {
   });
 
   const onSubmit = async (data: LoginFormValues) => {
-    setServerError(null);
     try {
+      // Step 1: Call backend directly to detect field-specific errors
+      const checkRes = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/login`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: data.email, password: data.password }),
+        }
+      );
+      const checkData = await checkRes.json();
+
+      if (!checkRes.ok) {
+        // Use errorCode for precise field-specific toast messages
+        switch (checkData.errorCode) {
+          case "EMAIL_NOT_FOUND":
+            toast.error("No account found with this email address.", {
+              id: "email-error",
+              icon: "✉️",
+            });
+            break;
+          case "WRONG_PASSWORD":
+            toast.error("Incorrect password. Please try again.", {
+              id: "password-error",
+              icon: "🔒",
+            });
+            break;
+          case "EMAIL_NOT_VERIFIED":
+            toast.error(
+              "Your email is not verified. Please complete OTP verification first.",
+              { id: "verify-error", icon: "📧" }
+            );
+            break;
+          case "ACCOUNT_DEACTIVATED":
+            toast.error(
+              "Your account has been deactivated. Please contact support.",
+              { id: "account-error", icon: "🚫" }
+            );
+            break;
+          default:
+            toast.error(checkData.message || "Login failed. Please try again.", {
+              id: "login-error",
+            });
+        }
+        return;
+      }
+
+      // Step 2: Credentials are valid — now use NextAuth signIn for session
       const res = await signIn("credentials", {
         redirect: false,
         email: data.email,
@@ -36,15 +82,19 @@ const LoginForm = () => {
       });
 
       if (res?.error) {
-        setServerError(res.error);
+        toast.error("Login failed. Please try again.", { id: "signin-error" });
       } else {
-        router.push("/dashboard"); // Adjust to your desired post-login route
+        toast.success("Welcome back! Signing you in...", { id: "login-success" });
+        router.push("/dashboard");
         router.refresh();
       }
-    } catch (error) {
-      setServerError("An unexpected error occurred.");
+    } catch {
+      toast.error("An unexpected error occurred. Please try again.", {
+        id: "unexpected-error",
+      });
     }
   };
+
 
   return (
     <motion.div
@@ -57,12 +107,6 @@ const LoginForm = () => {
         <h2 className="text-3xl font-extrabold text-gray-900 mb-2">Welcome Back</h2>
         <p className="text-gray-500 font-medium">Sign in to continue</p>
       </div>
-
-      {serverError && (
-        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded text-sm text-center">
-          {serverError}
-        </div>
-      )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <AuthInput
@@ -110,7 +154,7 @@ const LoginForm = () => {
       </form>
 
       <p className="text-center mt-8 text-gray-600 font-medium">
-        Don't have an account?{" "}
+        Don&apos;t have an account?{" "}
         <Link href="/register" className="text-primary hover:text-primary/80 font-bold transition-colors">
           Create Account
         </Link>

@@ -182,7 +182,8 @@ export const loginUser = async (req, res) => {
     if (!user) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         success: false,
-        message: 'Invalid credentials',
+        errorCode: 'EMAIL_NOT_FOUND',
+        message: 'No account found with this email address.',
       });
     }
 
@@ -190,6 +191,7 @@ export const loginUser = async (req, res) => {
     if (!user.isActive) {
       return res.status(StatusCodes.FORBIDDEN).json({
         success: false,
+        errorCode: 'ACCOUNT_DEACTIVATED',
         message: 'Your account has been deactivated. Please contact support.',
       });
     }
@@ -198,6 +200,7 @@ export const loginUser = async (req, res) => {
     if (!user.isVerified) {
       return res.status(StatusCodes.FORBIDDEN).json({
         success: false,
+        errorCode: 'EMAIL_NOT_VERIFIED',
         message: 'Please verify your email via OTP before logging in.',
       });
     }
@@ -208,7 +211,8 @@ export const loginUser = async (req, res) => {
     if (!isMatch) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         success: false,
-        message: 'Invalid credentials',
+        errorCode: 'WRONG_PASSWORD',
+        message: 'Incorrect password. Please try again.',
       });
     }
 
