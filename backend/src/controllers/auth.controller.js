@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/user.model.js';
+import PendingRegistration from '../models/pendingRegistration.model.js';
 import env from '../config/env.js';
 import { StatusCodes } from 'http-status-codes';
 import { registerSchema, loginSchema } from '../validators/auth.validator.js';
@@ -17,7 +18,8 @@ const generateToken = (id) => {
 };
 
 /**
- * @desc    Register a new user (Step 1: generate and send OTP)
+ * @desc    Register a new user (Step 1: save to PendingRegistration, send OTP)
+ *          NOTE: No User document is created at this step.
  * @route   POST /api/v1/auth/register
  * @access  Public
  */
@@ -26,13 +28,12 @@ export const registerUser = async (req, res) => {
     // Validate request body
     const validatedData = registerSchema.parse(req.body);
 
-    // Check if user already exists
-    let user = await User.findOne({ email: validatedData.email });
-    
-    if (user && user.isVerified) {
+    // Check if a verified user already exists with this email
+    const existingUser = await User.findOne({ email: validatedData.email });
+    if (existingUser) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
-        message: 'User with this email already exists',
+        message: 'An account with this email already exists. Please login.',
       });
     }
 
@@ -40,39 +41,34 @@ export const registerUser = async (req, res) => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
-    if (user) {
-      // User exists but unverified, update their OTP
-      user.otp = otp;
-      user.otpExpires = otpExpires;
-      user.fullName = validatedData.fullName;
-      user.phone = validatedData.phone;
-      user.password = validatedData.password;
-      await user.save();
-    } else {
-      // Create unverified user
-      user = await User.create({
+    // Upsert into PendingRegistration (no User created yet)
+    await PendingRegistration.findOneAndUpdate(
+      { email: validatedData.email },
+      {
         fullName: validatedData.fullName,
         email: validatedData.email,
         phone: validatedData.phone,
         password: validatedData.password,
-        isVerified: false,
         otp,
         otpExpires,
-      });
-    }
+      },
+      { upsert: true, new: true, setDefaultsOnInsert: true, runValidators: false }
+    );
 
     // Send OTP via email
     try {
       await sendEmail({
-        email: user.email,
+        email: validatedData.email,
         subject: 'Your Registration OTP',
         message: `Your OTP for registration is: ${otp}\nIt is valid for 10 minutes.`,
       });
     } catch (emailError) {
       console.error('Email Sending Error:', emailError);
+      // Clean up the pending record if email fails
+      await PendingRegistration.deleteOne({ email: validatedData.email });
       return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         success: false,
-        message: 'Failed to send OTP email',
+        message: 'Failed to send OTP email. Please try again.',
       });
     }
 
@@ -98,7 +94,7 @@ export const registerUser = async (req, res) => {
 };
 
 /**
- * @desc    Verify OTP for registration
+ * @desc    Verify OTP — on success, create the actual User in DB
  * @route   POST /api/v1/auth/verify-otp
  * @access  Public
  */
@@ -113,41 +109,42 @@ export const verifyOTP = async (req, res) => {
       });
     }
 
-    const user = await User.findOne({ email }).select('+password');
+    // Look in PendingRegistration, NOT in User
+    const pending = await PendingRegistration.findOne({ email });
 
-    if (!user) {
+    if (!pending) {
       return res.status(StatusCodes.NOT_FOUND).json({
         success: false,
-        message: 'User not found',
+        message: 'No pending registration found. Please register again.',
       });
     }
 
-    if (user.isVerified) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        success: false,
-        message: 'User is already verified',
-      });
-    }
-
-    if (user.otp !== otp) {
+    if (pending.otp !== otp) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
         message: 'Invalid OTP',
       });
     }
 
-    if (user.otpExpires < new Date()) {
+    if (pending.otpExpires < new Date()) {
+      await PendingRegistration.deleteOne({ email });
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
-        message: 'OTP has expired',
+        message: 'OTP has expired. Please register again.',
       });
     }
 
-    // Mark user as verified and clear OTP
-    user.isVerified = true;
-    user.otp = undefined;
-    user.otpExpires = undefined;
-    await user.save();
+    // OTP is valid — NOW create the actual User in the database
+    const user = await User.create({
+      fullName: pending.fullName,
+      email: pending.email,
+      phone: pending.phone,
+      password: pending.password, // already hashed by PendingRegistration pre-save hook
+      isVerified: true,
+    });
+
+    // Remove the pending registration record
+    await PendingRegistration.deleteOne({ email });
 
     // Generate token
     const token = generateToken(user._id);
@@ -185,7 +182,8 @@ export const loginUser = async (req, res) => {
     if (!user) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         success: false,
-        message: 'Invalid credentials',
+        errorCode: 'EMAIL_NOT_FOUND',
+        message: 'No account found with this email address.',
       });
     }
 
@@ -193,6 +191,7 @@ export const loginUser = async (req, res) => {
     if (!user.isActive) {
       return res.status(StatusCodes.FORBIDDEN).json({
         success: false,
+        errorCode: 'ACCOUNT_DEACTIVATED',
         message: 'Your account has been deactivated. Please contact support.',
       });
     }
@@ -201,17 +200,19 @@ export const loginUser = async (req, res) => {
     if (!user.isVerified) {
       return res.status(StatusCodes.FORBIDDEN).json({
         success: false,
+        errorCode: 'EMAIL_NOT_VERIFIED',
         message: 'Please verify your email via OTP before logging in.',
       });
     }
 
     // Check if password matches
     const isMatch = await user.comparePassword(validatedData.password);
-    
+
     if (!isMatch) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         success: false,
-        message: 'Invalid credentials',
+        errorCode: 'WRONG_PASSWORD',
+        message: 'Incorrect password. Please try again.',
       });
     }
 
@@ -252,7 +253,7 @@ export const getMe = async (req, res) => {
   try {
     // User is already attached to req by the auth middleware
     const user = await User.findById(req.user.id);
-    
+
     res.status(StatusCodes.OK).json({
       success: true,
       data: {

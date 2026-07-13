@@ -6,6 +6,7 @@ import ThemeProvider from "@/components/ThemeProvider";
 import LayoutContent from "@/components/LayoutContent";
 import LenisProvider from "@/components/LenisProvider";
 import AuthProvider from "@/components/auth/AuthProvider";
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,6 +40,17 @@ export default function RootLayout({
             <LenisProvider>
               <ThemeProvider>
                 <LayoutContent>{children}</LayoutContent>
+                <Toaster
+                  position="top-right"
+                  toastOptions={{
+                    duration: 4000,
+                    style: {
+                      borderRadius: "12px",
+                      fontWeight: "500",
+                      fontSize: "14px",
+                    },
+                  }}
+                />
               </ThemeProvider>
             </LenisProvider>
           </QueryProvider>

@@ -203,7 +203,7 @@ const RegisterForm = () => {
         <form onSubmit={handleOtpSubmit(onOtpVerification)} className="space-y-5">
           <AuthInput
             label="One-Time Password (OTP)"
-            // placeholder="Enter 6-digit OTP"
+            placeholder="Enter 6-digit OTP"
             icon={<FaEnvelope />}
             registration={registerOtp("otp")}
             error={otpErrors.otp?.message}
