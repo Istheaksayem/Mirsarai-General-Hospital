@@ -1,6 +1,7 @@
 "use client";
 
 import { useDiagnosticService } from "@/hooks/useDiagnosticService";
+import { useLanguage } from "@/context/LanguageContext";
 import { FaMicroscope, FaClock, FaUserMd, FaCheckCircle, FaFlask, FaHeartbeat } from "react-icons/fa";
 import { MdScience, MdLocalHospital } from "react-icons/md";
 import { motion } from "framer-motion";
@@ -17,14 +18,15 @@ const fadeUp = {
 };
 
 const DiagnosticServicePage = () => {
-  const { data, isLoading, isError } = useDiagnosticService();
+  const { lang, t } = useLanguage();
+  const { data, isLoading, isError } = useDiagnosticService(lang);
 
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--background)" }}>
         <div className="flex flex-col items-center gap-4">
           <div className="w-16 h-16 rounded-full border-4 border-[var(--color-accent)] border-t-transparent animate-spin" />
-          <p className="font-semibold text-lg" style={{ color: "var(--color-accent)" }}>Loading...</p>
+          <p className="font-semibold text-lg" style={{ color: "var(--color-accent)" }}>{t("Loading...", "লোড হচ্ছে...")}</p>
         </div>
       </div>
     );
@@ -33,12 +35,10 @@ const DiagnosticServicePage = () => {
   if (isError || !data) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--background)" }}>
-        <p className="text-red-500 text-lg font-medium">Failed to load diagnostic service data.</p>
+        <p className="text-red-500 text-lg font-medium">{t("Failed to load diagnostic service data.", "ডায়াগনস্টিক সেবার তথ্য লোড করতে ব্যর্থ হয়েছে।")}</p>
       </div>
     );
   }
-
-  const { diagnostic } = data;
 
   return (
     <main className="overflow-hidden" style={{ background: "var(--background)" }}>
@@ -46,8 +46,8 @@ const DiagnosticServicePage = () => {
       <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
-            src={diagnostic.backgroundImage}
-            alt="Diagnostic Lab"
+            src={data.backgroundImage}
+            alt={t("Diagnostic Lab", "ডায়াগনস্টিক ল্যাব")}
             className="w-full h-full object-cover"
             onError={(e) => {
               (e.target as HTMLImageElement).src =
@@ -59,10 +59,10 @@ const DiagnosticServicePage = () => {
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div className="border-l-4 border-orange-500 pl-6" {...fadeUp}>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-4 tracking-tight">
-              {diagnostic.title}
+              {data.title}
             </h1>
             <div className="flex items-center text-xs md:text-sm font-bold tracking-widest uppercase text-gray-300 gap-3">
-              <span className="text-white">DIAGNOSTIC</span>
+              <span className="text-white">{t("DIAGNOSTIC", "ডায়াগনস্টিক")}</span>
             </div>
           </motion.div>
         </div>
@@ -71,7 +71,7 @@ const DiagnosticServicePage = () => {
       {/* ── Features Grid ── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 -mt-16 relative z-20">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {diagnostic.features.map((feature: any, index: number) => {
+          {data.features.map((feature: any, index: number) => {
             const Icon = iconMap[feature.icon] || FaMicroscope;
             return (
               <motion.div
@@ -112,10 +112,10 @@ const DiagnosticServicePage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <motion.div {...fadeUp}>
             <h2 className="text-4xl md:text-5xl font-bold mb-8 leading-tight" style={{ color: "var(--color-primary)" }}>
-              Advanced <span style={{ color: "var(--color-secondary)" }}>Diagnostic</span> Solutions
+              {t("Advanced", "উন্নত")} <span style={{ color: "var(--color-secondary)" }}>{t("Diagnostic", "ডায়াগনস্টিক")}</span> {t("Solutions", "সমাধান")}
             </h2>
             <p className="text-lg leading-relaxed mb-8 text-gray-600 dark:text-gray-400">
-              {diagnostic.description}
+              {data.description}
             </p>
             <div className="space-y-4">
               <div className="flex items-center gap-4 p-3 rounded-xl hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-colors">
@@ -125,8 +125,8 @@ const DiagnosticServicePage = () => {
                   <FaClock style={{ color: "var(--color-primary)" }} size={20} />
                 </div>
                 <div>
-                  <p className="font-semibold" style={{ color: "var(--color-primary)" }}>Working Hours</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{diagnostic.workingHours.weekdays} (Weekdays)</p>
+                  <p className="font-semibold" style={{ color: "var(--color-primary)" }}>{t("Working Hours", "কাজের সময়")}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{data.workingHours.weekdays} ({t("Weekdays", "সপ্তাহের দিন")})</p>
                 </div>
               </div>
               <div className="flex items-center gap-4 p-3 rounded-xl hover:bg-green-50/50 dark:hover:bg-green-900/10 transition-colors">
@@ -136,8 +136,8 @@ const DiagnosticServicePage = () => {
                   <FaHeartbeat style={{ color: "var(--color-secondary)" }} size={20} />
                 </div>
                 <div>
-                  <p className="font-semibold" style={{ color: "var(--color-primary)" }}>Emergency Services</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{diagnostic.workingHours.emergency}</p>
+                  <p className="font-semibold" style={{ color: "var(--color-primary)" }}>{t("Emergency Services", "জরুরি সেবা")}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{data.workingHours.emergency}</p>
                 </div>
               </div>
             </div>
@@ -153,7 +153,7 @@ const DiagnosticServicePage = () => {
             />
             <img
               src="https://images.unsplash.com/photo-1579154204601-01588f351e67?w=800&h=600&fit=crop"
-              alt="Laboratory"
+              alt={t("Laboratory", "ল্যাবরেটরি")}
               className="relative z-10 w-full h-[400px] lg:h-[500px] object-cover rounded-[var(--radius-xl)] shadow-xl"
             />
           </motion.div>
@@ -171,18 +171,18 @@ const DiagnosticServicePage = () => {
             <div className="inline-block px-5 py-2 mb-6 text-sm font-bold tracking-wider uppercase text-white rounded-full"
               style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}
             >
-              Our Laboratory Services
+              {t("Our Laboratory Services", "আমাদের ল্যাবরেটরি সেবা")}
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight" style={{ color: "var(--color-primary)" }}>
-              Comprehensive Diagnostic Testing
+              {t("Comprehensive Diagnostic Testing", "ব্যাপক ডায়াগনস্টিক পরীক্ষা")}
             </h2>
             <p className="text-lg max-w-2xl mx-auto text-gray-500 dark:text-gray-400">
-              Accurate testing across multiple specialties with fast turnaround
+              {t("Accurate testing across multiple specialties with fast turnaround", "দ্রুত ফলাফল সহ বিভিন্ন বিশেষত্ব জুড়ে নির্ভুল পরীক্ষা")}
             </p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {diagnostic.services.map((service: any, index: number) => {
+            {data.services.map((service: any, index: number) => {
               const Icon = iconMap[service.icon] || MdScience;
               const accent = service.accent || "var(--color-primary)";
               return (
@@ -245,18 +245,18 @@ const DiagnosticServicePage = () => {
             <div className="inline-block px-5 py-2 mb-6 text-sm font-bold tracking-wider uppercase text-white rounded-full"
               style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}
             >
-              Our Impact
+              {t("Our Impact", "আমাদের প্রভাব")}
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight" style={{ color: "var(--color-primary)" }}>
-              Excellence in Numbers
+              {t("Excellence in Numbers", "সংখ্যায় শ্রেষ্ঠত্ব")}
             </h2>
             <p className="text-lg max-w-2xl mx-auto text-gray-500 dark:text-gray-400">
-              Trusted by thousands for accurate and timely diagnostic services
+              {t("Trusted by thousands for accurate and timely diagnostic services", "নির্ভুল ও সময়োপযোগী ডায়াগনস্টিক সেবার জন্য হাজার হাজার মানুষের আস্থা")}
             </p>
           </motion.div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-            {diagnostic.statistics.map((stat: any, i: number) => (
+            {data.statistics.map((stat: any, i: number) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 30 }}
@@ -287,10 +287,10 @@ const DiagnosticServicePage = () => {
       <section className="py-28 px-4 text-center">
         <motion.div className="max-w-3xl mx-auto" {...fadeUp}>
           <h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight tracking-tight" style={{ color: "var(--color-primary)" }}>
-            Need Diagnostic Services?
+            {t("Need Diagnostic Services?", "ডায়াগনস্টিক সেবা প্রয়োজন?")}
           </h2>
           <p className="text-lg mb-12 leading-relaxed max-w-xl mx-auto text-gray-500 dark:text-gray-400">
-            Book your test today or visit our diagnostic center for immediate service
+            {t("Book your test today or visit our diagnostic center for immediate service", "আজই আপনার পরীক্ষা বুক করুন বা তাৎক্ষণিক সেবার জন্য আমাদের ডায়াগনস্টিক সেন্টারে আসুন")}
           </p>
           <a
             href="/appointment?service=diagnostic"
@@ -299,7 +299,7 @@ const DiagnosticServicePage = () => {
               background: "linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%)",
             }}
           >
-            Book Diagnostic Test
+            {t("Book Diagnostic Test", "ডায়াগনস্টিক টেস্ট বুক করুন")}
           </a>
         </motion.div>
       </section>

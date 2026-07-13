@@ -1,65 +1,86 @@
 {
   "nicu": {
     "id": 2,
-    "title": "NICU & Baby Care",
-    "subtitle": "Specialized Neonatal Intensive Care Unit",
-    "heroDescription": "A dedicated unit providing specialized medical care for newborns, premature babies, and infants requiring intensive monitoring and treatment. Our NICU is equipped with advanced life-support systems and staffed by expert neonatologists and pediatric nurses.",
+    "title": { "en": "NICU & Baby Care", "bn": "এনআইসিইউ ও শিশু সেবা" },
+    "subtitle": { "en": "Specialized Neonatal Intensive Care Unit", "bn": "বিশেষায়িত নবজাতক নিবিড় পরিচর্যা ইউনিট" },
+    "heroDescription": { "en": "A dedicated unit providing specialized medical care for newborns, premature babies, and infants requiring intensive monitoring and treatment. Our NICU is equipped with advanced life-support systems and staffed by expert neonatologists and pediatric nurses.", "bn": "নবজাতক, অকালপ্রসবী শিশু এবং নিবিড় পর্যবেক্ষণ ও চিকিৎসার প্রয়োজন এমন শিশুদের জন্য বিশেষায়িত চিকিৎসা সেবা প্রদানকারী একটি নিবেদিত ইউনিট। আমাদের এনআইসিইউ উন্নত লাইফ-সাপোর্ট সিস্টেমে সজ্জিত এবং বিশেষজ্ঞ নিওনাটোলজিস্ট ও পেডিয়াট্রিক নার্সদের দ্বারা পরিচালিত।" },
     "backgroundImage": "/images/nicu-care.jpg",
-    "description": "Our Neonatal Intensive Care Unit (NICU) provides 24/7 specialized care for premature and critically ill newborns. With state-of-the-art equipment and a compassionate team of neonatologists, pediatric nurses, and support staff, we ensure the best possible care for your precious little ones.",
+    "description": { "en": "Our Neonatal Intensive Care Unit (NICU) provides 24/7 specialized care for premature and critically ill newborns. With state-of-the-art equipment and a compassionate team of neonatologists, pediatric nurses, and support staff, we ensure the best possible care for your precious little ones.", "bn": "আমাদের নিওনাটাল ইনটেনসিভ কেয়ার ইউনিট (এনআইসিইউ) অকালপ্রসবী ও গুরুতর অসুস্থ নবজাতকদের ২৪/৭ বিশেষায়িত সেবা প্রদান করে। অত্যাধুনিক সরঞ্জাম এবং নিওনাটোলজিস্ট, পেডিয়াট্রিক নার্স ও সহায়ক কর্মীদের একটি সহানুভূতিশীল দলের মাধ্যমে আমরা আপনার মূল্যবান ছোট্ট সন্তানের জন্য সর্বোত্তম সেবা নিশ্চিত করি।" },
     "features": [
-      { "title": "24/7 Monitoring", "description": "Round-the-clock supervision by trained medical staff", "icon": "FaHeartbeat" },
-      { "title": "Advanced Equipment", "description": "Ventilators, incubators, and monitoring systems", "icon": "FaLaptopMedical" },
-      { "title": "Expert Team", "description": "Specialized neonatologists and pediatric nurses", "icon": "FaUserNurse" },
-      { "title": "Family Support", "description": "Counseling and guidance for parents", "icon": "FaHandHoldingHeart" }
+      { "title": { "en": "24/7 Monitoring", "bn": "২৪/৭ মনিটরিং" }, "description": { "en": "Round-the-clock supervision by trained medical staff", "bn": "প্রশিক্ষিত চিকিৎসা কর্মীদের দ্বারা ২৪ ঘন্টা তত্ত্বাবধান" }, "icon": "FaHeartbeat" },
+      { "title": { "en": "Advanced Equipment", "bn": "অত্যাধুনিক সরঞ্জাম" }, "description": { "en": "Ventilators, incubators, and monitoring systems", "bn": "ভেন্টিলেটর, ইনকিউবেটর ও মনিটরিং সিস্টেম" }, "icon": "FaLaptopMedical" },
+      { "title": { "en": "Expert Team", "bn": "বিশেষজ্ঞ দল" }, "description": { "en": "Specialized neonatologists and pediatric nurses", "bn": "বিশেষায়িত নিওনাটোলজিস্ট ও পেডিয়াট্রিক নার্স" }, "icon": "FaUserNurse" },
+      { "title": { "en": "Family Support", "bn": "পরিবারিক সহায়তা" }, "description": { "en": "Counseling and guidance for parents", "bn": "পিতামাতার জন্য পরামর্শ ও নির্দেশনা" }, "icon": "FaHandHoldingHeart" }
     ],
     "services": [
       {
-        "category": "Neonatal Care",
+        "category": { "en": "Neonatal Care", "bn": "নবজাতক সেবা" },
         "icon": "FaBaby",
         "accent": "#f59e0b",
         "items": [
-          "Premature Baby Care", "Low Birth Weight Management", "Respiratory Distress Treatment",
-          "Neonatal Jaundice (Phototherapy)", "Birth Asphyxia Management", "Neonatal Sepsis Treatment",
-          "Temperature Regulation", "Feeding Support (NG Tube, IV)"
+          { "en": "Premature Baby Care", "bn": "অকালপ্রসবী শিশু সেবা" },
+          { "en": "Low Birth Weight Management", "bn": "কম ওজন ব্যবস্থাপনা" },
+          { "en": "Respiratory Distress Treatment", "bn": "শ্বাসকষ্ট চিকিৎসা" },
+          { "en": "Neonatal Jaundice (Phototherapy)", "bn": "নবজাতক জন্ডিস (ফটোথেরাপি)" },
+          { "en": "Birth Asphyxia Management", "bn": "জন্মগত শ্বাসকষ্ট ব্যবস্থাপনা" },
+          { "en": "Neonatal Sepsis Treatment", "bn": "নবজাতক সেপসিস চিকিৎসা" },
+          { "en": "Temperature Regulation", "bn": "তাপমাত্রা নিয়ন্ত্রণ" },
+          { "en": "Feeding Support (NG Tube, IV)", "bn": "খাদ্য সহায়তা (এনজি টিউব, আইভি)" }
         ]
       },
       {
-        "category": "Baby Care Services",
+        "category": { "en": "Baby Care Services", "bn": "শিশু সেবা" },
         "icon": "FaHeartbeat",
         "accent": "#ec4899",
         "items": [
-          "Well Baby Checkups", "Vaccination Programs", "Growth Monitoring",
-          "Nutritional Counseling", "Developmental Assessment", "Newborn Screening Tests",
-          "Breastfeeding Support", "Pediatric Consultations"
+          { "en": "Well Baby Checkups", "bn": "সুস্থ শিশু পরীক্ষা" },
+          { "en": "Vaccination Programs", "bn": "টিকাদান কর্মসূচি" },
+          { "en": "Growth Monitoring", "bn": "বৃদ্ধি পর্যবেক্ষণ" },
+          { "en": "Nutritional Counseling", "bn": "পুষ্টি পরামর্শ" },
+          { "en": "Developmental Assessment", "bn": "বিকাশ মূল্যায়ন" },
+          { "en": "Newborn Screening Tests", "bn": "নবজাতক স্ক্রিনিং টেস্ট" },
+          { "en": "Breastfeeding Support", "bn": "বুকের দুধ খাওয়ানো সহায়তা" },
+          { "en": "Pediatric Consultations", "bn": "শিশু বিশেষজ্ঞ পরামর্শ" }
         ]
       },
       {
-        "category": "Emergency Services",
+        "category": { "en": "Emergency Services", "bn": "জরুরি সেবা" },
         "icon": "FaAmbulance",
         "accent": "#ef4444",
         "items": [
-          "Neonatal Resuscitation", "Emergency Admissions", "Critical Care Support",
-          "Ambulance Service", "Transfer Facilities", "On-call Pediatricians"
+          { "en": "Neonatal Resuscitation", "bn": "নবজাতক পুনরুজ্জীবন" },
+          { "en": "Emergency Admissions", "bn": "জরুরি ভর্তি" },
+          { "en": "Critical Care Support", "bn": "নিবিড় পরিচর্যা সহায়তা" },
+          { "en": "Ambulance Service", "bn": "অ্যাম্বুলেন্স সেবা" },
+          { "en": "Transfer Facilities", "bn": "স্থানান্তর সুবিধা" },
+          { "en": "On-call Pediatricians", "bn": "কল অন শিশু বিশেষজ্ঞ" }
         ]
       }
     ],
     "equipment": [
-      "Neonatal Ventilators", "Infant Incubators", "Radiant Warmers", "Phototherapy Units",
-      "Cardiac Monitors", "Pulse Oximeters", "Infusion Pumps", "Bili Lights", "Oxygen Supply System"
+      { "en": "Neonatal Ventilators", "bn": "নবজাতক ভেন্টিলেটর" },
+      { "en": "Infant Incubators", "bn": "শিশু ইনকিউবেটর" },
+      { "en": "Radiant Warmers", "bn": "রেডিয়েন্ট ওয়ার্মার" },
+      { "en": "Phototherapy Units", "bn": "ফটোথেরাপি ইউনিট" },
+      { "en": "Cardiac Monitors", "bn": "কার্ডিয়াক মনিটর" },
+      { "en": "Pulse Oximeters", "bn": "পালস অক্সিমিটার" },
+      { "en": "Infusion Pumps", "bn": "ইনফিউশন পাম্প" },
+      { "en": "Bili Lights", "bn": "বিলি লাইট" },
+      { "en": "Oxygen Supply System", "bn": "অক্সিজেন সরবরাহ ব্যবস্থা" }
     ],
     "statistics": [
-      { "value": "500+", "label": "Babies Treated Annually" },
-      { "value": "95%", "label": "Success Rate" },
-      { "value": "24/7", "label": "Availability" },
-      { "value": "15+", "label": "NICU Beds" }
+      { "value": "500+", "label": { "en": "Babies Treated Annually", "bn": "বার্ষিক চিকিৎসা প্রদত্ত শিশু" } },
+      { "value": "95%", "label": { "en": "Success Rate", "bn": "সফলতার হার" } },
+      { "value": "24/7", "label": { "en": "Availability", "bn": "প্রাপ্যতা" } },
+      { "value": "15+", "label": { "en": "NICU Beds", "bn": "এনআইসিইউ শয্যা" } }
     ],
     "guidelines": [
-      "Parents can visit during designated hours (10 AM - 12 PM, 4 PM - 6 PM)",
-      "Only two visitors allowed at a time per baby",
-      "Proper hand hygiene mandatory before entering NICU",
-      "Mobile phones to be kept on silent mode",
-      "Photography requires permission from medical staff",
-      "Kangaroo Mother Care encouraged for stable babies"
+      { "en": "Parents can visit during designated hours (10 AM - 12 PM, 4 PM - 6 PM)", "bn": "পিতামাতা নির্ধারিত সময়ে (সকাল ১০-১২, বিকেল ৪-৬) দেখতে পারেন" },
+      { "en": "Only two visitors allowed at a time per baby", "bn": "প্রতি শিশুর জন্য একসাথে মাত্র দুইজন দর্শক অনুমোদিত" },
+      { "en": "Proper hand hygiene mandatory before entering NICU", "bn": "এনআইসিইউতে প্রবেশের আগে সঠিক হাত পরিষ্কার করা বাধ্যতামূলক" },
+      { "en": "Mobile phones to be kept on silent mode", "bn": "মোবাইল ফোন নীরব মোডে রাখতে হবে" },
+      { "en": "Photography requires permission from medical staff", "bn": "ছবি তোলার জন্য চিকিৎসা কর্মীদের অনুমতি প্রয়োজন" },
+      { "en": "Kangaroo Mother Care encouraged for stable babies", "bn": "স্থিতিশীল শিশুদের জন্য ক্যাঙ্গারু মাদার কেয়ার উৎসাহিত করা হয়" }
     ]
   }
 }

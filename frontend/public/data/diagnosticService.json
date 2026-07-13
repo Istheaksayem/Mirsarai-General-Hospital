@@ -1,77 +1,100 @@
 {
   "diagnostic": {
     "id": 1,
-    "title": "Diagnostic Services",
-    "subtitle": "Advanced Medical Testing & Laboratory Excellence",
-    "heroDescription": "State-of-the-art diagnostic center equipped with modern technology for accurate and timely results. Our experienced technicians and pathologists ensure precision in every test.",
+    "title": { "en": "Diagnostic Services", "bn": "ডায়াগনস্টিক সেবা" },
+    "subtitle": { "en": "Advanced Medical Testing & Laboratory Excellence", "bn": "উন্নত মেডিকেল পরীক্ষা ও ল্যাবরেটরি সেবা" },
+    "heroDescription": { "en": "State-of-the-art diagnostic center equipped with modern technology for accurate and timely results. Our experienced technicians and pathologists ensure precision in every test.", "bn": "আধুনিক প্রযুক্তিতে সজ্জিত অত্যাধুনিক ডায়াগনস্টিক সেন্টার যা নির্ভুল ও সময়োপযোগী ফলাফল প্রদান করে। আমাদের অভিজ্ঞ প্রযুক্তিবিদ ও প্যাথলজিস্টরা প্রতিটি পরীক্ষায় নির্ভুলতা নিশ্চিত করেন।" },
     "backgroundImage": "/images/diagnostic-lab.jpg",
-    "description": "Mirsarai General Hospital's Diagnostic Center offers comprehensive laboratory services with cutting-edge equipment and experienced medical professionals. We provide accurate, fast, and reliable test results to support effective diagnosis and treatment.",
+    "description": { "en": "Mirsarai General Hospital's Diagnostic Center offers comprehensive laboratory services with cutting-edge equipment and experienced medical professionals. We provide accurate, fast, and reliable test results to support effective diagnosis and treatment.", "bn": "মীরসরাই জেনারেল হাসপাতালের ডায়াগনস্টিক সেন্টার অত্যাধুনিক সরঞ্জাম ও অভিজ্ঞ চিকিৎসা পেশাদারদের সাথে ব্যাপক ল্যাবরেটরি সেবা প্রদান করে। আমরা কার্যকর রোগ নির্ণয় ও চিকিৎসা সমর্থনের জন্য নির্ভুল, দ্রুত এবং নির্ভরযোগ্য পরীক্ষার ফলাফল প্রদান করি।" },
     "features": [
-      { "title": "Advanced Equipment", "description": "Latest medical technology for precise diagnostic testing", "icon": "FaMicroscope" },
-      { "title": "Fast Results", "description": "Quick turnaround time for urgent test reports", "icon": "FaClock" },
-      { "title": "Experienced Staff", "description": "Qualified pathologists and lab technicians", "icon": "FaUserMd" },
-      { "title": "Quality Assurance", "description": "Stringent quality control for accurate results", "icon": "FaCheckCircle" }
+      { "title": { "en": "Advanced Equipment", "bn": "অত্যাধুনিক সরঞ্জাম" }, "description": { "en": "Latest medical technology for precise diagnostic testing", "bn": "নির্ভুল ডায়াগনস্টিক পরীক্ষার জন্য সর্বশেষ মেডিকেল প্রযুক্তি" }, "icon": "FaMicroscope" },
+      { "title": { "en": "Fast Results", "bn": "দ্রুত ফলাফল" }, "description": { "en": "Quick turnaround time for urgent test reports", "bn": "জরুরি পরীক্ষার রিপোর্টের জন্য দ্রুত সময়" }, "icon": "FaClock" },
+      { "title": { "en": "Experienced Staff", "bn": "অভিজ্ঞ কর্মীবাহিনী" }, "description": { "en": "Qualified pathologists and lab technicians", "bn": "যোগ্য প্যাথলজিস্ট এবং ল্যাব প্রযুক্তিবিদ" }, "icon": "FaUserMd" },
+      { "title": { "en": "Quality Assurance", "bn": "গুণগত মান নিশ্চিতকরণ" }, "description": { "en": "Stringent quality control for accurate results", "bn": "নির্ভুল ফলাফলের জন্য কঠোর মান নিয়ন্ত্রণ" }, "icon": "FaCheckCircle" }
     ],
     "services": [
       {
-        "category": "Clinical Pathology",
+        "category": { "en": "Clinical Pathology", "bn": "ক্লিনিক্যাল প্যাথলজি" },
         "icon": "FaFlask",
         "accent": "#1E2B7A",
         "tests": [
-          "Complete Blood Count (CBC)", "Blood Sugar (Fasting & Random)", "Lipid Profile",
-          "Liver Function Test (LFT)", "Kidney Function Test (KFT)", "Thyroid Function Test",
-          "Urine Routine Examination", "Stool Examination"
+          { "en": "Complete Blood Count (CBC)", "bn": "কমপ্লিট ব্লাড কাউন্ট (সিবিসি)" },
+          { "en": "Blood Sugar (Fasting & Random)", "bn": "ব্লাড সুগার (রোজা ও র্যান্ডম)" },
+          { "en": "Lipid Profile", "bn": "লিপিড প্রোফাইল" },
+          { "en": "Liver Function Test (LFT)", "bn": "লিভার ফাংশন টেস্ট (এলএফটি)" },
+          { "en": "Kidney Function Test (KFT)", "bn": "কিডনি ফাংশন টেস্ট (কেএফটি)" },
+          { "en": "Thyroid Function Test", "bn": "থাইরয়েড ফাংশন টেস্ট" },
+          { "en": "Urine Routine Examination", "bn": "ইউরিন রুটিন পরীক্ষা" },
+          { "en": "Stool Examination", "bn": "স্টুল পরীক্ষা" }
         ]
       },
       {
-        "category": "Biochemistry",
+        "category": { "en": "Biochemistry", "bn": "জৈব রসায়ন" },
         "icon": "FaMicroscope",
         "accent": "#76BC21",
         "tests": [
-          "Serum Electrolytes", "Cardiac Enzymes", "HbA1c (Glycated Hemoglobin)",
-          "Serum Protein", "Bilirubin (Total & Direct)", "Calcium & Phosphorus",
-          "Uric Acid", "Amylase & Lipase"
+          { "en": "Serum Electrolytes", "bn": "সিরাম ইলেক্ট্রোলাইট" },
+          { "en": "Cardiac Enzymes", "bn": "কার্ডিয়াক এনজাইম" },
+          { "en": "HbA1c (Glycated Hemoglobin)", "bn": "এইচবিএ১সি (গ্লাইকেটেড হিমোগ্লোবিন)" },
+          { "en": "Serum Protein", "bn": "সিরাম প্রোটিন" },
+          { "en": "Bilirubin (Total & Direct)", "bn": "বিলিরুবিন (মোট ও প্রত্যক্ষ)" },
+          { "en": "Calcium & Phosphorus", "bn": "ক্যালসিয়াম ও ফসফরাস" },
+          { "en": "Uric Acid", "bn": "ইউরিক অ্যাসিড" },
+          { "en": "Amylase & Lipase", "bn": "অ্যামাইলেজ ও লাইপেজ" }
         ]
       },
       {
-        "category": "Microbiology",
+        "category": { "en": "Microbiology", "bn": "অণুজীববিদ্যা" },
         "icon": "MdScience",
         "accent": "#f59e0b",
         "tests": [
-          "Blood Culture", "Urine Culture", "Stool Culture",
-          "Sputum Culture", "Wound Swab Culture", "Sensitivity Testing"
+          { "en": "Blood Culture", "bn": "ব্লাড কালচার" },
+          { "en": "Urine Culture", "bn": "ইউরিন কালচার" },
+          { "en": "Stool Culture", "bn": "স্টুল কালচার" },
+          { "en": "Sputum Culture", "bn": "স্পুটাম কালচার" },
+          { "en": "Wound Swab Culture", "bn": "ক্ষত স্থানের সোয়াব কালচার" },
+          { "en": "Sensitivity Testing", "bn": "সেনসিটিভিটি টেস্টিং" }
         ]
       },
       {
-        "category": "Serology & Immunology",
+        "category": { "en": "Serology & Immunology", "bn": "সেরোলজি ও ইমিউনোলজি" },
         "icon": "FaHeartbeat",
         "accent": "#ec4899",
         "tests": [
-          "HIV Screening", "Hepatitis B & C Markers", "Dengue NS1 & Antibody",
-          "Typhoid (Widal Test)", "VDRL/RPR", "Blood Group & Rh Typing",
-          "CRP (C-Reactive Protein)", "ASO Titre"
+          { "en": "HIV Screening", "bn": "এইচআইভি স্ক্রিনিং" },
+          { "en": "Hepatitis B & C Markers", "bn": "হেপাটাইটিস বি ও সি মার্কার" },
+          { "en": "Dengue NS1 & Antibody", "bn": "ডেঙ্গু এনএস১ ও অ্যান্টিবডি" },
+          { "en": "Typhoid (Widal Test)", "bn": "টাইফয়েড (উইডাল টেস্ট)" },
+          { "en": "VDRL/RPR", "bn": "ভিডিআরএল/আরপিআর" },
+          { "en": "Blood Group & Rh Typing", "bn": "ব্লাড গ্রুপ ও আরএইচ টাইপিং" },
+          { "en": "CRP (C-Reactive Protein)", "bn": "সিআরপি (সি-রিঅ্যাকটিভ প্রোটিন)" },
+          { "en": "ASO Titre", "bn": "এএসও টাইটার" }
         ]
       },
       {
-        "category": "Imaging Services",
+        "category": { "en": "Imaging Services", "bn": "ইমেজিং সেবা" },
         "icon": "MdLocalHospital",
         "accent": "#8b5cf6",
         "tests": [
-          "X-Ray (Digital)", "Ultrasound (USG)", "ECG (Electrocardiogram)",
-          "Echocardiography", "CT Scan (Available on referral)", "MRI (Available on referral)"
+          { "en": "X-Ray (Digital)", "bn": "এক্স-রে (ডিজিটাল)" },
+          { "en": "Ultrasound (USG)", "bn": "আল্ট্রাসাউন্ড (ইউএসজি)" },
+          { "en": "ECG (Electrocardiogram)", "bn": "ইসিজি (ইলেক্ট্রোকার্ডিওগ্রাম)" },
+          { "en": "Echocardiography", "bn": "ইকোকার্ডিওগ্রাফি" },
+          { "en": "CT Scan (Available on referral)", "bn": "সিটি স্ক্যান (রেফারেল সাপেক্ষে)" },
+          { "en": "MRI (Available on referral)", "bn": "এমআরআই (রেফারেল সাপেক্ষে)" }
         ]
       }
     ],
     "workingHours": {
       "weekdays": "8:00 AM - 10:00 PM",
       "weekends": "9:00 AM - 8:00 PM",
-      "emergency": "24/7 Available"
+      "emergency": { "en": "24/7 Available", "bn": "২৪/৭ উপলব্ধ" }
     },
     "statistics": [
-      { "value": "50,000+", "label": "Tests Conducted Annually" },
-      { "value": "100+", "label": "Different Test Types" },
-      { "value": "2-24hrs", "label": "Average Report Time" },
-      { "value": "99.5%", "label": "Accuracy Rate" }
+      { "value": "50,000+", "label": { "en": "Tests Conducted Annually", "bn": "বার্ষিক পরীক্ষা পরিচালিত" } },
+      { "value": "100+", "label": { "en": "Different Test Types", "bn": "বিভিন্ন পরীক্ষার ধরন" } },
+      { "value": "2-24hrs", "label": { "en": "Average Report Time", "bn": "গড় রিপোর্ট সময়" } },
+      { "value": "99.5%", "label": { "en": "Accuracy Rate", "bn": "নির্ভুলতার হার" } }
     ]
   }
 }

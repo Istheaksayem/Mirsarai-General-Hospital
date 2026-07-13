@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { Globe, Edit3, CheckCircle2, XCircle, Settings, Info, Target, ImageIcon, Briefcase, Building2, Stethoscope, Layers } from "lucide-react";
+import { Globe, Edit3, CheckCircle2, XCircle, Settings, Info, Target, ImageIcon, Briefcase, Building2, Stethoscope, Layers, Microscope, Baby, FileText, AlertTriangle, HelpCircle } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
@@ -45,6 +45,10 @@ export default function CMSPage() {
             { label: "Doctor CMS Hub", desc: "CMS view — visibility toggles, featured, quick actions", href: "/super-admin/cms/doctors", Icon: Stethoscope, color: "teal" },
             { label: "Individual Doctors", desc: "Manage doctor profiles, schedule, contact & SEO", href: "/super-admin/doctors", Icon: Stethoscope, color: "teal" },
             { label: "Specializations", desc: "Manage doctor specialization terms linked to departments", href: "/super-admin/cms/specializations", Icon: Layers, color: "rose" },
+            { label: "Service Pages", desc: "Manage Diagnostic, NICU & Baby Care page content", href: "/super-admin/cms/services", Icon: Microscope, color: "violet" },
+            { label: "Health Blog", desc: "Blog posts, categories, tags & hero", href: "/super-admin/cms/health-blog", Icon: FileText, color: "emerald" },
+            { label: "Emergency Info", desc: "Contacts, first aid, preparedness & hero", href: "/super-admin/cms/emergency-information", Icon: AlertTriangle, color: "red" },
+            { label: "FAQ", desc: "Categories, questions, answers & contact", href: "/super-admin/cms/faq", Icon: HelpCircle, color: "amber" },
           ].map(({ label, desc, href, Icon, color }) => (
             <div
               key={href}

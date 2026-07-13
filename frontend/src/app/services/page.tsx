@@ -55,7 +55,7 @@ const ServicesPage = () => {
       <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--background)" }}>
         <div className="flex flex-col items-center gap-4">
           <div className="w-16 h-16 rounded-full border-4 border-[var(--color-accent)] border-t-transparent animate-spin" />
-          <p className="font-semibold text-lg" style={{ color: "var(--color-accent)" }}>Loading...</p>
+          <p className="font-semibold text-lg" style={{ color: "var(--color-accent)" }}>{lang === "bn" ? "লোড হচ্ছে..." : "Loading..."}</p>
         </div>
       </div>
     );

@@ -3,8 +3,8 @@
 import React from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/context/LanguageContext";
+import { useEmergencyInfo, EmergencyInfoData } from "@/hooks/useEmergencyInfo";
 import {
   FaAmbulance,
   FaPhoneAlt,
@@ -21,45 +21,6 @@ import {
   FaExclamationTriangle,
 } from "react-icons/fa";
 
-interface EmergencyData {
-  hero: {
-    title: { en: string; bn: string };
-    subtitle: { en: string; bn: string };
-    description: { en: string; bn: string };
-    image: string;
-  };
-  emergencyContacts: {
-    title: { en: string; bn: string };
-    contacts: Array<{
-      icon: string;
-      title: { en: string; bn: string };
-      number: string;
-      available: { en: string; bn: string };
-    }>;
-  };
-  firstAid: {
-    title: { en: string; bn: string };
-    items: Array<{
-      icon: string;
-      title: { en: string; bn: string };
-      steps: Array<{ en: string; bn: string }>;
-    }>;
-  };
-  whenToCallEmergency: {
-    title: { en: string; bn: string };
-    description: { en: string; bn: string };
-    situations: Array<{ en: string; bn: string }>;
-  };
-  emergencyPreparedness: {
-    title: { en: string; bn: string };
-    tips: Array<{
-      icon: string;
-      title: { en: string; bn: string };
-      description: { en: string; bn: string };
-    }>;
-  };
-}
-
 const iconMap: { [key: string]: React.ElementType } = {
   FaAmbulance,
   FaPhoneAlt,
@@ -75,19 +36,10 @@ const iconMap: { [key: string]: React.ElementType } = {
   FaHospitalUser,
 };
 
-const fetchEmergencyData = async (): Promise<EmergencyData> => {
-  const res = await fetch("/data/emergencyInfo.json");
-  if (!res.ok) throw new Error("Failed to fetch emergency data");
-  return res.json();
-};
-
 const EmergencyInfoPage = () => {
   const { lang } = useLanguage();
 
-  const { data, isLoading, error } = useQuery<EmergencyData>({
-    queryKey: ["emergencyInfo"],
-    queryFn: fetchEmergencyData,
-  });
+  const { data, isLoading, error } = useEmergencyInfo();
 
   if (isLoading) {
     return (

@@ -3,8 +3,8 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/context/LanguageContext";
+import { useFAQ, FAQData } from "@/hooks/useFAQ";
 import {
   FaQuestionCircle,
   FaCalendarCheck,
@@ -15,37 +15,6 @@ import {
   FaEnvelope,
 } from "react-icons/fa";
 
-// ── Types ──────────────────────────────────────────────────────────────────
-interface Category {
-  id: string;
-  name: { en: string; bn: string };
-  icon: string;
-}
-
-interface FAQ {
-  id: number;
-  category: string;
-  question: { en: string; bn: string };
-  answer: { en: string; bn: string };
-}
-
-interface FAQData {
-  hero: {
-    title: { en: string; bn: string };
-    subtitle: { en: string; bn: string };
-    description: { en: string; bn: string };
-    image: string;
-  };
-  categories: Category[];
-  faqs: FAQ[];
-  contactInfo: {
-    title: { en: string; bn: string };
-    description: { en: string; bn: string };
-    phone: string;
-    email: string;
-  };
-}
-
 // ── Icon Mapper ────────────────────────────────────────────────────────────
 const iconMap: { [key: string]: React.ElementType } = {
   FaQuestionCircle,
@@ -54,23 +23,13 @@ const iconMap: { [key: string]: React.ElementType } = {
   FaMoneyBillWave,
 };
 
-// ── Fetch FAQ Data ─────────────────────────────────────────────────────────
-const fetchFAQData = async (): Promise<FAQData> => {
-  const res = await fetch("/data/faq.json");
-  if (!res.ok) throw new Error("Failed to fetch FAQ data");
-  return res.json();
-};
-
 // ── Main FAQ Page ──────────────────────────────────────────────────────────
 const FAQPage = () => {
   const { lang } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
 
-  const { data, isLoading, error } = useQuery<FAQData>({
-    queryKey: ["faq"],
-    queryFn: fetchFAQData,
-  });
+  const { data, isLoading, error } = useFAQ();
 
   if (isLoading) {
     return (
