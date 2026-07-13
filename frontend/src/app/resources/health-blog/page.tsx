@@ -3,50 +3,15 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/context/LanguageContext";
 import { FaClock, FaUser, FaTag } from "react-icons/fa";
-
-interface BlogPost {
-  id: number;
-  category: string;
-  title: { en: string; bn: string };
-  excerpt: { en: string; bn: string };
-  author: { en: string; bn: string };
-  date: string;
-  readTime: { en: string; bn: string };
-  image: string;
-}
-
-interface BlogData {
-  hero: {
-    title: { en: string; bn: string };
-    subtitle: { en: string; bn: string };
-    description: { en: string; bn: string };
-    image: string;
-  };
-  categories: Array<{
-    id: string;
-    name: { en: string; bn: string };
-  }>;
-  posts: BlogPost[];
-  tags: Array<{ en: string; bn: string }>;
-}
-
-const fetchBlogData = async (): Promise<BlogData> => {
-  const res = await fetch("/data/healthBlog.json");
-  if (!res.ok) throw new Error("Failed to fetch blog data");
-  return res.json();
-};
+import { useHealthBlog, HealthBlogData } from "@/hooks/useHealthBlog";
 
 const HealthBlogPage = () => {
   const { lang } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
-  const { data, isLoading, error } = useQuery<BlogData>({
-    queryKey: ["healthBlog"],
-    queryFn: fetchBlogData,
-  });
+  const { data, isLoading, error } = useHealthBlog();
 
   if (isLoading) {
     return (

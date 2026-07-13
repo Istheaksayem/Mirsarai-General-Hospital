@@ -20,6 +20,12 @@ import diagnosticServiceRoutes from './diagnosticService.routes.js';
 import nicuBabyCareRoutes from './nicuBabyCare.routes.js';
 import adminDiagnosticServiceRoutes from './admin/diagnosticService.admin.routes.js';
 import adminNicuBabyCareRoutes from './admin/nicuBabyCare.admin.routes.js';
+import healthBlogRoutes from './healthBlog.routes.js';
+import emergencyInfoRoutes from './emergencyInfo.routes.js';
+import faqRoutes from './faq.routes.js';
+import adminHealthBlogRoutes from './admin/healthBlog.admin.routes.js';
+import adminEmergencyInfoRoutes from './admin/emergencyInfo.admin.routes.js';
+import adminFaqRoutes from './admin/faq.admin.routes.js';
 import { authenticate, authorize } from '../middlewares/auth.middleware.js';
 import catchAsync from '../utils/catchAsync.js';
 import { sendSuccess } from '../utils/ApiResponse.js';
@@ -89,6 +95,11 @@ router.use('/service-page', diagnosticServiceRoutes);
 // ── NICU & Baby Care Routes ───────────────────────────────────────────────────────
 router.use('/service-page', nicuBabyCareRoutes);
 
+// ── Resource Page Routes ──────────────────────────────────────────────────────────
+router.use('/health-blog', healthBlogRoutes);
+router.use('/emergency-information', emergencyInfoRoutes);
+router.use('/faq', faqRoutes);
+
 // ── Doctor Routes ────────────────────────────────────────────────────────────────
 router.use('/doctors', doctorRoutes);
 
@@ -108,6 +119,9 @@ router.use('/admin/service-page', authenticate, authorize('super-admin'), adminN
 router.use('/admin/doctors', authenticate, authorize('super-admin'), adminDoctorRoutes);
 router.use('/admin/departments', authenticate, authorize('super-admin'), adminDepartmentRoutes);
 router.use('/admin/specializations', authenticate, authorize('super-admin'), adminSpecializationRoutes);
+router.use('/admin/health-blog', authenticate, authorize('super-admin'), adminHealthBlogRoutes);
+router.use('/admin/emergency-information', authenticate, authorize('super-admin'), adminEmergencyInfoRoutes);
+router.use('/admin/faq', authenticate, authorize('super-admin'), adminFaqRoutes);
 router.use('/admin/appointments', authenticate, authorize('super-admin'), adminAppointmentRoutes);
 
 export default router;

@@ -827,3 +827,139 @@ export const getServicePageData = (type: string) =>
 
 export const updateServicePageData = (type: string, data: Partial<ServicePageData>) =>
   mutateAdminReal<ServicePageData>(`admin/service-page/${type}`, data, "PUT");
+
+// ─── Resource Page CMS Types ──────────────────────────────────────────────
+
+export interface HealthBlogPost {
+  id: number;
+  category: string;
+  title: BilingualField;
+  excerpt: BilingualField;
+  author: BilingualField;
+  date: string;
+  readTime: BilingualField;
+  image: string;
+}
+
+export interface HealthBlogData {
+  _id?: string;
+  hero: {
+    title: BilingualField;
+    subtitle: BilingualField;
+    description: BilingualField;
+    image: string;
+  };
+  categories: { id: string; name: BilingualField }[];
+  posts: HealthBlogPost[];
+  tags: BilingualField[];
+  sections: Record<string, SectionConfig>;
+  seo: SeoConfig;
+  createdBy?: string;
+  updatedBy?: string;
+}
+
+export interface EmergencyContact {
+  icon: string;
+  title: BilingualField;
+  number: string;
+  available: BilingualField;
+}
+
+export interface FirstAidStep {
+  en: string;
+  bn: string;
+}
+
+export interface FirstAidItem {
+  icon: string;
+  title: BilingualField;
+  steps: FirstAidStep[];
+}
+
+export interface PreparednessTip {
+  icon: string;
+  title: BilingualField;
+  description: BilingualField;
+}
+
+export interface EmergencyInfoData {
+  _id?: string;
+  hero: {
+    title: BilingualField;
+    subtitle: BilingualField;
+    description: BilingualField;
+    image: string;
+  };
+  emergencyContacts: {
+    title: BilingualField;
+    contacts: EmergencyContact[];
+  };
+  firstAid: {
+    title: BilingualField;
+    items: FirstAidItem[];
+  };
+  whenToCallEmergency: {
+    title: BilingualField;
+    description: BilingualField;
+    situations: FirstAidStep[];
+  };
+  emergencyPreparedness: {
+    title: BilingualField;
+    tips: PreparednessTip[];
+  };
+  sections: Record<string, SectionConfig>;
+  seo: SeoConfig;
+  createdBy?: string;
+  updatedBy?: string;
+}
+
+export interface FAQCategory {
+  id: string;
+  name: BilingualField;
+  icon: string;
+}
+
+export interface FAQItemData {
+  id: number;
+  category: string;
+  question: BilingualField;
+  answer: BilingualField;
+}
+
+export interface FAQContactInfo {
+  title: BilingualField;
+  description: BilingualField;
+  phone: string;
+  email: string;
+}
+
+export interface FAQData {
+  _id?: string;
+  hero: {
+    title: BilingualField;
+    subtitle: BilingualField;
+    description: BilingualField;
+    image: string;
+  };
+  categories: FAQCategory[];
+  faqs: FAQItemData[];
+  contactInfo: FAQContactInfo;
+  sections: Record<string, SectionConfig>;
+  seo: SeoConfig;
+  createdBy?: string;
+  updatedBy?: string;
+}
+
+// ─── Resource Page CMS API Functions ──────────────────────────────────────
+
+export const getHealthBlog = () => fetchReal<HealthBlogData>("health-blog");
+export const updateHealthBlog = (data: Partial<HealthBlogData>) =>
+  mutateAdminReal<HealthBlogData>("admin/health-blog", data, "PUT");
+
+export const getEmergencyInfo = () => fetchReal<EmergencyInfoData>("emergency-information");
+export const updateEmergencyInfo = (data: Partial<EmergencyInfoData>) =>
+  mutateAdminReal<EmergencyInfoData>("admin/emergency-information", data, "PUT");
+
+export const getFAQData = () => fetchReal<FAQData>("faq");
+export const updateFAQData = (data: Partial<FAQData>) =>
+  mutateAdminReal<FAQData>("admin/faq", data, "PUT");
