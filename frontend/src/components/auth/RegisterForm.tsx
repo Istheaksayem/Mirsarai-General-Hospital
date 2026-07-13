@@ -1,6 +1,6 @@
-"use client";
+  "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { FaUser, FaEnvelope, FaPhone } from "react-icons/fa";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -32,9 +32,16 @@ const RegisterForm = () => {
     register: registerOtp,
     handleSubmit: handleOtpSubmit,
     formState: { errors: otpErrors, isSubmitting: isOtpSubmitting },
+    reset: resetOtpForm,
   } = useForm<OtpFormValues>({
     resolver: zodResolver(otpSchema),
   });
+
+  useEffect(() => {
+    if (step === 2) {
+      resetOtpForm({ otp: "" });
+    }
+  }, [step, resetOtpForm]);
 
   const onSubmit = async (data: RegisterFormValues) => {
     setServerError(null);
@@ -200,10 +207,11 @@ const RegisterForm = () => {
           <GoogleButton />
         </form>
       ) : (
-        <form onSubmit={handleOtpSubmit(onOtpVerification)} className="space-y-5">
+        <form key={step} autoComplete="off" onSubmit={handleOtpSubmit(onOtpVerification)} className="space-y-5">
           <AuthInput
             label="One-Time Password (OTP)"
-            placeholder="Enter 6-digit OTP"
+            placeholder="Enter OTP"
+            autoComplete="off"
             icon={<FaEnvelope />}
             registration={registerOtp("otp")}
             error={otpErrors.otp?.message}

@@ -20,16 +20,24 @@ const userSchema = new mongoose.Schema(
         'Please provide a valid email address',
       ],
     },
+    googleId: {
+      type: String,
+      default: null,
+    },
     phone: {
       type: String,
-      required: [true, 'Please provide your phone number'],
+      required: function () {
+        return !this.googleId;
+      },
       trim: true,
     },
     password: {
       type: String,
-      required: [true, 'Please provide a password'],
+      required: function () {
+        return !this.googleId;
+      },
       minlength: [6, 'Password must be at least 6 characters long'],
-      select: false, // Don't return password by default
+      select: false,
     },
     role: {
       type: String,
@@ -59,7 +67,7 @@ const userSchema = new mongoose.Schema(
 // Encrypt password using bcrypt before saving
 userSchema.pre('save', async function (next) {
   // Only run this function if password was actually modified
-  if (!this.isModified('password')) return next();
+  if (!this.isModified('password') || !this.password) return next();
 
   try {
     const salt = await bcrypt.genSalt(10);

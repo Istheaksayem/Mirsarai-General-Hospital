@@ -44,3 +44,4 @@ const AuthInput: React.FC<AuthInputProps> = ({
 };
 
 export default AuthInput;
+  
