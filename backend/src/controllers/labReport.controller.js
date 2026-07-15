@@ -16,7 +16,9 @@ export const uploadReport = catchAsync(async (req, res) => {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Missing required fields');
   }
 
-  const fileUrl = `/uploads/reports/${req.file.filename}`;
+  // Convert buffer to base64 Data URI
+  const base64String = req.file.buffer.toString('base64');
+  const fileUrl = `data:${req.file.mimetype};base64,${base64String}`;
 
   const report = await LabReport.create({
     patientId,

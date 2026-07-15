@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import {
   UserCheck, Mail, Phone, Building2, Award, Calendar,
-  Edit2, Save, X, Camera, GraduationCap, Briefcase,
+  Edit2, Save, X, Camera, GraduationCap, Briefcase, Loader2,
 } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge } from "@/components/ui/Badge";
@@ -10,7 +10,8 @@ import { Button } from "@/components/ui/Button";
 import { useMyLabAdminProfile, useUpdateMyLabAdminProfile } from "@/lib/hooks/useMyLabAdminProfile";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import type { LabAdminProfileData } from "@/lib/services/api";
+import { type LabAdminProfileData } from "@/lib/services/api";
+import { getImageUrl } from "@/lib/utils";
 
 interface FormState {
   profilePhoto: string;
@@ -41,6 +42,7 @@ export default function LabAdminProfilePage() {
   const [form, setForm] = useState<FormState>(emptyForm);
   const [formErrors, setFormErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [saving, setSaving] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [saveMessage, setSaveMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   useEffect(() => {
@@ -168,31 +170,47 @@ export default function LabAdminProfilePage() {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6 flex flex-col items-center text-center">
             <div className="mb-4 relative">
-              <div className="h-24 w-24 rounded-full bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg">
-                {form.profilePhoto ? (
-                  <img src={form.profilePhoto} alt="Profile" className="h-full w-full rounded-full object-cover" />
+              <div className="h-24 w-24 rounded-full bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg overflow-hidden">
+                {isUploadingImage ? (
+                  <Loader2 className="h-8 w-8 animate-spin text-white" />
+                ) : form.profilePhoto ? (
+                  <img src={getImageUrl(form.profilePhoto)} alt="Profile" className="h-full w-full object-cover" />
                 ) : (
                   (user?.name || "L").charAt(0)
                 )}
               </div>
-              <label className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 flex items-center justify-center cursor-pointer shadow hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+              <label className={`absolute -bottom-1 -right-1 h-8 w-8 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 flex items-center justify-center ${isUploadingImage ? 'cursor-not-allowed' : 'cursor-pointer'} shadow hover:bg-gray-50 dark:hover:bg-gray-700 transition`}>
                 <Camera className="h-4 w-4 text-gray-500" />
                 <input
-                  type="text"
+                  type="file"
                   className="hidden"
-                  placeholder="Photo URL"
-                  value={form.profilePhoto}
-                  onChange={(e) => updateField("profilePhoto", e.target.value)}
+                  accept="image/*"
+                  disabled={isUploadingImage}
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    setIsUploadingImage(true);
+                    try {
+                      const reader = new FileReader();
+                      reader.onloadend = async () => {
+                        try {
+                          const base64Data = reader.result as string;
+                          updateField("profilePhoto", base64Data);
+                        } catch (err) {
+                          setSaveMessage({ type: "error", text: "Failed to read image" });
+                        } finally {
+                          setIsUploadingImage(false);
+                        }
+                      };
+                      reader.readAsDataURL(file);
+                    } catch (err) {
+                      setSaveMessage({ type: "error", text: "Failed to read file" });
+                      setIsUploadingImage(false);
+                    }
+                  }}
                 />
               </label>
             </div>
-            <input
-              type="text"
-              placeholder="Profile photo URL"
-              value={form.profilePhoto}
-              onChange={(e) => updateField("profilePhoto", e.target.value)}
-              className="w-full text-center rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 focus:outline-none focus:border-violet-600"
-            />
             <div className="mt-6 w-full space-y-3 border-t border-gray-100 dark:border-gray-800 pt-5">
               <FormField label="Gender" required error={formErrors.gender}>
                 <select
@@ -299,9 +317,9 @@ export default function LabAdminProfilePage() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6 flex flex-col items-center text-center">
-          <div className="mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-purple-600 text-white text-3xl font-bold shadow-lg">
+          <div className="mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-purple-600 text-white text-3xl font-bold shadow-lg overflow-hidden">
             {profile.profilePhoto ? (
-              <img src={profile.profilePhoto} alt="Profile" className="h-full w-full rounded-full object-cover" />
+              <img src={getImageUrl(profile.profilePhoto)} alt="Profile" className="h-full w-full object-cover" />
             ) : (
               (user?.name || "L").charAt(0)
             )}
