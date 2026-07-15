@@ -1,4 +1,4 @@
-  "use client";
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -64,7 +64,6 @@ const RegisterForm = () => {
         return;
       }
 
-      // Registration successful, move to OTP step
       setRegisteredData({ email: data.email, password: data.password });
       setStep(2);
       setServerError(null);
@@ -94,7 +93,6 @@ const RegisterForm = () => {
         return;
       }
 
-      // If OTP verification is successful, log them in automatically using NextAuth
       const signInResult = await signIn("credentials", {
         redirect: false,
         email: registeredData.email,
@@ -105,7 +103,7 @@ const RegisterForm = () => {
         setServerError("Registration successful, but auto-login failed. Please sign in manually.");
         setTimeout(() => router.push("/login"), 2000);
       } else {
-        router.push("/dashboard"); // Redirect to appropriate page
+        router.push("/dashboard");
         router.refresh();
       }
     } catch (error: any) {
@@ -229,14 +227,12 @@ const RegisterForm = () => {
         </form>
       )}
 
-      {step === 1 && (
-        <p className="text-center mt-8 text-gray-600 font-medium">
-          Already have an account?{" "}
-          <Link href="/login" className="text-primary hover:text-primary/80 font-bold transition-colors">
-            Sign In
-          </Link>
-        </p>
-      )}
+      <p className="text-center mt-8 text-gray-600 font-medium">
+        Already have an account?{" "}
+        <Link href="/login" className="text-primary hover:text-primary/80 font-bold transition-colors">
+          Sign In
+        </Link>
+      </p>
     </motion.div>
   );
 };

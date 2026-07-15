@@ -1,6 +1,8 @@
 import { LoginCredentials, Role, User } from "@/types/auth";
 
-// Mock users database — replace with real API later
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+
+// Mock users database — fallback for when backend is unavailable
 const MOCK_USERS: Array<User & { password: string }> = [
   {
     id: "1",
@@ -41,6 +43,17 @@ const MOCK_USERS: Array<User & { password: string }> = [
   },
 ];
 
+// Map backend roles to frontend roles
+export const ROLE_MAP: Record<string, Role> = {
+  superadmin: "super-admin",
+  "super-admin": "super-admin",
+  doctor: "doctor",
+  reception: "reception-admin",
+  "reception-admin": "reception-admin",
+  lab: "lab-admin",
+  "lab-admin": "lab-admin",
+};
+
 export interface MockAuthResult {
   success: boolean;
   user?: User;
@@ -50,7 +63,45 @@ export interface MockAuthResult {
 export async function mockLogin(
   credentials: LoginCredentials
 ): Promise<MockAuthResult> {
-  // Simulate network delay
+  // Try real backend first
+  try {
+    const res = await fetch(`${BACKEND_URL}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: credentials.email,
+        password: credentials.password,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok && data?.message) {
+      return { success: false, error: data.message };
+    }
+
+    if (res.ok && data.success && data.data?.user) {
+      const backendUser = data.data.user;
+      const frontendRole = ROLE_MAP[backendUser.role] || backendUser.role;
+
+      return {
+        success: true,
+        user: {
+          id: backendUser._id,
+          name: backendUser.fullName,
+          email: backendUser.email,
+          role: frontendRole as Role,
+          token: data.data.token,
+          approvalStatus: backendUser.approvalStatus,
+          profileCompleted: backendUser.profileCompleted,
+        },
+      };
+    }
+  } catch {
+    // Backend unavailable, fall through to mock
+  }
+
+  // Simulate network delay for mock fallback
   await new Promise((r) => setTimeout(r, 900));
 
   const found = MOCK_USERS.find(

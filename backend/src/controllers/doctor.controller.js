@@ -2,6 +2,7 @@ import { StatusCodes } from 'http-status-codes';
 import catchAsync from '../utils/catchAsync.js';
 import { sendSuccess, sendPaginated } from '../utils/ApiResponse.js';
 import * as DoctorService from '../services/doctor.service.js';
+import * as DoctorProfileService from '../services/doctorProfile.service.js';
 
 // ── PUBLIC ─────────────────────────────────────────────────────────────────────
 
@@ -124,4 +125,75 @@ export const toggleFeatured = catchAsync(async (req, res) => {
 export const reorderDoctors = catchAsync(async (req, res) => {
   await DoctorService.reorderDoctors(req.body);
   sendSuccess(res, StatusCodes.OK, null, 'Doctors reordered successfully');
+});
+
+// ── DOCTOR SELF-PROFILE ────────────────────────────────────────────────────────
+
+/**
+ * GET /api/v1/doctors/me
+ * Auth: authenticated doctor
+ * Desc: get the logged-in doctor's own profile
+ */
+export const getMyProfile = catchAsync(async (req, res) => {
+  const profile = await DoctorProfileService.getMyProfile(req.user.id);
+  sendSuccess(res, StatusCodes.OK, profile, 'Profile fetched successfully');
+});
+
+/**
+ * PUT /api/v1/doctors/me
+ * Auth: authenticated doctor
+ * Desc: create or update the logged-in doctor's profile
+ */
+export const createOrUpdateMyProfile = catchAsync(async (req, res) => {
+  const profile = await DoctorProfileService.createOrUpdateMyProfile(req.user.id, req.body);
+  sendSuccess(res, StatusCodes.OK, profile, 'Profile saved successfully');
+});
+
+// ── SUPER ADMIN — ASSIGN ADMIN INFO ────────────────────────────────────────────
+
+/**
+ * PATCH /api/v1/admin/doctors/registrations/:userId/assign-admin-info
+ * Admin: assign department, designation, branch, employmentType to a doctor profile
+ */
+export const assignAdminInfo = catchAsync(async (req, res) => {
+  const profile = await DoctorService.assignAdminInfo(req.params.userId, req.body, req.user?.id);
+  sendSuccess(res, StatusCodes.OK, profile, 'Admin info assigned successfully');
+});
+
+// ── SUPER ADMIN — REGISTRATION APPROVAL ────────────────────────────────────────
+
+/**
+ * GET /api/v1/admin/doctors/registrations/pending
+ * Admin: list all pending staff registrations (doctor, receptionist, lab admin)
+ */
+export const getPendingRegistrations = catchAsync(async (req, res) => {
+  const registrations = await DoctorService.getPendingRegistrations();
+  sendSuccess(res, StatusCodes.OK, registrations, 'Pending registrations fetched successfully');
+});
+
+/**
+ * PATCH /api/v1/admin/doctors/registrations/:userId/approve
+ * Admin: approve a staff registration
+ */
+export const approveRegistration = catchAsync(async (req, res) => {
+  const user = await DoctorService.approveRegistration(req.params.userId, req.user?.id);
+  sendSuccess(res, StatusCodes.OK, user, 'Staff approved successfully');
+});
+
+/**
+ * PATCH /api/v1/admin/doctors/registrations/:userId/reject
+ * Admin: reject a staff registration
+ */
+export const rejectRegistration = catchAsync(async (req, res) => {
+  const user = await DoctorService.rejectRegistration(req.params.userId, req.user?.id);
+  sendSuccess(res, StatusCodes.OK, user, 'Staff rejected successfully');
+});
+
+/**
+ * PATCH /api/v1/admin/doctors/registrations/:userId/suspend
+ * Admin: suspend an approved staff member
+ */
+export const suspendDoctor = catchAsync(async (req, res) => {
+  const user = await DoctorService.suspendDoctor(req.params.userId, req.user?.id);
+  sendSuccess(res, StatusCodes.OK, user, 'Staff suspended successfully');
 });

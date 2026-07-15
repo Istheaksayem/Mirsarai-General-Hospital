@@ -1,4 +1,8 @@
 import Doctor from '../models/doctor.model.js';
+import User from '../models/user.model.js';
+import DoctorProfile from '../models/doctorProfile.model.js';
+import ReceptionistProfile from '../models/receptionistProfile.model.js';
+import LabAdminProfile from '../models/labAdminProfile.model.js';
 import ApiError from '../utils/ApiError.js';
 import { StatusCodes } from 'http-status-codes';
 import { PAGINATION } from '../constants/index.js';
@@ -210,4 +214,184 @@ export const reorderDoctors = async (orderUpdates) => {
  */
 export const getDepartments = async () => {
   return Doctor.distinct('department.en', { isVisible: true });
+};
+
+// ── STAFF REGISTRATION APPROVAL ────────────────────────────────────────────────
+
+const STAFF_ROLES = ['doctor', 'reception', 'lab'];
+
+/**
+ * Get all pending staff registrations
+ */
+export const getPendingRegistrations = async () => {
+  return User.find({ role: { $in: STAFF_ROLES }, approvalStatus: 'pending' })
+    .select('_id fullName email phone role createdAt')
+    .sort({ createdAt: -1 })
+    .lean();
+};
+
+/**
+ * Approve a staff registration
+ */
+export const approveRegistration = async (userId, adminId) => {
+  const user = await User.findById(userId);
+  if (!user) throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
+  if (!STAFF_ROLES.includes(user.role)) throw new ApiError(StatusCodes.BAD_REQUEST, 'User is not a staff member');
+
+  user.approvalStatus = 'approved';
+  user.accountStatus = 'active';
+  user.isActive = true;
+  user.updatedBy = adminId;
+  await user.save();
+
+  return user.toJSON();
+};
+
+/**
+ * Reject a staff registration
+ */
+export const rejectRegistration = async (userId, adminId) => {
+  const user = await User.findById(userId);
+  if (!user) throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
+  if (!STAFF_ROLES.includes(user.role)) throw new ApiError(StatusCodes.BAD_REQUEST, 'User is not a staff member');
+
+  user.approvalStatus = 'rejected';
+  user.updatedBy = adminId;
+  await user.save();
+
+  return user.toJSON();
+};
+
+/**
+ * Generate the next sequential doctor code (DOC-00001, DOC-00002, …)
+ */
+const generateNextDoctorCode = async () => {
+  const lastProfile = await DoctorProfile.findOne({})
+    .sort({ doctorCode: -1 })
+    .select('doctorCode')
+    .lean();
+  if (!lastProfile) return 'DOC-00001';
+  const lastNum = parseInt(lastProfile.doctorCode.replace('DOC-'), 10);
+  return `DOC-${String(lastNum + 1).padStart(5, '0')}`;
+};
+
+/**
+ * Assign admin-only info to a staff profile (department, designation, branch, employmentType)
+ * Works for doctor, reception, and lab roles
+ */
+export const assignAdminInfo = async (userId, adminData, adminId) => {
+  const user = await User.findById(userId);
+  if (!user) throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
+  if (!STAFF_ROLES.includes(user.role)) throw new ApiError(StatusCodes.BAD_REQUEST, 'User is not a staff member');
+
+  const adminFields = {
+    department: adminData.department,
+    designation: adminData.designation,
+    branch: adminData.branch || '',
+    employmentType: adminData.employmentType || '',
+  };
+
+  if (user.role === 'doctor') {
+    let profile = await DoctorProfile.findOne({ userId });
+
+    if (!profile) {
+      const doctorCode = await generateNextDoctorCode();
+      profile = await DoctorProfile.create({
+        userId,
+        doctorCode,
+        ...adminFields,
+      });
+    } else {
+      profile = await DoctorProfile.findOneAndUpdate(
+        { userId },
+        { $set: adminFields },
+        { new: true, runValidators: true }
+      );
+    }
+
+    return profile;
+  }
+
+  if (user.role === 'reception') {
+    let profile = await ReceptionistProfile.findOne({ userId });
+
+    if (!profile) {
+      const receptionistCode = await generateNextReceptionistCode();
+      profile = await ReceptionistProfile.create({
+        userId,
+        receptionistCode,
+        ...adminFields,
+      });
+    } else {
+      profile = await ReceptionistProfile.findOneAndUpdate(
+        { userId },
+        { $set: adminFields },
+        { new: true, runValidators: true }
+      );
+    }
+
+    return profile;
+  }
+
+  if (user.role === 'lab') {
+    let profile = await LabAdminProfile.findOne({ userId });
+
+    if (!profile) {
+      const labAdminCode = await generateNextLabAdminCode();
+      profile = await LabAdminProfile.create({
+        userId,
+        labAdminCode,
+        ...adminFields,
+      });
+    } else {
+      profile = await LabAdminProfile.findOneAndUpdate(
+        { userId },
+        { $set: adminFields },
+        { new: true, runValidators: true }
+      );
+    }
+
+    return profile;
+  }
+};
+
+/**
+ * Generate the next sequential receptionist code (REC-00001, REC-00002, …)
+ */
+const generateNextReceptionistCode = async () => {
+  const lastProfile = await ReceptionistProfile.findOne({})
+    .sort({ receptionistCode: -1 })
+    .select('receptionistCode')
+    .lean();
+  if (!lastProfile) return 'REC-00001';
+  const lastNum = parseInt(lastProfile.receptionistCode.replace('REC-'), 10);
+  return `REC-${String(lastNum + 1).padStart(5, '0')}`;
+};
+
+/**
+ * Generate the next sequential lab admin code (LAB-00001, LAB-00002, …)
+ */
+const generateNextLabAdminCode = async () => {
+  const lastProfile = await LabAdminProfile.findOne({})
+    .sort({ labAdminCode: -1 })
+    .select('labAdminCode')
+    .lean();
+  if (!lastProfile) return 'LAB-00001';
+  const lastNum = parseInt(lastProfile.labAdminCode.replace('LAB-'), 10);
+  return `LAB-${String(lastNum + 1).padStart(5, '0')}`;
+};
+
+/**
+ * Suspend an already-approved staff member
+ */
+export const suspendDoctor = async (userId, adminId) => {
+  const user = await User.findById(userId);
+  if (!user) throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
+  if (!STAFF_ROLES.includes(user.role)) throw new ApiError(StatusCodes.BAD_REQUEST, 'User is not a staff member');
+
+  user.accountStatus = 'suspended';
+  user.updatedBy = adminId;
+  await user.save();
+
+  return user.toJSON();
 };

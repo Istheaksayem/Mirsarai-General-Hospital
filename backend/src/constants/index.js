@@ -20,6 +20,20 @@ export const USER_STATUS = {
   PENDING: 'pending',
 };
 
+// Approval Status (for doctor registration flow)
+export const APPROVAL_STATUS = {
+  PENDING: 'pending',
+  APPROVED: 'approved',
+  REJECTED: 'rejected',
+};
+
+// Account Status (for ongoing account management)
+export const ACCOUNT_STATUS = {
+  ACTIVE: 'active',
+  INACTIVE: 'inactive',
+  SUSPENDED: 'suspended',
+};
+
 // Gender
 export const GENDER = {
   MALE: 'male',

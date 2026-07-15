@@ -162,6 +162,17 @@ export function LoginForm() {
           </div>
         </div>
       </div>
+
+      {/* Staff registration link */}
+      <p className="mt-6 text-center text-xs text-gray-400 dark:text-gray-500">
+        Don&apos;t have an account?{" "}
+        <a
+          href="/staff-register"
+          className="font-semibold text-[#1E2B7A] hover:text-[#2d3fa8] dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+        >
+          Register here
+        </a>
+      </p>
     </motion.div>
   );
 }

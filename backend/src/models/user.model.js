@@ -22,7 +22,6 @@ const userSchema = new mongoose.Schema(
     },
     googleId: {
       type: String,
-      default: null,
     },
     phone: {
       type: String,
@@ -41,8 +40,22 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ['patient', 'doctor', 'admin', 'superadmin'],
+      enum: ['patient', 'doctor', 'admin', 'super-admin', 'reception', 'lab'],
       default: 'patient',
+    },
+    approvalStatus: {
+      type: String,
+      enum: ['pending', 'approved', 'rejected'],
+      default: 'pending',
+    },
+    accountStatus: {
+      type: String,
+      enum: ['active', 'inactive', 'suspended'],
+      default: 'inactive',
+    },
+    profileCompleted: {
+      type: Boolean,
+      default: false,
     },
     isActive: {
       type: Boolean,
@@ -89,6 +102,11 @@ userSchema.methods.toJSON = function () {
   delete user.password;
   return user;
 };
+
+// Sparse unique index on googleId: allows multiple null values
+// while enforcing uniqueness for non-null values (Google OAuth users).
+// This replaces the previously created non-sparse unique index on googleId.
+userSchema.index({ googleId: 1 }, { unique: true, sparse: true });
 
 const User = mongoose.model('User', userSchema);
 

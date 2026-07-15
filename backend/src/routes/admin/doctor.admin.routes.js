@@ -5,9 +5,53 @@ import {
   createDoctorSchema,
   updateDoctorSchema,
   doctorQuerySchema,
+  assignAdminInfoSchema,
 } from '../../validators/doctor.validator.js';
 
 const router = express.Router();
+
+// ── DOCTOR REGISTRATION APPROVAL ROUTES ────────────────────────────────────────
+// IMPORTANT: These fixed routes MUST be defined BEFORE /:id parameterized routes
+// to avoid "registrations" being caught as an ID value.
+
+/**
+ * @route  GET    /api/v1/admin/doctors/registrations/pending
+ * @desc   List all pending doctor registrations
+ * @access Admin (super-admin)
+ */
+router.get('/registrations/pending', DoctorController.getPendingRegistrations);
+
+/**
+ * @route  PATCH  /api/v1/admin/doctors/registrations/:userId/approve
+ * @desc   Approve a doctor registration
+ * @access Admin (super-admin)
+ */
+router.patch('/registrations/:userId/approve', DoctorController.approveRegistration);
+
+/**
+ * @route  PATCH  /api/v1/admin/doctors/registrations/:userId/reject
+ * @desc   Reject a doctor registration
+ * @access Admin (super-admin)
+ */
+router.patch('/registrations/:userId/reject', DoctorController.rejectRegistration);
+
+/**
+ * @route  PATCH  /api/v1/admin/doctors/registrations/:userId/assign-admin-info
+ * @desc   Assign department, designation, branch, employmentType to a doctor profile
+ * @access Admin (super-admin)
+ */
+router.patch(
+  '/registrations/:userId/assign-admin-info',
+  validate(assignAdminInfoSchema),
+  DoctorController.assignAdminInfo
+);
+
+/**
+ * @route  PATCH  /api/v1/admin/doctors/registrations/:userId/suspend
+ * @desc   Suspend an approved doctor
+ * @access Admin (super-admin)
+ */
+router.patch('/registrations/:userId/suspend', DoctorController.suspendDoctor);
 
 // ── ADMIN CMS ROUTES ───────────────────────────────────────────────────────────
 // All require authentication (applied at parent router level)
