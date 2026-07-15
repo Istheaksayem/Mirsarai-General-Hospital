@@ -89,6 +89,7 @@ export const assignAdminInfoSchema = z.object({
 // ── Doctor Profile Schema (self-registered doctor profile completion) ─────────
 export const doctorProfileSchema = z.object({
   body: z.object({
+    // ── Existing fields ─────────────────────────────────────────────────
     department: z.string().optional().default(''),
     specialization: z.string().min(1, 'Specialization is required'),
     qualification: z.string().min(1, 'Qualification is required'),
@@ -108,5 +109,31 @@ export const doctorProfileSchema = z.object({
     dateOfBirth: z.string().optional(),
     address: z.string().optional().default(''),
     biography: z.string().optional().default(''),
+
+    // ── New bilingual fields (optional — fallback to existing) ──────────
+    name: z.object({
+      en: z.string().optional().default(''),
+      bn: z.string().optional().default(''),
+    }).optional(),
+    about: z.object({
+      en: z.string().optional().default(''),
+      bn: z.string().optional().default(''),
+    }).optional(),
+    chamberTime: z.object({
+      en: z.string().optional().default(''),
+      bn: z.string().optional().default(''),
+    }).optional(),
+    chamberAddress: z.object({
+      en: z.string().optional().default(''),
+      bn: z.string().optional().default(''),
+    }).optional(),
+    services: z.array(
+      z.object({ en: z.string().default(''), bn: z.string().default('') })
+    ).optional().default([]),
+    languages: z.array(z.string()).optional().default(['Bangla', 'English']),
+    onlineConsultation: z.boolean().optional().default(false),
+    offlineConsultation: z.boolean().optional().default(true),
+    appointmentAvailable: z.boolean().optional().default(true),
+    available: z.boolean().optional().default(true),
   }),
 });

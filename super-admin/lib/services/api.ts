@@ -581,6 +581,20 @@ export interface DoctorProfileData {
   isDeleted?: boolean;
   createdAt?: string;
   updatedAt?: string;
+
+  // ── New bilingual fields ────────────────────────────────────────────────
+  slug?: string;
+  name?: { en: string; bn: string };
+  about?: { en: string; bn: string };
+  chamberTime?: { en: string; bn: string };
+  chamberAddress?: { en: string; bn: string };
+  services?: { en: string; bn: string }[];
+  languages?: string[];
+  onlineConsultation?: boolean;
+  offlineConsultation?: boolean;
+  appointmentAvailable?: boolean;
+  available?: boolean;
+  image?: string;
 }
 
 function getDoctorAuthHeaders(): Record<string, string> {

@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import {
   UserCheck, Mail, Phone, Building2, Award, Calendar,
-  Edit2, Save, X, Stethoscope, Clock, Camera,
+  Edit2, Save, X, Stethoscope, Clock, Camera, Globe, Wifi, WifiOff,
 } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge } from "@/components/ui/Badge";
@@ -26,6 +26,19 @@ interface FormState {
   dateOfBirth: string;
   address: string;
   biography: string;
+
+  // ── New bilingual / extra fields ─────────────────────────────────────────
+  nameBn: string;
+  aboutEn: string;
+  aboutBn: string;
+  chamberTimeEn: string;
+  chamberTimeBn: string;
+  services: { en: string; bn: string }[];
+  languages: string[];
+  onlineConsultation: boolean;
+  offlineConsultation: boolean;
+  appointmentAvailable: boolean;
+  available: boolean;
 }
 
 const emptyForm: FormState = {
@@ -40,6 +53,17 @@ const emptyForm: FormState = {
   dateOfBirth: "",
   address: "",
   biography: "",
+  nameBn: "",
+  aboutEn: "",
+  aboutBn: "",
+  chamberTimeEn: "",
+  chamberTimeBn: "",
+  services: [],
+  languages: ["Bangla", "English"],
+  onlineConsultation: false,
+  offlineConsultation: true,
+  appointmentAvailable: true,
+  available: true,
 };
 
 export default function DoctorProfilePage() {
@@ -70,6 +94,17 @@ export default function DoctorProfilePage() {
         dateOfBirth: profile.dateOfBirth ? new Date(profile.dateOfBirth).toISOString().split("T")[0] : "",
         address: profile.address || "",
         biography: profile.biography || "",
+        nameBn: profile.name?.bn || "",
+        aboutEn: profile.about?.en || profile.biography || "",
+        aboutBn: profile.about?.bn || "",
+        chamberTimeEn: profile.chamberTime?.en || "",
+        chamberTimeBn: profile.chamberTime?.bn || "",
+        services: profile.services || [],
+        languages: profile.languages || ["Bangla", "English"],
+        onlineConsultation: profile.onlineConsultation || false,
+        offlineConsultation: profile.offlineConsultation !== false,
+        appointmentAvailable: profile.appointmentAvailable !== false,
+        available: profile.available !== false,
       });
     }
   }, [profile]);
@@ -116,6 +151,15 @@ export default function DoctorProfilePage() {
         dateOfBirth: form.dateOfBirth || undefined,
         address: form.address,
         biography: form.biography,
+        name: { en: user?.fullName || "", bn: form.nameBn },
+        about: { en: form.aboutEn, bn: form.aboutBn },
+        chamberTime: { en: form.chamberTimeEn, bn: form.chamberTimeBn },
+        services: form.services,
+        languages: form.languages,
+        onlineConsultation: form.onlineConsultation,
+        offlineConsultation: form.offlineConsultation,
+        appointmentAvailable: form.appointmentAvailable,
+        available: form.available,
       };
       await updateMutation.mutateAsync(payload);
       await refreshUser();
@@ -146,6 +190,17 @@ export default function DoctorProfilePage() {
         dateOfBirth: profile.dateOfBirth ? new Date(profile.dateOfBirth).toISOString().split("T")[0] : "",
         address: profile.address || "",
         biography: profile.biography || "",
+        nameBn: profile.name?.bn || "",
+        aboutEn: profile.about?.en || profile.biography || "",
+        aboutBn: profile.about?.bn || "",
+        chamberTimeEn: profile.chamberTime?.en || "",
+        chamberTimeBn: profile.chamberTime?.bn || "",
+        services: profile.services || [],
+        languages: profile.languages || ["Bangla", "English"],
+        onlineConsultation: profile.onlineConsultation || false,
+        offlineConsultation: profile.offlineConsultation !== false,
+        appointmentAvailable: profile.appointmentAvailable !== false,
+        available: profile.available !== false,
       });
     }
     setEditing(false);
@@ -309,6 +364,184 @@ export default function DoctorProfilePage() {
                     className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:border-[#1E2B7A] focus:outline-none focus:ring-1 focus:ring-[#1E2B7A]"
                   />
                 </FormField>
+              </div>
+            </div>
+
+            {/* Name (Bengali) */}
+            <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6">
+              <h3 className="mb-4 font-semibold text-gray-900 dark:text-gray-100">Name <span className="text-gray-400 font-normal">(বাংলা)</span></h3>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <FormField label="English">
+                  <input
+                    value={user?.fullName || ""}
+                    disabled
+                    className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3 py-2 text-sm text-gray-500"
+                  />
+                </FormField>
+                <FormField label="বাংলা">
+                  <input
+                    value={form.nameBn}
+                    onChange={(e) => updateField("nameBn", e.target.value)}
+                    placeholder="e.g. ডা. মোঃ আব্দুল্লাহ আল মামুন"
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:border-[#1E2B7A] focus:outline-none focus:ring-1 focus:ring-[#1E2B7A]"
+                  />
+                </FormField>
+              </div>
+            </div>
+
+            {/* About (Bilingual) */}
+            <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6">
+              <h3 className="mb-4 font-semibold text-gray-900 dark:text-gray-100">About <span className="text-gray-400 font-normal">(bilingual)</span></h3>
+              <div className="space-y-3">
+                <FormField label="English">
+                  <textarea
+                    value={form.aboutEn}
+                    onChange={(e) => updateField("aboutEn", e.target.value)}
+                    rows={3}
+                    placeholder="Tell patients about yourself in English..."
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm resize-none focus:border-[#1E2B7A] focus:outline-none focus:ring-1 focus:ring-[#1E2B7A]"
+                  />
+                </FormField>
+                <FormField label="বাংলা">
+                  <textarea
+                    value={form.aboutBn}
+                    onChange={(e) => updateField("aboutBn", e.target.value)}
+                    rows={3}
+                    placeholder="বাংলায় আপনার সম্পর্কে লিখুন..."
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm resize-none focus:border-[#1E2B7A] focus:outline-none focus:ring-1 focus:ring-[#1E2B7A]"
+                  />
+                </FormField>
+              </div>
+            </div>
+
+            {/* Chamber Time (Bilingual) */}
+            <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6">
+              <h3 className="mb-4 font-semibold text-gray-900 dark:text-gray-100">Chamber Time <span className="text-gray-400 font-normal">(bilingual)</span></h3>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <FormField label="English">
+                  <input
+                    value={form.chamberTimeEn}
+                    onChange={(e) => updateField("chamberTimeEn", e.target.value)}
+                    placeholder="e.g. Sat-Thu | 5:00 PM - 9:00 PM"
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:border-[#1E2B7A] focus:outline-none focus:ring-1 focus:ring-[#1E2B7A]"
+                  />
+                </FormField>
+                <FormField label="বাংলা">
+                  <input
+                    value={form.chamberTimeBn}
+                    onChange={(e) => updateField("chamberTimeBn", e.target.value)}
+                    placeholder="e.g. শনি-বৃহ | বিকাল ৫:০০ - রাত ৯:০০"
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:border-[#1E2B7A] focus:outline-none focus:ring-1 focus:ring-[#1E2B7A]"
+                  />
+                </FormField>
+              </div>
+            </div>
+
+            {/* Services */}
+            <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6">
+              <h3 className="mb-4 font-semibold text-gray-900 dark:text-gray-100">Services <span className="text-gray-400 font-normal">(bilingual)</span></h3>
+              {form.services.map((svc, idx) => (
+                <div key={idx} className="flex items-start gap-2 mb-2">
+                  <div className="flex-1 grid grid-cols-2 gap-2">
+                    <input
+                      value={svc.en}
+                      onChange={(e) => {
+                        const updated = [...form.services];
+                        updated[idx] = { ...updated[idx], en: e.target.value };
+                        updateField("services", updated);
+                      }}
+                      placeholder="Service (English)"
+                      className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:border-[#1E2B7A] focus:outline-none focus:ring-1 focus:ring-[#1E2B7A]"
+                    />
+                    <input
+                      value={svc.bn}
+                      onChange={(e) => {
+                        const updated = [...form.services];
+                        updated[idx] = { ...updated[idx], bn: e.target.value };
+                        updateField("services", updated);
+                      }}
+                      placeholder="Service (বাংলা)"
+                      className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:border-[#1E2B7A] focus:outline-none focus:ring-1 focus:ring-[#1E2B7A]"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const updated = form.services.filter((_, i) => i !== idx);
+                      updateField("services", updated);
+                    }}
+                    className="mt-1 p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ))}
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => updateField("services", [...form.services, { en: "", bn: "" }])}
+                className="mt-2"
+              >
+                + Add Service
+              </Button>
+            </div>
+
+            {/* Languages */}
+            <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6">
+              <h3 className="mb-4 font-semibold text-gray-900 dark:text-gray-100">Languages</h3>
+              <input
+                value={form.languages.join(", ")}
+                onChange={(e) => updateField("languages", e.target.value.split(",").map(s => s.trim()).filter(Boolean))}
+                placeholder="e.g. Bangla, English, Hindi"
+                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:border-[#1E2B7A] focus:outline-none focus:ring-1 focus:ring-[#1E2B7A]"
+              />
+              <p className="mt-1 text-xs text-gray-400">Comma-separated list of languages you speak</p>
+            </div>
+
+            {/* Consultation Options */}
+            <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6">
+              <h3 className="mb-4 font-semibold text-gray-900 dark:text-gray-100">Consultation Options</h3>
+              <div className="flex flex-wrap gap-4">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.onlineConsultation}
+                    onChange={(e) => updateField("onlineConsultation", e.target.checked)}
+                    className="rounded border-gray-300 text-[#1E2B7A] focus:ring-[#1E2B7A]"
+                  />
+                  <Wifi className="h-4 w-4 text-[#76BC21]" />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Online Consultation</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.offlineConsultation}
+                    onChange={(e) => updateField("offlineConsultation", e.target.checked)}
+                    className="rounded border-gray-300 text-[#1E2B7A] focus:ring-[#1E2B7A]"
+                  />
+                  <WifiOff className="h-4 w-4 text-gray-500" />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Offline Consultation</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.appointmentAvailable}
+                    onChange={(e) => updateField("appointmentAvailable", e.target.checked)}
+                    className="rounded border-gray-300 text-[#1E2B7A] focus:ring-[#1E2B7A]"
+                  />
+                  <Calendar className="h-4 w-4 text-[#1E2B7A]" />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Appointments Available</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.available}
+                    onChange={(e) => updateField("available", e.target.checked)}
+                    className="rounded border-gray-300 text-[#1E2B7A] focus:ring-[#1E2B7A]"
+                  />
+                  <Globe className="h-4 w-4 text-green-500" />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Available for patients</span>
+                </label>
               </div>
             </div>
 

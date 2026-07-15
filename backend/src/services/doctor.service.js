@@ -18,39 +18,217 @@ const generateSlug = (name) => {
     .trim();
 };
 
+// ── TRANSFORM: DoctorProfile → Doctor shape ─────────────────────────────────────
+
+/**
+ * Transform a DoctorProfile document into the Doctor response shape
+ * expected by the public frontend
+ */
+const transformProfileToDoctor = (profile, user) => ({
+  _id: profile._id,
+  slug: profile.slug || '',
+  name: {
+    en: profile.name?.en || user?.fullName || '',
+    bn: profile.name?.bn || profile.name?.en || user?.fullName || '',
+  },
+  designation: {
+    en: profile.designation?.en || profile.designation || '',
+    bn: profile.designation?.bn || profile.designationBn || '',
+  },
+  specialization: {
+    en: profile.specialization?.en || profile.specialization || '',
+    bn: profile.specialization?.bn || profile.specializationBn || '',
+  },
+  department: {
+    en: profile.department?.en || profile.department || '',
+    bn: profile.department?.bn || profile.departmentBn || '',
+  },
+  qualification: profile.qualification?.en || profile.qualification || '',
+  experience: {
+    en: profile.experienceLabel?.en || `${profile.experience || 0}+ Years`,
+    bn: profile.experienceLabel?.bn || `${profile.experience || 0}+ বছর`,
+  },
+  languages: profile.languages || ['Bangla', 'English'],
+  about: {
+    en: profile.about?.en || profile.biography || '',
+    bn: profile.about?.bn || '',
+  },
+  services: profile.services || [],
+  consultationFee: profile.consultationFee || 0,
+  chamberTime: {
+    en: profile.chamberTime?.en || '',
+    bn: profile.chamberTime?.bn || '',
+  },
+  chamberAddress: {
+    en: profile.chamberAddress?.en || '',
+    bn: profile.chamberAddress?.bn || '',
+  },
+  address: {
+    en: profile.address?.en || profile.address || '',
+    bn: profile.address?.bn || '',
+  },
+  availableDays: profile.availableDays || [],
+  phone: profile.phone || user?.phone || '',
+  email: profile.email || user?.email || '',
+  image: profile.image || profile.profilePhoto || '',
+  featured: profile.featured || false,
+  displayOrder: profile.displayOrder || 0,
+  isVisible: profile.profileVisibility === 'published',
+  status: profile.status || 'active',
+  available: profile.available !== false,
+  socialLinks: profile.socialLinks || [],
+  awards: profile.awards || [],
+  memberships: profile.memberships || [],
+  onlineConsultation: profile.onlineConsultation || false,
+  offlineConsultation: profile.offlineConsultation !== false,
+  appointmentAvailable: profile.appointmentAvailable !== false,
+  patientsCount: 0,
+  rating: 5,
+  joinDate: profile.createdAt?.toISOString?.() || profile.createdAt || '',
+  createdAt: profile.createdAt,
+  updatedAt: profile.updatedAt,
+});
+
+// ── SELF-REGISTERED DOCTORS ────────────────────────────────────────────────────
+
+/**
+ * Get all published self-registered doctors whose associated User
+ * is approved, active, and has completed their profile
+ */
+export const getSelfRegisteredDoctors = async () => {
+  const profiles = await DoctorProfile.find({
+    profileVisibility: 'published',
+    status: { $ne: 'inactive' },
+    isDeleted: { $ne: true },
+  }).lean();
+
+  if (!profiles.length) return [];
+
+  const userIds = profiles.map(p => p.userId);
+  const users = await User.find({
+    _id: { $in: userIds },
+    approvalStatus: 'approved',
+    accountStatus: 'active',
+    profileCompleted: true,
+  }).select('fullName email phone').lean();
+
+  const userMap = new Map(users.map(u => [u._id.toString(), u]));
+
+  return profiles
+    .filter(p => userMap.has(p.userId.toString()))
+    .map(p => transformProfileToDoctor(p, userMap.get(p.userId.toString())));
+};
+
+// ── DEDUPLICATION ───────────────────────────────────────────────────────────────
+
+/**
+ * Build a set of unique identifiers from CMS doctors to use for
+ * deduplication of self-registered doctors
+ */
+const buildCmsIdentitySet = (cmsDoctors) => {
+  const emails = new Set();
+  const slugs = new Set();
+  const regNos = new Set();
+
+  for (const d of cmsDoctors) {
+    if (d.email) emails.add(d.email.toLowerCase());
+    if (d.slug) slugs.add(d.slug);
+    if (d.registrationNumber) regNos.add(d.registrationNumber.toLowerCase());
+  }
+
+  return { emails, slugs, regNos };
+};
+
+/**
+ * Filter out self-registered doctors that already exist in CMS
+ * (matched by email, slug, or registration number)
+ */
+const filterDuplicates = (selfRegistered, cmsDoctors) => {
+  const cmsIds = buildCmsIdentitySet(cmsDoctors);
+
+  return selfRegistered.filter(d =>
+    !cmsIds.emails.has(d.email?.toLowerCase()) &&
+    !cmsIds.slugs.has(d.slug) &&
+    !cmsIds.regNos.has(d.slug)
+  );
+};
+
 // ── PUBLIC QUERIES ────────────────────────────────────────────────────────────
 
 /**
  * Get all doctors for public frontend
- * Returns only visible and relevant fields
+ * Returns visible CMS doctors + published self-registered doctors
+ * Deduplicates by email / slug / registration number
  */
 export const getPublicDoctors = async () => {
-  return Doctor.find({ isVisible: true, status: { $ne: 'inactive' } })
+  const cmsDoctors = await Doctor.find({ isVisible: true, status: { $ne: 'inactive' } })
     .select('-__v -createdBy -updatedBy -seo -galleryImages -bannerImage -appointmentsToday')
     .sort({ featured: -1, displayOrder: 1, 'name.en': 1 })
     .lean();
+
+  const selfRegistered = await getSelfRegisteredDoctors();
+  const uniqueSelfRegistered = filterDuplicates(selfRegistered, cmsDoctors);
+
+  const merged = [...cmsDoctors, ...uniqueSelfRegistered];
+  merged.sort((a, b) => {
+    if (a.featured !== b.featured) return b.featured ? 1 : -1;
+    if ((a.displayOrder || 0) !== (b.displayOrder || 0)) return (a.displayOrder || 0) - (b.displayOrder || 0);
+    return (a.name?.en || '').localeCompare(b.name?.en || '');
+  });
+
+  return merged;
 };
 
 /**
  * Get single doctor by slug for public frontend
+ * Tries CMS doctor first, falls back to self-registered
  */
 export const getPublicDoctorBySlug = async (slug) => {
-  const doctor = await Doctor.findOne({ slug, isVisible: true })
+  const cmsDoctor = await Doctor.findOne({ slug, isVisible: true })
     .select('-__v -createdBy -updatedBy')
     .lean();
-  if (!doctor) throw new ApiError(StatusCodes.NOT_FOUND, 'Doctor not found');
-  return doctor;
+
+  if (cmsDoctor) return cmsDoctor;
+
+  const profile = await DoctorProfile.findOne({
+    slug,
+    profileVisibility: 'published',
+    isDeleted: { $ne: true },
+  }).lean();
+
+  if (!profile) throw new ApiError(StatusCodes.NOT_FOUND, 'Doctor not found');
+
+  const user = await User.findOne({
+    _id: profile.userId,
+    approvalStatus: 'approved',
+    accountStatus: 'active',
+    profileCompleted: true,
+  }).lean();
+
+  if (!user) throw new ApiError(StatusCodes.NOT_FOUND, 'Doctor not found');
+
+  return transformProfileToDoctor(profile, user);
 };
 
 /**
  * Get featured doctors (for homepage section)
+ * Returns featured CMS doctors + featured self-registered doctors
  */
 export const getFeaturedDoctors = async (limit = 4) => {
-  return Doctor.find({ isVisible: true, featured: true, status: 'active' })
+  const cmsDoctors = await Doctor.find({ isVisible: true, featured: true, status: 'active' })
     .select('name slug specialization department designation image consultationFee experience available')
     .sort({ displayOrder: 1 })
     .limit(limit)
     .lean();
+
+  if (cmsDoctors.length >= limit) return cmsDoctors.slice(0, limit);
+
+  const selfRegistered = await getSelfRegisteredDoctors();
+  const featuredSelf = selfRegistered
+    .filter(d => d.featured && !cmsDoctors.some(c => c.slug === d.slug))
+    .slice(0, limit - cmsDoctors.length);
+
+  return [...cmsDoctors, ...featuredSelf].slice(0, limit);
 };
 
 // ── ADMIN CMS QUERIES ─────────────────────────────────────────────────────────
@@ -109,7 +287,6 @@ export const getAdminDoctorById = async (id) => {
  * Create doctor
  */
 export const createDoctor = async (data, userId) => {
-  // Auto-generate slug if not provided
   if (!data.slug) {
     const base = generateSlug(data.name.en);
     let slug = base;
@@ -120,12 +297,10 @@ export const createDoctor = async (data, userId) => {
     }
     data.slug = slug;
   } else {
-    // Check slug uniqueness
     const existing = await Doctor.findOne({ slug: data.slug });
     if (existing) throw new ApiError(StatusCodes.CONFLICT, 'Slug already exists');
   }
 
-  // Auto-generate experience label from years if not provided
   if (data.experience?.years && !data.experience?.label?.en) {
     const yrs = data.experience.years;
     data.experience.label = { en: `${yrs}+ Years`, bn: `${yrs}+ বছর` };
@@ -142,13 +317,11 @@ export const updateDoctor = async (id, data, userId) => {
   const doctor = await Doctor.findById(id);
   if (!doctor) throw new ApiError(StatusCodes.NOT_FOUND, 'Doctor not found');
 
-  // If slug is changing, check uniqueness
   if (data.slug && data.slug !== doctor.slug) {
     const existing = await Doctor.findOne({ slug: data.slug, _id: { $ne: id } });
     if (existing) throw new ApiError(StatusCodes.CONFLICT, 'Slug already in use');
   }
 
-  // Regenerate experience label if years changed
   if (data.experience?.years && !data.experience?.label?.en) {
     const yrs = data.experience.years;
     data.experience.label = { en: `${yrs}+ Years`, bn: `${yrs}+ বছর` };
@@ -210,10 +383,15 @@ export const reorderDoctors = async (orderUpdates) => {
 };
 
 /**
- * Get department list (unique)
+ * Get department list (unique, from both CMS and self-registered doctors)
  */
 export const getDepartments = async () => {
-  return Doctor.distinct('department.en', { isVisible: true });
+  const cmsDepts = await Doctor.distinct('department.en', { isVisible: true });
+  const selfDepts = await DoctorProfile.distinct('department', {
+    profileVisibility: 'published',
+    isDeleted: { $ne: true },
+  });
+  return [...new Set([...cmsDepts, ...selfDepts])].sort();
 };
 
 // ── STAFF REGISTRATION APPROVAL ────────────────────────────────────────────────
@@ -355,9 +533,6 @@ export const assignAdminInfo = async (userId, adminData, adminId) => {
   }
 };
 
-/**
- * Generate the next sequential receptionist code (REC-00001, REC-00002, …)
- */
 const generateNextReceptionistCode = async () => {
   const lastProfile = await ReceptionistProfile.findOne({})
     .sort({ receptionistCode: -1 })
@@ -368,9 +543,6 @@ const generateNextReceptionistCode = async () => {
   return `REC-${String(lastNum + 1).padStart(5, '0')}`;
 };
 
-/**
- * Generate the next sequential lab admin code (LAB-00001, LAB-00002, …)
- */
 const generateNextLabAdminCode = async () => {
   const lastProfile = await LabAdminProfile.findOne({})
     .sort({ labAdminCode: -1 })
