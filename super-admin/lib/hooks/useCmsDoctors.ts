@@ -9,11 +9,18 @@ import {
   toggleCmsDoctorVisibility,
   toggleCmsDoctorFeatured,
   reorderCmsDoctors,
+  getPendingDoctorRegistrations,
+  approveDoctorRegistration,
+  rejectDoctorRegistration,
+  assignDoctorAdminInfo,
   type CmsDoctor,
   type DoctorQueryParams,
+  type PendingRegistration,
+  type AdminInfoData,
 } from "@/lib/services/api";
 
 const DOCTORS_KEY = "cms-doctors";
+const PENDING_KEY = "pending-registrations";
 
 // ── Query Hooks ───────────────────────────────────────────────────────────────
 
@@ -94,5 +101,39 @@ export const useReorderCmsDoctors = () => {
     mutationFn: (updates: { id: string; displayOrder: number }[]) =>
       reorderCmsDoctors(updates),
     onSuccess: () => qc.invalidateQueries({ queryKey: [DOCTORS_KEY] }),
+  });
+};
+
+// ── Pending Registration Hooks ─────────────────────────────────────────────────
+
+export const usePendingRegistrations = () =>
+  useQuery({
+    queryKey: [PENDING_KEY],
+    queryFn: () => getPendingDoctorRegistrations(),
+    staleTime: 1000 * 15,
+  });
+
+export const useApproveRegistration = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (userId: string) => approveDoctorRegistration(userId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: [PENDING_KEY] }),
+  });
+};
+
+export const useRejectRegistration = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (userId: string) => rejectDoctorRegistration(userId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: [PENDING_KEY] }),
+  });
+};
+
+export const useAssignAdminInfo = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ userId, data }: { userId: string; data: AdminInfoData }) =>
+      assignDoctorAdminInfo(userId, data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: [PENDING_KEY] }),
   });
 };

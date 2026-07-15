@@ -15,7 +15,7 @@ export const registerSchema = z.object({
     .min(6, "Password must be at least 6 characters long"),
   confirmPassword: z.string(),
   terms: z.literal(true, {
-    errorMap: () => ({ message: "You must accept the terms and conditions" }),
+    message: "You must accept the terms and conditions",
   }),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords do not match",

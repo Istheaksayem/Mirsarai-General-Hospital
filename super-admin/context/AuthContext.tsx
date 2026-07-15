@@ -8,13 +8,15 @@ import React, {
   useState,
 } from "react";
 import { useRouter } from "next/navigation";
-import { AuthState, LoginCredentials, ROLE_ROUTES, User } from "@/types/auth";
-import { mockLogin } from "@/lib/mock-auth";
+import { AuthState, LoginCredentials, ROLE_ROUTES, Role, User } from "@/types/auth";
+import { mockLogin, ROLE_MAP } from "@/lib/mock-auth";
 import { clearUser, retrieveUser, storeUser } from "@/lib/auth-storage";
+import { fetchCurrentUser } from "@/lib/services/api";
 
 interface AuthContextValue extends AuthState {
   login: (credentials: LoginCredentials) => Promise<{ error?: string }>;
   logout: () => void;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -50,6 +52,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [router]
   );
 
+  const refreshUser = useCallback(async () => {
+    const current = retrieveUser();
+    if (!current?.token) return;
+    try {
+      const backendUser = await fetchCurrentUser(current.token);
+      const frontendRole: Role = ROLE_MAP[backendUser.role] || backendUser.role;
+      const updated: User = {
+        ...current,
+        name: backendUser.fullName ?? current.name,
+        email: backendUser.email ?? current.email,
+        role: frontendRole,
+        approvalStatus: backendUser.approvalStatus,
+        profileCompleted: backendUser.profileCompleted,
+      };
+      storeUser(updated);
+      setUser(updated);
+    } catch {
+      // Silently fail — user can still use the app with stale data
+    }
+  }, []);
+
   const logout = useCallback(() => {
     clearUser();
     setUser(null);
@@ -58,7 +81,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, isAuthenticated: !!user, isLoading, login, logout }}
+      value={{ user, isAuthenticated: !!user, isLoading, login, logout, refreshUser }}
     >
       {children}
     </AuthContext.Provider>

@@ -9,9 +9,19 @@ const errorConverter = (err, req, res, next) => {
   let error = err;
 
   if (!(error instanceof ApiError)) {
-    const statusCode = error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
-    const message = error.message || 'Internal Server Error';
-    error = new ApiError(statusCode, message, false, err.stack);
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map((e) => e.message).join(', ');
+      error = new ApiError(StatusCodes.BAD_REQUEST, `Validation Error: ${messages}`);
+    } else if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern)[0];
+      error = new ApiError(StatusCodes.CONFLICT, `${field} already exists`);
+    } else if (error.name === 'CastError') {
+      error = new ApiError(StatusCodes.BAD_REQUEST, `Invalid ${error.path}: ${error.value}`);
+    } else {
+      const statusCode = error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
+      const message = error.message || 'Internal Server Error';
+      error = new ApiError(statusCode, message, false, err.stack);
+    }
   }
 
   next(error);
@@ -34,29 +44,6 @@ const errorHandler = (err, req, res, next) => {
     ...(err.errors && { errors: err.errors }),
     ...(env.nodeEnv === 'development' && { stack: err.stack }),
   };
-
-  // Mongoose validation error
-  if (err.name === 'ValidationError') {
-    statusCode = StatusCodes.BAD_REQUEST;
-    response.message = 'Validation Error';
-    response.errors = Object.values(err.errors).map((e) => ({
-      field: e.path,
-      message: e.message,
-    }));
-  }
-
-  // Mongoose duplicate key error
-  if (err.code === 11000) {
-    statusCode = StatusCodes.CONFLICT;
-    const field = Object.keys(err.keyPattern)[0];
-    response.message = `${field} already exists`;
-  }
-
-  // Mongoose cast error (invalid ObjectId)
-  if (err.name === 'CastError') {
-    statusCode = StatusCodes.BAD_REQUEST;
-    response.message = `Invalid ${err.path}: ${err.value}`;
-  }
 
   // JWT errors
   if (err.name === 'JsonWebTokenError') {

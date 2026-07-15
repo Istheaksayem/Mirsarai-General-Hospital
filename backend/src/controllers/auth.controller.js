@@ -3,18 +3,21 @@ import User from '../models/user.model.js';
 import PendingRegistration from '../models/pendingRegistration.model.js';
 import env from '../config/env.js';
 import { StatusCodes } from 'http-status-codes';
-import { registerSchema, loginSchema } from '../validators/auth.validator.js';
+import { registerSchema, loginSchema, staffRegisterSchema } from '../validators/auth.validator.js';
+import * as AuthService from '../services/auth.service.js';
 import sendEmail from '../utils/sendEmail.js';
 
 /**
  * Generate JWT Token
- * @param {string} id - User ID
+ * @param {object} user - User document
  * @returns {string} - JWT Token
  */
-const generateToken = (id) => {
-  return jwt.sign({ id }, env.jwt.secret, {
-    expiresIn: env.jwt.expiresIn,
-  });
+const generateToken = (user) => {
+  return jwt.sign(
+    { id: user._id, role: user.role },
+    env.jwt.secret,
+    { expiresIn: env.jwt.expiresIn }
+  );
 };
 
 /**
@@ -147,7 +150,7 @@ export const verifyOTP = async (req, res) => {
     await PendingRegistration.deleteOne({ email });
 
     // Generate token
-    const token = generateToken(user._id);
+    const token = generateToken(user);
 
     res.status(StatusCodes.OK).json({
       success: true,
@@ -216,8 +219,34 @@ export const loginUser = async (req, res) => {
       });
     }
 
+    // Staff-specific checks (doctor, reception, lab)
+    const STAFF_ROLES = ['doctor', 'reception', 'lab'];
+    if (STAFF_ROLES.includes(user.role)) {
+      if (user.approvalStatus === 'pending') {
+        return res.status(StatusCodes.FORBIDDEN).json({
+          success: false,
+          errorCode: 'STAFF_PENDING_APPROVAL',
+          message: 'Your registration is waiting for Super Admin approval.',
+        });
+      }
+      if (user.approvalStatus === 'rejected') {
+        return res.status(StatusCodes.FORBIDDEN).json({
+          success: false,
+          errorCode: 'STAFF_REJECTED',
+          message: 'Your registration request has been rejected.',
+        });
+      }
+      if (user.accountStatus === 'suspended') {
+        return res.status(StatusCodes.FORBIDDEN).json({
+          success: false,
+          errorCode: 'ACCOUNT_SUSPENDED',
+          message: 'Your account has been suspended. Contact administrator.',
+        });
+      }
+    }
+
     // Generate token
-    const token = generateToken(user._id);
+    const token = generateToken(user);
 
     res.status(StatusCodes.OK).json({
       success: true,
@@ -240,6 +269,49 @@ export const loginUser = async (req, res) => {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: 'Server Error during login',
+    });
+  }
+};
+
+/**
+ * @desc    Register a new staff member (Doctor, Receptionist, Lab Admin) — no OTP required
+ * @route   POST /api/v1/auth/register-staff
+ * @access  Public
+ */
+export const registerStaff = async (req, res) => {
+  try {
+    const validatedData = staffRegisterSchema.parse(req.body);
+
+    const user = await AuthService.registerStaff(validatedData);
+
+    const roleLabels = { doctor: 'Doctor', reception: 'Receptionist', lab: 'Lab Admin' };
+    const roleLabel = roleLabels[validatedData.role] || 'Staff';
+
+    res.status(StatusCodes.CREATED).json({
+      success: true,
+      message: `${roleLabel} registration submitted. Waiting for Super Admin approval.`,
+      data: { user },
+    });
+  } catch (error) {
+    if (error.name === 'ZodError') {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'Validation Error',
+        errors: error.errors,
+      });
+    }
+
+    if (error.statusCode === StatusCodes.CONFLICT) {
+      return res.status(StatusCodes.CONFLICT).json({
+        success: false,
+        message: error.message,
+      });
+    }
+
+    console.error('Staff Registration Error:', error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: 'Server Error during staff registration',
     });
   }
 };

@@ -559,6 +559,189 @@ export const toggleCmsDoctorFeatured = (id: string) => mutateAdminReal<CmsDoctor
 export const reorderCmsDoctors = (updates: { id: string; displayOrder: number }[]) =>
   mutateAdminReal<null>("admin/doctors/reorder", updates, "PATCH");
 
+// ─── Doctor Self Profile (authenticated doctor) ────────────────────────────────
+
+export interface DoctorProfileData {
+  _id?: string;
+  userId?: string;
+  doctorCode?: string;
+  department: string;
+  specialization: string;
+  qualification: string;
+  experience: number;
+  bmdcNumber: string;
+  consultationFee: number;
+  availableDays: string[];
+  availableTimeSlots: { day: string; startTime: string; endTime: string }[];
+  profilePhoto: string;
+  gender: string;
+  dateOfBirth?: string;
+  address: string;
+  biography: string;
+  isDeleted?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+
+  // ── New bilingual fields ────────────────────────────────────────────────
+  slug?: string;
+  name?: { en: string; bn: string };
+  about?: { en: string; bn: string };
+  chamberTime?: { en: string; bn: string };
+  chamberAddress?: { en: string; bn: string };
+  services?: { en: string; bn: string }[];
+  languages?: string[];
+  onlineConsultation?: boolean;
+  offlineConsultation?: boolean;
+  appointmentAvailable?: boolean;
+  available?: boolean;
+  image?: string;
+}
+
+function getDoctorAuthHeaders(): Record<string, string> {
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (typeof window !== "undefined") {
+    try {
+      const raw = sessionStorage.getItem("mgh_admin_user");
+      if (raw) {
+        const user = JSON.parse(raw);
+        if (user.token) headers["Authorization"] = `Bearer ${user.token}`;
+      }
+    } catch {}
+  }
+  return headers;
+}
+
+async function fetchDoctorProfile<T>(path: string): Promise<T> {
+  const res = await fetch(`${BACKEND_API}/${path}`, {
+    cache: "no-store",
+    headers: getDoctorAuthHeaders(),
+  });
+  if (!res.ok) {
+    const errorText = await res.text();
+    let errorMessage = `Failed to fetch ${path}`;
+    try { const parsed = JSON.parse(errorText); errorMessage = parsed.message || errorMessage; } catch {}
+    throw new ApiError(res.status, errorMessage);
+  }
+  const result = await res.json();
+  return result.data as T;
+}
+
+async function updateDoctorProfile<T>(path: string, data: unknown): Promise<T> {
+  const res = await fetch(`${BACKEND_API}/${path}`, {
+    method: "PUT",
+    headers: getDoctorAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const errorText = await res.text();
+    let errorMessage = `Failed to update ${path}`;
+    try { const parsed = JSON.parse(errorText); errorMessage = parsed.message || errorMessage; } catch {}
+    throw new ApiError(res.status, errorMessage);
+  }
+  const result = await res.json();
+  return result.data as T;
+}
+
+export const getMyDoctorProfile = () =>
+  fetchDoctorProfile<DoctorProfileData>("doctors/me");
+
+export const updateMyDoctorProfile = (data: Partial<DoctorProfileData>) =>
+  updateDoctorProfile<DoctorProfileData>("doctors/me", data);
+
+// ─── Receptionist Self Profile ────────────────────────────────────────────
+
+export interface ReceptionistProfileData {
+  _id?: string;
+  userId?: string;
+  receptionistCode?: string;
+  department: string;
+  designation: string;
+  branch: string;
+  employmentType: string;
+  profilePhoto: string;
+  gender: string;
+  dateOfBirth?: string;
+  address: string;
+  emergencyContact: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export const getMyReceptionistProfile = () =>
+  fetchDoctorProfile<ReceptionistProfileData>("receptionists/me");
+
+export const updateMyReceptionistProfile = (data: Partial<ReceptionistProfileData>) =>
+  updateDoctorProfile<ReceptionistProfileData>("receptionists/me", data);
+
+// ─── Lab Admin Self Profile ───────────────────────────────────────────────
+
+export interface LabAdminProfileData {
+  _id?: string;
+  userId?: string;
+  labAdminCode?: string;
+  department: string;
+  designation: string;
+  branch: string;
+  employmentType: string;
+  profilePhoto: string;
+  gender: string;
+  dateOfBirth?: string;
+  address: string;
+  qualification: string;
+  experience: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export const getMyLabAdminProfile = () =>
+  fetchDoctorProfile<LabAdminProfileData>("lab/me");
+
+export const updateMyLabAdminProfile = (data: Partial<LabAdminProfileData>) =>
+  updateDoctorProfile<LabAdminProfileData>("lab/me", data);
+
+export const fetchCurrentUser = async (token: string) => {
+  const res = await fetch(`${BACKEND_API}/auth/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  const result = await res.json();
+  if (!res.ok || !result.success) throw new Error(result.message || "Failed to fetch user");
+  return result.data.user;
+};
+
+// ─── Doctor Registration Approval ──────────────────────────────────────────────
+
+export interface PendingRegistration {
+  _id: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  role: string;
+  createdAt: string;
+}
+
+export const getPendingDoctorRegistrations = () =>
+  fetchAdminReal<{ data: PendingRegistration[] }>("admin/doctors/registrations/pending");
+
+export const approveDoctorRegistration = (userId: string) =>
+  mutateAdminReal<{ data: unknown }>(`admin/doctors/registrations/${userId}/approve`, {}, "PATCH");
+
+export const rejectDoctorRegistration = (userId: string) =>
+  mutateAdminReal<{ data: unknown }>(`admin/doctors/registrations/${userId}/reject`, {}, "PATCH");
+
+export const suspendDoctor = (userId: string) =>
+  mutateAdminReal<{ data: unknown }>(`admin/doctors/registrations/${userId}/suspend`, {}, "PATCH");
+
+export interface AdminInfoData {
+  department: string;
+  designation: string;
+  branch?: string;
+  employmentType?: string;
+}
+
+export const assignDoctorAdminInfo = (userId: string, data: AdminInfoData) =>
+  mutateAdminReal<{ data: unknown }>(`admin/doctors/registrations/${userId}/assign-admin-info`, data, "PATCH");
+
 // ─── Department CMS Types ─────────────────────────────────────────────────────
 
 export interface DeptService {

@@ -8,6 +8,10 @@ export interface User {
   avatar?: string;
   department?: string;
   doctorRef?: string;
+  token?: string;
+  approvalStatus?: string;
+  profileCompleted?: boolean;
+  doctorCode?: string;
 }
 
 export interface AuthState {

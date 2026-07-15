@@ -2,6 +2,7 @@ import { setServers } from 'node:dns/promises';
 import app from './src/app.js';
 import env from './src/config/env.js';
 import connectDatabase from './src/config/database.js';
+import { seedDefaultAdmins } from './src/scripts/seedDefaultAdmins.js';
 
 // Set custom DNS servers for reliable resolution (Cloudflare + Google)
 setServers(['1.1.1.1', '8.8.8.8']);
@@ -13,6 +14,9 @@ const startServer = async () => {
   try {
     // Connect to database
     await connectDatabase();
+
+    // Ensure default super admin accounts exist
+    await seedDefaultAdmins();
 
     // Start listening
     const server = app.listen(env.port, () => {

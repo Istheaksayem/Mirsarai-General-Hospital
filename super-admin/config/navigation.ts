@@ -42,7 +42,8 @@ export const NAV_CONFIG: Record<Role, NavSection[]> = {
       title: "Management",
       items: [
         { label: "Patients", href: "/super-admin/patients", icon: Users },
-        { label: "Doctors", href: "/super-admin/doctors", icon: Stethoscope },
+        { label: "Doctors", href: "/super-admin/doctors", icon: Stethoscope, badge: "CMS" },
+        { label: "Pending Registrations", href: "/super-admin/doctors/pending-registrations", icon: UserCheck },
         { label: "Departments", href: "/super-admin/departments", icon: Building2 },
       ],
     },
@@ -66,7 +67,10 @@ export const NAV_CONFIG: Record<Role, NavSection[]> = {
 
   "reception-admin": [
     {
-      items: [{ label: "Dashboard", href: "/reception-admin", icon: LayoutDashboard }],
+      items: [
+        { label: "Dashboard", href: "/reception-admin", icon: LayoutDashboard },
+        { label: "Profile", href: "/reception-admin/profile", icon: UserCheck },
+      ],
     },
     {
       title: "Front Desk",
@@ -87,7 +91,10 @@ export const NAV_CONFIG: Record<Role, NavSection[]> = {
 
   "lab-admin": [
     {
-      items: [{ label: "Dashboard", href: "/lab-admin", icon: LayoutDashboard }],
+      items: [
+        { label: "Dashboard", href: "/lab-admin", icon: LayoutDashboard },
+        { label: "Profile", href: "/lab-admin/profile", icon: UserCheck },
+      ],
     },
     {
       title: "Laboratory",

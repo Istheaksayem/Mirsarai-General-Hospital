@@ -75,3 +75,65 @@ export const doctorQuerySchema = z.object({
     sortOrder:  z.enum(['asc', 'desc']).optional(),
   }),
 });
+
+// ── Admin Assign Info Schema ───────────────────────────────────────────────────
+export const assignAdminInfoSchema = z.object({
+  body: z.object({
+    department: z.string().min(1, 'Department is required'),
+    designation: z.string().min(1, 'Designation is required'),
+    branch: z.string().optional().default(''),
+    employmentType: z.enum(['permanent', 'visiting', 'contract', 'resident', '']).optional().default(''),
+  }),
+});
+
+// ── Doctor Profile Schema (self-registered doctor profile completion) ─────────
+export const doctorProfileSchema = z.object({
+  body: z.object({
+    // ── Existing fields ─────────────────────────────────────────────────
+    department: z.string().optional().default(''),
+    specialization: z.string().min(1, 'Specialization is required'),
+    qualification: z.string().min(1, 'Qualification is required'),
+    experience: z.number().min(0).default(0),
+    bmdcNumber: z.string().min(1, 'BMDC registration number is required'),
+    consultationFee: z.number().min(0).default(0),
+    availableDays: z.array(z.string()).default([]),
+    availableTimeSlots: z.array(
+      z.object({
+        day: z.string(),
+        startTime: z.string(),
+        endTime: z.string(),
+      })
+    ).default([]),
+    profilePhoto: z.string().optional().default(''),
+    gender: z.enum(['male', 'female', 'other']).default('other'),
+    dateOfBirth: z.string().optional(),
+    address: z.string().optional().default(''),
+    biography: z.string().optional().default(''),
+
+    // ── New bilingual fields (optional — fallback to existing) ──────────
+    name: z.object({
+      en: z.string().optional().default(''),
+      bn: z.string().optional().default(''),
+    }).optional(),
+    about: z.object({
+      en: z.string().optional().default(''),
+      bn: z.string().optional().default(''),
+    }).optional(),
+    chamberTime: z.object({
+      en: z.string().optional().default(''),
+      bn: z.string().optional().default(''),
+    }).optional(),
+    chamberAddress: z.object({
+      en: z.string().optional().default(''),
+      bn: z.string().optional().default(''),
+    }).optional(),
+    services: z.array(
+      z.object({ en: z.string().default(''), bn: z.string().default('') })
+    ).optional().default([]),
+    languages: z.array(z.string()).optional().default(['Bangla', 'English']),
+    onlineConsultation: z.boolean().optional().default(false),
+    offlineConsultation: z.boolean().optional().default(true),
+    appointmentAvailable: z.boolean().optional().default(true),
+    available: z.boolean().optional().default(true),
+  }),
+});

@@ -66,6 +66,7 @@ const LoginForm = () => {
               { id: "account-error", icon: "🚫" }
             );
             break;
+
           default:
             toast.error(checkData.message || "Login failed. Please try again.", {
               id: "login-error",
