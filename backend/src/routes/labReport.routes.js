@@ -14,5 +14,10 @@ router.post(
 );
 
 router.get('/recent', labReportController.getRecentReports);
+router.get('/', labReportController.getAllReports);
+router.get('/:id', labReportController.getReportById);
+router.patch('/:id/status', labReportController.updateReportStatus);
+router.delete('/:id', labReportController.deleteReport);
+router.get('/:id/download', labReportController.downloadReport);
 
 export default router;

@@ -297,8 +297,11 @@ export default function LabAdminProfilePage() {
 
   if (isError || !profile) {
     return (
-      <div className="rounded-2xl border border-dashed border-gray-200 dark:border-gray-700 p-12 text-center text-gray-400">
-        Lab admin profile not found. Please complete your profile.
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 dark:border-gray-700 p-12 text-center text-gray-400">
+        <p className="mb-4">Lab admin profile not found. Please complete your profile.</p>
+        <Button onClick={() => setEditing(true)}>
+          <Edit2 className="h-4 w-4 mr-1.5" />Complete Profile
+        </Button>
       </div>
     );
   }
