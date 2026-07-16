@@ -49,6 +49,7 @@ interface ActionButtonsProps {
   onView?: (row: Record<string, unknown>) => void;
   onEdit?: (row: Record<string, unknown>) => void;
   onDelete?: (row: Record<string, unknown>) => void;
+  hideEdit?: boolean;
 }
 
 export function ActionButtons({
@@ -58,6 +59,7 @@ export function ActionButtons({
   onView,
   onEdit,
   onDelete,
+  hideEdit,
 }: ActionButtonsProps) {
   const router = useRouter();
   const [showDelete, setShowDelete] = useState(false);
@@ -85,13 +87,15 @@ export function ActionButtons({
         </button>
 
         {/* Edit */}
-        <button
-          onClick={handleEdit}
-          title="Edit"
-          className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors"
-        >
-          <Pencil className="h-3.5 w-3.5" />
-        </button>
+        {!hideEdit && (
+          <button
+            onClick={handleEdit}
+            title="Edit"
+            className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors"
+          >
+            <Pencil className="h-3.5 w-3.5" />
+          </button>
+        )}
 
         {/* Delete */}
         <button
