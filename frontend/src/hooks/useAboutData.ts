@@ -69,6 +69,8 @@ export interface AboutData {
 }
 
 // ── Fetcher ───────────────────────────────────────────────────────────────────
+import { normalizeImages } from "@/lib/getImageUrl";
+
 const fetchAboutData = async (): Promise<AboutData> => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
 
@@ -85,8 +87,8 @@ const fetchAboutData = async (): Promise<AboutData> => {
     const mvData = await mvRes.json();
 
     return {
-      about: aboutData.data,
-      missionVision: mvData.data
+      about: normalizeImages(aboutData.data),
+      missionVision: normalizeImages(mvData.data)
     };
   } catch (error) {
     console.warn("Backend API not reachable for about data. Falling back to local data/aboutData.json", error);

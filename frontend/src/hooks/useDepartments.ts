@@ -56,6 +56,7 @@ export interface DepartmentsData {
 }
 
 // ── Fetchers ──────────────────────────────────────────────────────────────────
+import { normalizeImages } from "@/lib/getImageUrl";
 
 const fetchDepartments = async (lang = "en"): Promise<Department[]> => {
   const res = await fetch(`${API_URL}/departments?lang=${lang}`, {
@@ -63,7 +64,7 @@ const fetchDepartments = async (lang = "en"): Promise<Department[]> => {
   });
   if (!res.ok) throw new Error("Failed to fetch departments");
   const json = await res.json();
-  return json.data as Department[];
+  return normalizeImages(json.data) as Department[];
 };
 
 const fetchDepartmentsData = async (lang = "en"): Promise<DepartmentsData> => {
@@ -74,7 +75,7 @@ const fetchDepartmentsData = async (lang = "en"): Promise<DepartmentsData> => {
 
   if (!pageConfigRes.ok) throw new Error("Failed to fetch departments page config");
   const json = await pageConfigRes.json();
-  const pageData = json.data;
+  const pageData = normalizeImages(json.data);
 
   return {
     departments: depts,
@@ -96,7 +97,7 @@ const fetchDepartmentBySlug = async (slug: string, lang = "en"): Promise<Departm
   });
   if (!res.ok) throw new Error(`Department not found: ${slug}`);
   const json = await res.json();
-  return json.data as Department;
+  return normalizeImages(json.data) as Department;
 };
 
 // ── Hooks ─────────────────────────────────────────────────────────────────────

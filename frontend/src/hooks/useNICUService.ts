@@ -44,11 +44,13 @@ export interface NICUService {
   };
 }
 
+import { normalizeImages } from "@/lib/getImageUrl";
+
 const fetchNICUService = async (lang = "en"): Promise<NICUService> => {
   const res = await fetch(`${API_URL}/service-page/nicu?lang=${lang}`, { cache: "no-store" });
   if (!res.ok) throw new Error("Failed to fetch NICU service data");
   const json = await res.json();
-  return json.data as NICUService;
+  return normalizeImages(json.data) as NICUService;
 };
 
 export const useNICUService = (lang = "en") =>

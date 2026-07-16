@@ -197,3 +197,9 @@ export const suspendDoctor = catchAsync(async (req, res) => {
   const user = await DoctorService.suspendDoctor(req.params.userId, req.user?.id);
   sendSuccess(res, StatusCodes.OK, user, 'Staff suspended successfully');
 });
+
+/** TEMPORARY: Backfill DoctorProfiles → Doctor collection */
+export const syncDoctorProfiles = catchAsync(async (req, res) => {
+  const results = await DoctorService.syncDoctorProfiles();
+  sendSuccess(res, StatusCodes.OK, results, 'Doctor profiles synced');
+});

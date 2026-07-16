@@ -2,6 +2,7 @@
 
 import React, { useRef } from "react";
 import { Upload, X, Image as ImageIcon } from "lucide-react";
+import { getImageUrl } from "@/lib/getImageUrl";
 
 interface ImageUploaderProps {
   label: string;
@@ -48,7 +49,7 @@ export function ImageUploader({ label, value, onChange, onUpload, helpText }: Im
           {value ? (
             <>
               <img
-                src={value.startsWith("/") ? `${process.env.NEXT_PUBLIC_API_URL?.replace("/api/v1", "") || "http://localhost:5000"}${value}` : value}
+                src={getImageUrl(value)}
                 alt="Preview"
                 className="w-full h-full object-cover"
               />

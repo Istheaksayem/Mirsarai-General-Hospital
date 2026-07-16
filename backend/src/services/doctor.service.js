@@ -3,6 +3,7 @@ import User from '../models/user.model.js';
 import DoctorProfile from '../models/doctorProfile.model.js';
 import ReceptionistProfile from '../models/receptionistProfile.model.js';
 import LabAdminProfile from '../models/labAdminProfile.model.js';
+import Counter from '../models/counter.model.js';
 import ApiError from '../utils/ApiError.js';
 import { StatusCodes } from 'http-status-codes';
 import { PAGINATION } from '../constants/index.js';
@@ -442,15 +443,37 @@ export const rejectRegistration = async (userId, adminId) => {
 
 /**
  * Generate the next sequential doctor code (DOC-00001, DOC-00002, …)
+ * Uses atomic Counter collection to guarantee uniqueness across concurrent requests.
  */
 const generateNextDoctorCode = async () => {
   const lastProfile = await DoctorProfile.findOne({})
     .sort({ doctorCode: -1 })
     .select('doctorCode')
     .lean();
-  if (!lastProfile) return 'DOC-00001';
-  const lastNum = parseInt(lastProfile.doctorCode.replace('DOC-'), 10);
-  return `DOC-${String(lastNum + 1).padStart(5, '0')}`;
+  let dbMax = 0;
+  if (lastProfile?.doctorCode) {
+    const match = lastProfile.doctorCode.match(/DOC-(\d+)/);
+    if (match) dbMax = parseInt(match[1], 10);
+  }
+
+  const counter = await Counter.findOneAndUpdate(
+    { name: 'doctorCode' },
+    { $inc: { seq: 1 } },
+    { new: true, upsert: true }
+  );
+
+  if (counter.seq === 1 && dbMax > 0) {
+    const bumped = await Counter.findOneAndUpdate(
+      { name: 'doctorCode', seq: { $lte: dbMax } },
+      { $set: { seq: dbMax + 1 } },
+      { new: true }
+    );
+    if (bumped) {
+      return `DOC-${String(bumped.seq).padStart(5, '0')}`;
+    }
+  }
+
+  return `DOC-${String(counter.seq).padStart(5, '0')}`;
 };
 
 /**
@@ -474,10 +497,35 @@ export const assignAdminInfo = async (userId, adminData, adminId) => {
 
     if (!profile) {
       const doctorCode = await generateNextDoctorCode();
+
+      const baseSlug = generateSlug(user.fullName);
+      let slug = baseSlug;
+      let count = 0;
+      while (true) {
+        const docExists = await Doctor.findOne({ slug }).lean();
+        const profExists = await DoctorProfile.findOne({ slug }).lean();
+        if (!docExists && !profExists) break;
+        count++;
+        slug = `${baseSlug}-${count}`;
+      }
+
       profile = await DoctorProfile.create({
         userId,
         doctorCode,
+        slug,
         ...adminFields,
+      });
+
+      await Doctor.create({
+        slug,
+        name: { en: user.fullName || 'Doctor', bn: '' },
+        designation: { en: adminData.designation || 'Staff', bn: '' },
+        specialization: { en: 'TBD', bn: '' },
+        department: { en: adminData.department || 'General', bn: '' },
+        qualification: 'TBD',
+        isVisible: false,
+        createdBy: adminId,
+        updatedBy: adminId,
       });
     } else {
       profile = await DoctorProfile.findOneAndUpdate(
@@ -485,6 +533,52 @@ export const assignAdminInfo = async (userId, adminData, adminId) => {
         { $set: adminFields },
         { new: true, runValidators: true }
       );
+
+      // Generate slug if missing
+      if (!profile.slug && user.fullName) {
+        const baseSlug = generateSlug(user.fullName);
+        let slug = baseSlug;
+        let count = 0;
+        while (true) {
+          const docExists = await Doctor.findOne({ slug }).lean();
+          const profExists = await DoctorProfile.findOne({ slug, _id: { $ne: profile._id } }).lean();
+          if (!docExists && !profExists) break;
+          count++;
+          slug = `${baseSlug}-${count}`;
+        }
+        await DoctorProfile.findOneAndUpdate(
+          { userId },
+          { $set: { slug, ...adminFields } },
+          { new: true }
+        );
+        profile = await DoctorProfile.findOne({ userId });
+      }
+
+      const profileSlug = profile.slug;
+      if (profileSlug) {
+        const existingDoctor = await Doctor.findOne({ slug: profileSlug }).lean();
+        const doctorPayload = {
+          slug: profileSlug,
+          name: { en: user.fullName || 'Doctor', bn: '' },
+          'designation.en': adminData.designation || 'Staff',
+          'specialization.en': 'TBD',
+          'department.en': adminData.department || 'General',
+          qualification: 'TBD',
+          isVisible: false,
+          updatedBy: adminId,
+        };
+        if (existingDoctor) {
+          await Doctor.findOneAndUpdate(
+            { slug: profileSlug },
+            { $set: doctorPayload }
+          );
+        } else {
+          await Doctor.create({
+            ...doctorPayload,
+            createdBy: adminId,
+          });
+        }
+      }
     }
 
     return profile;
@@ -538,9 +632,30 @@ const generateNextReceptionistCode = async () => {
     .sort({ receptionistCode: -1 })
     .select('receptionistCode')
     .lean();
-  if (!lastProfile) return 'REC-00001';
-  const lastNum = parseInt(lastProfile.receptionistCode.replace('REC-'), 10);
-  return `REC-${String(lastNum + 1).padStart(5, '0')}`;
+  let dbMax = 0;
+  if (lastProfile?.receptionistCode) {
+    const match = lastProfile.receptionistCode.match(/REC-(\d+)/);
+    if (match) dbMax = parseInt(match[1], 10);
+  }
+
+  const counter = await Counter.findOneAndUpdate(
+    { name: 'receptionistCode' },
+    { $inc: { seq: 1 } },
+    { new: true, upsert: true }
+  );
+
+  if (counter.seq === 1 && dbMax > 0) {
+    const bumped = await Counter.findOneAndUpdate(
+      { name: 'receptionistCode', seq: { $lte: dbMax } },
+      { $set: { seq: dbMax + 1 } },
+      { new: true }
+    );
+    if (bumped) {
+      return `REC-${String(bumped.seq).padStart(5, '0')}`;
+    }
+  }
+
+  return `REC-${String(counter.seq).padStart(5, '0')}`;
 };
 
 const generateNextLabAdminCode = async () => {
@@ -548,14 +663,134 @@ const generateNextLabAdminCode = async () => {
     .sort({ labAdminCode: -1 })
     .select('labAdminCode')
     .lean();
-  if (!lastProfile) return 'LAB-00001';
-  const lastNum = parseInt(lastProfile.labAdminCode.replace('LAB-'), 10);
-  return `LAB-${String(lastNum + 1).padStart(5, '0')}`;
+  let dbMax = 0;
+  if (lastProfile?.labAdminCode) {
+    const match = lastProfile.labAdminCode.match(/LAB-(\d+)/);
+    if (match) dbMax = parseInt(match[1], 10);
+  }
+
+  const counter = await Counter.findOneAndUpdate(
+    { name: 'labAdminCode' },
+    { $inc: { seq: 1 } },
+    { new: true, upsert: true }
+  );
+
+  if (counter.seq === 1 && dbMax > 0) {
+    const bumped = await Counter.findOneAndUpdate(
+      { name: 'labAdminCode', seq: { $lte: dbMax } },
+      { $set: { seq: dbMax + 1 } },
+      { new: true }
+    );
+    if (bumped) {
+      return `LAB-${String(bumped.seq).padStart(5, '0')}`;
+    }
+  }
+
+  return `LAB-${String(counter.seq).padStart(5, '0')}`;
 };
 
 /**
  * Suspend an already-approved staff member
  */
+/**
+ * One-time backfill: sync all DoctorProfiles to Doctor collection.
+ * Generates slugs for profiles missing them, creates Doctor docs where missing.
+ */
+export const syncDoctorProfiles = async () => {
+  const DoctorProfile = (await import('../models/doctorProfile.model.js')).default;
+  const User = (await import('../models/user.model.js')).default;
+  const results = { slugsAdded: [], doctorsCreated: [], errors: [] };
+
+  const generateSlug = (name) =>
+    name.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').replace(/--+/g, '-').trim();
+
+  // Phase 1: Profiles missing slug
+  const noSlugProfiles = await DoctorProfile.find({ slug: { $in: [null, undefined, ''] } }).lean();
+  for (const prof of noSlugProfiles) {
+    try {
+      const user = await User.findById(prof.userId).lean();
+      const nameEn = prof.name?.en || user?.fullName || 'doctor';
+      let baseSlug = generateSlug(nameEn);
+      if (!baseSlug) baseSlug = `doctor-${prof.doctorCode || Date.now()}`;
+
+      let slug = baseSlug;
+      let count = 0;
+      while (true) {
+        const docExists = await Doctor.findOne({ slug }).lean();
+        const profExists = await DoctorProfile.findOne({ slug, _id: { $ne: prof._id } }).lean();
+        if (!docExists && !profExists) break;
+        count++;
+        slug = `${baseSlug}-${count}`;
+      }
+
+      await DoctorProfile.findByIdAndUpdate(prof._id, { $set: { slug } });
+      results.slugsAdded.push({ id: prof._id, name: nameEn, slug: slug || 'MISSING' });
+
+      const existingDoc = await Doctor.findOne({ slug }).lean();
+      if (!existingDoc) {
+        const newDoc = await Doctor.create({
+          slug,
+          name: { en: nameEn, bn: prof.name?.bn || '' },
+          'designation.en': prof.designation || 'Staff',
+          'specialization.en': prof.specialization || 'TBD',
+          'department.en': prof.department || 'General',
+          qualification: prof.qualification || 'TBD',
+          phone: prof.phone || user?.phone || '',
+          email: prof.email || user?.email || '',
+          consultationFee: prof.consultationFee || 0,
+          availableDays: prof.availableDays || [],
+          image: prof.image || prof.profilePhoto || '',
+          'about.en': prof.biography || prof.about?.en || '',
+          isVisible: prof.profileVisibility === 'published',
+          createdBy: prof.userId,
+          updatedBy: prof.userId,
+        });
+        results.doctorsCreated.push({ id: newDoc._id, slug, name: nameEn });
+      }
+    } catch (err) {
+      results.errors.push({ id: prof._id, error: err.message });
+    }
+  }
+
+  // Phase 2: Profiles with slug but no matching Doctor doc
+  const sluggedProfiles = await DoctorProfile.find({
+    slug: { $nin: [null, undefined, ''] }
+  }).lean();
+
+  for (const prof of sluggedProfiles) {
+    try {
+      const existingDoc = await Doctor.findOne({ slug: prof.slug }).lean();
+      if (existingDoc) continue;
+
+      const user = await User.findById(prof.userId).lean();
+      const nameEn = prof.name?.en || user?.fullName || 'doctor';
+
+      const newDoc = await Doctor.create({
+        slug: prof.slug,
+        name: { en: nameEn, bn: prof.name?.bn || '' },
+        'designation.en': prof.designation || 'Staff',
+        'specialization.en': prof.specialization || 'TBD',
+        'department.en': prof.department || 'General',
+        qualification: prof.qualification || 'TBD',
+        phone: prof.phone || user?.phone || '',
+        email: prof.email || user?.email || '',
+        consultationFee: prof.consultationFee || 0,
+        availableDays: prof.availableDays || [],
+        image: prof.image || prof.profilePhoto || '',
+        'about.en': prof.biography || prof.about?.en || '',
+        isVisible: prof.profileVisibility === 'published',
+        createdBy: prof.userId,
+        updatedBy: prof.userId,
+      });
+      results.doctorsCreated.push({ id: newDoc._id, slug: prof.slug, name: nameEn });
+    } catch (err) {
+      results.errors.push({ id: prof._id, error: err.message });
+    }
+  }
+
+  return results;
+};
+
 export const suspendDoctor = async (userId, adminId) => {
   const user = await User.findById(userId);
   if (!user) throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');

@@ -17,12 +17,14 @@ interface Service {
   displayOrder: number;
 }
 
+import { normalizeImages } from "@/lib/getImageUrl";
+
 const fetchServices = async (): Promise<Service[]> => {
   try {
     const res = await fetch(`${API_URL}/services`, { cache: "no-store" });
     if (!res.ok) throw new Error("API unavailable");
     const json = await res.json();
-    return json.data as Service[];
+    return normalizeImages(json.data) as Service[];
   } catch {
     const fallback = await fetch("/data/services.json", { cache: "no-store" });
     if (!fallback.ok) throw new Error("Failed to fetch services");

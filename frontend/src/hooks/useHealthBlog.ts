@@ -39,12 +39,14 @@ export interface HealthBlogData {
   tags: BlogTag[];
 }
 
+import { normalizeImages } from "@/lib/getImageUrl";
+
 const fetchHealthBlog = async (): Promise<HealthBlogData> => {
   try {
     const res = await fetch(`${API_URL}/health-blog`, { cache: "no-store" });
     if (!res.ok) throw new Error("Failed to fetch health blog data");
     const json = await res.json();
-    return json.data as HealthBlogData;
+    return normalizeImages(json.data) as HealthBlogData;
   } catch {
     const res = await fetch("/data/healthBlog.json", { cache: "no-store" });
     if (!res.ok) throw new Error("Failed to fetch fallback health blog data");

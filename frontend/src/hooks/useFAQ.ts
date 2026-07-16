@@ -38,12 +38,14 @@ export interface FAQData {
   contactInfo: FAQContactInfo;
 }
 
+import { normalizeImages } from "@/lib/getImageUrl";
+
 const fetchFAQ = async (): Promise<FAQData> => {
   try {
     const res = await fetch(`${API_URL}/faq`, { cache: "no-store" });
     if (!res.ok) throw new Error("Failed to fetch FAQ data");
     const json = await res.json();
-    return json.data as FAQData;
+    return normalizeImages(json.data) as FAQData;
   } catch {
     const res = await fetch("/data/faq.json", { cache: "no-store" });
     if (!res.ok) throw new Error("Failed to fetch fallback FAQ data");

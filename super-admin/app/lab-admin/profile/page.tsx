@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
+import { getImageUrl } from "@/lib/getImageUrl";
 import {
   UserCheck, Mail, Phone, Building2, Award, Calendar,
   Edit2, Save, X, Camera, GraduationCap, Briefcase, Loader2,
@@ -170,11 +171,9 @@ export default function LabAdminProfilePage() {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6 flex flex-col items-center text-center">
             <div className="mb-4 relative">
-              <div className="h-24 w-24 rounded-full bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg overflow-hidden">
-                {isUploadingImage ? (
-                  <Loader2 className="h-8 w-8 animate-spin text-white" />
-                ) : form.profilePhoto ? (
-                  <img src={getImageUrl(form.profilePhoto)} alt="Profile" className="h-full w-full object-cover" />
+              <div className="h-24 w-24 rounded-full bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg">
+                {form.profilePhoto ? (
+                  <img src={getImageUrl(form.profilePhoto)} alt="Profile" className="h-full w-full rounded-full object-cover" />
                 ) : (
                   (user?.name || "L").charAt(0)
                 )}

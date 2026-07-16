@@ -56,12 +56,14 @@ export interface EmergencyInfoData {
   };
 }
 
+import { normalizeImages } from "@/lib/getImageUrl";
+
 const fetchEmergencyInfo = async (): Promise<EmergencyInfoData> => {
   try {
     const res = await fetch(`${API_URL}/emergency-information`, { cache: "no-store" });
     if (!res.ok) throw new Error("Failed to fetch emergency info data");
     const json = await res.json();
-    return json.data as EmergencyInfoData;
+    return normalizeImages(json.data) as EmergencyInfoData;
   } catch {
     const res = await fetch("/data/emergencyInfo.json", { cache: "no-store" });
     if (!res.ok) throw new Error("Failed to fetch fallback emergency info data");

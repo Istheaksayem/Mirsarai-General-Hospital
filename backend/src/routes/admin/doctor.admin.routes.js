@@ -47,11 +47,14 @@ router.patch(
 );
 
 /**
- * @route  PATCH  /api/v1/admin/doctors/registrations/:userId/suspend
+ * @route  PATCH /api/v1/admin/doctors/registrations/:userId/suspend
  * @desc   Suspend an approved doctor
  * @access Admin (super-admin)
  */
 router.patch('/registrations/:userId/suspend', DoctorController.suspendDoctor);
+
+/** TEMPORARY: POST /api/v1/admin/doctors/sync-profiles — backfill DoctorProfiles into Doctor collection */
+router.post('/sync-profiles', DoctorController.syncDoctorProfiles);
 
 // ── ADMIN CMS ROUTES ───────────────────────────────────────────────────────────
 // All require authentication (applied at parent router level)

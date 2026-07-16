@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
+import { getImageUrl } from "@/lib/getImageUrl";
 import {
   UserCheck, Mail, Phone, Building2, Award, Calendar,
   Edit2, Save, X, Stethoscope, Clock, Camera, Globe, Wifi, WifiOff,
@@ -262,7 +263,7 @@ export default function DoctorProfilePage() {
             <div className="mb-4 relative">
               <div className="h-24 w-24 rounded-full bg-gradient-to-br from-[#1E2B7A] to-[#76BC21] flex items-center justify-center text-white text-3xl font-bold shadow-lg">
                 {form.profilePhoto ? (
-                  <img src={form.profilePhoto} alt="Profile" className="h-full w-full rounded-full object-cover" />
+                  <img src={getImageUrl(form.profilePhoto)} alt="Profile" className="h-full w-full rounded-full object-cover" />
                 ) : (
                   (user?.name || "D").charAt(0)
                 )}
