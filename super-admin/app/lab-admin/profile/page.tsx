@@ -12,8 +12,6 @@ import { useMyLabAdminProfile, useUpdateMyLabAdminProfile } from "@/lib/hooks/us
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { type LabAdminProfileData } from "@/lib/services/api";
-import { getImageUrl } from "@/lib/utils";
-
 interface FormState {
   profilePhoto: string;
   gender: string;
