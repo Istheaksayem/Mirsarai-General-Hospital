@@ -17,13 +17,7 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
-// Quick-fill demo accounts
-const DEMO_ACCOUNTS = [
-  { label: "Super Admin", email: "superadmin@mgh.com" },
-  { label: "Reception", email: "reception@mgh.com" },
-  { label: "Lab Admin", email: "lab@mgh.com" },
-  { label: "Doctor", email: "doctor@mgh.com" },
-];
+
 
 export function LoginForm() {
   const { login } = useAuth();
@@ -128,39 +122,7 @@ export function LoginForm() {
           </Button>
         </form>
 
-        {/* Demo accounts */}
-        <div className="mt-6">
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200 dark:border-gray-700" />
-            </div>
-            <div className="relative flex justify-center">
-              <span className="bg-white dark:bg-gray-900 px-3 text-xs text-gray-400 dark:text-gray-500">
-                Demo accounts (password: admin123)
-              </span>
-            </div>
-          </div>
-          <div className="mt-4 grid grid-cols-2 gap-2">
-            {DEMO_ACCOUNTS.map((acc) => (
-              <button
-                key={acc.email}
-                type="button"
-                onClick={() => {
-                  setValue("email", acc.email);
-                  setValue("password", "admin123");
-                }}
-                className="rounded-lg border border-gray-200 dark:border-gray-700 px-3 py-2 text-left transition-colors hover:border-[#1E2B7A]/40 hover:bg-[#1E2B7A]/5 dark:hover:bg-[#1E2B7A]/20"
-              >
-                <p className="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                  {acc.label}
-                </p>
-                <p className="truncate text-[11px] text-gray-400 dark:text-gray-500">
-                  {acc.email}
-                </p>
-              </button>
-            ))}
-          </div>
-        </div>
+
       </div>
 
       {/* Staff registration link */}
