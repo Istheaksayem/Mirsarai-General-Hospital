@@ -1,4 +1,5 @@
 import DoctorProfile from '../models/doctorProfile.model.js';
+import Doctor from '../models/doctor.model.js';
 import User from '../models/user.model.js';
 import ApiError from '../utils/ApiError.js';
 import { StatusCodes } from 'http-status-codes';
@@ -41,10 +42,10 @@ const generateSlug = (name) => {
 const generateUniqueSlug = async (baseSlug) => {
   let slug = baseSlug;
   let count = 0;
-  // Check both DoctorProfile and Doctor collections to avoid URL conflicts
   while (true) {
-    const existingProfile = await DoctorProfile.findOne({ slug }).lean();
-    if (!existingProfile) break;
+    const profileExists = await DoctorProfile.findOne({ slug }).lean();
+    const doctorExists = await Doctor.findOne({ slug }).lean();
+    if (!profileExists && !doctorExists) break;
     count++;
     slug = `${baseSlug}-${count}`;
   }
@@ -120,6 +121,25 @@ export const createOrUpdateMyProfile = async (userId, data) => {
 
     // Mark profile as completed on the User
     await User.findByIdAndUpdate(userId, { profileCompleted: true });
+
+    // Create corresponding Doctor document
+    await Doctor.create({
+      slug,
+      name: { en: doctorData.name?.en || user.fullName || 'Doctor', bn: doctorData.name?.bn || '' },
+      'designation.en': doctorData.designation || 'Staff',
+      'specialization.en': doctorData.specialization || 'TBD',
+      'department.en': doctorData.department || 'General',
+      qualification: doctorData.qualification || 'TBD',
+      phone: doctorData.phone || user.phone || '',
+      email: doctorData.email || user.email || '',
+      consultationFee: doctorData.consultationFee || 0,
+      availableDays: doctorData.availableDays || [],
+      image: doctorData.image || '',
+      'about.en': doctorData.biography || '',
+      isVisible: true,
+      createdBy: userId,
+      updatedBy: userId,
+    });
   } else {
     // ── Update existing profile ──────────────────────────────────────────
 
@@ -143,6 +163,25 @@ export const createOrUpdateMyProfile = async (userId, data) => {
     // Set visibility to published (if transitioning from draft)
     doctorData.profileVisibility = 'published';
 
+    // Generate slug if profile doesn't have one
+    if (!profile.slug && doctorData.name?.en) {
+      const nameEn = doctorData.name.en;
+      const baseSlug = generateSlug(nameEn);
+      let slug = baseSlug;
+      let count = 0;
+      while (true) {
+        const docExists = await Doctor.findOne({ slug }).lean();
+        const profExists = await DoctorProfile.findOne({
+          slug,
+          _id: { $ne: profile._id },
+        }).lean();
+        if (!docExists && !profExists) break;
+        count++;
+        slug = `${baseSlug}-${count}`;
+      }
+      doctorData.slug = slug;
+    }
+
     profile = await DoctorProfile.findOneAndUpdate(
       { userId },
       { $set: doctorData },
@@ -151,6 +190,43 @@ export const createOrUpdateMyProfile = async (userId, data) => {
 
     // Ensure profile is marked completed (in case it wasn't)
     await User.findByIdAndUpdate(userId, { profileCompleted: true });
+
+    // Sync with Doctor collection
+    const profileSlug = profile.slug;
+    if (profileSlug) {
+      const doctorPayload = {
+        slug: profileSlug,
+        name: {
+          en: doctorData.name?.en || user.fullName || 'Doctor',
+          bn: doctorData.name?.bn || '',
+        },
+        'designation.en': profile.designation || 'Staff',
+        'specialization.en': doctorData.specialization || profile.specialization || 'TBD',
+        'department.en': profile.department || 'General',
+        qualification: doctorData.qualification || profile.qualification || 'TBD',
+        phone: doctorData.phone || user.phone || '',
+        email: doctorData.email || user.email || '',
+        consultationFee: doctorData.consultationFee || 0,
+        availableDays: doctorData.availableDays || [],
+        image: doctorData.image || profile.image || '',
+        'about.en': doctorData.biography || profile.biography || '',
+        isVisible: true,
+        updatedBy: userId,
+      };
+
+      const existingDoctor = await Doctor.findOne({ slug: profileSlug }).lean();
+      if (existingDoctor) {
+        await Doctor.findOneAndUpdate(
+          { slug: profileSlug },
+          { $set: doctorPayload }
+        );
+      } else {
+        await Doctor.create({
+          ...doctorPayload,
+          createdBy: userId,
+        });
+      }
+    }
   }
 
   return profile;
