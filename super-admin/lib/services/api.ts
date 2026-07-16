@@ -95,6 +95,23 @@ export class ApiError extends Error {
   }
 }
 
+// ─── Image URL Normalization ──────────────────────────────────────────────────
+
+import { getImageUrl } from '../getImageUrl';
+
+function normalizeImages(obj: unknown): unknown {
+  if (typeof obj === 'string') return getImageUrl(obj);
+  if (Array.isArray(obj)) return obj.map(normalizeImages);
+  if (obj && typeof obj === 'object') {
+    const result: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
+      result[key] = normalizeImages(value);
+    }
+    return result;
+  }
+  return obj;
+}
+
 // ─── Base Fetcher ─────────────────────────────────────────────────────────────
 
 const MOCK_BASE = "/mock-data";
@@ -238,7 +255,7 @@ async function fetchReal<T>(path: string): Promise<T> {
     throw new ApiError(res.status, errorMessage);
   }
   const result = await res.json();
-  return result.data as T;
+  return normalizeImages(result.data) as T;
 }
 
 async function saveReal<T>(path: string, data: Partial<T>, method: "PUT" | "PATCH"): Promise<T> {
@@ -259,7 +276,7 @@ async function saveReal<T>(path: string, data: Partial<T>, method: "PUT" | "PATC
     throw new ApiError(res.status, errorMessage);
   }
   const result = await res.json();
-  return result.data as T;
+  return normalizeImages(result.data) as T;
 }
 
 export const getAdminHomepage = () => fetchReal<HomepageData>("homepage");
@@ -526,7 +543,7 @@ async function fetchAdminReal<T>(path: string): Promise<T> {
     throw new ApiError(res.status, errorMessage);
   }
   const result = await res.json();
-  return result as T;
+  return normalizeImages(result) as T;
 }
 
 async function mutateAdminReal<T>(path: string, data: unknown, method: "POST" | "PUT" | "PATCH" | "DELETE" = "PUT"): Promise<T> {
@@ -542,7 +559,7 @@ async function mutateAdminReal<T>(path: string, data: unknown, method: "POST" | 
     throw new ApiError(res.status, errorMessage);
   }
   const result = await res.json();
-  return result.data as T;
+  return normalizeImages(result.data) as T;
 }
 
 export const getCmsDoctors = (params: DoctorQueryParams = {}) => {
@@ -623,7 +640,7 @@ async function fetchDoctorProfile<T>(path: string): Promise<T> {
     throw new ApiError(res.status, errorMessage);
   }
   const result = await res.json();
-  return result.data as T;
+  return normalizeImages(result.data) as T;
 }
 
 async function updateDoctorProfile<T>(path: string, data: unknown): Promise<T> {
@@ -639,7 +656,7 @@ async function updateDoctorProfile<T>(path: string, data: unknown): Promise<T> {
     throw new ApiError(res.status, errorMessage);
   }
   const result = await res.json();
-  return result.data as T;
+  return normalizeImages(result.data) as T;
 }
 
 export const getMyDoctorProfile = () =>

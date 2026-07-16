@@ -40,11 +40,13 @@ export interface DiagnosticService {
   statistics: Statistic[];
 }
 
+import { normalizeImages } from "@/lib/getImageUrl";
+
 const fetchDiagnosticService = async (lang = "en"): Promise<DiagnosticService> => {
   const res = await fetch(`${API_URL}/service-page/diagnostic-services?lang=${lang}`, { cache: "no-store" });
   if (!res.ok) throw new Error("Failed to fetch diagnostic service data");
   const json = await res.json();
-  return json.data as DiagnosticService;
+  return normalizeImages(json.data) as DiagnosticService;
 };
 
 export const useDiagnosticService = (lang = "en") =>

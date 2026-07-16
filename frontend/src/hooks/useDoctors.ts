@@ -36,12 +36,15 @@ export interface Doctor {
 }
 
 // ── Normalizer ────────────────────────────────────────────────────────────────
+import { getImageUrl } from "@/lib/getImageUrl";
+
 // API stores experience as { years, label: { en, bn } }, frontend expects { en, bn }
 const normalizeDoctor = (d: Record<string, unknown>): Doctor => {
   const exp = d.experience as Record<string, unknown>;
   if (exp && exp.label) {
     d.experience = exp.label;
   }
+  if (d.image) d.image = getImageUrl(d.image as string);
   return d as unknown as Doctor;
 };
 
