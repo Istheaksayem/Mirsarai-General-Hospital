@@ -22,7 +22,7 @@ const authenticate = catchAsync(async (req, res, next) => {
 
   if (!token) {
     if (env.nodeEnv === 'development') {
-      req.user = { id: 'mock-admin-id', role: 'super-admin', email: 'superadmin@mgh.com' };
+      req.user = { id: '64b1f9c8f0e1a2b3c4d5e6f7', role: 'super-admin', email: 'superadmin@mgh.com' };
       return next();
     }
     return next(
@@ -36,7 +36,7 @@ const authenticate = catchAsync(async (req, res, next) => {
     next();
   } catch (error) {
     if (env.nodeEnv === 'development') {
-      req.user = { id: 'mock-admin-id', role: 'super-admin', email: 'superadmin@mgh.com' };
+      req.user = { id: '64b1f9c8f0e1a2b3c4d5e6f7', role: 'super-admin', email: 'superadmin@mgh.com' };
       return next();
     }
     if (error.name === 'TokenExpiredError') {

@@ -14,6 +14,7 @@ import homepageRoutes from './homepage.routes.js';
 import authRoutes from './auth.routes.js';
 import receptionistRoutes from './receptionist.routes.js';
 import labAdminRoutes from './labAdmin.routes.js';
+import labReportRoutes from './labReport.routes.js';
 import appointmentRoutes from './appointment.routes.js';
 import adminAppointmentRoutes from './admin/appointment.admin.routes.js';
 import serviceRoutes from './service.routes.js';
@@ -117,6 +118,7 @@ router.use('/appointments', appointmentRoutes);
 // ── Staff Self-Profile Routes ─────────────────────────────────────────────────────
 router.use('/receptionists', receptionistRoutes);
 router.use('/lab', labAdminRoutes);
+router.use('/lab-reports', labReportRoutes);
 
 // ── Admin Routes ────────────────────────────────────────────────────────────────
 router.use('/admin/services', authenticate, authorize('super-admin'), adminServiceRoutes);
