@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/Button";
 import { useMyLabAdminProfile, useUpdateMyLabAdminProfile } from "@/lib/hooks/useMyLabAdminProfile";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import { uploadProfilePhoto } from "@/lib/services/api";
 import { type LabAdminProfileData } from "@/lib/services/api";
 interface FormState {
   profilePhoto: string;
@@ -23,7 +24,7 @@ interface FormState {
 
 const emptyForm: FormState = {
   profilePhoto: "",
-  gender: "other",
+  gender: "",
   dateOfBirth: "",
   address: "",
   qualification: "",
@@ -48,7 +49,7 @@ export default function LabAdminProfilePage() {
     if (profile) {
       setForm({
         profilePhoto: profile.profilePhoto || "",
-        gender: profile.gender || "other",
+        gender: profile.gender || "",
         dateOfBirth: profile.dateOfBirth ? new Date(profile.dateOfBirth).toISOString().split("T")[0] : "",
         address: profile.address || "",
         qualification: profile.qualification || "",
@@ -67,11 +68,12 @@ export default function LabAdminProfilePage() {
 
   const validate = useCallback((): boolean => {
     const errors: Partial<Record<keyof FormState, string>> = {};
+    if (!form.profilePhoto.trim()) errors.profilePhoto = "Profile photo is required";
     if (!form.gender.trim()) errors.gender = "Gender is required";
     if (!form.dateOfBirth.trim()) errors.dateOfBirth = "Date of birth is required";
     if (!form.address.trim()) errors.address = "Address is required";
     if (!form.qualification.trim()) errors.qualification = "Qualification is required";
-    if (form.experience < 0) errors.experience = "Experience must be a non-negative number";
+    if (form.experience < 1) errors.experience = "Experience must be at least 1 year";
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   }, [form]);
@@ -107,7 +109,7 @@ export default function LabAdminProfilePage() {
     if (profile) {
       setForm({
         profilePhoto: profile.profilePhoto || "",
-        gender: profile.gender || "other",
+        gender: profile.gender || "",
         dateOfBirth: profile.dateOfBirth ? new Date(profile.dateOfBirth).toISOString().split("T")[0] : "",
         address: profile.address || "",
         qualification: profile.qualification || "",
@@ -188,26 +190,19 @@ export default function LabAdminProfilePage() {
                     if (!file) return;
                     setIsUploadingImage(true);
                     try {
-                      const reader = new FileReader();
-                      reader.onloadend = async () => {
-                        try {
-                          const base64Data = reader.result as string;
-                          updateField("profilePhoto", base64Data);
-                        } catch (err) {
-                          setSaveMessage({ type: "error", text: "Failed to read image" });
-                        } finally {
-                          setIsUploadingImage(false);
-                        }
-                      };
-                      reader.readAsDataURL(file);
-                    } catch (err) {
-                      setSaveMessage({ type: "error", text: "Failed to read file" });
+                      const { url } = await uploadProfilePhoto(file);
+                      updateField("profilePhoto", url);
+                    } catch (err: unknown) {
+                      const message = err instanceof Error ? err.message : "Failed to upload photo";
+                      setSaveMessage({ type: "error", text: message });
+                    } finally {
                       setIsUploadingImage(false);
                     }
                   }}
                 />
               </label>
             </div>
+            {formErrors.profilePhoto && <p className="mt-2 text-xs text-red-500">{formErrors.profilePhoto}</p>}
             <div className="mt-6 w-full space-y-3 border-t border-gray-100 dark:border-gray-800 pt-5">
               <FormField label="Gender" required error={formErrors.gender}>
                 <select

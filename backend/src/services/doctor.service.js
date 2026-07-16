@@ -523,6 +523,7 @@ export const assignAdminInfo = async (userId, adminData, adminId) => {
         specialization: { en: 'TBD', bn: '' },
         department: { en: adminData.department || 'General', bn: '' },
         qualification: 'TBD',
+        experience: { years: 0, label: { en: '0+ Years', bn: '০+ বছর' } },
         isVisible: false,
         createdBy: adminId,
         updatedBy: adminId,
@@ -564,6 +565,9 @@ export const assignAdminInfo = async (userId, adminData, adminId) => {
           'specialization.en': 'TBD',
           'department.en': adminData.department || 'General',
           qualification: 'TBD',
+          'experience.years': 0,
+          'experience.label.en': '0+ Years',
+          'experience.label.bn': '০+ বছর',
           isVisible: false,
           updatedBy: adminId,
         };
@@ -687,108 +691,6 @@ const generateNextLabAdminCode = async () => {
   }
 
   return `LAB-${String(counter.seq).padStart(5, '0')}`;
-};
-
-/**
- * Suspend an already-approved staff member
- */
-/**
- * One-time backfill: sync all DoctorProfiles to Doctor collection.
- * Generates slugs for profiles missing them, creates Doctor docs where missing.
- */
-export const syncDoctorProfiles = async () => {
-  const DoctorProfile = (await import('../models/doctorProfile.model.js')).default;
-  const User = (await import('../models/user.model.js')).default;
-  const results = { slugsAdded: [], doctorsCreated: [], errors: [] };
-
-  const generateSlug = (name) =>
-    name.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').replace(/--+/g, '-').trim();
-
-  // Phase 1: Profiles missing slug
-  const noSlugProfiles = await DoctorProfile.find({ slug: { $in: [null, undefined, ''] } }).lean();
-  for (const prof of noSlugProfiles) {
-    try {
-      const user = await User.findById(prof.userId).lean();
-      const nameEn = prof.name?.en || user?.fullName || 'doctor';
-      let baseSlug = generateSlug(nameEn);
-      if (!baseSlug) baseSlug = `doctor-${prof.doctorCode || Date.now()}`;
-
-      let slug = baseSlug;
-      let count = 0;
-      while (true) {
-        const docExists = await Doctor.findOne({ slug }).lean();
-        const profExists = await DoctorProfile.findOne({ slug, _id: { $ne: prof._id } }).lean();
-        if (!docExists && !profExists) break;
-        count++;
-        slug = `${baseSlug}-${count}`;
-      }
-
-      await DoctorProfile.findByIdAndUpdate(prof._id, { $set: { slug } });
-      results.slugsAdded.push({ id: prof._id, name: nameEn, slug: slug || 'MISSING' });
-
-      const existingDoc = await Doctor.findOne({ slug }).lean();
-      if (!existingDoc) {
-        const newDoc = await Doctor.create({
-          slug,
-          name: { en: nameEn, bn: prof.name?.bn || '' },
-          'designation.en': prof.designation || 'Staff',
-          'specialization.en': prof.specialization || 'TBD',
-          'department.en': prof.department || 'General',
-          qualification: prof.qualification || 'TBD',
-          phone: prof.phone || user?.phone || '',
-          email: prof.email || user?.email || '',
-          consultationFee: prof.consultationFee || 0,
-          availableDays: prof.availableDays || [],
-          image: prof.image || prof.profilePhoto || '',
-          'about.en': prof.biography || prof.about?.en || '',
-          isVisible: prof.profileVisibility === 'published',
-          createdBy: prof.userId,
-          updatedBy: prof.userId,
-        });
-        results.doctorsCreated.push({ id: newDoc._id, slug, name: nameEn });
-      }
-    } catch (err) {
-      results.errors.push({ id: prof._id, error: err.message });
-    }
-  }
-
-  // Phase 2: Profiles with slug but no matching Doctor doc
-  const sluggedProfiles = await DoctorProfile.find({
-    slug: { $nin: [null, undefined, ''] }
-  }).lean();
-
-  for (const prof of sluggedProfiles) {
-    try {
-      const existingDoc = await Doctor.findOne({ slug: prof.slug }).lean();
-      if (existingDoc) continue;
-
-      const user = await User.findById(prof.userId).lean();
-      const nameEn = prof.name?.en || user?.fullName || 'doctor';
-
-      const newDoc = await Doctor.create({
-        slug: prof.slug,
-        name: { en: nameEn, bn: prof.name?.bn || '' },
-        'designation.en': prof.designation || 'Staff',
-        'specialization.en': prof.specialization || 'TBD',
-        'department.en': prof.department || 'General',
-        qualification: prof.qualification || 'TBD',
-        phone: prof.phone || user?.phone || '',
-        email: prof.email || user?.email || '',
-        consultationFee: prof.consultationFee || 0,
-        availableDays: prof.availableDays || [],
-        image: prof.image || prof.profilePhoto || '',
-        'about.en': prof.biography || prof.about?.en || '',
-        isVisible: prof.profileVisibility === 'published',
-        createdBy: prof.userId,
-        updatedBy: prof.userId,
-      });
-      results.doctorsCreated.push({ id: newDoc._id, slug: prof.slug, name: nameEn });
-    } catch (err) {
-      results.errors.push({ id: prof._id, error: err.message });
-    }
-  }
-
-  return results;
 };
 
 export const suspendDoctor = async (userId, adminId) => {

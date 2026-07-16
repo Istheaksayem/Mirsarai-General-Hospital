@@ -576,6 +576,37 @@ export interface DoctorQueryParams {
   sortOrder?: "asc" | "desc";
 }
 
+// ─── Upload API ───────────────────────────────────────────────────────────────
+
+export async function uploadProfilePhoto(file: File): Promise<{ url: string }> {
+  const formData = new FormData();
+  formData.append("photo", file);
+
+  const headers: Record<string, string> = {};
+  if (typeof window !== "undefined") {
+    try {
+      const raw = sessionStorage.getItem("mgh_admin_user");
+      if (raw) {
+        const user = JSON.parse(raw);
+        if (user.token) headers["Authorization"] = `Bearer ${user.token}`;
+      }
+    } catch {}
+  }
+
+  const res = await fetch(`${BACKEND_API}/upload/profile-photo`, {
+    method: "POST",
+    headers,
+    body: formData,
+  });
+
+  const json = await res.json();
+  if (!res.ok || !json.success) {
+    const msg = json.message || "Failed to upload photo";
+    throw new Error(msg);
+  }
+  return json.data;
+}
+
 // ─── Doctor CMS API ───────────────────────────────────────────────────────────
 
 function getAuthHeaders(): Record<string, string> {

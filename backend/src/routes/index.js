@@ -15,6 +15,7 @@ import authRoutes from './auth.routes.js';
 import receptionistRoutes from './receptionist.routes.js';
 import labAdminRoutes from './labAdmin.routes.js';
 import labReportRoutes from './labReport.routes.js';
+import uploadRoutes from './upload.routes.js';
 import appointmentRoutes from './appointment.routes.js';
 import adminAppointmentRoutes from './admin/appointment.admin.routes.js';
 import serviceRoutes from './service.routes.js';
@@ -119,6 +120,7 @@ router.use('/appointments', appointmentRoutes);
 router.use('/receptionists', receptionistRoutes);
 router.use('/lab', labAdminRoutes);
 router.use('/lab-reports', labReportRoutes);
+router.use('/upload', uploadRoutes);
 
 // ── Admin Routes ────────────────────────────────────────────────────────────────
 router.use('/admin/services', authenticate, authorize('super-admin'), adminServiceRoutes);
