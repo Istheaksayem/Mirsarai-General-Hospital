@@ -133,6 +133,67 @@ export const getDepartments = () => fetchMock<Department[]>("departments.json");
 export const getAppointments = () => fetchMock<Appointment[]>("appointments.json");
 export const getBilling = () => fetchMock<Invoice[]>("billing.json");
 export const getReports = () => fetchMock<Report[]>("reports.json");
+
+// ─── Lab Reports Real API ─────────────────────────────────────────────────────
+
+export interface LabReportData {
+  _id: string;
+  patientId: string;
+  testName: string;
+  reportType: string;
+  requestingDoctor: string;
+  fileUrl: string;
+  status: "pending" | "completed";
+  uploadedBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface LabReportListResponse {
+  data: LabReportData[];
+  total: number;
+}
+
+// Get all lab reports (for lab admin)
+export const getLabReports = () => fetchAdminReal<{ data: LabReportData[] }>("lab-reports");
+
+// Get single lab report by ID
+export const getLabReportById = (id: string) => fetchAdminReal<{ data: LabReportData }>(`lab-reports/${id}`);
+
+// Update lab report status
+export const updateLabReportStatus = (id: string, status: "pending" | "completed") =>
+  mutateAdminReal<LabReportData>(`lab-reports/${id}/status`, { status }, "PATCH");
+
+// Delete lab report
+export const deleteLabReport = (id: string) =>
+  mutateAdminReal<null>(`lab-reports/${id}`, undefined, "DELETE");
+
+// Download lab report
+export const downloadLabReport = (id: string) =>
+  fetchAdminReal<{ data: { fileUrl: string; testName: string } }>(`lab-reports/${id}/download`);
+
+// Upload new lab report
+export const uploadLabReport = (formData: FormData) => {
+  return fetch(`${BACKEND_API}/lab-reports/upload`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: formData,
+  }).then(async (res) => {
+    if (!res.ok) {
+      const errorText = await res.text();
+      let errorMessage = "Failed to upload report";
+      try {
+        const parsed = JSON.parse(errorText);
+        errorMessage = parsed.message || errorMessage;
+      } catch {}
+      throw new ApiError(res.status, errorMessage);
+    }
+    return res.json();
+  });
+};
+
+// Get recent lab reports
+export const getRecentLabReports = () => fetchAdminReal<{ data: LabReportData[] }>("lab-reports/recent");
 export const getNotifications = () => fetchMock<Notification[]>("notifications.json");
 export const getRoles = () => fetchMock<RoleData[]>("roles.json");
 export const getActivities = () => fetchMock<Activity[]>("activities.json");
@@ -513,6 +574,37 @@ export interface DoctorQueryParams {
   search?: string;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
+}
+
+// ─── Upload API ───────────────────────────────────────────────────────────────
+
+export async function uploadProfilePhoto(file: File): Promise<{ url: string }> {
+  const formData = new FormData();
+  formData.append("photo", file);
+
+  const headers: Record<string, string> = {};
+  if (typeof window !== "undefined") {
+    try {
+      const raw = sessionStorage.getItem("mgh_admin_user");
+      if (raw) {
+        const user = JSON.parse(raw);
+        if (user.token) headers["Authorization"] = `Bearer ${user.token}`;
+      }
+    } catch {}
+  }
+
+  const res = await fetch(`${BACKEND_API}/upload/profile-photo`, {
+    method: "POST",
+    headers,
+    body: formData,
+  });
+
+  const json = await res.json();
+  if (!res.ok || !json.success) {
+    const msg = json.message || "Failed to upload photo";
+    throw new Error(msg);
+  }
+  return json.data;
 }
 
 // ─── Doctor CMS API ───────────────────────────────────────────────────────────

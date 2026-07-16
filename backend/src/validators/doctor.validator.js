@@ -87,16 +87,16 @@ export const assignAdminInfoSchema = z.object({
 });
 
 // ── Doctor Profile Schema (self-registered doctor profile completion) ─────────
+// All fields are mandatory — no defaults, all must be explicitly provided
 export const doctorProfileSchema = z.object({
   body: z.object({
-    // ── Existing fields ─────────────────────────────────────────────────
     department: z.string().optional().default(''),
     specialization: z.string().min(1, 'Specialization is required'),
     qualification: z.string().min(1, 'Qualification is required'),
-    experience: z.number().min(0).default(0),
+    experience: z.number().min(1, 'Experience must be at least 1 year'),
     bmdcNumber: z.string().min(1, 'BMDC registration number is required'),
-    consultationFee: z.number().min(0).default(0),
-    availableDays: z.array(z.string()).default([]),
+    consultationFee: z.number().min(0, 'Consultation fee is required'),
+    availableDays: z.array(z.string()).min(1, 'At least one available day is required'),
     availableTimeSlots: z.array(
       z.object({
         day: z.string(),
@@ -104,36 +104,36 @@ export const doctorProfileSchema = z.object({
         endTime: z.string(),
       })
     ).default([]),
-    profilePhoto: z.string().optional().default(''),
-    gender: z.enum(['male', 'female', 'other']).default('other'),
-    dateOfBirth: z.string().optional(),
-    address: z.string().optional().default(''),
-    biography: z.string().optional().default(''),
+    profilePhoto: z.string().min(1, 'Profile photo is required'),
+    gender: z.enum(['male', 'female', 'other'], { required_error: 'Gender is required' }),
+    dateOfBirth: z.string().min(1, 'Date of birth is required'),
+    address: z.string().min(1, 'Address is required'),
+    biography: z.string().min(1, 'Biography is required'),
 
-    // ── New bilingual fields (optional — fallback to existing) ──────────
+    // ── Bilingual fields (all mandatory) ────────────────────────────────
     name: z.object({
       en: z.string().optional().default(''),
-      bn: z.string().optional().default(''),
-    }).optional(),
+      bn: z.string().min(1, 'Name (Bengali) is required'),
+    }),
     about: z.object({
-      en: z.string().optional().default(''),
-      bn: z.string().optional().default(''),
-    }).optional(),
+      en: z.string().min(1, 'About (English) is required'),
+      bn: z.string().min(1, 'About (Bengali) is required'),
+    }),
     chamberTime: z.object({
-      en: z.string().optional().default(''),
-      bn: z.string().optional().default(''),
-    }).optional(),
+      en: z.string().min(1, 'Chamber time (English) is required'),
+      bn: z.string().min(1, 'Chamber time (Bengali) is required'),
+    }),
     chamberAddress: z.object({
       en: z.string().optional().default(''),
       bn: z.string().optional().default(''),
     }).optional(),
     services: z.array(
       z.object({ en: z.string().default(''), bn: z.string().default('') })
-    ).optional().default([]),
-    languages: z.array(z.string()).optional().default(['Bangla', 'English']),
-    onlineConsultation: z.boolean().optional().default(false),
-    offlineConsultation: z.boolean().optional().default(true),
-    appointmentAvailable: z.boolean().optional().default(true),
-    available: z.boolean().optional().default(true),
+    ).default([]),
+    languages: z.array(z.string()).min(1, 'At least one language is required'),
+    onlineConsultation: z.boolean({ required_error: 'Online consultation preference is required' }),
+    offlineConsultation: z.boolean({ required_error: 'Offline consultation preference is required' }),
+    appointmentAvailable: z.boolean({ required_error: 'Appointment availability is required' }),
+    available: z.boolean({ required_error: 'Availability status is required' }),
   }),
 });

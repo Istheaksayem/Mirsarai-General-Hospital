@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import { getImageUrl } from "@/lib/getImageUrl";
 import {
   UserCheck, Mail, Phone, Building2, Award, Calendar,
-  Edit2, Save, X, Camera, GraduationCap, Briefcase,
+  Edit2, Save, X, Camera, GraduationCap, Briefcase, Loader2,
 } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge } from "@/components/ui/Badge";
@@ -11,7 +11,8 @@ import { Button } from "@/components/ui/Button";
 import { useMyLabAdminProfile, useUpdateMyLabAdminProfile } from "@/lib/hooks/useMyLabAdminProfile";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import type { LabAdminProfileData } from "@/lib/services/api";
+import { uploadProfilePhoto } from "@/lib/services/api";
+import { type LabAdminProfileData } from "@/lib/services/api";
 
 interface FormState {
   profilePhoto: string;
@@ -24,7 +25,7 @@ interface FormState {
 
 const emptyForm: FormState = {
   profilePhoto: "",
-  gender: "other",
+  gender: "",
   dateOfBirth: "",
   address: "",
   qualification: "",
@@ -42,13 +43,14 @@ export default function LabAdminProfilePage() {
   const [form, setForm] = useState<FormState>(emptyForm);
   const [formErrors, setFormErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [saving, setSaving] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [saveMessage, setSaveMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   useEffect(() => {
     if (profile) {
       setForm({
         profilePhoto: profile.profilePhoto || "",
-        gender: profile.gender || "other",
+        gender: profile.gender || "",
         dateOfBirth: profile.dateOfBirth ? new Date(profile.dateOfBirth).toISOString().split("T")[0] : "",
         address: profile.address || "",
         qualification: profile.qualification || "",
@@ -67,11 +69,12 @@ export default function LabAdminProfilePage() {
 
   const validate = useCallback((): boolean => {
     const errors: Partial<Record<keyof FormState, string>> = {};
+    if (!form.profilePhoto.trim()) errors.profilePhoto = "Profile photo is required";
     if (!form.gender.trim()) errors.gender = "Gender is required";
     if (!form.dateOfBirth.trim()) errors.dateOfBirth = "Date of birth is required";
     if (!form.address.trim()) errors.address = "Address is required";
     if (!form.qualification.trim()) errors.qualification = "Qualification is required";
-    if (form.experience < 0) errors.experience = "Experience must be a non-negative number";
+    if (form.experience < 1) errors.experience = "Experience must be at least 1 year";
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   }, [form]);
@@ -107,7 +110,7 @@ export default function LabAdminProfilePage() {
     if (profile) {
       setForm({
         profilePhoto: profile.profilePhoto || "",
-        gender: profile.gender || "other",
+        gender: profile.gender || "",
         dateOfBirth: profile.dateOfBirth ? new Date(profile.dateOfBirth).toISOString().split("T")[0] : "",
         address: profile.address || "",
         qualification: profile.qualification || "",
@@ -176,24 +179,31 @@ export default function LabAdminProfilePage() {
                   (user?.name || "L").charAt(0)
                 )}
               </div>
-              <label className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 flex items-center justify-center cursor-pointer shadow hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+              <label className={`absolute -bottom-1 -right-1 h-8 w-8 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 flex items-center justify-center ${isUploadingImage ? 'cursor-not-allowed' : 'cursor-pointer'} shadow hover:bg-gray-50 dark:hover:bg-gray-700 transition`}>
                 <Camera className="h-4 w-4 text-gray-500" />
                 <input
-                  type="text"
+                  type="file"
                   className="hidden"
-                  placeholder="Photo URL"
-                  value={form.profilePhoto}
-                  onChange={(e) => updateField("profilePhoto", e.target.value)}
+                  accept="image/*"
+                  disabled={isUploadingImage}
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    setIsUploadingImage(true);
+                    try {
+                      const { url } = await uploadProfilePhoto(file);
+                      updateField("profilePhoto", url);
+                    } catch (err: unknown) {
+                      const message = err instanceof Error ? err.message : "Failed to upload photo";
+                      setSaveMessage({ type: "error", text: message });
+                    } finally {
+                      setIsUploadingImage(false);
+                    }
+                  }}
                 />
               </label>
             </div>
-            <input
-              type="text"
-              placeholder="Profile photo URL"
-              value={form.profilePhoto}
-              onChange={(e) => updateField("profilePhoto", e.target.value)}
-              className="w-full text-center rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 focus:outline-none focus:border-violet-600"
-            />
+            {formErrors.profilePhoto && <p className="mt-2 text-xs text-red-500">{formErrors.profilePhoto}</p>}
             <div className="mt-6 w-full space-y-3 border-t border-gray-100 dark:border-gray-800 pt-5">
               <FormField label="Gender" required error={formErrors.gender}>
                 <select
@@ -280,8 +290,11 @@ export default function LabAdminProfilePage() {
 
   if (isError || !profile) {
     return (
-      <div className="rounded-2xl border border-dashed border-gray-200 dark:border-gray-700 p-12 text-center text-gray-400">
-        Lab admin profile not found. Please complete your profile.
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 dark:border-gray-700 p-12 text-center text-gray-400">
+        <p className="mb-4">Lab admin profile not found. Please complete your profile.</p>
+        <Button onClick={() => setEditing(true)}>
+          <Edit2 className="h-4 w-4 mr-1.5" />Complete Profile
+        </Button>
       </div>
     );
   }
@@ -300,9 +313,9 @@ export default function LabAdminProfilePage() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6 flex flex-col items-center text-center">
-          <div className="mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-purple-600 text-white text-3xl font-bold shadow-lg">
+          <div className="mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-purple-600 text-white text-3xl font-bold shadow-lg overflow-hidden">
             {profile.profilePhoto ? (
-              <img src={profile.profilePhoto} alt="Profile" className="h-full w-full rounded-full object-cover" />
+              <img src={getImageUrl(profile.profilePhoto)} alt="Profile" className="h-full w-full object-cover" />
             ) : (
               (user?.name || "L").charAt(0)
             )}

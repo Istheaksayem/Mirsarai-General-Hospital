@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/Button";
 import { useMyDoctorProfile, useUpdateMyDoctorProfile } from "@/lib/hooks/useMyDoctorProfile";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import { uploadProfilePhoto } from "@/lib/services/api";
 import type { DoctorProfileData } from "@/lib/services/api";
 
 const AVAILABILITY_DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -36,10 +37,10 @@ interface FormState {
   chamberTimeBn: string;
   services: { en: string; bn: string }[];
   languages: string[];
-  onlineConsultation: boolean;
-  offlineConsultation: boolean;
-  appointmentAvailable: boolean;
-  available: boolean;
+  onlineConsultation: boolean | null;
+  offlineConsultation: boolean | null;
+  appointmentAvailable: boolean | null;
+  available: boolean | null;
 }
 
 const emptyForm: FormState = {
@@ -50,7 +51,7 @@ const emptyForm: FormState = {
   consultationFee: 0,
   availableDays: [],
   profilePhoto: "",
-  gender: "other",
+  gender: "",
   dateOfBirth: "",
   address: "",
   biography: "",
@@ -60,11 +61,11 @@ const emptyForm: FormState = {
   chamberTimeEn: "",
   chamberTimeBn: "",
   services: [],
-  languages: ["Bangla", "English"],
-  onlineConsultation: false,
-  offlineConsultation: true,
-  appointmentAvailable: true,
-  available: true,
+  languages: [],
+  onlineConsultation: null,
+  offlineConsultation: null,
+  appointmentAvailable: null,
+  available: null,
 };
 
 export default function DoctorProfilePage() {
@@ -78,6 +79,7 @@ export default function DoctorProfilePage() {
   const [form, setForm] = useState<FormState>(emptyForm);
   const [formErrors, setFormErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [saving, setSaving] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [saveMessage, setSaveMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   // Load profile data into form
@@ -91,7 +93,7 @@ export default function DoctorProfilePage() {
         consultationFee: profile.consultationFee || 0,
         availableDays: profile.availableDays || [],
         profilePhoto: profile.profilePhoto || "",
-        gender: profile.gender || "other",
+        gender: profile.gender || "",
         dateOfBirth: profile.dateOfBirth ? new Date(profile.dateOfBirth).toISOString().split("T")[0] : "",
         address: profile.address || "",
         biography: profile.biography || "",
@@ -101,11 +103,11 @@ export default function DoctorProfilePage() {
         chamberTimeEn: profile.chamberTime?.en || "",
         chamberTimeBn: profile.chamberTime?.bn || "",
         services: profile.services || [],
-        languages: profile.languages || ["Bangla", "English"],
-        onlineConsultation: profile.onlineConsultation || false,
-        offlineConsultation: profile.offlineConsultation !== false,
-        appointmentAvailable: profile.appointmentAvailable !== false,
-        available: profile.available !== false,
+        languages: profile.languages || [],
+        onlineConsultation: profile.onlineConsultation ?? null,
+        offlineConsultation: profile.offlineConsultation ?? null,
+        appointmentAvailable: profile.appointmentAvailable ?? null,
+        available: profile.available ?? null,
       });
     }
   }, [profile]);
@@ -117,6 +119,21 @@ export default function DoctorProfilePage() {
     },
     []
   );
+
+  const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingPhoto(true);
+    try {
+      const { url } = await uploadProfilePhoto(file);
+      updateField("profilePhoto", url);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to upload photo";
+      setSaveMessage({ type: "error", text: message });
+    } finally {
+      setUploadingPhoto(false);
+    }
+  }, [updateField]);
 
   const toggleDay = useCallback((day: string) => {
     setForm((prev) => ({
@@ -131,7 +148,25 @@ export default function DoctorProfilePage() {
     const errors: Partial<Record<keyof FormState, string>> = {};
     if (!form.specialization.trim()) errors.specialization = "Specialization is required";
     if (!form.qualification.trim()) errors.qualification = "Qualification is required";
+    if (form.experience < 1) errors.experience = "Experience must be at least 1 year";
     if (!form.bmdcNumber.trim()) errors.bmdcNumber = "BMDC registration number is required";
+    if (form.consultationFee < 0) errors.consultationFee = "Consultation fee is required";
+    if (form.availableDays.length === 0) errors.availableDays = "At least one available day is required";
+    if (!form.profilePhoto.trim()) errors.profilePhoto = "Profile photo is required";
+    if (!form.gender.trim()) errors.gender = "Gender is required";
+    if (!form.dateOfBirth.trim()) errors.dateOfBirth = "Date of birth is required";
+    if (!form.address.trim()) errors.address = "Address is required";
+    if (!form.biography.trim()) errors.biography = "Biography is required";
+    if (!form.nameBn.trim()) errors.nameBn = "Name (Bengali) is required";
+    if (!form.aboutEn.trim()) errors.aboutEn = "About (English) is required";
+    if (!form.aboutBn.trim()) errors.aboutBn = "About (Bengali) is required";
+    if (!form.chamberTimeEn.trim()) errors.chamberTimeEn = "Chamber time (English) is required";
+    if (!form.chamberTimeBn.trim()) errors.chamberTimeBn = "Chamber time (Bengali) is required";
+    if (form.languages.length === 0) errors.languages = "At least one language is required";
+    if (form.onlineConsultation === null) errors.onlineConsultation = "Please specify online consultation preference";
+    if (form.offlineConsultation === null) errors.offlineConsultation = "Please specify offline consultation preference";
+    if (form.appointmentAvailable === null) errors.appointmentAvailable = "Please specify appointment availability";
+    if (form.available === null) errors.available = "Please specify your availability status";
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   }, [form]);
@@ -152,15 +187,15 @@ export default function DoctorProfilePage() {
         dateOfBirth: form.dateOfBirth || undefined,
         address: form.address,
         biography: form.biography,
-        name: { en: user?.fullName || "", bn: form.nameBn },
+        name: { en: user?.name || "", bn: form.nameBn },
         about: { en: form.aboutEn, bn: form.aboutBn },
         chamberTime: { en: form.chamberTimeEn, bn: form.chamberTimeBn },
         services: form.services,
         languages: form.languages,
-        onlineConsultation: form.onlineConsultation,
-        offlineConsultation: form.offlineConsultation,
-        appointmentAvailable: form.appointmentAvailable,
-        available: form.available,
+        onlineConsultation: form.onlineConsultation ?? undefined,
+        offlineConsultation: form.offlineConsultation ?? undefined,
+        appointmentAvailable: form.appointmentAvailable ?? undefined,
+        available: form.available ?? undefined,
       };
       await updateMutation.mutateAsync(payload);
       await refreshUser();
@@ -187,7 +222,7 @@ export default function DoctorProfilePage() {
         consultationFee: profile.consultationFee || 0,
         availableDays: profile.availableDays || [],
         profilePhoto: profile.profilePhoto || "",
-        gender: profile.gender || "other",
+        gender: profile.gender || "",
         dateOfBirth: profile.dateOfBirth ? new Date(profile.dateOfBirth).toISOString().split("T")[0] : "",
         address: profile.address || "",
         biography: profile.biography || "",
@@ -197,11 +232,11 @@ export default function DoctorProfilePage() {
         chamberTimeEn: profile.chamberTime?.en || "",
         chamberTimeBn: profile.chamberTime?.bn || "",
         services: profile.services || [],
-        languages: profile.languages || ["Bangla", "English"],
-        onlineConsultation: profile.onlineConsultation || false,
-        offlineConsultation: profile.offlineConsultation !== false,
-        appointmentAvailable: profile.appointmentAvailable !== false,
-        available: profile.available !== false,
+        languages: profile.languages || [],
+        onlineConsultation: profile.onlineConsultation ?? null,
+        offlineConsultation: profile.offlineConsultation ?? null,
+        appointmentAvailable: profile.appointmentAvailable ?? null,
+        available: profile.available ?? null,
       });
     }
     setEditing(false);
@@ -271,23 +306,20 @@ export default function DoctorProfilePage() {
               <label className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 flex items-center justify-center cursor-pointer shadow hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                 <Camera className="h-4 w-4 text-gray-500" />
                 <input
-                  type="text"
+                  type="file"
                   className="hidden"
-                  placeholder="Photo URL"
-                  value={form.profilePhoto}
-                  onChange={(e) => updateField("profilePhoto", e.target.value)}
+                  accept="image/*"
+                  onChange={handleFileSelect}
+                  disabled={uploadingPhoto}
                 />
               </label>
             </div>
-            <input
-              type="text"
-              placeholder="Profile photo URL"
-              value={form.profilePhoto}
-              onChange={(e) => updateField("profilePhoto", e.target.value)}
-              className="w-full text-center rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 focus:outline-none focus:border-[#1E2B7A]"
-            />
+            <p className="text-xs text-gray-400 mt-1">
+              {uploadingPhoto ? "Uploading..." : "Click camera icon to upload photo"}
+            </p>
+            {formErrors.profilePhoto && <p className="mt-1 text-xs text-red-500">{formErrors.profilePhoto}</p>}
             <div className="mt-6 w-full space-y-3 border-t border-gray-100 dark:border-gray-800 pt-5">
-              <FormField label="Gender" error={formErrors.gender}>
+              <FormField label="Gender" required error={formErrors.gender}>
                 <select
                   value={form.gender}
                   onChange={(e) => updateField("gender", e.target.value)}
@@ -298,7 +330,7 @@ export default function DoctorProfilePage() {
                   <option value="other">Other</option>
                 </select>
               </FormField>
-              <FormField label="Date of Birth" error={formErrors.dateOfBirth}>
+              <FormField label="Date of Birth" required error={formErrors.dateOfBirth}>
                 <input
                   type="date"
                   value={form.dateOfBirth}
@@ -306,7 +338,7 @@ export default function DoctorProfilePage() {
                   className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm"
                 />
               </FormField>
-              <FormField label="Address" error={formErrors.address}>
+              <FormField label="Address" required error={formErrors.address}>
                 <textarea
                   value={form.address}
                   onChange={(e) => updateField("address", e.target.value)}
@@ -339,7 +371,7 @@ export default function DoctorProfilePage() {
                     className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:border-[#1E2B7A] focus:outline-none focus:ring-1 focus:ring-[#1E2B7A]"
                   />
                 </FormField>
-                <FormField label="Experience (years)" error={formErrors.experience}>
+                <FormField label="Experience (years)" required error={formErrors.experience}>
                   <input
                     type="number"
                     min={0}
@@ -356,7 +388,7 @@ export default function DoctorProfilePage() {
                     className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:border-[#1E2B7A] focus:outline-none focus:ring-1 focus:ring-[#1E2B7A]"
                   />
                 </FormField>
-                <FormField label="Consultation Fee (৳)" error={formErrors.consultationFee}>
+                <FormField label="Consultation Fee (৳)" required error={formErrors.consultationFee}>
                   <input
                     type="number"
                     min={0}
@@ -374,12 +406,12 @@ export default function DoctorProfilePage() {
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <FormField label="English">
                   <input
-                    value={user?.fullName || ""}
+                    value={user?.name || ""}
                     disabled
                     className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3 py-2 text-sm text-gray-500"
                   />
                 </FormField>
-                <FormField label="বাংলা">
+                <FormField label="বাংলা" required error={formErrors.nameBn}>
                   <input
                     value={form.nameBn}
                     onChange={(e) => updateField("nameBn", e.target.value)}
@@ -394,7 +426,7 @@ export default function DoctorProfilePage() {
             <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6">
               <h3 className="mb-4 font-semibold text-gray-900 dark:text-gray-100">About <span className="text-gray-400 font-normal">(bilingual)</span></h3>
               <div className="space-y-3">
-                <FormField label="English">
+                <FormField label="English" required error={formErrors.aboutEn}>
                   <textarea
                     value={form.aboutEn}
                     onChange={(e) => updateField("aboutEn", e.target.value)}
@@ -403,7 +435,7 @@ export default function DoctorProfilePage() {
                     className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm resize-none focus:border-[#1E2B7A] focus:outline-none focus:ring-1 focus:ring-[#1E2B7A]"
                   />
                 </FormField>
-                <FormField label="বাংলা">
+                <FormField label="বাংলা" required error={formErrors.aboutBn}>
                   <textarea
                     value={form.aboutBn}
                     onChange={(e) => updateField("aboutBn", e.target.value)}
@@ -419,7 +451,7 @@ export default function DoctorProfilePage() {
             <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6">
               <h3 className="mb-4 font-semibold text-gray-900 dark:text-gray-100">Chamber Time <span className="text-gray-400 font-normal">(bilingual)</span></h3>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <FormField label="English">
+                <FormField label="English" required error={formErrors.chamberTimeEn}>
                   <input
                     value={form.chamberTimeEn}
                     onChange={(e) => updateField("chamberTimeEn", e.target.value)}
@@ -427,7 +459,7 @@ export default function DoctorProfilePage() {
                     className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:border-[#1E2B7A] focus:outline-none focus:ring-1 focus:ring-[#1E2B7A]"
                   />
                 </FormField>
-                <FormField label="বাংলা">
+                <FormField label="বাংলা" required error={formErrors.chamberTimeBn}>
                   <input
                     value={form.chamberTimeBn}
                     onChange={(e) => updateField("chamberTimeBn", e.target.value)}
@@ -489,7 +521,7 @@ export default function DoctorProfilePage() {
 
             {/* Languages */}
             <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6">
-              <h3 className="mb-4 font-semibold text-gray-900 dark:text-gray-100">Languages</h3>
+              <h3 className="mb-4 font-semibold text-gray-900 dark:text-gray-100">Languages <span className="text-red-500">*</span></h3>
               <input
                 value={form.languages.join(", ")}
                 onChange={(e) => updateField("languages", e.target.value.split(",").map(s => s.trim()).filter(Boolean))}
@@ -497,16 +529,17 @@ export default function DoctorProfilePage() {
                 className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:border-[#1E2B7A] focus:outline-none focus:ring-1 focus:ring-[#1E2B7A]"
               />
               <p className="mt-1 text-xs text-gray-400">Comma-separated list of languages you speak</p>
+              {formErrors.languages && <p className="mt-1 text-xs text-red-500">{formErrors.languages}</p>}
             </div>
 
             {/* Consultation Options */}
             <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6">
-              <h3 className="mb-4 font-semibold text-gray-900 dark:text-gray-100">Consultation Options</h3>
+              <h3 className="mb-4 font-semibold text-gray-900 dark:text-gray-100">Consultation Options <span className="text-red-500">*</span></h3>
               <div className="flex flex-wrap gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={form.onlineConsultation}
+                    checked={form.onlineConsultation ?? false}
                     onChange={(e) => updateField("onlineConsultation", e.target.checked)}
                     className="rounded border-gray-300 text-[#1E2B7A] focus:ring-[#1E2B7A]"
                   />
@@ -516,7 +549,7 @@ export default function DoctorProfilePage() {
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={form.offlineConsultation}
+                    checked={form.offlineConsultation ?? false}
                     onChange={(e) => updateField("offlineConsultation", e.target.checked)}
                     className="rounded border-gray-300 text-[#1E2B7A] focus:ring-[#1E2B7A]"
                   />
@@ -526,7 +559,7 @@ export default function DoctorProfilePage() {
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={form.appointmentAvailable}
+                    checked={form.appointmentAvailable ?? false}
                     onChange={(e) => updateField("appointmentAvailable", e.target.checked)}
                     className="rounded border-gray-300 text-[#1E2B7A] focus:ring-[#1E2B7A]"
                   />
@@ -536,7 +569,7 @@ export default function DoctorProfilePage() {
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={form.available}
+                    checked={form.available ?? false}
                     onChange={(e) => updateField("available", e.target.checked)}
                     className="rounded border-gray-300 text-[#1E2B7A] focus:ring-[#1E2B7A]"
                   />
@@ -544,11 +577,15 @@ export default function DoctorProfilePage() {
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Available for patients</span>
                 </label>
               </div>
+              {formErrors.onlineConsultation && <p className="mt-2 text-xs text-red-500">{formErrors.onlineConsultation}</p>}
+              {formErrors.offlineConsultation && <p className="mt-1 text-xs text-red-500">{formErrors.offlineConsultation}</p>}
+              {formErrors.appointmentAvailable && <p className="mt-1 text-xs text-red-500">{formErrors.appointmentAvailable}</p>}
+              {formErrors.available && <p className="mt-1 text-xs text-red-500">{formErrors.available}</p>}
             </div>
 
             {/* Available Days */}
             <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6">
-              <h3 className="mb-4 font-semibold text-gray-900 dark:text-gray-100">Available Days</h3>
+              <h3 className="mb-4 font-semibold text-gray-900 dark:text-gray-100">Available Days <span className="text-red-500">*</span></h3>
               <div className="flex flex-wrap gap-2">
                 {AVAILABILITY_DAYS.map((day) => {
                   const isSelected = form.availableDays.includes(day);
@@ -569,11 +606,12 @@ export default function DoctorProfilePage() {
                   );
                 })}
               </div>
+              {formErrors.availableDays && <p className="mt-2 text-xs text-red-500">{formErrors.availableDays}</p>}
             </div>
 
             {/* Biography */}
             <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6">
-              <h3 className="mb-4 font-semibold text-gray-900 dark:text-gray-100">Biography <span className="text-gray-400 font-normal">(optional)</span></h3>
+              <h3 className="mb-4 font-semibold text-gray-900 dark:text-gray-100">Biography <span className="text-red-500">*</span></h3>
               <textarea
                 value={form.biography}
                 onChange={(e) => updateField("biography", e.target.value)}
@@ -581,6 +619,7 @@ export default function DoctorProfilePage() {
                 placeholder="Tell patients about yourself, your expertise, and approach to care..."
                 className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm resize-none focus:border-[#1E2B7A] focus:outline-none focus:ring-1 focus:ring-[#1E2B7A]"
               />
+              {formErrors.biography && <p className="mt-1 text-xs text-red-500">{formErrors.biography}</p>}
             </div>
           </div>
         </div>
