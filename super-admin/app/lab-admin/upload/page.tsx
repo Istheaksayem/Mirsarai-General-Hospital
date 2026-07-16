@@ -20,7 +20,7 @@ export default function UploadReportsPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [recentUploads, setRecentUploads] = useState<RecentUpload[]>([]);
-  
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState({
@@ -69,7 +69,7 @@ export default function UploadReportsPage() {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setDragging(false);
-    
+
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const droppedFile = e.dataTransfer.files[0];
       validateAndSetFile(droppedFile);
@@ -129,7 +129,7 @@ export default function UploadReportsPage() {
       data.append('reportFile', file);
 
       const url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/lab-reports/upload`;
-      
+
       const res = await fetch(url, {
         method: 'POST',
         headers: {
@@ -148,7 +148,7 @@ export default function UploadReportsPage() {
       setFormData({ patientId: "", testName: "", reportType: "", requestingDoctor: "" });
       setFile(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
-      
+
       fetchRecentUploads();
 
       // Clear success message after 3 seconds
@@ -173,14 +173,14 @@ export default function UploadReportsPage() {
         <div className="space-y-5">
           <form onSubmit={handleSubmit} className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6 space-y-5 shadow-sm">
             <h2 className="font-semibold text-gray-900 dark:text-gray-100">Upload New Report</h2>
-            
+
             {error && (
               <div className="p-3 bg-red-50 text-red-600 rounded-lg flex items-center gap-2 text-sm">
                 <AlertCircle className="h-4 w-4 shrink-0" />
                 <span>{error}</span>
               </div>
             )}
-            
+
 
             {!file ? (
               <div
@@ -195,10 +195,10 @@ export default function UploadReportsPage() {
                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Drag & drop files here</p>
                 <p className="text-xs text-gray-400 mt-1">Supports PDF, JPG, PNG (max 10MB)</p>
                 <Button type="button" variant="outline" size="sm" className="mt-4 pointer-events-none">Browse Files</Button>
-                <input 
-                  type="file" 
-                  ref={fileInputRef} 
-                  className="hidden" 
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
                   accept=".pdf,.jpg,.jpeg,.png"
                   onChange={handleFileChange}
                 />
@@ -214,8 +214,8 @@ export default function UploadReportsPage() {
                     <p className="text-xs text-gray-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
                   </div>
                 </div>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={removeFile}
                   className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                 >
@@ -225,25 +225,25 @@ export default function UploadReportsPage() {
             )}
 
             <div className="space-y-4">
-              <Input 
-                name="patientId" 
-                value={formData.patientId} 
-                onChange={handleChange} 
-                label="Patient ID" 
-                placeholder="e.g. P-1001" 
+              <Input
+                name="patientId"
+                value={formData.patientId}
+                onChange={handleChange}
+                label="Patient ID"
+                placeholder="e.g. P-1001"
                 required
               />
-              <Input 
-                name="testName" 
-                value={formData.testName} 
-                onChange={handleChange} 
-                label="Test Name" 
-                placeholder="e.g. Complete Blood Count" 
+              <Input
+                name="testName"
+                value={formData.testName}
+                onChange={handleChange}
+                label="Test Name"
+                placeholder="e.g. Complete Blood Count"
                 required
               />
               <div className="space-y-1.5">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Report Type *</label>
-                <select 
+                <select
                   name="reportType"
                   value={formData.reportType}
                   onChange={handleChange}
@@ -257,16 +257,16 @@ export default function UploadReportsPage() {
                   <option value="microbiology">Microbiology</option>
                 </select>
               </div>
-              <Input 
-                name="requestingDoctor" 
-                value={formData.requestingDoctor} 
-                onChange={handleChange} 
-                label="Requesting Doctor" 
-                placeholder="Dr. Name" 
+              <Input
+                name="requestingDoctor"
+                value={formData.requestingDoctor}
+                onChange={handleChange}
+                label="Requesting Doctor"
+                placeholder="Dr. Name"
                 required
               />
             </div>
-            
+
             <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
@@ -286,7 +286,7 @@ export default function UploadReportsPage() {
         {/* Recent uploads */}
         <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6 space-y-4 shadow-sm h-fit">
           <h2 className="font-semibold text-gray-900 dark:text-gray-100">Recent Uploads</h2>
-          
+
           {recentUploads.length === 0 ? (
             <div className="text-center py-8 text-gray-500 text-sm">
               No recent uploads found.
@@ -323,9 +323,9 @@ export default function UploadReportsPage() {
               <p className="font-medium text-gray-900 dark:text-gray-100">Success</p>
               <p className="text-sm text-gray-500 dark:text-gray-400">{success}</p>
             </div>
-            <button 
+            <button
               type="button"
-              onClick={() => setSuccess(null)} 
+              onClick={() => setSuccess(null)}
               className="ml-4 p-1 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               <X className="h-5 w-5" />
