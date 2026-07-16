@@ -137,14 +137,24 @@ export const verifyOTP = async (req, res) => {
       });
     }
 
-    // OTP is valid — NOW create the actual User in the database
-    const user = await User.create({
+    const isStaff = pending.role && pending.role !== 'patient';
+    const userPayload = {
       fullName: pending.fullName,
       email: pending.email,
       phone: pending.phone,
-      password: pending.password, // already hashed by PendingRegistration pre-save hook
+      password: pending.password,
       isVerified: true,
-    });
+      role: pending.role || 'patient',
+    };
+
+    if (isStaff) {
+      userPayload.approvalStatus = 'pending';
+      userPayload.accountStatus = 'inactive';
+      userPayload.isActive = false;
+      userPayload.profileCompleted = false;
+    }
+
+    const user = await User.create(userPayload);
 
     // Remove the pending registration record
     await PendingRegistration.deleteOne({ email });
@@ -282,15 +292,49 @@ export const registerStaff = async (req, res) => {
   try {
     const validatedData = staffRegisterSchema.parse(req.body);
 
-    const user = await AuthService.registerStaff(validatedData);
+    const existingUser = await User.findOne({ email: validatedData.email });
+    if (existingUser) {
+      return res.status(StatusCodes.CONFLICT).json({
+        success: false,
+        message: 'An account with this email already exists',
+      });
+    }
 
-    const roleLabels = { doctor: 'Doctor', reception: 'Receptionist', lab: 'Lab Admin' };
-    const roleLabel = roleLabels[validatedData.role] || 'Staff';
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
-    res.status(StatusCodes.CREATED).json({
+    await PendingRegistration.findOneAndUpdate(
+      { email: validatedData.email },
+      {
+        fullName: validatedData.fullName,
+        email: validatedData.email,
+        phone: validatedData.phone,
+        password: validatedData.password,
+        role: validatedData.role,
+        otp,
+        otpExpires,
+      },
+      { upsert: true, new: true, setDefaultsOnInsert: true, runValidators: false }
+    );
+
+    try {
+      await sendEmail({
+        email: validatedData.email,
+        subject: 'Your Staff Registration OTP',
+        message: `Your OTP for staff registration is: ${otp}\nIt is valid for 10 minutes.`,
+      });
+    } catch (emailError) {
+      console.error('Email Sending Error:', emailError);
+      await PendingRegistration.deleteOne({ email: validatedData.email });
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: 'Failed to send OTP email. Please try again.',
+      });
+    }
+
+    res.status(StatusCodes.OK).json({
       success: true,
-      message: `${roleLabel} registration submitted. Waiting for Super Admin approval.`,
-      data: { user },
+      message: 'OTP sent to your email. Please verify to complete staff registration.',
     });
   } catch (error) {
     if (error.name === 'ZodError') {
@@ -298,13 +342,6 @@ export const registerStaff = async (req, res) => {
         success: false,
         message: 'Validation Error',
         errors: error.errors,
-      });
-    }
-
-    if (error.statusCode === StatusCodes.CONFLICT) {
-      return res.status(StatusCodes.CONFLICT).json({
-        success: false,
-        message: error.message,
       });
     }
 

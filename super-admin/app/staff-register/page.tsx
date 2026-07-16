@@ -51,6 +51,12 @@ export default function StaffRegisterPage() {
   const [serverError, setServerError] = useState<string | null>(null);
   const [successData, setSuccessData] = useState<{ reference: string; role: string } | null>(null);
 
+  const [step, setStep] = useState<1 | 2>(1);
+  const [emailForOtp, setEmailForOtp] = useState<string>("");
+  const [roleForOtp, setRoleForOtp] = useState<string>("");
+  const [otp, setOtp] = useState<string>("");
+  const [isVerifying, setIsVerifying] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -73,11 +79,45 @@ export default function StaffRegisterPage() {
         return;
       }
 
-      const userId = result.data?.user?._id;
-      const reference = userId ? generateReferenceNumber(userId) : "N/A";
-      setSuccessData({ reference, role: values.role });
+      setEmailForOtp(values.email);
+      setRoleForOtp(values.role);
+      setStep(2);
     } catch {
       setServerError("An error occurred. Please try again.");
+    }
+  };
+
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!otp) {
+      setServerError("Please enter the OTP");
+      return;
+    }
+
+    setServerError(null);
+    setIsVerifying(true);
+    try {
+      const res = await fetch(`${BACKEND_URL}/auth/verify-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: emailForOtp, otp }),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        setServerError(result.message || "OTP verification failed");
+        setIsVerifying(false);
+        return;
+      }
+
+      const userId = result.data?.user?._id;
+      const reference = userId ? generateReferenceNumber(userId) : "N/A";
+      setSuccessData({ reference, role: roleForOtp });
+    } catch {
+      setServerError("An error occurred. Please try again.");
+    } finally {
+      setIsVerifying(false);
     }
   };
 
@@ -127,6 +167,62 @@ export default function StaffRegisterPage() {
             >
               Go to Login
             </a>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
+  if (step === 2 && !successData) {
+    return (
+      <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-[#f0f3ff] via-white to-[#f4fce8] dark:from-gray-950 dark:via-[#0b1020] dark:to-[#0d1a07] p-4">
+        <div aria-hidden="true" className="pointer-events-none absolute -top-32 -left-32 h-96 w-96 rounded-full bg-[#1E2B7A]/10 blur-3xl dark:bg-[#1E2B7A]/20" />
+        <div aria-hidden="true" className="pointer-events-none absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-[#76BC21]/10 blur-3xl dark:bg-[#76BC21]/15" />
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="w-full max-w-md"
+        >
+          <div className="rounded-2xl border border-gray-200/80 dark:border-gray-700/60 bg-white dark:bg-gray-900 shadow-xl shadow-gray-200/60 dark:shadow-gray-950/60 p-8 text-center">
+            <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-50 mb-2">
+              Verify OTP
+            </h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+              We've sent a 6-digit OTP to <span className="font-semibold text-gray-700 dark:text-gray-300">{emailForOtp}</span>.
+            </p>
+
+            <form onSubmit={handleVerifyOtp} className="space-y-4">
+              <Input
+                label="Enter OTP"
+                type="text"
+                placeholder="123456"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                maxLength={6}
+                required
+              />
+
+              <AnimatePresence>
+                {serverError && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 px-3.5 py-2.5 text-sm text-red-600 dark:text-red-400">
+                      {serverError}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <Button type="submit" size="lg" loading={isVerifying} className="w-full">
+                Verify OTP
+              </Button>
+            </form>
           </div>
         </motion.div>
       </div>

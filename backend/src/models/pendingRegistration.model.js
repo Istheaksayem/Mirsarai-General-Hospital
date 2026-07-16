@@ -29,6 +29,11 @@ const pendingRegistrationSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    role: {
+      type: String,
+      enum: ['patient', 'doctor', 'reception', 'lab'],
+      default: 'patient',
+    },
     otp: {
       type: String,
       required: true,

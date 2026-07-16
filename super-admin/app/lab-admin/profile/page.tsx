@@ -13,7 +13,6 @@ import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { uploadProfilePhoto } from "@/lib/services/api";
 import { type LabAdminProfileData } from "@/lib/services/api";
-
 interface FormState {
   profilePhoto: string;
   gender: string;

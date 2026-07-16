@@ -102,22 +102,6 @@ export default function LabReportsPage() {
     }
   };
 
-  const handleEdit = async (row: Record<string, unknown>) => {
-    const currentStatus = row.status as "pending" | "completed";
-    const newStatus = currentStatus === "pending" ? "completed" : "pending";
-    
-    try {
-      await updateStatus.mutateAsync({ 
-        id: row._id as string, 
-        status: newStatus 
-      });
-      showNotification("success", `Report marked as ${newStatus}`);
-    } catch (error) {
-      showNotification("error", "Failed to update report status");
-      console.error(error);
-    }
-  };
-
   const handleDelete = async (row: Record<string, unknown>) => {
     try {
       await deleteReport.mutateAsync(row._id as string);
@@ -181,7 +165,33 @@ export default function LabReportsPage() {
       header: "Status",
       cell: (r) => {
         const s = r.status as Report["status"];
-        return <Badge variant={statusVariant[s] ?? "default"}>{r.status as string}</Badge>;
+        return (
+          <select
+            value={s}
+            onChange={async (e) => {
+              const newStatus = e.target.value as Report["status"];
+              try {
+                await updateStatus.mutateAsync({ 
+                  id: r._id as string, 
+                  status: newStatus 
+                });
+                showNotification("success", `Report marked as ${newStatus}`);
+              } catch (error) {
+                showNotification("error", "Failed to update report status");
+                console.error(error);
+              }
+            }}
+            className={`text-xs px-2 py-1 rounded-md font-medium border focus:ring-2 focus:ring-offset-1 focus:outline-none ${
+              s === 'completed' ? 'bg-green-50 text-green-700 border-green-200 focus:ring-green-500' :
+              s === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-200 focus:ring-amber-500' :
+              'bg-blue-50 text-blue-700 border-blue-200 focus:ring-blue-500'
+            }`}
+          >
+            <option value="pending">Pending</option>
+            <option value="in-progress">In Progress</option>
+            <option value="completed">Completed</option>
+          </select>
+        );
       },
     },
     {
@@ -193,8 +203,8 @@ export default function LabReportsPage() {
         <ActionButtons
           row={row}
           onView={handleView}
-          onEdit={handleEdit}
           onDelete={handleDelete}
+          hideEdit
         />
       ),
     },
