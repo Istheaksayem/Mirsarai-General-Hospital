@@ -99,7 +99,8 @@ export const putGallerySchema = z.object({
     hero: z.object({
       title: localizedStringSchema,
       subtitle: localizedStringSchema,
-      description: localizedStringSchema
+      description: localizedStringSchema,
+      image: z.string().optional()
     }),
     categories: z.array(galleryCategoryValSchema).default([]),
     images: z.array(galleryImageValSchema).default([]),

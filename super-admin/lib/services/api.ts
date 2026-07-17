@@ -421,7 +421,7 @@ export interface GalleryStatItem {
 
 export interface GalleryData {
   _id?: string;
-  hero: { title: LocalizedString; subtitle: LocalizedString; description: LocalizedString };
+  hero: { title: LocalizedString; subtitle: LocalizedString; description: LocalizedString; image?: string };
   categories: GalleryCategory[];
   images: GalleryImage[];
   stats: { title: LocalizedString; items: GalleryStatItem[] };
