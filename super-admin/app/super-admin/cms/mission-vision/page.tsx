@@ -48,7 +48,7 @@ export default function MissionVisionCmsPage() {
     setIsSaving(true);
     setStatus(null);
     try {
-      await updateMissionVision(data);
+      const result = await updateMissionVision(data); setData(result);
       setStatus({ type: "success", text: "Mission & Vision content saved successfully!" });
       setTimeout(() => setStatus(null), 4000);
     } catch (e: any) {

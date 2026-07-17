@@ -46,7 +46,7 @@ export default function FAQCmsPage() {
     setIsSaving(true);
     setStatus(null);
     try {
-      await updateFAQData(data);
+      const result = await updateFAQData(data); setData(result);
       setStatus({ type: "success", text: "FAQ content saved successfully!" });
       setTimeout(() => setStatus(null), 4000);
     } catch (e: any) {

@@ -8,6 +8,7 @@ import { MdSecurity } from "react-icons/md";
 import { useEffect, useRef } from "react";
 import { BsFillHeartPulseFill } from "react-icons/bs";
 import { motion } from "framer-motion";
+import { getImageUrl } from "@/lib/getImageUrl";
 
 const statIcons = [FaUserMd, FaUsers, FaSmile, FaAward];
 
@@ -130,7 +131,7 @@ const AboutPage = () => {
       {/* Background Image Layer */}
       <div
         className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url('${about.image}')` }}
+        style={{ backgroundImage: `url('${getImageUrl(about.image)}')` }}
       />
       <div className="absolute inset-0 bg-black/60" />
 
@@ -174,7 +175,7 @@ const AboutPage = () => {
               <div
                 className="w-full h-[500px] bg-cover bg-center"
                 style={{
-                  backgroundImage: `url('${about.image}')`,
+                  backgroundImage: `url('${getImageUrl(about.image)}')`,
                 }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent" />
@@ -296,7 +297,7 @@ const AboutPage = () => {
         <div
           className="absolute inset-0 bg-cover bg-center bg-fixed"
           style={{
-            backgroundImage: `url('${about.image}')`,
+            backgroundImage: `url('${getImageUrl(about.image)}')`,
           }}
         />
         <div className="absolute inset-0 bg-primary/50" />
@@ -395,7 +396,7 @@ const AboutPage = () => {
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: `url('${about.image}')`,
+            backgroundImage: `url('${getImageUrl(about.image)}')`,
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-br from-white/95 via-blue-50/95 to-white/95" />

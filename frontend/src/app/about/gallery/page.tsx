@@ -347,7 +347,7 @@ const GalleryPage = () => {
             >
               <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl mb-4">
                 <Image
-                  src={lightboxImage.src}
+                  src={getImageUrl(lightboxImage.src)}
                   alt={
                     lang === "bn"
                       ? lightboxImage.title.bn
