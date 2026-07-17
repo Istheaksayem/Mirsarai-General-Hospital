@@ -12,6 +12,8 @@ import {
   updateCareer,
   addCareerPosition,
   deleteCareerPosition,
+  getOurTeam,
+  updateOurTeam,
   uploadCMSImage
 } from '../controllers/aboutCMS.controller.js';
 import validate from '../middlewares/validate.middleware.js';
@@ -19,7 +21,8 @@ import {
   putAboutUsSchema,
   putMissionVisionSchema,
   putGallerySchema,
-  putCareerSchema
+  putCareerSchema,
+  putOurTeamSchema
 } from '../validators/aboutCMS.validation.js';
 import { authenticate, authorize } from '../middlewares/auth.middleware.js';
 
@@ -60,5 +63,10 @@ router.route('/career/positions/:id')
 // ── Media Upload Route ──
 router.route('/upload')
   .post(authenticate, authorize('super-admin'), uploadCMSImage);
+
+// ── Our Team Routes ──
+router.route('/our-team')
+  .get(getOurTeam)
+  .put(authenticate, authorize('super-admin'), validate(putOurTeamSchema), updateOurTeam);
 
 export default router;

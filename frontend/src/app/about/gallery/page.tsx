@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/context/LanguageContext";
 import { FiX, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { getImageUrl } from "@/lib/getImageUrl";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface GalleryImage {
@@ -34,6 +35,7 @@ interface GalleryData {
     title: { en: string; bn: string };
     subtitle: { en: string; bn: string };
     description: { en: string; bn: string };
+    image?: string;
   };
   categories: Category[];
   images: GalleryImage[];
@@ -148,7 +150,24 @@ const GalleryPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary via-primary/95 to-tertiary text-white py-20 overflow-hidden">
+      <section className="relative text-white py-20 overflow-hidden">
+        {/* Background Layer */}
+        {data.hero.image ? (
+          <>
+            <div 
+              className="absolute inset-0" 
+              style={{ 
+                backgroundImage: `url(${getImageUrl(data.hero.image)})`, 
+                backgroundSize: 'cover', 
+                backgroundPosition: 'center' 
+              }} 
+            />
+            {/* Dark overlay for text readability */}
+            <div className="absolute inset-0 bg-black/50" />
+          </>
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/95 to-tertiary" />
+        )}
         {/* Animated Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="hero-pattern-grid absolute inset-0" />
@@ -258,7 +277,7 @@ const GalleryPage = () => {
                   onClick={() => openLightbox(image, index)}
                 >
                   <Image
-                    src={image.src}
+                    src={getImageUrl(image.src)}
                     alt={lang === "bn" ? image.title.bn : image.title.en}
                     fill
                     className="object-cover group-hover:scale-110 transition-transform duration-500"

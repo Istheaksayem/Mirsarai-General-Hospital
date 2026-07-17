@@ -107,3 +107,50 @@ export const useAboutData = () =>
     staleTime: 1000 * 60 * 15,
   });
 export default useAboutData;
+
+// ── Our Team Types ─────────────────────────────────────────────────────────────
+export interface TeamMember {
+  name: BiText;
+  designation: BiText;
+  department: BiText;
+  bio: BiText;
+  image: string;
+  email: string;
+  phone: string;
+  order: number;
+}
+
+export interface OurTeamSection {
+  hero: {
+    title: BiText;
+    subtitle: BiText;
+    description: BiText;
+    image: string;
+  };
+  sectionTitle: BiText;
+  sectionDescription: BiText;
+  members: TeamMember[];
+  sections?: {
+    hero: SectionConfig;
+    members: SectionConfig;
+    cta: SectionConfig;
+  };
+  seo?: SEOConfig;
+}
+
+// ── Our Team Fetcher ────────────────────────────────────────────────────────────
+const fetchOurTeamData = async (): Promise<OurTeamSection> => {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+  const res = await fetch(`${apiUrl}/about/our-team`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch Our Team data");
+  const json = await res.json();
+  return normalizeImages(json.data) as OurTeamSection;
+};
+
+// ── Our Team Hook ───────────────────────────────────────────────────────────────
+export const useOurTeamData = () =>
+  useQuery<OurTeamSection>({
+    queryKey: ["ourTeamData"],
+    queryFn: fetchOurTeamData,
+    staleTime: 1000 * 60 * 15,
+  });

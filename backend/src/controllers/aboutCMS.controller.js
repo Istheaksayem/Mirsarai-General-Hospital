@@ -9,6 +9,7 @@ import AboutUs from '../models/aboutUs.model.js';
 import MissionVision from '../models/missionVision.model.js';
 import Gallery from '../models/gallery.model.js';
 import Career from '../models/career.model.js';
+import OurTeam from '../models/team.model.js';
 
 // ============================================
 // ABOUT US CMS
@@ -183,6 +184,42 @@ export const deleteCareerPosition = catchAsync(async (req, res) => {
   if (req.user) data.updatedBy = req.user.email || req.user.id;
   await data.save();
   return sendSuccess(res, StatusCodes.OK, null, 'Career position deleted successfully');
+});
+
+// ============================================
+// OUR TEAM CMS
+// ============================================
+export const getOurTeam = catchAsync(async (req, res) => {
+  let data = await OurTeam.findOne();
+  if (!data) {
+    // Auto-create default data on first access
+    data = await OurTeam.create({
+      hero: {
+        title:       { en: 'Meet Our Team', bn: 'আমাদের টিমের সাথে পরিচিত হন' },
+        subtitle:    { en: 'Dedicated Healthcare Professionals', bn: 'নিবেদিতপ্রাণ স্বাস্থ্যসেবা পেশাদার' },
+        description: { en: 'Our team of experienced doctors, nurses, and specialists work tirelessly to provide the best care for every patient.', bn: 'আমাদের অভিজ্ঞ ডাক্তার, নার্স এবং বিশেষজ্ঞদের টিম প্রতিটি রোগীর জন্য সর্বোত্তম সেবা প্রদানে নিরলসভাবে কাজ করে।' },
+        image: ''
+      },
+      sectionTitle:       { en: 'Our Expert Team Members', bn: 'আমাদের বিশেষজ্ঞ টিম সদস্যরা' },
+      sectionDescription: { en: 'Meet the dedicated professionals who make Mirsarai General Hospital a trusted healthcare institution.', bn: 'সেই নিবেদিতপ্রাণ পেশাদারদের সাথে পরিচিত হন যারা মীরসরাই জেনারেল হাসপাতালকে একটি বিশ্বস্ত স্বাস্থ্যসেবা প্রতিষ্ঠান হিসেবে গড়ে তুলেছেন।' },
+      members: [],
+      createdBy: 'auto-init'
+    });
+  }
+  return sendSuccess(res, StatusCodes.OK, data, 'Our Team data fetched successfully');
+});
+
+export const updateOurTeam = catchAsync(async (req, res) => {
+  let data = await OurTeam.findOne();
+  if (!data) {
+    data = new OurTeam(req.body);
+    if (req.user) data.createdBy = req.user.email || req.user.id;
+  } else {
+    data.set(req.body);
+  }
+  if (req.user) data.updatedBy = req.user.email || req.user.id;
+  await data.save();
+  return sendSuccess(res, StatusCodes.OK, data, 'Our Team data updated successfully');
 });
 
 // ============================================

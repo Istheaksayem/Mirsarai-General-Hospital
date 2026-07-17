@@ -46,6 +46,7 @@ const NAV_ITEMS: NavItem[] = [
       { en: "Health Blog", bn: "স্বাস্থ্য ব্লগ", href: "/resources/health-blog" },
       { en: "Emergency Info", bn: "জরুরি তথ্য", href: "/resources/emergency-info" },
       { en: "FAQ", bn: "প্রশ্নোত্তর", href: "/resources/faq" },
+      { en: "Our Team", bn: "আমাদের টিম", href: "/resources/our-team" },
     ],
   },
   { type: "link", en: "Appointment", bn: "অ্যাপয়েন্টমেন্ট", href: "/appointment" },

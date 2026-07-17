@@ -115,6 +115,9 @@ export default function GalleryCmsPage() {
               {/* Hero */}
               <div className="space-y-4">
                 <SectionDivider title="Hero Section" description="Banner at the top of the Gallery page" />
+                <ImageUploader label="Hero Background Image" value={data.hero.image || ""}
+                  onChange={(url) => set((d) => ({ ...d, hero: { ...d.hero, image: url } }))}
+                  onUpload={handleImageUpload} />
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <LocalizedInput label="Hero Title" value={data.hero.title} activeTab={langTab}
                     onChange={(v) => set((d) => ({ ...d, hero: { ...d.hero, title: v } }))}

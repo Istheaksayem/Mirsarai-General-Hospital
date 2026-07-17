@@ -41,7 +41,8 @@ const gallerySchema = new mongoose.Schema(
     hero: {
       title: { type: localizedStringSchema, required: true },
       subtitle: { type: localizedStringSchema, required: true },
-      description: { type: localizedStringSchema, required: true }
+      description: { type: localizedStringSchema, required: true },
+      image: { type: String, default: '' }
     },
     categories: { type: [galleryCategorySchema], default: [] },
     images: { type: [galleryImageSchema], default: [] },
