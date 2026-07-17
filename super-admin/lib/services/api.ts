@@ -479,6 +479,48 @@ export const updateGalleryData = (data: Partial<GalleryData>) => saveReal<Galler
 export const getCareerData = () => fetchReal<CareerData>("about/career");
 export const updateCareerData = (data: Partial<CareerData>) => saveReal<CareerData>("about/career", data, "PUT");
 
+// ─── Our Team CMS Types ─────────────────────────────────────────────────
+
+export interface OurTeamMember {
+  name: LocalizedString;
+  designation: LocalizedString;
+  department: LocalizedString;
+  bio: LocalizedString;
+  image: string;
+  email: string;
+  phone: string;
+  order: number;
+}
+
+export interface OurTeamCustomSection {
+  id: string;
+  title: LocalizedString;
+  description: LocalizedString;
+  image: string;
+  order: number;
+}
+
+export interface OurTeamData {
+  _id?: string;
+  hero: {
+    title: LocalizedString;
+    subtitle: LocalizedString;
+    description: LocalizedString;
+    image: string;
+  };
+  sectionTitle: LocalizedString;
+  sectionDescription: LocalizedString;
+  members: OurTeamMember[];
+  customSections?: OurTeamCustomSection[];
+  sections: Record<string, SectionConfig>;
+  seo: SeoConfig;
+  createdBy?: string;
+  updatedBy?: string;
+}
+
+export const getOurTeamData = () => fetchReal<OurTeamData>("about/our-team");
+export const updateOurTeamData = (data: Partial<OurTeamData>) => saveReal<OurTeamData>("about/our-team", data, "PUT");
+
 // Image upload helper
 export async function uploadCmsImage(base64Data: string): Promise<string> {
   const res = await fetch(`${BACKEND_API}/about/upload`, {

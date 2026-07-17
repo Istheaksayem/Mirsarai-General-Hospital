@@ -173,3 +173,35 @@ export const putCareerSchema = z.object({
     seo: seoSchema.optional()
   })
 });
+
+// Our Team Validation
+const teamMemberValSchema = z.object({
+  name: localizedStringSchema,
+  designation: localizedStringSchema,
+  department: localizedStringSchema,
+  bio: localizedStringSchema,
+  image: z.string().optional().default(''),
+  email: z.string().optional().default(''),
+  phone: z.string().optional().default(''),
+  order: z.number().int().optional().default(0)
+});
+
+export const putOurTeamSchema = z.object({
+  body: z.object({
+    hero: z.object({
+      title: localizedStringSchema,
+      subtitle: localizedStringSchema,
+      description: localizedStringSchema,
+      image: z.string().optional().default('')
+    }),
+    sectionTitle: localizedStringSchema,
+    sectionDescription: localizedStringSchema,
+    members: z.array(teamMemberValSchema).default([]),
+    sections: z.object({
+      hero: sectionConfigSchema,
+      members: sectionConfigSchema,
+      cta: sectionConfigSchema
+    }).optional(),
+    seo: seoSchema.optional()
+  })
+});

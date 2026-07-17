@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { Globe, Edit3, CheckCircle2, XCircle, Settings, Info, Target, ImageIcon, Briefcase, Building2, Stethoscope, Layers, Microscope, Baby, FileText, AlertTriangle, HelpCircle } from "lucide-react";
+import { Globe, Edit3, CheckCircle2, XCircle, Settings, Info, Target, ImageIcon, Briefcase, Building2, Stethoscope, Layers, Microscope, Baby, FileText, AlertTriangle, HelpCircle, Users } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
@@ -49,6 +49,7 @@ export default function CMSPage() {
             { label: "Health Blog", desc: "Blog posts, categories, tags & hero", href: "/super-admin/cms/health-blog", Icon: FileText, color: "emerald" },
             { label: "Emergency Info", desc: "Contacts, first aid, preparedness & hero", href: "/super-admin/cms/emergency-information", Icon: AlertTriangle, color: "red" },
             { label: "FAQ", desc: "Categories, questions, answers & contact", href: "/super-admin/cms/faq", Icon: HelpCircle, color: "amber" },
+            { label: "Our Team", desc: "Team members, hero section & call-to-action", href: "/super-admin/cms/our-team", Icon: Users, color: "cyan" },
           ].map(({ label, desc, href, Icon, color }) => (
             <div
               key={href}
