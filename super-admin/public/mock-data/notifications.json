@@ -1,0 +1,12 @@
+[
+  { "id": "NOT-001", "title": "New appointment request", "description": "Patient Aminul Islam requested appointment with Dr. Nasrin Ahmed", "type": "appointment", "priority": "high", "read": false, "timestamp": "2026-07-08T08:15:00Z", "actionUrl": "/super-admin/appointments" },
+  { "id": "NOT-002", "title": "Lab report ready", "description": "CBC report for Patient P-1001 is ready for review", "type": "lab-report", "priority": "medium", "read": false, "timestamp": "2026-07-08T07:45:00Z", "actionUrl": "/super-admin/reports" },
+  { "id": "NOT-003", "title": "System backup completed", "description": "Daily backup completed successfully at 2:00 AM", "type": "system", "priority": "low", "read": true, "timestamp": "2026-07-08T02:00:00Z", "actionUrl": "/super-admin/settings" },
+  { "id": "NOT-004", "title": "Payment received", "description": "Payment of ৳150,675 received for Invoice INV-004", "type": "billing", "priority": "medium", "read": true, "timestamp": "2026-07-07T16:30:00Z", "actionUrl": "/super-admin/billing" },
+  { "id": "NOT-005", "title": "New doctor registration", "description": "Dr. Mahbub Rahman has registered and awaiting approval", "type": "staff", "priority": "high", "read": false, "timestamp": "2026-07-07T14:20:00Z", "actionUrl": "/super-admin/doctors" },
+  { "id": "NOT-006", "title": "Emergency admission", "description": "Emergency patient admitted to ICU - Bed #12", "type": "emergency", "priority": "urgent", "read": true, "timestamp": "2026-07-07T11:45:00Z", "actionUrl": "/reception-admin/patients" },
+  { "id": "NOT-007", "title": "Appointment cancelled", "description": "Hafizul Islam cancelled appointment APT-007", "type": "appointment", "priority": "low", "read": true, "timestamp": "2026-07-07T10:15:00Z", "actionUrl": "/reception-admin/appointments" },
+  { "id": "NOT-008", "title": "Inventory alert", "description": "Lab reagent stock running low - requires reorder", "type": "inventory", "priority": "medium", "read": false, "timestamp": "2026-07-06T18:00:00Z", "actionUrl": "/lab-admin/diagnostic" },
+  { "id": "NOT-009", "title": "Staff leave request", "description": "Dr. Kamal Hossain requested leave for July 15-17", "type": "staff", "priority": "medium", "read": true, "timestamp": "2026-07-06T09:30:00Z", "actionUrl": "/super-admin/doctors" },
+  { "id": "NOT-010", "title": "Website content updated", "description": "Services page has been updated with new information", "type": "cms", "priority": "low", "read": true, "timestamp": "2026-07-05T15:20:00Z", "actionUrl": "/super-admin/cms" }
+]

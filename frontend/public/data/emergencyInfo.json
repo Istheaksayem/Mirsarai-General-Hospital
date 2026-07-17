@@ -1,0 +1,277 @@
+{
+  "hero": {
+    "title": {
+      "en": "Emergency Information",
+      "bn": "জরুরি তথ্য"
+    },
+    "subtitle": {
+      "en": "24/7 Emergency Care & Support",
+      "bn": "২৪/৭ জরুরি পরিচর্যা এবং সহায়তা"
+    },
+    "description": {
+      "en": "Quick access to emergency contacts, first aid guidance, and critical health information when you need it most.",
+      "bn": "জরুরি যোগাযোগ, প্রাথমিক চিকিৎসা নির্দেশনা এবং গুরুত্বপূর্ণ স্বাস্থ্য তথ্যের দ্রুত প্রবেশাধিকার যখন আপনার সবচেয়ে বেশি প্রয়োজন।"
+    },
+    "image": "/hospital-banner.jpg"
+  },
+  "emergencyContacts": {
+    "title": {
+      "en": "Emergency Contacts",
+      "bn": "জরুরি যোগাযোগ"
+    },
+    "contacts": [
+      {
+        "icon": "FaAmbulance",
+        "title": {
+          "en": "Ambulance Service",
+          "bn": "অ্যাম্বুলেন্স সেবা"
+        },
+        "number": "999",
+        "available": {
+          "en": "24/7 Available",
+          "bn": "২৪/৭ উপলব্ধ"
+        }
+      },
+      {
+        "icon": "FaPhoneAlt",
+        "title": {
+          "en": "Emergency Hotline",
+          "bn": "জরুরি হটলাইন"
+        },
+        "number": "+880 1234-567890",
+        "available": {
+          "en": "24/7 Available",
+          "bn": "২৪/৭ উপলব্ধ"
+        }
+      },
+      {
+        "icon": "FaHospital",
+        "title": {
+          "en": "Hospital Reception",
+          "bn": "হাসপাতাল রিসেপশন"
+        },
+        "number": "+880 1234-567891",
+        "available": {
+          "en": "24/7 Available",
+          "bn": "২৪/৭ উপলব্ধ"
+        }
+      },
+      {
+        "icon": "FaUserMd",
+        "title": {
+          "en": "Doctor on Call",
+          "bn": "কল এ ডাক্তার"
+        },
+        "number": "+880 1234-567892",
+        "available": {
+          "en": "24/7 Available",
+          "bn": "২৪/৭ উপলব্ধ"
+        }
+      }
+    ]
+  },
+  "firstAid": {
+    "title": {
+      "en": "First Aid Guidelines",
+      "bn": "প্রাথমিক চিকিৎসা নির্দেশিকা"
+    },
+    "items": [
+      {
+        "icon": "FaHeartbeat",
+        "title": {
+          "en": "Heart Attack",
+          "bn": "হার্ট অ্যাটাক"
+        },
+        "steps": [
+          {
+            "en": "Call emergency services immediately (999)",
+            "bn": "অবিলম্বে জরুরি সেবায় কল করুন (৯৯৯)"
+          },
+          {
+            "en": "Help the person sit down and rest",
+            "bn": "ব্যক্তিকে বসতে এবং বিশ্রাম নিতে সাহায্য করুন"
+          },
+          {
+            "en": "Loosen any tight clothing",
+            "bn": "যেকোনো টাইট পোশাক ঢিলা করুন"
+          },
+          {
+            "en": "Give aspirin if available (chew, don't swallow)",
+            "bn": "যদি উপলব্ধ থাকে অ্যাসপিরিন দিন (চিবিয়ে খান, গিলবেন না)"
+          }
+        ]
+      },
+      {
+        "icon": "FaBandAid",
+        "title": {
+          "en": "Severe Bleeding",
+          "bn": "গুরুতর রক্তপাত"
+        },
+        "steps": [
+          {
+            "en": "Apply direct pressure to the wound with a clean cloth",
+            "bn": "একটি পরিষ্কার কাপড় দিয়ে ক্ষতস্থানে সরাসরি চাপ প্রয়োগ করুন"
+          },
+          {
+            "en": "Elevate the injured area above heart level",
+            "bn": "আহত স্থানটি হৃদযন্ত্রের স্তরের উপরে উঁচু করুন"
+          },
+          {
+            "en": "Don't remove the cloth if it becomes soaked",
+            "bn": "কাপড় ভিজে গেলে সরিয়ে ফেলবেন না"
+          },
+          {
+            "en": "Call emergency services if bleeding doesn't stop",
+            "bn": "রক্তপাত বন্ধ না হলে জরুরি সেবায় কল করুন"
+          }
+        ]
+      },
+      {
+        "icon": "FaFire",
+        "title": {
+          "en": "Burns",
+          "bn": "পোড়া"
+        },
+        "steps": [
+          {
+            "en": "Cool the burn under cool running water for 10-20 minutes",
+            "bn": "১০-২০ মিনিটের জন্য ঠান্ডা প্রবাহিত পানিতে পোড়া ঠান্ডা করুন"
+          },
+          {
+            "en": "Remove jewelry and tight clothing before swelling",
+            "bn": "ফোলা হওয়ার আগে গহনা এবং টাইট পোশাক সরান"
+          },
+          {
+            "en": "Cover with sterile, non-adhesive bandage",
+            "bn": "জীবাণুমুক্ত, আঠালো নয় এমন ব্যান্ডেজ দিয়ে ঢেকে দিন"
+          },
+          {
+            "en": "Seek medical attention for severe burns",
+            "bn": "গুরুতর পোড়ার জন্য চিকিৎসা সহায়তা নিন"
+          }
+        ]
+      },
+      {
+        "icon": "FaLungs",
+        "title": {
+          "en": "Choking",
+          "bn": "শ্বাসরোধ"
+        },
+        "steps": [
+          {
+            "en": "Encourage coughing if person can breathe",
+            "bn": "ব্যক্তি শ্বাস নিতে পারলে কাশিতে উৎসাহিত করুন"
+          },
+          {
+            "en": "Perform back blows (5 firm blows between shoulder blades)",
+            "bn": "পিঠে আঘাত করুন (কাঁধের ব্লেডের মধ্যে ৫টি দৃঢ় আঘাত)"
+          },
+          {
+            "en": "Perform abdominal thrusts (Heimlich maneuver)",
+            "bn": "পেটে চাপ প্রয়োগ করুন (হেইমলিচ ম্যানুভার)"
+          },
+          {
+            "en": "Call emergency services if object doesn't come out",
+            "bn": "বস্তু বের না হলে জরুরি সেবায় কল করুন"
+          }
+        ]
+      }
+    ]
+  },
+  "whenToCallEmergency": {
+    "title": {
+      "en": "When to Call Emergency Services",
+      "bn": "কখন জরুরি সেবায় কল করবেন"
+    },
+    "description": {
+      "en": "Call emergency services immediately if you experience:",
+      "bn": "আপনি যদি অনুভব করেন তাহলে অবিলম্বে জরুরি সেবায় কল করুন:"
+    },
+    "situations": [
+      {
+        "en": "Chest pain or pressure lasting more than a few minutes",
+        "bn": "কয়েক মিনিটের বেশি স্থায়ী বুকে ব্যথা বা চাপ"
+      },
+      {
+        "en": "Difficulty breathing or shortness of breath",
+        "bn": "শ্বাস নিতে অসুবিধা বা শ্বাসকষ্ট"
+      },
+      {
+        "en": "Sudden weakness, numbness, or paralysis",
+        "bn": "হঠাৎ দুর্বলতা, অসাড়তা বা পক্ষাঘাত"
+      },
+      {
+        "en": "Severe bleeding that won't stop",
+        "bn": "গুরুতর রক্তপাত যা বন্ধ হবে না"
+      },
+      {
+        "en": "Loss of consciousness or confusion",
+        "bn": "চেতনা হারানো বা বিভ্রান্তি"
+      },
+      {
+        "en": "Severe allergic reaction (difficulty breathing, swelling)",
+        "bn": "গুরুতর অ্যালার্জি প্রতিক্রিয়া (শ্বাস নিতে অসুবিধা, ফোলা)"
+      },
+      {
+        "en": "Severe burns or injuries",
+        "bn": "গুরুতর পোড়া বা আঘাত"
+      },
+      {
+        "en": "Poisoning or drug overdose",
+        "bn": "বিষক্রিয়া বা ড্রাগ ওভারডোজ"
+      }
+    ]
+  },
+  "emergencyPreparedness": {
+    "title": {
+      "en": "Emergency Preparedness Tips",
+      "bn": "জরুরি প্রস্তুতির টিপস"
+    },
+    "tips": [
+      {
+        "icon": "FaFirstAid",
+        "title": {
+          "en": "Keep a First Aid Kit",
+          "bn": "প্রাথমিক চিকিৎসা কিট রাখুন"
+        },
+        "description": {
+          "en": "Maintain a well-stocked first aid kit at home and in your vehicle",
+          "bn": "বাড়িতে এবং আপনার গাড়িতে একটি ভালভাবে স্টক করা প্রাথমিক চিকিৎসা কিট রাখুন"
+        }
+      },
+      {
+        "icon": "FaListAlt",
+        "title": {
+          "en": "Emergency Contact List",
+          "bn": "জরুরি যোগাযোগ তালিকা"
+        },
+        "description": {
+          "en": "Keep a list of emergency contacts and important medical information",
+          "bn": "জরুরি যোগাযোগ এবং গুরুত্বপূর্ণ চিকিৎসা তথ্যের একটি তালিকা রাখুন"
+        }
+      },
+      {
+        "icon": "FaPills",
+        "title": {
+          "en": "Medication Information",
+          "bn": "ওষুধের তথ্য"
+        },
+        "description": {
+          "en": "Keep a record of all medications, allergies, and medical conditions",
+          "bn": "সমস্ত ওষুধ, অ্যালার্জি এবং চিকিৎসা অবস্থার একটি রেকর্ড রাখুন"
+        }
+      },
+      {
+        "icon": "FaHospitalUser",
+        "title": {
+          "en": "Know the Nearest Hospital",
+          "bn": "নিকটতম হাসপাতাল জানুন"
+        },
+        "description": {
+          "en": "Be aware of the location and route to the nearest emergency facility",
+          "bn": "নিকটতম জরুরি সুবিধার অবস্থান এবং রুট সম্পর্কে সচেতন থাকুন"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "statistics": {
+    "todayAppointments": 48,
+    "todayAppointmentsTrend": 8.4,
+    "checkedIn": 32,
+    "checkedInTrend": 12.1,
+    "waiting": 11,
+    "waitingTrend": -15.4,
+    "totalBillingToday": 4820,
+    "totalBillingTodayTrend": 22.8,
+    "notificationsCount": 5
+  },
+  "recentQueue": [
+    { "token": "T-015", "patientName": "Abdul Karim", "doctorName": "Dr. Tasnim Alam", "waitTime": "5 mins", "status": "in-consultation" },
+    { "token": "T-016", "patientName": "Jahanara Begum", "doctorName": "Dr. Rafiqul Islam", "waitTime": "12 mins", "status": "waiting" },
+    { "token": "T-017", "patientName": "Mohammad Yasin", "doctorName": "Dr. Kamrul Hasan", "waitTime": "18 mins", "status": "waiting" },
+    { "token": "T-018", "patientName": "Fariha Sultana", "doctorName": "Dr. Tasnim Alam", "waitTime": "30 mins", "status": "waiting" },
+    { "token": "T-019", "patientName": "Nayan Chowdhury", "doctorName": "Dr. Sayed Ahmed", "waitTime": "45 mins", "status": "waiting" }
+  ],
+  "todayAppointments": [
+    { "id": "apt-101", "patientName": "Abdul Karim", "doctorName": "Dr. Tasnim Alam", "department": "Cardiology", "timeSlot": "09:30 AM", "status": "in-consultation" },
+    { "id": "apt-102", "patientName": "Jahanara Begum", "doctorName": "Dr. Rafiqul Islam", "department": "Pediatrics", "timeSlot": "09:45 AM", "status": "waiting" },
+    { "id": "apt-103", "patientName": "Mohammad Yasin", "doctorName": "Dr. Kamrul Hasan", "department": "Orthopedics", "timeSlot": "10:00 AM", "status": "waiting" },
+    { "id": "apt-104", "patientName": "Fariha Sultana", "doctorName": "Dr. Tasnim Alam", "department": "Cardiology", "timeSlot": "10:15 AM", "status": "confirmed" },
+    { "id": "apt-105", "patientName": "Nayan Chowdhury", "doctorName": "Dr. Sayed Ahmed", "department": "Neurology", "timeSlot": "10:30 AM", "status": "confirmed" },
+    { "id": "apt-106", "patientName": "Sajeda Khatun", "doctorName": "Dr. Nusrat Jahan", "department": "Gynecology", "timeSlot": "10:45 AM", "status": "completed" }
+  ],
+  "recentBilling": [
+    { "id": "inv-201", "patientName": "Sajeda Khatun", "billAmount": 1200, "date": "2026-07-08T09:40:00Z", "paymentMethod": "Bkash", "status": "paid" },
+    { "id": "inv-202", "patientName": "Kamal Uddin", "billAmount": 350, "date": "2026-07-08T09:15:00Z", "paymentMethod": "Cash", "status": "paid" },
+    { "id": "inv-203", "patientName": "Rumana Akhter", "billAmount": 2400, "date": "2026-07-08T08:50:00Z", "paymentMethod": "Visa", "status": "paid" },
+    { "id": "inv-204", "patientName": "Mohammad Selim", "billAmount": 870, "date": "2026-07-08T08:20:00Z", "paymentMethod": "Bkash", "status": "pending" }
+  ]
+}

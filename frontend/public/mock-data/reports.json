@@ -1,0 +1,8 @@
+[
+  { "id": "rep-001", "patientName": "Shirina Akhter", "doctorName": "Dr. Rafiqul Islam", "testName": "Chest X-Ray", "category": "Radiology", "date": "2026-07-08", "status": "final", "documentUrl": "/mock-reports/rep-001.pdf" },
+  { "id": "rep-002", "patientName": "Zahir Raihan", "doctorName": "Dr. Nusrat Jahan", "testName": "Ultrasonography (USG)", "category": "Radiology", "date": "2026-07-08", "status": "final", "documentUrl": "/mock-reports/rep-002.pdf" },
+  { "id": "rep-003", "patientName": "Hasanuzzaman", "doctorName": "Dr. Kamrul Hasan", "testName": "Urine Analysis", "category": "Pathology", "date": "2026-07-08", "status": "final", "documentUrl": "/mock-reports/rep-003.pdf" },
+  { "id": "rep-004", "patientName": "Faruk Ahmed", "doctorName": "Dr. Tasnim Alam", "testName": "Complete Blood Count (CBC)", "category": "Pathology", "date": "2026-07-08", "status": "draft", "documentUrl": "/mock-reports/rep-004.pdf" },
+  { "id": "rep-005", "patientName": "Fatema Begum", "doctorName": "Dr. Tasnim Alam", "testName": "Lipid Profile & Glucose", "category": "Biochemistry", "date": "2026-07-08", "status": "pending-review", "documentUrl": "/mock-reports/rep-005.pdf" },
+  { "id": "rep-006", "patientName": "Abdul Wahab", "doctorName": "Dr. Kamrul Hasan", "testName": "Electrocardiogram (ECG)", "category": "Cardiology", "date": "2026-07-08", "status": "pending-review", "documentUrl": "/mock-reports/rep-006.pdf" }
+]

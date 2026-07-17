@@ -1,0 +1,95 @@
+{
+  "babyCare": {
+    "id": 3,
+    "title": { "en": "Baby Care Center", "bn": "শিশু যত্ন কেন্দ্র" },
+    "subtitle": { "en": "Comprehensive Pediatric & Infant Healthcare", "bn": "ব্যাপক শিশু ও নবজাতক স্বাস্থ্যসেবা" },
+    "heroDescription": { "en": "Dedicated baby care services with expert pediatricians, child specialists, and nursing staff. We provide complete healthcare solutions for infants and children from birth to adolescence.", "bn": "বিশেষজ্ঞ শিশুরোগ বিশেষজ্ঞ, শিশু বিশেষজ্ঞ এবং নার্সিং স্টাফদের সাথে নিবেদিত শিশু যত্ন সেবা। আমরা জন্ম থেকে কৈশোর পর্যন্ত শিশুদের জন্য সম্পূর্ণ স্বাস্থ্যসেবা সমাধান প্রদান করি।" },
+    "backgroundImage": "/images/baby-care.jpg",
+    "description": { "en": "Our Baby Care Center is designed to provide comprehensive healthcare services for newborns, infants, and children. From routine checkups to specialized treatments, our experienced pediatricians ensure your child receives the best medical care in a child-friendly environment.", "bn": "আমাদের শিশু যত্ন কেন্দ্রটি নবজাতক, শিশু এবং বাচ্চাদের জন্য ব্যাপক স্বাস্থ্যসেবা প্রদানের জন্য ডিজাইন করা হয়েছে। নিয়মিত চেকআপ থেকে শুরু করে বিশেষায়িত চিকিৎসা পর্যন্ত, আমাদের অভিজ্ঞ শিশুরোগ বিশেষজ্ঞরা আপনার সন্তানের শিশু-বান্ধব পরিবেশে সর্বোত্তম চিকিৎসা সেবা নিশ্চিত করেন।" },
+    "features": [
+      { "title": { "en": "Expert Pediatricians", "bn": "বিশেষজ্ঞ শিশুরোগ বিশেষজ্ঞ" }, "description": { "en": "Highly qualified child specialists available", "bn": "উচ্চ যোগ্য শিশু বিশেষজ্ঞগণ উপলব্ধ" }, "icon": "FaUserMd" },
+      { "title": { "en": "Vaccination Program", "bn": "টিকাদান কর্মসূচি" }, "description": { "en": "Complete immunization schedule management", "bn": "সম্পূর্ণ টিকাদান সময়সূচী ব্যবস্থাপনা" }, "icon": "FaSyringe" },
+      { "title": { "en": "Child-Friendly", "bn": "শিশু-বান্ধব" }, "description": { "en": "Comfortable and welcoming environment for kids", "bn": "শিশুদের জন্য আরামদায়ক ও আমন্ত্রণমূলক পরিবেশ" }, "icon": "FaSmile" },
+      { "title": { "en": "Parent Education", "bn": "অভিভাবক শিক্ষা" }, "description": { "en": "Guidance on child care and nutrition", "bn": "শিশু যত্ন ও পুষ্টি সম্পর্কে নির্দেশনা" }, "icon": "FaBook" }
+    ],
+    "services": [
+      {
+        "category": { "en": "Routine Care", "bn": "নিয়মিত সেবা" },
+        "icon": "FaBaby",
+        "accent": "#76BC21",
+        "items": [
+          { "en": "Regular Health Checkups", "bn": "নিয়মিত স্বাস্থ্য পরীক্ষা" },
+          { "en": "Growth & Development Monitoring", "bn": "বৃদ্ধি ও বিকাশ পর্যবেক্ষণ" },
+          { "en": "Nutritional Assessment", "bn": "পুষ্টি মূল্যায়ন" },
+          { "en": "Immunization Services", "bn": "টিকাদান সেবা" },
+          { "en": "Vision & Hearing Screening", "bn": "দৃষ্টি ও শ্রবণ স্ক্রিনিং" },
+          { "en": "Dental Health Guidance", "bn": "দন্ত স্বাস্থ্য নির্দেশনা" },
+          { "en": "Behavioral Assessment", "bn": "আচরণগত মূল্যায়ন" },
+          { "en": "School Health Checkups", "bn": "স্কুল স্বাস্থ্য পরীক্ষা" }
+        ]
+      },
+      {
+        "category": { "en": "Medical Services", "bn": "চিকিৎসা সেবা" },
+        "icon": "FaHeartbeat",
+        "accent": "#f59e0b",
+        "items": [
+          { "en": "Common Childhood Illnesses", "bn": "সাধারণ শৈশব রোগ" },
+          { "en": "Fever Management", "bn": "জ্বর ব্যবস্থাপনা" },
+          { "en": "Respiratory Infections", "bn": "শ্বাসযন্ত্রের সংক্রমণ" },
+          { "en": "Diarrhea & Dehydration Treatment", "bn": "ডায়রিয়া ও পানিশূন্যতা চিকিৎসা" },
+          { "en": "Skin Conditions", "bn": "ত্বকের সমস্যা" },
+          { "en": "Allergies & Asthma", "bn": "এলার্জি ও হাঁপানি" },
+          { "en": "Minor Injuries Treatment", "bn": "ছোটখাট আঘাতের চিকিৎসা" },
+          { "en": "Prescription Management", "bn": "প্রেসক্রিপশন ব্যবস্থাপনা" }
+        ]
+      },
+      {
+        "category": { "en": "Specialized Care", "bn": "বিশেষায়িত সেবা" },
+        "icon": "FaUserMd",
+        "accent": "#ec4899",
+        "items": [
+          { "en": "Neonatal Care", "bn": "নবজাতক সেবা" },
+          { "en": "Premature Baby Follow-up", "bn": "অকালপ্রসবী শিশুর ফলো-আপ" },
+          { "en": "Chronic Disease Management", "bn": "দীর্ঘস্থায়ী রোগ ব্যবস্থাপনা" },
+          { "en": "Nutritional Disorders", "bn": "পুষ্টিজনিত ব্যাধি" },
+          { "en": "Growth Disorders", "bn": "বৃদ্ধিজনিত ব্যাধি" },
+          { "en": "Developmental Delays", "bn": "বিকাশগত বিলম্ব" },
+          { "en": "Genetic Counseling", "bn": "জিনগত পরামর্শ" },
+          { "en": "Pediatric Surgery Referrals", "bn": "শিশু অস্ত্রোপচার রেফারেল" }
+        ]
+      },
+      {
+        "category": { "en": "Wellness Programs", "bn": "সুস্থতা কর্মসূচি" },
+        "icon": "FaBook",
+        "accent": "#8b5cf6",
+        "items": [
+          { "en": "Breastfeeding Workshops", "bn": "বুকের দুধ খাওয়ানো কর্মশালা" },
+          { "en": "Infant Massage Training", "bn": "শিশু ম্যাসেজ প্রশিক্ষণ" },
+          { "en": "Nutrition Counseling", "bn": "পুষ্টি পরামর্শ" },
+          { "en": "Parenting Classes", "bn": "প্যারেন্টিং ক্লাস" },
+          { "en": "First Aid Training", "bn": "প্রাথমিক চিকিৎসা প্রশিক্ষণ" },
+          { "en": "Child Safety Education", "bn": "শিশু নিরাপত্তা শিক্ষা" }
+        ]
+      }
+    ],
+    "vaccinationSchedule": [
+      { "age": { "en": "At Birth", "bn": "জন্মের সময়" }, "vaccines": ["BCG", "OPV-0", "Hepatitis B-1"] },
+      { "age": { "en": "6 Weeks", "bn": "৬ সপ্তাহ" }, "vaccines": ["Pentavalent-1", "OPV-1", "PCV-1", "Rota-1"] },
+      { "age": { "en": "10 Weeks", "bn": "১০ সপ্তাহ" }, "vaccines": ["Pentavalent-2", "OPV-2", "PCV-2", "Rota-2"] },
+      { "age": { "en": "14 Weeks", "bn": "১৪ সপ্তাহ" }, "vaccines": ["Pentavalent-3", "OPV-3", "PCV-3", "IPV-1"] },
+      { "age": { "en": "9 Months", "bn": "৯ মাস" }, "vaccines": ["Measles-Rubella-1", "OPV-4"] },
+      { "age": { "en": "15 Months", "bn": "১৫ মাস" }, "vaccines": ["Measles-Rubella-2"] }
+    ],
+    "statistics": [
+      { "value": "2,000+", "label": { "en": "Children Treated Monthly", "bn": "মাসিক চিকিৎসা প্রদত্ত শিশু" } },
+      { "value": "100%", "label": { "en": "Vaccination Coverage", "bn": "টিকাদান কভারেজ" } },
+      { "value": "10+", "label": { "en": "Pediatric Specialists", "bn": "শিশু বিশেষজ্ঞ" } },
+      { "value": "98%", "label": { "en": "Parent Satisfaction", "bn": "অভিভাবক সন্তুষ্টি" } }
+    ],
+    "workingHours": {
+      "weekdays": "8:00 AM - 8:00 PM",
+      "weekends": "9:00 AM - 5:00 PM",
+      "emergency": { "en": "24/7 Emergency Care Available", "bn": "২৪/৭ জরুরি সেবা উপলব্ধ" }
+    }
+  }
+}

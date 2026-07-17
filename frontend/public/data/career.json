@@ -1,0 +1,273 @@
+{
+  "hero": {
+    "title": {
+      "en": "Join Our Team",
+      "bn": "আমাদের দলে যোগ দিন"
+    },
+    "subtitle": {
+      "en": "Build Your Career in Healthcare Excellence",
+      "bn": "স্বাস্থ্যসেবায় আপনার ক্যারিয়ার গড়ুন"
+    },
+    "description": {
+      "en": "Join Mirsarai General Hospital and be part of a dedicated team committed to providing exceptional healthcare services to our community.",
+      "bn": "মীরসরাই জেনারেল হাসপাতালে যোগ দিন এবং আমাদের সম্প্রদায়ে ব্যতিক্রমী স্বাস্থ্যসেবা প্রদানে প্রতিশ্রুতিবদ্ধ একটি নিবেদিত দলের অংশ হন।"
+    },
+    "image": ""
+  },
+  "whyJoinUs": {
+    "title": {
+      "en": "Why Join Mirsarai General Hospital?",
+      "bn": "কেন মীরসরাই জেনারেল হাসপাতালে যোগ দিবেন?"
+    },
+    "benefits": [
+      {
+        "icon": "FaUserMd",
+        "title": {
+          "en": "Professional Growth",
+          "bn": "পেশাদার উন্নয়ন"
+        },
+        "description": {
+          "en": "Continuous learning opportunities and career advancement",
+          "bn": "ক্রমাগত শেখার সুযোগ এবং ক্যারিয়ার উন্নতি"
+        }
+      },
+      {
+        "icon": "FaHeart",
+        "title": {
+          "en": "Work-Life Balance",
+          "bn": "কর্ম-জীবন ভারসাম্য"
+        },
+        "description": {
+          "en": "Flexible schedules and supportive work environment",
+          "bn": "নমনীয় সময়সূচী এবং সহায়ক কাজের পরিবেশ"
+        }
+      },
+      {
+        "icon": "FaHandHoldingMedical",
+        "title": {
+          "en": "Competitive Benefits",
+          "bn": "প্রতিযোগিতামূলক সুবিধা"
+        },
+        "description": {
+          "en": "Attractive salary packages and comprehensive benefits",
+          "bn": "আকর্ষণীয় বেতন প্যাকেজ এবং ব্যাপক সুবিধা"
+        }
+      },
+      {
+        "icon": "FaUsers",
+        "title": {
+          "en": "Team Collaboration",
+          "bn": "দলগত সহযোগিতা"
+        },
+        "description": {
+          "en": "Work with experienced professionals in a collaborative environment",
+          "bn": "সহযোগিতামূলক পরিবেশে অভিজ্ঞ পেশাদারদের সাথে কাজ করুন"
+        }
+      }
+    ]
+  },
+  "openPositions": [
+    {
+      "id": 1,
+      "title": {
+        "en": "Senior Consultant - Cardiology",
+        "bn": "সিনিয়র পরামর্শদাতা - হৃদরোগ বিভাগ"
+      },
+      "department": {
+        "en": "Cardiology",
+        "bn": "হৃদরোগ বিভাগ"
+      },
+      "type": {
+        "en": "Full Time",
+        "bn": "পূর্ণকালীন"
+      },
+      "experience": {
+        "en": "5+ years",
+        "bn": "৫+ বছর"
+      },
+      "description": {
+        "en": "We are looking for an experienced cardiologist to join our team",
+        "bn": "আমরা আমাদের দলে যোগদানের জন্য একজন অভিজ্ঞ হৃদরোগ বিশেষজ্ঞ খুঁজছি"
+      }
+    },
+    {
+      "id": 2,
+      "title": {
+        "en": "Staff Nurse - ICU",
+        "bn": "স্টাফ নার্স - আইসিইউ"
+      },
+      "department": {
+        "en": "Intensive Care Unit",
+        "bn": "নিবিড় পরিচর্যা ইউনিট"
+      },
+      "type": {
+        "en": "Full Time",
+        "bn": "পূর্ণকালীন"
+      },
+      "experience": {
+        "en": "2+ years",
+        "bn": "২+ বছর"
+      },
+      "description": {
+        "en": "Experienced ICU nurse needed for critical care unit",
+        "bn": "গুরুতর যত্ন ইউনিটের জন্য অভিজ্ঞ আইসিইউ নার্স প্রয়োজন"
+      }
+    },
+    {
+      "id": 3,
+      "title": {
+        "en": "Medical Technologist - Lab",
+        "bn": "মেডিকেল টেকনোলজিস্ট - ল্যাব"
+      },
+      "department": {
+        "en": "Diagnostic Lab",
+        "bn": "ডায়াগনস্টিক ল্যাব"
+      },
+      "type": {
+        "en": "Full Time",
+        "bn": "পূর্ণকালীন"
+      },
+      "experience": {
+        "en": "3+ years",
+        "bn": "৩+ বছর"
+      },
+      "description": {
+        "en": "Laboratory technologist with expertise in clinical diagnostics",
+        "bn": "ক্লিনিক্যাল ডায়াগনস্টিকসে দক্ষতা সহ ল্যাবরেটরি টেকনোলজিস্ট"
+      }
+    },
+    {
+      "id": 4,
+      "title": {
+        "en": "Physiotherapist",
+        "bn": "ফিজিওথেরাপিস্ট"
+      },
+      "department": {
+        "en": "Rehabilitation",
+        "bn": "পুনর্বাসন"
+      },
+      "type": {
+        "en": "Part Time",
+        "bn": "খণ্ডকালীন"
+      },
+      "experience": {
+        "en": "1+ years",
+        "bn": "১+ বছর"
+      },
+      "description": {
+        "en": "Licensed physiotherapist for rehabilitation services",
+        "bn": "পুনর্বাসন সেবার জন্য লাইসেন্সপ্রাপ্ত ফিজিওথেরাপিস্ট"
+      }
+    },
+    {
+      "id": 5,
+      "title": {
+        "en": "Pharmacist",
+        "bn": "ফার্মাসিস্ট"
+      },
+      "department": {
+        "en": "Pharmacy",
+        "bn": "ফার্মেসি"
+      },
+      "type": {
+        "en": "Full Time",
+        "bn": "পূর্ণকালীন"
+      },
+      "experience": {
+        "en": "2+ years",
+        "bn": "২+ বছর"
+      },
+      "description": {
+        "en": "Registered pharmacist with hospital pharmacy experience",
+        "bn": "হাসপাতাল ফার্মেসি অভিজ্ঞতা সহ নিবন্ধিত ফার্মাসিস্ট"
+      }
+    },
+    {
+      "id": 6,
+      "title": {
+        "en": "Receptionist",
+        "bn": "অভ্যর্থনাকারী"
+      },
+      "department": {
+        "en": "Front Desk",
+        "bn": "ফ্রন্ট ডেস্ক"
+      },
+      "type": {
+        "en": "Full Time",
+        "bn": "পূর্ণকালীন"
+      },
+      "experience": {
+        "en": "1+ years",
+        "bn": "১+ বছর"
+      },
+      "description": {
+        "en": "Front desk receptionist with excellent communication skills",
+        "bn": "চমৎকার যোগাযোগ দক্ষতা সহ ফ্রন্ট ডেস্ক রিসেপশনিস্ট"
+      }
+    }
+  ],
+  "applicationProcess": {
+    "title": {
+      "en": "Application Process",
+      "bn": "আবেদন প্রক্রিয়া"
+    },
+    "steps": [
+      {
+        "step": 1,
+        "title": {
+          "en": "Submit Application",
+          "bn": "আবেদন জমা দিন"
+        },
+        "description": {
+          "en": "Fill out the online application form with your details",
+          "bn": "আপনার বিবরণ সহ অনলাইন আবেদন ফর্মটি পূরণ করুন"
+        }
+      },
+      {
+        "step": 2,
+        "title": {
+          "en": "Initial Screening",
+          "bn": "প্রাথমিক স্ক্রিনিং"
+        },
+        "description": {
+          "en": "Our HR team will review your application",
+          "bn": "আমাদের এইচআর টিম আপনার আবেদন পর্যালোচনা করবে"
+        }
+      },
+      {
+        "step": 3,
+        "title": {
+          "en": "Interview",
+          "bn": "সাক্ষাৎকার"
+        },
+        "description": {
+          "en": "Shortlisted candidates will be invited for interview",
+          "bn": "নির্বাচিত প্রার্থীদের সাক্ষাৎকারের জন্য আমন্ত্রণ জানানো হবে"
+        }
+      },
+      {
+        "step": 4,
+        "title": {
+          "en": "Offer & Onboarding",
+          "bn": "অফার এবং অনবোর্ডিং"
+        },
+        "description": {
+          "en": "Selected candidates receive offer and start onboarding",
+          "bn": "নির্বাচিত প্রার্থীরা অফার পাবেন এবং অনবোর্ডিং শুরু করবেন"
+        }
+      }
+    ]
+  },
+  "contact": {
+    "title": {
+      "en": "Questions About Careers?",
+      "bn": "ক্যারিয়ার সম্পর্কে প্রশ্ন?"
+    },
+    "description": {
+      "en": "Our HR team is here to help answer any questions you may have",
+      "bn": "আমাদের এইচআর টিম আপনার যেকোনো প্রশ্নের উত্তর দিতে সাহায্য করতে এখানে আছে"
+    },
+    "email": "careers@mirsaraihospital.com",
+    "phone": "+880 1234-567890"
+  }
+}

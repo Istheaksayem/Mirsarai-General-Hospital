@@ -1,0 +1,9 @@
+[
+  { "id": "dept-001", "name": "Cardiology", "code": "CARD", "headOfDepartment": "Dr. Tasnim Alam", "staffCount": 24, "bedCount": 40, "status": "active", "description": "Diagnosis and treatment of heart and vascular disorders." },
+  { "id": "dept-002", "name": "Pediatrics", "code": "PEDI", "headOfDepartment": "Dr. Rafiqul Islam", "staffCount": 18, "bedCount": 30, "status": "active", "description": "Medical care for infants, children, and adolescents." },
+  { "id": "dept-003", "name": "Orthopedics", "code": "ORTH", "headOfDepartment": "Dr. Kamrul Hasan", "staffCount": 15, "bedCount": 25, "status": "active", "description": "Correction of deformities or functional impairments of the skeletal system." },
+  { "id": "dept-004", "name": "Gynecology", "code": "GYNE", "headOfDepartment": "Dr. Nusrat Jahan", "staffCount": 22, "bedCount": 35, "status": "active", "description": "Healthcare for the female reproductive system and breasts." },
+  { "id": "dept-005", "name": "Neurology", "code": "NEUR", "headOfDepartment": "Dr. Sayed Ahmed", "staffCount": 12, "bedCount": 20, "status": "active", "description": "Diagnosis and treatment of all categories of conditions and disease involving the nervous system." },
+  { "id": "dept-006", "name": "Dermatology", "code": "DERM", "headOfDepartment": "Dr. Farhana Yasmin", "staffCount": 8, "bedCount": 0, "status": "active", "description": "Diagnosis and treatment of skin, hair, and nail disorders." },
+  { "id": "dept-007", "name": "Emergency", "code": "EMER", "headOfDepartment": "Dr. M. A. Mannan", "staffCount": 35, "bedCount": 50, "status": "active", "description": "Immediate, 24/7 medical response and trauma services." }
+]
