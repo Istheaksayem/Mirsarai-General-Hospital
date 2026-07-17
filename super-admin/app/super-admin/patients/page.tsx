@@ -7,10 +7,10 @@ import { SearchFilter, SelectFilter } from "@/components/ui/SearchFilter";
 import { DataTable, Column } from "@/components/ui/DataTable";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { usePatients } from "@/lib/hooks/usePatients";
+import { usePatients, useDeletePatient } from "@/lib/hooks/usePatients";
 import { createActionColumn } from "@/components/ui/ActionButtons";
-import { RegisterPatientModal, type NewPatient } from "@/components/patients/RegisterPatientModal";
-import type { Patient } from "@/lib/services/api";
+import type { PatientRow } from "@/lib/hooks/usePatients";
+import toast from "react-hot-toast";
 
 const statusVariant: Record<string, "success" | "warning" | "info"> = {
   active: "success", inactive: "warning", admitted: "info",
@@ -51,6 +51,7 @@ const columns: Column<Record<string, unknown>>[] = [
 
 export default function PatientsPage() {
   const { data: fetchedData = [], isLoading } = usePatients();
+  const deleteMutation = useDeletePatient();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
 
@@ -63,6 +64,14 @@ export default function PatientsPage() {
     return matchSearch && matchStatus;
   }) as unknown as Record<string, unknown>[];
 
+  const handleDelete = (row: Record<string, unknown>) => {
+    const patient = row as unknown as PatientRow;
+    deleteMutation.mutate(patient._id, {
+      onSuccess: () => toast.success("Patient deactivated"),
+      onError: () => toast.error("Failed to deactivate patient"),
+    });
+  };
+
   return (
     <div className="space-y-6">
       <PageHeader title="Patient Management" description={`${data.length} registered patients`} icon={Users}>
@@ -72,7 +81,6 @@ export default function PatientsPage() {
         </Link>
       </PageHeader>
 
-      {/* Stats strip */}
       <div className="grid grid-cols-3 gap-3">
         {[
           { label: "Total", value: data.length, color: "text-[#1E2B7A] dark:text-blue-400" },
@@ -86,7 +94,6 @@ export default function PatientsPage() {
         ))}
       </div>
 
-      {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <SearchFilter value={search} onChange={setSearch} placeholder="Search by name, ID or phone..." className="flex-1" />
         <SelectFilter

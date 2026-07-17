@@ -14,11 +14,12 @@ import { useCmsDoctorById, useUpdateCmsDoctor, useCreateCmsDoctor } from "@/lib/
 import { uploadCmsImage, type CmsDoctor, type BilingualField } from "@/lib/services/api";
 import { LanguageTabs } from "@/components/cms/LanguageTabs";
 import { ImageUploader } from "@/components/cms/ImageUploader";
+import { ChamberTimePicker } from "@/components/doctors/ChamberTimePicker";
+import { LanguageMultiSelect } from "@/components/doctors/LanguageMultiSelect";
 import { cn } from "@/lib/utils";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const DAYS = ["Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 const STATUS_OPTIONS = [
   { value: "active", label: "Active", color: "text-emerald-600" },
   { value: "on-leave", label: "On Leave", color: "text-amber-600" },
@@ -246,11 +247,6 @@ export default function DoctorCmsEditorPage({
 
   const removeService = (idx: number) => {
     setField("services", (form.services || []).filter((_, i) => i !== idx));
-  };
-
-  const toggleDay = (day: string) => {
-    const days = form.availableDays || [];
-    setField("availableDays", days.includes(day) ? days.filter((d) => d !== day) : [...days, day]);
   };
 
   const addKeyword = () => {
@@ -482,11 +478,12 @@ export default function DoctorCmsEditorPage({
               </div>
             </div>
 
-            <BilingualField
-              label="Chamber Time"
-              value={form.chamberTime || emptyBilingual()}
-              onChange={(v) => setField("chamberTime", v)}
-              hint="e.g. 'Saturday–Thursday | 5:00 PM – 9:00 PM' shown in profile"
+            <ChamberTimePicker
+              availableDays={form.availableDays || []}
+              chamberTime={form.chamberTime || emptyBilingual()}
+              onDaysChange={(days) => setField("availableDays", days)}
+              onChamberTimeChange={(ct) => setField("chamberTime", ct)}
+              showTitle={true}
             />
 
             <BilingualField
@@ -495,31 +492,6 @@ export default function DoctorCmsEditorPage({
               onChange={(v) => setField("chamberAddress", v)}
               hint="Shown in doctor profile contact section"
             />
-
-            {/* Available Days */}
-            <div>
-              <FieldLabel hint="Days highlighted as available in the schedule section">Available Days</FieldLabel>
-              <div className="flex flex-wrap gap-2 mt-1">
-                {DAYS.map((day) => {
-                  const selected = (form.availableDays || []).includes(day);
-                  return (
-                    <button
-                      key={day}
-                      type="button"
-                      onClick={() => toggleDay(day)}
-                      className={cn(
-                        "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all",
-                        selected
-                          ? "bg-[#1E2B7A] text-white shadow-sm"
-                          : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700"
-                      )}
-                    >
-                      {day.slice(0, 3)}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
 
             {/* Consultation Toggles */}
             <div className="flex flex-wrap gap-4">
@@ -558,14 +530,10 @@ export default function DoctorCmsEditorPage({
               value={form.address || emptyBilingual()}
               onChange={(v) => setField("address", v)}
             />
-            <div>
-              <FieldLabel hint="Comma-separated languages spoken">Languages</FieldLabel>
-              <Input
-                value={(form.languages || []).join(", ")}
-                onChange={(v) => setField("languages", v.split(",").map(s => s.trim()).filter(Boolean))}
-                placeholder="Bangla, English"
-              />
-            </div>
+            <LanguageMultiSelect
+              value={form.languages || []}
+              onChange={(languages) => setField("languages", languages)}
+            />
           </SectionCard>
 
           {/* SEO */}

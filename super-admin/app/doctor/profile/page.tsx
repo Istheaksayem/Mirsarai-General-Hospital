@@ -13,6 +13,8 @@ import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { uploadProfilePhoto } from "@/lib/services/api";
 import type { DoctorProfileData } from "@/lib/services/api";
+import { ChamberTimePicker } from "@/components/doctors/ChamberTimePicker";
+import { LanguageMultiSelect } from "@/components/doctors/LanguageMultiSelect";
 
 const AVAILABILITY_DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -134,15 +136,6 @@ export default function DoctorProfilePage() {
       setUploadingPhoto(false);
     }
   }, [updateField]);
-
-  const toggleDay = useCallback((day: string) => {
-    setForm((prev) => ({
-      ...prev,
-      availableDays: prev.availableDays.includes(day)
-        ? prev.availableDays.filter((d) => d !== day)
-        : [...prev.availableDays, day],
-    }));
-  }, []);
 
   const validate = useCallback((): boolean => {
     const errors: Partial<Record<keyof FormState, string>> = {};
@@ -447,27 +440,21 @@ export default function DoctorProfilePage() {
               </div>
             </div>
 
-            {/* Chamber Time (Bilingual) */}
+            {/* Chamber Schedule (Unified: days + time) */}
             <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6">
-              <h3 className="mb-4 font-semibold text-gray-900 dark:text-gray-100">Chamber Time <span className="text-gray-400 font-normal">(bilingual)</span></h3>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <FormField label="English" required error={formErrors.chamberTimeEn}>
-                  <input
-                    value={form.chamberTimeEn}
-                    onChange={(e) => updateField("chamberTimeEn", e.target.value)}
-                    placeholder="e.g. Sat-Thu | 5:00 PM - 9:00 PM"
-                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:border-[#1E2B7A] focus:outline-none focus:ring-1 focus:ring-[#1E2B7A]"
-                  />
-                </FormField>
-                <FormField label="বাংলা" required error={formErrors.chamberTimeBn}>
-                  <input
-                    value={form.chamberTimeBn}
-                    onChange={(e) => updateField("chamberTimeBn", e.target.value)}
-                    placeholder="e.g. শনি-বৃহ | বিকাল ৫:০০ - রাত ৯:০০"
-                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:border-[#1E2B7A] focus:outline-none focus:ring-1 focus:ring-[#1E2B7A]"
-                  />
-                </FormField>
-              </div>
+              <ChamberTimePicker
+                availableDays={form.availableDays}
+                chamberTime={{ en: form.chamberTimeEn, bn: form.chamberTimeBn }}
+                onDaysChange={(days) => updateField("availableDays", days)}
+                onChamberTimeChange={(ct) => {
+                  updateField("chamberTimeEn", ct.en);
+                  updateField("chamberTimeBn", ct.bn);
+                }}
+                dayErrors={formErrors.availableDays}
+                timeErrors={formErrors.chamberTimeEn || formErrors.chamberTimeBn ? "Chamber time is required" : undefined}
+                showTitle={true}
+              />
+              {formErrors.chamberTimeBn && <p className="mt-2 text-xs text-red-500">{formErrors.chamberTimeBn}</p>}
             </div>
 
             {/* Services */}
@@ -521,15 +508,12 @@ export default function DoctorProfilePage() {
 
             {/* Languages */}
             <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6">
-              <h3 className="mb-4 font-semibold text-gray-900 dark:text-gray-100">Languages <span className="text-red-500">*</span></h3>
-              <input
-                value={form.languages.join(", ")}
-                onChange={(e) => updateField("languages", e.target.value.split(",").map(s => s.trim()).filter(Boolean))}
-                placeholder="e.g. Bangla, English, Hindi"
-                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:border-[#1E2B7A] focus:outline-none focus:ring-1 focus:ring-[#1E2B7A]"
+              <LanguageMultiSelect
+                value={form.languages}
+                onChange={(languages) => updateField("languages", languages)}
+                error={formErrors.languages}
+                required
               />
-              <p className="mt-1 text-xs text-gray-400">Comma-separated list of languages you speak</p>
-              {formErrors.languages && <p className="mt-1 text-xs text-red-500">{formErrors.languages}</p>}
             </div>
 
             {/* Consultation Options */}
@@ -583,31 +567,7 @@ export default function DoctorProfilePage() {
               {formErrors.available && <p className="mt-1 text-xs text-red-500">{formErrors.available}</p>}
             </div>
 
-            {/* Available Days */}
-            <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6">
-              <h3 className="mb-4 font-semibold text-gray-900 dark:text-gray-100">Available Days <span className="text-red-500">*</span></h3>
-              <div className="flex flex-wrap gap-2">
-                {AVAILABILITY_DAYS.map((day) => {
-                  const isSelected = form.availableDays.includes(day);
-                  return (
-                    <button
-                      key={day}
-                      type="button"
-                      onClick={() => toggleDay(day)}
-                      className={[
-                        "rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors",
-                        isSelected
-                          ? "border-[#76BC21]/40 bg-[#76BC21]/10 text-[#76BC21] dark:border-[#76BC21]/30 dark:bg-[#76BC21]/10"
-                          : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-500 hover:border-gray-300",
-                      ].join(" ")}
-                    >
-                      {day}
-                    </button>
-                  );
-                })}
-              </div>
-              {formErrors.availableDays && <p className="mt-2 text-xs text-red-500">{formErrors.availableDays}</p>}
-            </div>
+
 
             {/* Biography */}
             <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6">

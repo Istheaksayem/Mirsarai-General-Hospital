@@ -3,6 +3,10 @@ import { APPOINTMENT_STATUS, GENDER } from '../constants/index.js';
 
 const appointmentSchema = new mongoose.Schema(
   {
+    patientId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Patient',
+    },
     patientName: {
       type: String,
       required: [true, 'Patient name is required'],

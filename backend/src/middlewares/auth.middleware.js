@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { StatusCodes } from 'http-status-codes';
 import env from '../config/env.js';
+import User from '../models/user.model.js';
 import ApiError from '../utils/ApiError.js';
 import catchAsync from '../utils/catchAsync.js';
 
@@ -32,6 +33,16 @@ const authenticate = catchAsync(async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, env.jwt.secret);
+
+    if (decoded.role !== 'super-admin') {
+      const userRecord = await User.findById(decoded.id).select('isActive').lean();
+      if (!userRecord || !userRecord.isActive) {
+        return next(
+          new ApiError(StatusCodes.FORBIDDEN, 'Your account has been deactivated. Please contact support.')
+        );
+      }
+    }
+
     req.user = decoded;
     next();
   } catch (error) {

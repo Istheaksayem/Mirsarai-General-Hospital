@@ -6,32 +6,56 @@ import { SearchFilter, SelectFilter } from "@/components/ui/SearchFilter";
 import { DataTable, Column } from "@/components/ui/DataTable";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { useAppointments } from "@/lib/hooks/useAppointments";
 import { createActionColumn } from "@/components/ui/ActionButtons";
+import { useQuery } from "@tanstack/react-query";
+import { getReceptionAppointments } from "@/lib/services/api";
 
 const columns: Column<Record<string, unknown>>[] = [
-  { key: "id", header: "ID", cell: (r) => <span className="font-mono text-xs text-gray-400">{r.id as string}</span> },
+  { key: "_id", header: "ID", cell: (r) => <span className="font-mono text-xs text-gray-400">{String(r._id).slice(-6)}</span> },
   {
     key: "patientName", header: "Patient",
-    cell: (r) => <div><p className="font-medium text-gray-900 dark:text-gray-100">{r.patientName as string}</p><p className="text-xs text-gray-400">{r.patientAge as number}y · {r.patientGender as string}</p></div>,
+    cell: (r) => {
+      const name = r.patientName;
+      const displayName = typeof name === "string" ? name : typeof name === "object" && name ? String((name as { en?: string; bn?: string }).en || (name as { en?: string; bn?: string }).bn || "") : String(name ?? "");
+      const age = r.patientAge;
+      const gender = typeof r.patientGender === "string" ? r.patientGender : String(r.patientGender ?? "");
+      return <div><p className="font-medium text-gray-900 dark:text-gray-100">{displayName}</p><p className="text-xs text-gray-400">{String(age ?? "")}y · {gender}</p></div>;
+    },
   },
   {
-    key: "doctorName", header: "Doctor",
-    cell: (r) => <div><p className="font-medium text-gray-900 dark:text-gray-100">{r.doctorName as string}</p><p className="text-xs text-gray-400">{r.department as string}</p></div>,
+    key: "doctor", header: "Doctor",
+    cell: (r) => {
+      const doc = r.doctor as Record<string, unknown> | undefined;
+      const docName = doc?.name ? ((doc.name as { en?: string; bn?: string }).en || (doc.name as { en?: string; bn?: string }).bn || "N/A") : "N/A";
+      const dept = typeof doc?.department === "string" ? doc.department : typeof r.department === "string" ? r.department : "";
+      return <div><p className="font-medium text-gray-900 dark:text-gray-100">{docName}</p><p className="text-xs text-gray-400">{dept}</p></div>;
+    },
   },
-  { key: "date", header: "Date", cell: (r) => <div><p className="font-medium">{r.date as string}</p><p className="text-xs text-gray-400">{r.time as string}</p></div> },
-  { key: "type", header: "Type", cell: (r) => <Badge variant="info">{r.type as string}</Badge> },
-  { key: "status", header: "Status", cell: (r) => <Badge variant={r.status === "confirmed" ? "success" : r.status === "pending" ? "warning" : r.status === "cancelled" ? "danger" : "default"}>{r.status as string}</Badge> },
+  { key: "date", header: "Date", cell: (r) => <div><p className="font-medium">{new Date(String(r.date ?? "")).toLocaleDateString()}</p><p className="text-xs text-gray-400">{String(r.time ?? "")}</p></div> },
+  { key: "type", header: "Type", cell: (r) => <Badge variant="info">{String(r.type ?? "")}</Badge> },
+  { key: "status", header: "Status", cell: (r) => <Badge variant={r.status === "confirmed" ? "success" : r.status === "pending" ? "warning" : r.status === "cancelled" ? "danger" : "default"}>{String(r.status ?? "")}</Badge> },
   createActionColumn(),
 ];
 
 export default function ReceptionAppointmentsPage() {
-  const { data = [], isLoading } = useAppointments();
+  const { data: fetched, isLoading } = useQuery({
+    queryKey: ["reception-appointments"],
+    queryFn: async () => {
+      const res = await getReceptionAppointments();
+      return res.data;
+    },
+  });
+  const data = fetched ?? [];
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const filtered = data.filter((a) => {
-    const ms = !search || a.patientName.toLowerCase().includes(search.toLowerCase()) || a.doctorName.toLowerCase().includes(search.toLowerCase());
-    return ms && (!status || a.status === status);
+    const rawName = (a as Record<string, unknown>).patientName;
+    const name = typeof rawName === "string" ? rawName : "";
+    const doc = (a as Record<string, unknown>).doctor as Record<string, unknown> | undefined;
+    const docNameObj = doc?.name as { en?: string; bn?: string } | undefined;
+    const docName = docNameObj?.en || docNameObj?.bn || "";
+    const ms = !search || name.toLowerCase().includes(search.toLowerCase()) || docName.toLowerCase().includes(search.toLowerCase());
+    return ms && (!status || (a as Record<string, unknown>).status === status);
   }) as unknown as Record<string, unknown>[];
   return (
     <div className="space-y-6">

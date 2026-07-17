@@ -1,3 +1,4 @@
+import bcrypt from 'bcrypt';
 import User from '../models/user.model.js';
 
 const DEFAULT_ADMINS = [
@@ -30,8 +31,14 @@ const DEFAULT_ADMINS = [
 export async function seedDefaultAdmins() {
   for (const admin of DEFAULT_ADMINS) {
     try {
-      await User.deleteOne({ email: admin.email });
-      await User.create(admin);
+      const salt = await bcrypt.genSalt(10);
+      admin.password = await bcrypt.hash(admin.password, salt);
+
+      await User.findOneAndUpdate(
+        { email: admin.email },
+        { $set: admin },
+        { upsert: true, new: true, runValidators: true }
+      );
       console.log(`Default admin ensured: ${admin.email}`);
     } catch (err) {
       console.error(`Failed to seed admin ${admin.email}:`, err.message);

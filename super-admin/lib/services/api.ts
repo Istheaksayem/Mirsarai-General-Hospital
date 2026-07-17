@@ -7,6 +7,29 @@ export interface Patient {
   lastVisit?: string; doctor?: string; department?: string; diagnosis?: string;
 }
 
+export interface RealPatient {
+  _id: string;
+  patientId: string;
+  fullName: string;
+  mobile: string;
+  email?: string;
+  dateOfBirth?: string;
+  age?: number;
+  gender?: string;
+  bloodGroup?: string;
+  address?: string;
+  status: "active" | "inactive" | "admitted";
+  diagnosis?: string;
+  department?: string;
+  isActive: boolean;
+  emergencyContact?: string;
+  allergies?: string;
+  medicalConditions?: string;
+  createdBy?: { _id: string; fullName: string };
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Doctor {
   id: string; name: string; specialization: string; department: string;
   qualification: string; experience: number; phone: string; email: string;
@@ -89,10 +112,19 @@ export type DashboardRole = "super-admin" | "reception-admin" | "lab-admin" | "d
 // ─── API Error ───────────────────────────────────────────────────────────────
 
 export class ApiError extends Error {
-  constructor(public status: number, message: string) {
+  errors?: { field: string; message: string }[];
+  constructor(public status: number, message: string, errors?: { field: string; message: string }[]) {
     super(message);
     this.name = "ApiError";
+    this.errors = errors;
   }
+}
+
+export function formatApiError(err: ApiError): string {
+  if (err.errors && err.errors.length > 0) {
+    return err.errors.map((e) => e.message).join("; ");
+  }
+  return err.message || "Something went wrong";
 }
 
 // ─── Image URL Normalization ──────────────────────────────────────────────────
@@ -154,7 +186,179 @@ export interface LabReportListResponse {
   total: number;
 }
 
-// Get all lab reports (for lab admin)
+// ─── Patient Management (super-admin) ────────────────────────────────────────
+
+export interface PaginatedPatients {
+  data: RealPatient[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export const getPatientsReal = (params?: Record<string, string>) => {
+  const q = params ? '?' + new URLSearchParams(params).toString() : '';
+  return fetchAdminReal<PaginatedPatients>(`admin/patients${q}`);
+};
+
+export const getPatientById = (id: string) =>
+  fetchAdminReal<{ data: RealPatient }>(`admin/patients/${id}`);
+
+export const createPatient = (data: Partial<RealPatient>) =>
+  mutateAdminReal<RealPatient>('admin/patients', data, 'POST');
+
+export const updatePatient = (id: string, data: Partial<RealPatient>) =>
+  mutateAdminReal<RealPatient>(`admin/patients/${id}`, data, 'PUT');
+
+export const deletePatient = (id: string) =>
+  mutateAdminReal<null>(`admin/patients/${id}`, undefined, 'DELETE');
+
+// ─── Reception Patient API ───────────────────────────────────────────────────
+
+export const registerPatientReception = (data: {
+  fullName: string;
+  mobile: string;
+  email?: string;
+  dateOfBirth?: string;
+  gender?: string;
+  bloodGroup?: string;
+  address?: string;
+  department?: string;
+}) => mutateAdminReal<RealPatient>('reception/patients/register', data, 'POST');
+
+export const searchPatients = (query: string) =>
+  fetchAdminReal<RealPatient[]>(`reception/patients/search?q=${encodeURIComponent(query)}`);
+
+// ─── Reception Appointments API ──────────────────────────────────────────────
+
+export const getReceptionAppointments = (params?: Record<string, string>) => {
+  const q = params ? '?' + new URLSearchParams(params).toString() : '';
+  return fetchAdminReal<{ data: unknown[]; total: number; page: number; limit: number }>(`reception/appointments${q}`);
+};
+
+export const updateAppointmentStatus = (id: string, status: string) =>
+  mutateAdminReal<unknown>(`reception/appointments/${id}/status`, { status }, 'PATCH');
+
+// ─── Lab Document API ────────────────────────────────────────────────────────
+
+export const lookupPatient = (query: string) =>
+  fetchAdminReal<{ data: RealPatient[] }>(`patients/lookup?q=${encodeURIComponent(query)}`)
+    .then(res => res.data);
+
+export const uploadDocument = (formData: FormData) => {
+  const headers: Record<string, string> = {};
+  if (typeof window !== 'undefined') {
+    try {
+      const raw = sessionStorage.getItem('mgh_admin_user');
+      if (raw) { const user = JSON.parse(raw); if (user.token) headers['Authorization'] = `Bearer ${user.token}`; }
+    } catch {}
+  }
+  return fetch(`${BACKEND_API}/lab/documents`, {
+    method: 'POST',
+    headers,
+    body: formData,
+  }).then(async (res) => {
+    if (!res.ok) {
+      const errorText = await res.text();
+      let errorMessage = 'Failed to upload document';
+      try { const parsed = JSON.parse(errorText); errorMessage = parsed.message || errorMessage; } catch {}
+      throw new ApiError(res.status, errorMessage);
+    }
+    return res.json();
+  });
+};
+
+export const getDocuments = (params?: Record<string, string>) => {
+  const q = params ? '?' + new URLSearchParams(params).toString() : '';
+  return fetchAdminReal<{ data: unknown[]; total: number }>(`lab/documents${q}`);
+};
+
+export const deleteDocument = (id: string) =>
+  mutateAdminReal<null>(`lab/documents/${id}`, undefined, 'DELETE');
+
+// ─── Patient Portal API ──────────────────────────────────────────────────────
+
+export const patientSendOtp = (email: string) =>
+  fetch(`${BACKEND_API}/patient/auth/send-otp`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  }).then((r) => r.json());
+
+export const patientVerifyOtp = (email: string, otp: string) =>
+  fetch(`${BACKEND_API}/patient/auth/verify-otp`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, otp }),
+  }).then((r) => r.json());
+
+export const patientRegister = (data: {
+  fullName: string;
+  email: string;
+  mobile: string;
+  dateOfBirth?: string;
+  gender?: string;
+  bloodGroup?: string;
+  address?: string;
+}) =>
+  fetch(`${BACKEND_API}/patient/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  }).then((r) => r.json());
+
+export const patientGetProfile = (token: string) =>
+  fetch(`${BACKEND_API}/patient/profile`, {
+    headers: { Authorization: `Bearer ${token}` },
+  }).then((r) => r.json());
+
+export const patientUpdateProfile = (token: string, data: Record<string, unknown>) =>
+  fetch(`${BACKEND_API}/patient/profile`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify(data),
+  }).then((r) => r.json());
+
+export const patientGetAppointments = (token: string) =>
+  fetch(`${BACKEND_API}/patient/appointments`, {
+    headers: { Authorization: `Bearer ${token}` },
+  }).then((r) => r.json());
+
+export const patientCreateAppointment = (token: string, data: Record<string, unknown>) =>
+  fetch(`${BACKEND_API}/patient/appointments`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify(data),
+  }).then((r) => r.json());
+
+export const patientGetDocuments = (token: string) =>
+  fetch(`${BACKEND_API}/patient/documents`, {
+    headers: { Authorization: `Bearer ${token}` },
+  }).then((r) => r.json());
+
+export const patientGetNotifications = (token: string) =>
+  fetch(`${BACKEND_API}/patient/notifications`, {
+    headers: { Authorization: `Bearer ${token}` },
+  }).then((r) => r.json());
+
+export const patientMarkNotificationRead = (token: string, id: string) =>
+  fetch(`${BACKEND_API}/patient/notifications/${id}/read`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${token}` },
+  }).then((r) => r.json());
+
+export const patientMarkAllNotificationsRead = (token: string) =>
+  fetch(`${BACKEND_API}/patient/notifications/read-all`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${token}` },
+  }).then((r) => r.json());
+
+export const patientGetTimeline = (token: string) =>
+  fetch(`${BACKEND_API}/patient/timeline`, {
+    headers: { Authorization: `Bearer ${token}` },
+  }).then((r) => r.json());
+
+// ─── Lab Reports (existing) ─────────────────────────────────────────────────
 export const getLabReports = () => fetchAdminReal<{ data: LabReportData[] }>("lab-reports");
 
 // Get single lab report by ID
@@ -174,9 +378,16 @@ export const downloadLabReport = (id: string) =>
 
 // Upload new lab report
 export const uploadLabReport = (formData: FormData) => {
+  const headers: Record<string, string> = {};
+  if (typeof window !== 'undefined') {
+    try {
+      const raw = sessionStorage.getItem('mgh_admin_user');
+      if (raw) { const user = JSON.parse(raw); if (user.token) headers['Authorization'] = `Bearer ${user.token}`; }
+    } catch {}
+  }
   return fetch(`${BACKEND_API}/lab-reports/upload`, {
     method: "POST",
-    headers: getAuthHeaders(),
+    headers,
     body: formData,
   }).then(async (res) => {
     if (!res.ok) {
@@ -631,8 +842,9 @@ async function fetchAdminReal<T>(path: string): Promise<T> {
   if (!res.ok) {
     const errorText = await res.text();
     let errorMessage = `Failed to fetch ${path}`;
-    try { const parsed = JSON.parse(errorText); errorMessage = parsed.message || errorMessage; } catch {}
-    throw new ApiError(res.status, errorMessage);
+    let errors: { field: string; message: string }[] | undefined;
+    try { const parsed = JSON.parse(errorText); errorMessage = parsed.message || errorMessage; errors = parsed.errors; } catch {}
+    throw new ApiError(res.status, errorMessage, errors);
   }
   const result = await res.json();
   return normalizeImages(result) as T;
@@ -647,8 +859,9 @@ async function mutateAdminReal<T>(path: string, data: unknown, method: "POST" | 
   if (!res.ok) {
     const errorText = await res.text();
     let errorMessage = `Failed to ${method} ${path}`;
-    try { const parsed = JSON.parse(errorText); errorMessage = parsed.message || errorMessage; } catch {}
-    throw new ApiError(res.status, errorMessage);
+    let errors: { field: string; message: string }[] | undefined;
+    try { const parsed = JSON.parse(errorText); errorMessage = parsed.message || errorMessage; errors = parsed.errors; } catch {}
+    throw new ApiError(res.status, errorMessage, errors);
   }
   const result = await res.json();
   return normalizeImages(result.data) as T;
@@ -667,6 +880,44 @@ export const toggleCmsDoctorVisibility = (id: string) => mutateAdminReal<CmsDoct
 export const toggleCmsDoctorFeatured = (id: string) => mutateAdminReal<CmsDoctor>(`admin/doctors/${id}/toggle-featured`, {}, "PATCH");
 export const reorderCmsDoctors = (updates: { id: string; displayOrder: number }[]) =>
   mutateAdminReal<null>("admin/doctors/reorder", updates, "PATCH");
+
+// ─── Staff Management (super-admin) ─────────────────────────────────────────
+
+export interface StaffMember {
+  _id: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  role: "admin" | "doctor" | "reception" | "lab";
+  approvalStatus: "pending" | "approved" | "rejected";
+  accountStatus: "active" | "inactive" | "suspended";
+  isActive: boolean;
+  profileCompleted: boolean;
+  isVerified: boolean;
+  createdAt: string;
+  updatedAt: string;
+  profile: Record<string, unknown> | null;
+}
+
+export const getStaffMembers = (params?: { role?: string }) => {
+  const q = params?.role ? `?role=${params.role}` : "";
+  return fetchAdminReal<{ data: StaffMember[] }>(`admin/staff${q}`);
+};
+
+export const getStaffMemberById = (id: string) =>
+  fetchAdminReal<{ data: StaffMember }>(`admin/staff/${id}`);
+
+export const updateStaffMember = (id: string, data: Partial<StaffMember>) =>
+  mutateAdminReal<StaffMember>(`admin/staff/${id}`, data, "PUT");
+
+export const deleteStaffMember = (id: string) =>
+  mutateAdminReal<null>(`admin/staff/${id}`, undefined, "DELETE");
+
+export const activateStaffMember = (id: string) =>
+  mutateAdminReal<StaffMember>(`admin/staff/${id}/activate`, {}, "PATCH");
+
+export const deactivateStaffMember = (id: string) =>
+  mutateAdminReal<StaffMember>(`admin/staff/${id}/deactivate`, {}, "PATCH");
 
 // ─── Doctor Self Profile (authenticated doctor) ────────────────────────────────
 

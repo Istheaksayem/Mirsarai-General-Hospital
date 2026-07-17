@@ -1,9 +1,10 @@
 "use client";
-import { use } from "react";
+import { use, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Pencil, User, Phone, Calendar, MapPin, Building2, Droplets, Activity } from "lucide-react";
-import { usePatients } from "@/lib/hooks/usePatients";
+import { ArrowLeft, Pencil, Trash2, User, Phone, Calendar, MapPin, Building2, Droplets, Activity } from "lucide-react";
+import { usePatients, useDeletePatient } from "@/lib/hooks/usePatients";
 import { Badge } from "@/components/ui/Badge";
+import toast from "react-hot-toast";
 
 const statusVariant: Record<string, "success" | "warning" | "info"> = { active: "success", inactive: "warning", admitted: "info" };
 
@@ -11,7 +12,9 @@ export default function ViewPatientPage({ params }: { params: Promise<{ id: stri
   const { id } = use(params);
   const router = useRouter();
   const { data = [], isLoading } = usePatients();
+  const deleteMutation = useDeletePatient();
   const patient = data.find(p => p.id === decodeURIComponent(id));
+  const [deleting, setDeleting] = useState(false);
 
   if (isLoading) return <div className="flex items-center justify-center h-64"><div className="animate-spin h-8 w-8 rounded-full border-4 border-[#1E2B7A] border-t-transparent" /></div>;
   if (!patient) return <div className="rounded-2xl border border-dashed border-gray-200 dark:border-gray-700 p-16 text-center text-gray-400">Patient not found</div>;
@@ -28,9 +31,22 @@ export default function ViewPatientPage({ params }: { params: Promise<{ id: stri
     { icon: Calendar, label: "Registered", value: patient.registrationDate || "—" },
   ];
 
+  const handleDelete = () => {
+    setDeleting(true);
+    deleteMutation.mutate(patient._id, {
+      onSuccess: () => {
+        toast.success("Patient deactivated");
+        router.push("/super-admin/patients");
+      },
+      onError: () => {
+        toast.error("Failed to deactivate patient");
+        setDeleting(false);
+      },
+    });
+  };
+
   return (
     <div className="space-y-6 w-full">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button onClick={() => router.push("/super-admin/patients")} className="flex h-9 w-9 items-center justify-center rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
@@ -41,14 +57,17 @@ export default function ViewPatientPage({ params }: { params: Promise<{ id: stri
             <p className="text-sm text-gray-500 mt-0.5">View patient details</p>
           </div>
         </div>
-        <button onClick={() => router.push(`/super-admin/patients/${encodeURIComponent(patient.id)}/edit`)} className="flex items-center gap-2 px-4 py-2 bg-[#1E2B7A] hover:bg-[#76BC21] text-white rounded-xl text-sm font-semibold transition-all">
-          <Pencil className="h-3.5 w-3.5" /> Edit
-        </button>
+        <div className="flex gap-2">
+          <button onClick={handleDelete} disabled={deleting} className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl text-sm font-semibold transition-all">
+            <Trash2 className="h-3.5 w-3.5" /> {deleting ? "Deactivating..." : "Deactivate"}
+          </button>
+          <button onClick={() => router.push(`/super-admin/patients/${encodeURIComponent(patient.id)}/edit`)} className="flex items-center gap-2 px-4 py-2 bg-[#1E2B7A] hover:bg-[#76BC21] text-white rounded-xl text-sm font-semibold transition-all">
+            <Pencil className="h-3.5 w-3.5" /> Edit
+          </button>
+        </div>
       </div>
 
-      {/* Profile card */}
       <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-        {/* Top banner */}
         <div className="h-24 bg-gradient-to-r from-[#1E2B7A] to-[#2c3e7a]" />
         <div className="px-6 pb-6">
           <div className="-mt-10 mb-4 flex items-end justify-between">
@@ -63,7 +82,6 @@ export default function ViewPatientPage({ params }: { params: Promise<{ id: stri
         </div>
       </div>
 
-      {/* Details grid */}
       <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
         <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-5">Patient Information</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
