@@ -19,6 +19,7 @@ import { ImageUploader } from "@/components/cms/ImageUploader";
 import { SeoFields } from "@/components/cms/SeoFields";
 import { LocalizedInput, LocalizedTextarea, SectionDivider } from "@/components/cms/LocalizedFields";
 import { FormField, FormInput } from "@/components/ui/FormPage";
+import { env } from "@/config/env";
 
 const SERVICE_LABELS: Record<string, string> = {
   "diagnostic-services": "Diagnostic Services",
@@ -94,7 +95,7 @@ export default function ServicePageCmsEditor() {
   const handleImageUpload = async (base64: string) => {
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1"}/about/upload`,
+        `${env.apiUrl}/about/upload`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

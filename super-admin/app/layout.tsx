@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { Providers } from "@/components/providers/Providers";
+import { env } from "@/config/env";
 import "./globals.css";
 
 const inter = Inter({
@@ -17,10 +18,10 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "MGH Admin",
-    template: "%s | MGH Admin",
+    default: env.appShortName,
+    template: `%s | ${env.appShortName}`,
   },
-  description: "Mirsarai General Hospital — Admin Management Panel",
+  description: env.appDescription,
   robots: { index: false, follow: false },
 };
 

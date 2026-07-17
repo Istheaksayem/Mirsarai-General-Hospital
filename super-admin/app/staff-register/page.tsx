@@ -8,6 +8,7 @@ import { Eye, EyeOff, Mail, Lock, User, Phone, ShieldCheck, Briefcase } from "lu
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { env } from "@/config/env";
 
 const staffRegisterSchema = z
   .object({
@@ -25,7 +26,7 @@ const staffRegisterSchema = z
 
 type FormValues = z.infer<typeof staffRegisterSchema>;
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+const BACKEND_URL = env.apiUrl;
 
 const ROLE_OPTIONS: { value: FormValues["role"]; label: string }[] = [
   { value: "doctor", label: "Doctor" },

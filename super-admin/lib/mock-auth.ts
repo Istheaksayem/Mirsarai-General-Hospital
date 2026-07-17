@@ -1,47 +1,50 @@
 import { LoginCredentials, Role, User } from "@/types/auth";
+import { env } from "@/config/env";
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+const BACKEND_URL = env.apiUrl;
 
-// Mock users database — fallback for when backend is unavailable
-const MOCK_USERS: Array<User & { password: string }> = [
-  {
-    id: "1",
-    name: "Arif Hossain",
-    email: "superadmin@mgh.com",
-    password: "admin123",
-    role: "super-admin",
-    avatar: "",
-    department: "Administration",
-  },
-  {
-    id: "2",
-    name: "Fatema Khatun",
-    email: "reception@mgh.com",
-    password: "admin123",
-    role: "reception-admin",
-    avatar: "",
-    department: "Reception",
-  },
-  {
-    id: "3",
-    name: "Rahim Uddin",
-    email: "lab@mgh.com",
-    password: "admin123",
-    role: "lab-admin",
-    avatar: "",
-    department: "Laboratory",
-  },
-  {
-    id: "4",
-    name: "Dr. Nasrin Begum",
-    email: "doctor@mgh.com",
-    password: "admin123",
-    role: "doctor",
-    avatar: "",
-    department: "General Medicine",
-    doctorRef: "doc_nasrin_id",
-  },
-];
+// Mock users database — only available when ENABLE_MOCK_AUTH is true
+const MOCK_USERS: Array<User & { password: string }> = env.enableMockAuth
+  ? [
+      {
+        id: "1",
+        name: "Arif Hossain",
+        email: "superadmin@mgh.com",
+        password: "admin123",
+        role: "super-admin",
+        avatar: "",
+        department: "Administration",
+      },
+      {
+        id: "2",
+        name: "Fatema Khatun",
+        email: "reception@mgh.com",
+        password: "admin123",
+        role: "reception-admin",
+        avatar: "",
+        department: "Reception",
+      },
+      {
+        id: "3",
+        name: "Rahim Uddin",
+        email: "lab@mgh.com",
+        password: "admin123",
+        role: "lab-admin",
+        avatar: "",
+        department: "Laboratory",
+      },
+      {
+        id: "4",
+        name: "Dr. Nasrin Begum",
+        email: "doctor@mgh.com",
+        password: "admin123",
+        role: "doctor",
+        avatar: "",
+        department: "General Medicine",
+        doctorRef: "doc_nasrin_id",
+      },
+    ]
+  : [];
 
 // Map backend roles to frontend roles
 export const ROLE_MAP: Record<string, Role> = {

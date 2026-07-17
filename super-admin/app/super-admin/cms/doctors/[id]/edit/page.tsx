@@ -8,8 +8,9 @@ import { RichTextEditor } from "@/components/cms/RichTextEditor";
 import { ImageUploader } from "@/components/cms/ImageUploader";
 import { SeoFields } from "@/components/cms/SeoFields";
 import { FormField, FormInput, FormSelect } from "@/components/ui/FormPage";
+import { env } from "@/config/env";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+const API_URL = env.apiUrl;
 const DAYS = ["Saturday","Sunday","Monday","Tuesday","Wednesday","Thursday","Friday"];
 
 type Bi = { en: string; bn: string };
@@ -291,7 +292,7 @@ export default function EditDoctorCmsPage({ params }: { params: Promise<{ id: st
           <ImageUploader label="Banner Image" value={s("bannerImage")} onChange={v => set("bannerImage", v)} onUpload={uploadImage} />
         </div>
         <FormField label="Or paste external URL">
-          <FormInput value={s("image")} onChange={e => set("image", e.target.value)} placeholder="https://images.unsplash.com/..." />
+          <FormInput value={s("image")} onChange={e => set("image", e.target.value)} placeholder="https://example.com/image.jpg" />
         </FormField>
       </section>
 

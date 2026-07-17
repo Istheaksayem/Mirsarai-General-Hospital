@@ -1,6 +1,7 @@
 import { User } from "@/types/auth";
+import { env } from "@/config/env";
 
-const AUTH_KEY = "mgh_admin_user";
+const AUTH_KEY = env.authStorageKey;
 
 export function storeUser(user: User): void {
   if (typeof window === "undefined") return;

@@ -10,8 +10,9 @@ import { SeoFields } from "@/components/cms/SeoFields";
 import { FormField, FormInput, FormSelect, FormSection } from "@/components/ui/FormPage";
 import { ChamberTimePicker } from "@/components/doctors/ChamberTimePicker";
 import { LanguageMultiSelect } from "@/components/doctors/LanguageMultiSelect";
+import { env } from "@/config/env";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+const API_URL = env.apiUrl;
 const DEPARTMENTS = ["General Medicine","Cardiology","Orthopedics","Neurology","Gynecology","Pediatrics","Gastroenterology","Dermatology","ENT","Ophthalmology","Urology","Radiology","Pathology","Emergency"];
 
 type Bi = { en: string; bn: string };
@@ -330,7 +331,7 @@ export default function AddDoctorCmsPage() {
             helpText="Wide banner image for doctor profile header" />
         </div>
         <FormField label="Or paste external image URL">
-          <FormInput value={form.image} onChange={e => set("image", e.target.value)} placeholder="https://images.unsplash.com/..." />
+          <FormInput value={form.image} onChange={e => set("image", e.target.value)} placeholder="https://example.com/image.jpg" />
         </FormField>
       </section>
 

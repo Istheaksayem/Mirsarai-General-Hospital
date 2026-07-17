@@ -12,6 +12,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { SearchFilter, SelectFilter } from "@/components/ui/SearchFilter";
 import { Badge } from "@/components/ui/Badge";
 import { getImageUrl } from "@/lib/getImageUrl";
+import { env } from "@/config/env";
 import {
   getCmsDoctors,
   deleteCmsDoctor,
@@ -167,7 +168,7 @@ export default function DoctorsCmsPage() {
               {/* Avatar */}
               <div className="h-12 w-12 rounded-xl overflow-hidden bg-[#1E2B7A]/10 shrink-0">
                 {doctor.image ? (
-                  <img src={getImageUrl(doctor.image)} alt={doctor.name.en} className="w-full h-full object-cover" onError={e => { e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(doctor.name.en)}&background=1E2B7A&color=fff`; }} />
+                  <img src={getImageUrl(doctor.image)} alt={doctor.name.en} className="w-full h-full object-cover" onError={e => { e.currentTarget.src = `${env.avatarFallbackUrl}?name=${encodeURIComponent(doctor.name.en)}&background=1E2B7A&color=fff`; }} />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-[#1E2B7A] font-black text-lg">
                     {doctor.name.en.charAt(0)}

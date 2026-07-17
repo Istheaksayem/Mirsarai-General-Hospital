@@ -3,6 +3,7 @@ import { Settings, Bell, Shield, Globe, Database } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { env } from "@/config/env";
 
 function Section({ title, icon: Icon, children }: { title: string; icon: React.ElementType; children: React.ReactNode }) {
   return (
@@ -42,10 +43,10 @@ export default function SettingsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Section title="Hospital Information" icon={Globe}>
           <div className="space-y-4">
-            <Input label="Hospital Name" defaultValue="Mirsarai General Hospital" />
-            <Input label="Contact Email" type="email" defaultValue="info@mgh.com" />
-            <Input label="Emergency Phone" defaultValue="+880-1234-567891" />
-            <Input label="Address" defaultValue="Mirsarai, Chittagong, Bangladesh" />
+            <Input label="Hospital Name" defaultValue={env.appName} />
+            <Input label="Contact Email" type="email" defaultValue={env.hospitalEmail} />
+            <Input label="Emergency Phone" defaultValue={env.hospitalPhone} />
+            <Input label="Address" defaultValue={env.hospitalAddress} />
           </div>
         </Section>
 
@@ -61,7 +62,7 @@ export default function SettingsPage() {
 
         <Section title="Security" icon={Shield}>
           <div className="space-y-4">
-            <Input label="Session Timeout (minutes)" type="number" defaultValue="60" />
+            <Input label="Session Timeout (minutes)" type="number" defaultValue={env.sessionTimeout} />
             <Toggle label="Two-Factor Authentication" desc="Require 2FA for all admin accounts" defaultChecked />
             <Toggle label="Login Attempt Limit" desc="Lock account after 5 failed attempts" defaultChecked />
             <Toggle label="Audit Logs" desc="Keep detailed access logs" defaultChecked />
@@ -72,7 +73,7 @@ export default function SettingsPage() {
           <div className="space-y-4">
             <div className="rounded-xl border border-gray-100 dark:border-gray-800 p-4 space-y-2">
               {[
-                ["App Version", "v2.0.0"],
+                ["App Version", env.appVersion],
                 ["Database", "PostgreSQL 15.2"],
                 ["Last Backup", "Today, 2:00 AM"],
                 ["Environment", "Production"],

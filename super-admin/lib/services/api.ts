@@ -127,8 +127,9 @@ export function formatApiError(err: ApiError): string {
   return err.message || "Something went wrong";
 }
 
-// ─── Image URL Normalization ──────────────────────────────────────────────────
+// ─── Imports ─────────────────────────────────────────────────────────────────
 
+import { env } from '@/config/env';
 import { getImageUrl } from '../getImageUrl';
 
 function normalizeImages(obj: unknown): unknown {
@@ -146,7 +147,7 @@ function normalizeImages(obj: unknown): unknown {
 
 // ─── Base Fetcher ─────────────────────────────────────────────────────────────
 
-const MOCK_BASE = "/mock-data";
+const MOCK_BASE = env.mockBase;
 
 async function fetchMock<T>(path: string): Promise<T> {
   const res = await fetch(`${MOCK_BASE}/${path}`, { cache: "no-store" });
@@ -249,7 +250,7 @@ export const uploadDocument = (formData: FormData) => {
   const headers: Record<string, string> = {};
   if (typeof window !== 'undefined') {
     try {
-      const raw = sessionStorage.getItem('mgh_admin_user');
+      const raw = sessionStorage.getItem(env.authStorageKey);
       if (raw) { const user = JSON.parse(raw); if (user.token) headers['Authorization'] = `Bearer ${user.token}`; }
     } catch {}
   }
@@ -381,7 +382,7 @@ export const uploadLabReport = (formData: FormData) => {
   const headers: Record<string, string> = {};
   if (typeof window !== 'undefined') {
     try {
-      const raw = sessionStorage.getItem('mgh_admin_user');
+      const raw = sessionStorage.getItem(env.authStorageKey);
       if (raw) { const user = JSON.parse(raw); if (user.token) headers['Authorization'] = `Bearer ${user.token}`; }
     } catch {}
   }
@@ -508,7 +509,7 @@ export interface HeroData {
   decorativeShapes: DecorativeShapesConfig;
 }
 
-const BACKEND_API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+const BACKEND_API = env.apiUrl;
 
 async function fetchReal<T>(path: string): Promise<T> {
   const res = await fetch(`${BACKEND_API}/${path}`, {
@@ -838,7 +839,7 @@ export async function uploadProfilePhoto(file: File): Promise<{ url: string }> {
   const headers: Record<string, string> = {};
   if (typeof window !== "undefined") {
     try {
-      const raw = sessionStorage.getItem("mgh_admin_user");
+      const raw = sessionStorage.getItem(env.authStorageKey);
       if (raw) {
         const user = JSON.parse(raw);
         if (user.token) headers["Authorization"] = `Bearer ${user.token}`;
@@ -866,7 +867,7 @@ function getAuthHeaders(): Record<string, string> {
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (typeof window !== "undefined") {
     try {
-      const raw = sessionStorage.getItem("mgh_admin_user");
+      const raw = sessionStorage.getItem(env.authStorageKey);
       if (raw) {
         const user = JSON.parse(raw);
         if (user.token) headers["Authorization"] = `Bearer ${user.token}`;
@@ -1003,7 +1004,7 @@ function getDoctorAuthHeaders(): Record<string, string> {
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (typeof window !== "undefined") {
     try {
-      const raw = sessionStorage.getItem("mgh_admin_user");
+      const raw = sessionStorage.getItem(env.authStorageKey);
       if (raw) {
         const user = JSON.parse(raw);
         if (user.token) headers["Authorization"] = `Bearer ${user.token}`;
