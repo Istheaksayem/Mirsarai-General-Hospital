@@ -56,9 +56,50 @@ export const createDoctorSchema = z.object({
   }),
 });
 
-// ── Update Doctor Schema (all fields optional) ────────────────────────────────
+// ── Update Doctor Schema (all fields optional, no defaults) ────────────────────
+// Each field is explicitly .optional() WITHOUT .default() to prevent silently
+// overwriting existing data in MongoDB during partial updates.
 export const updateDoctorSchema = z.object({
-  body: createDoctorSchema.shape.body.partial(),
+  body: z.object({
+    name:              bilingualZ.optional(),
+    slug:              z.string().min(1).regex(/^[a-z0-9-]+$/, 'Slug must be lowercase alphanumeric with hyphens').optional(),
+    designation:       bilingualZ.optional(),
+    specialization:    bilingualZ.optional(),
+    department:        bilingualZ.optional(),
+    qualification:     z.string().min(1).optional(),
+    experience: z.object({
+      years: z.number().min(0),
+      label: bilingualOptZ,
+    }).optional(),
+    registrationNumber:   z.string().optional(),
+    languages:            z.array(z.string()).optional(),
+    about:                bilingualOptZ,
+    services:             z.array(serviceZ).optional(),
+    consultationFee:      z.number().min(0).optional(),
+    chamberTime:          bilingualOptZ,
+    timeSlots:            z.array(timeSlotZ).optional(),
+    availableDays:        z.array(z.string()).optional(),
+    onlineConsultation:   z.boolean().optional(),
+    offlineConsultation:  z.boolean().optional(),
+    appointmentAvailable: z.boolean().optional(),
+    phone:                z.string().optional(),
+    email:                z.string().email().optional(),
+    address:              bilingualOptZ,
+    chamberAddress:       bilingualOptZ,
+    image:                z.string().optional(),
+    bannerImage:          z.string().optional(),
+    galleryImages:        z.array(z.string()).optional(),
+    status:               z.enum(['active', 'on-leave', 'inactive']).optional(),
+    available:            z.boolean().optional(),
+    featured:             z.boolean().optional(),
+    displayOrder:         z.number().optional(),
+    isVisible:            z.boolean().optional(),
+    seo: z.object({
+      metaTitle:       bilingualOptZ,
+      metaDescription: bilingualOptZ,
+      keywords:        z.array(z.string()).optional(),
+    }).optional(),
+  }),
   params: z.object({ id: z.string().min(1) }),
 });
 

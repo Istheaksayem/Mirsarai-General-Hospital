@@ -9,7 +9,9 @@ import { Button } from "@/components/ui/Button";
 import { usePatients } from "@/lib/hooks/usePatients";
 import { createActionColumn } from "@/components/ui/ActionButtons";
 import { RegisterPatientModal, type NewPatient } from "@/components/patients/RegisterPatientModal";
-import type { Patient } from "@/lib/services/api";
+import { registerPatientReception, ApiError, formatApiError } from "@/lib/services/api";
+import toast from "react-hot-toast";
+import { useQueryClient } from "@tanstack/react-query";
 
 const columns: Column<Record<string, unknown>>[] = [
   {
@@ -46,21 +48,36 @@ const columns: Column<Record<string, unknown>>[] = [
 
 export default function ReceptionPatientsPage() {
   const { data: fetchedData = [], isLoading } = usePatients();
-  const [localPatients, setLocalPatients] = useState<Patient[]>([]);
+  const qc = useQueryClient();
   const [showModal, setShowModal] = useState(false);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
 
-  // Merge fetched + locally registered patients
-  const data = [...fetchedData, ...localPatients];
+  const data = [...fetchedData];
 
   const filtered = data.filter((p) => {
     const ms = !search || p.name.toLowerCase().includes(search.toLowerCase()) || p.phone.includes(search);
     return ms && (!status || p.status === status);
   }) as unknown as Record<string, unknown>[];
 
-  function handleRegister(patient: NewPatient) {
-    setLocalPatients((prev) => [patient as unknown as Patient, ...prev]);
+  async function handleRegister(patient: NewPatient) {
+    try {
+      await registerPatientReception({
+        fullName: patient.name,
+        mobile: patient.phone,
+        email: patient.email,
+        dateOfBirth: patient.dob,
+        gender: patient.gender.toLowerCase(),
+        address: patient.address,
+        department: patient.department,
+        bloodGroup: patient.bloodGroup || undefined,
+      });
+      toast.success("Patient registered successfully");
+      qc.invalidateQueries({ queryKey: ["patients"] });
+    } catch (err: unknown) {
+      const msg = err instanceof ApiError ? formatApiError(err) : "Failed to register patient";
+      toast.error(msg);
+    }
   }
 
   return (

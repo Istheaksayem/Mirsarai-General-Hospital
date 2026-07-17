@@ -3,11 +3,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Users } from "lucide-react";
 import { FormPage, FormField, FormInput, FormSelect, FormSection } from "@/components/ui/FormPage";
-import { generatePatientId } from "@/components/patients/RegisterPatientModal";
-import { usePatients } from "@/lib/hooks/usePatients";
+import { useCreatePatient } from "@/lib/hooks/usePatients";
+import { ApiError, formatApiError } from "@/lib/services/api";
+import toast from "react-hot-toast";
 
 const DEPARTMENTS = ["General Medicine","Cardiology","Orthopedics","Neurology","Gynecology","Pediatrics","Gastroenterology","Dermatology","ENT","Ophthalmology","Urology","Oncology","Radiology","Pathology","Emergency"];
-const BLOOD_GROUPS = ["A+","A−","B+","B−","AB+","AB−","O+","O−"];
+const BLOOD_GROUPS = ["A+","A-","B+","B-","AB+","AB-","O+","O-"];
 
 function calcAge(dob: string) {
   if (!dob) return 0;
@@ -19,13 +20,12 @@ function calcAge(dob: string) {
 
 export default function AddPatientPage() {
   const router = useRouter();
-  const { data = [] } = usePatients();
+  const createMutation = useCreatePatient();
   const today = new Date().toISOString().split("T")[0];
 
-  const [form, setForm] = useState({ name: "", phone: "", dob: "", gender: "", address: "", department: "", bloodGroup: "" });
+  const [form, setForm] = useState({ name: "", phone: "", email: "", dob: "", gender: "", address: "", department: "", bloodGroup: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const patientId = generatePatientId(data.length);
   const age = calcAge(form.dob);
   const set = (k: string, v: string) => { setForm(f => ({ ...f, [k]: v })); setErrors(e => { const n = { ...e }; delete n[k]; return n; }); };
 
@@ -34,6 +34,8 @@ export default function AddPatientPage() {
     if (!form.name.trim()) e.name = "Name is required";
     if (!form.phone.trim()) e.phone = "Mobile is required";
     else if (!/^01[3-9]\d{8}$/.test(form.phone.replace(/[-\s]/g, ""))) e.phone = "Enter valid BD mobile number";
+    if (!form.email.trim()) e.email = "Email is required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) e.email = "Enter a valid email address";
     if (!form.dob) e.dob = "Date of birth is required";
     if (!form.gender) e.gender = "Gender is required";
     if (!form.address.trim()) e.address = "Address is required";
@@ -44,27 +46,39 @@ export default function AddPatientPage() {
   function handleSubmit() {
     const e = validate();
     if (Object.keys(e).length > 0) { setErrors(e); return; }
-    // In production: call API. For now just navigate back with success.
-    router.push("/super-admin/patients?registered=1");
+
+    createMutation.mutate({
+      fullName: form.name.trim(),
+      mobile: form.phone.trim(),
+      email: form.email.trim(),
+      dateOfBirth: form.dob,
+      gender: form.gender.toLowerCase(),
+      address: form.address.trim(),
+      department: form.department,
+      bloodGroup: form.bloodGroup || undefined,
+    }, {
+      onSuccess: () => {
+        toast.success("Patient registered successfully");
+        router.push("/super-admin/patients?registered=1");
+      },
+      onError: (err) => {
+        const msg = err instanceof ApiError ? formatApiError(err) : "Failed to register patient";
+        toast.error(msg);
+      },
+    });
   }
 
   return (
-    <FormPage title="Add New Patient" description={`Patient ID will be: ${patientId}`} backHref="/super-admin/patients" onSubmit={handleSubmit} submitLabel="Register Patient">
-      {/* Auto-generated ID banner */}
-      <div className="flex items-center justify-between rounded-xl border border-[#1E2B7A]/20 bg-[#1E2B7A]/5 dark:bg-[#1E2B7A]/10 px-5 py-3">
-        <div>
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Auto-Generated Patient ID</p>
-          <p className="font-mono text-2xl font-black text-[#1E2B7A] dark:text-blue-400 tracking-wider mt-0.5">{patientId}</p>
-        </div>
-        <Users className="h-8 w-8 text-[#1E2B7A]/30 dark:text-blue-400/30" />
-      </div>
-
+    <FormPage title="Add New Patient" backHref="/super-admin/patients" onSubmit={handleSubmit} submitLabel="Register Patient">
       <FormSection title="Personal Information">
         <FormField label="Full Name" required error={errors.name}>
           <FormInput placeholder="e.g. Aminul Islam" value={form.name} onChange={e => set("name", e.target.value)} />
         </FormField>
         <FormField label="Mobile Number" required error={errors.phone}>
           <FormInput placeholder="e.g. 01711-234567" value={form.phone} onChange={e => set("phone", e.target.value)} maxLength={14} />
+        </FormField>
+        <FormField label="Email Address" required error={errors.email}>
+          <FormInput type="email" placeholder="e.g. patient@example.com" value={form.email} onChange={e => set("email", e.target.value)} />
         </FormField>
         <FormField label="Date of Birth" required error={errors.dob}>
           <FormInput type="date" max={today} value={form.dob} onChange={e => set("dob", e.target.value)} />
@@ -94,9 +108,6 @@ export default function AddPatientPage() {
             <option value="">Select department</option>
             {DEPARTMENTS.map(d => <option key={d} value={d}>{d}</option>)}
           </FormSelect>
-        </FormField>
-        <FormField label="Last Visit (auto)">
-          <FormInput value={today} readOnly />
         </FormField>
         <div className="sm:col-span-2">
           <FormField label="Address" required error={errors.address}>

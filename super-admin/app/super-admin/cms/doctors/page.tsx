@@ -3,19 +3,21 @@
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
-  Stethoscope, UserPlus, Building2, Star, LayoutList,
-  Edit3, Eye, Trash2, ToggleLeft, ToggleRight,
-  Search, Filter, ArrowLeft, Plus, ChevronRight,
+  Stethoscope, Star, Edit3, Eye, Trash2,
+  ArrowLeft, Plus,
 } from "lucide-react";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SearchFilter, SelectFilter } from "@/components/ui/SearchFilter";
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
 import { getImageUrl } from "@/lib/getImageUrl";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+import {
+  getCmsDoctors,
+  deleteCmsDoctor,
+  toggleCmsDoctorFeatured,
+  toggleCmsDoctorVisibility,
+} from "@/lib/services/api";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface AdminDoctor {
@@ -34,32 +36,6 @@ interface AdminDoctor {
   displayOrder: number;
 }
 
-// ── API calls ──────────────────────────────────────────────────────────────
-const fetchAdminDoctors = async (): Promise<AdminDoctor[]> => {
-  const res = await fetch(`${API_URL}/admin/doctors?limit=50`, { cache: "no-store" });
-  if (!res.ok) throw new Error("Failed to fetch doctors");
-  const json = await res.json();
-  return json.data || json.doctors || [];
-};
-
-const toggleFeatured = async (id: string) => {
-  const res = await fetch(`${API_URL}/admin/doctors/${id}/toggle-featured`, { method: "PATCH" });
-  if (!res.ok) throw new Error("Failed to toggle featured");
-  return res.json();
-};
-
-const toggleVisibility = async (id: string) => {
-  const res = await fetch(`${API_URL}/admin/doctors/${id}/toggle-visibility`, { method: "PATCH" });
-  if (!res.ok) throw new Error("Failed to toggle visibility");
-  return res.json();
-};
-
-const deleteDoctor = async (id: string) => {
-  const res = await fetch(`${API_URL}/admin/doctors/${id}`, { method: "DELETE" });
-  if (!res.ok) throw new Error("Failed to delete doctor");
-  return res.json();
-};
-
 // ── Status colors ──────────────────────────────────────────────────────────
 const statusVariant: Record<string, "success" | "warning" | "danger"> = {
   active:    "success",
@@ -75,24 +51,25 @@ export default function DoctorsCmsPage() {
   const [statusFilter, setStatusFilter] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
-  const { data: doctors = [], isLoading, isError } = useQuery<AdminDoctor[]>({
+  const { data: res, isLoading, isError } = useQuery({
     queryKey: ["admin-doctors"],
-    queryFn: fetchAdminDoctors,
+    queryFn: () => getCmsDoctors({ limit: 50 }),
     staleTime: 60_000,
   });
+  const doctors: AdminDoctor[] = (res?.data || []) as AdminDoctor[];
 
   const featuredMutation = useMutation({
-    mutationFn: toggleFeatured,
+    mutationFn: toggleCmsDoctorFeatured,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-doctors"] }),
   });
 
   const visibilityMutation = useMutation({
-    mutationFn: toggleVisibility,
+    mutationFn: toggleCmsDoctorVisibility,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-doctors"] }),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: deleteDoctor,
+    mutationFn: deleteCmsDoctor,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-doctors"] });
       setDeleteConfirm(null);
@@ -171,7 +148,7 @@ export default function DoctorsCmsPage() {
       {isError ? (
         <div className="rounded-2xl border border-dashed border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/10 p-8 text-center text-red-500">
           <p className="font-semibold">Could not connect to backend API</p>
-          <p className="text-xs mt-1">Make sure the backend server is running at {API_URL}</p>
+          <p className="text-xs mt-1">Make sure the backend server is running</p>
         </div>
       ) : filtered.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-gray-200 dark:border-gray-700 p-10 text-center text-gray-400">

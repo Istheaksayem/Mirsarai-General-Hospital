@@ -9,7 +9,7 @@
  * 2. Replace fetchFromJson() calls with fetchFromApi() calls per function
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
 
 // ── Base fetcher: static JSON files (current mock) ────────────────────────────
 async function fetchFromJson<T>(path: string): Promise<T> {
@@ -136,6 +136,138 @@ export async function fetchWebsiteContent() {
   const res = await fetch("/mock-data/website-content.json", { cache: "no-store" });
   if (!res.ok) throw new Error("Failed to fetch website CMS content");
   return res.json();
+}
+
+// ── Patient Token Helper ───────────────────────────────────────────────────────
+function getPatientToken(): string {
+  if (typeof window === 'undefined') return '';
+  try {
+    return sessionStorage.getItem('mgh_patient_token') || '';
+  } catch { return ''; }
+}
+
+async function patientFetch<T>(endpoint: string, options?: RequestInit): Promise<T> {
+  const token = getPatientToken();
+  const res = await fetch(`${API_URL}/${endpoint}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...((options?.headers as Record<string, string>) || {}),
+    },
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: `API error [${endpoint}]` }));
+    throw new Error(err.message || `API error [${endpoint}]`);
+  }
+  const json = await res.json();
+  return json.data as T;
+}
+
+// ── Patient Portal API ─────────────────────────────────────────────────────────
+export interface PatientProfileData {
+  _id: string;
+  patientId: string;
+  fullName: string;
+  mobile: string;
+  email: string;
+  dateOfBirth?: string;
+  age?: number;
+  gender?: string;
+  bloodGroup?: string;
+  address?: string;
+  emergencyContact?: string;
+  allergies?: string;
+  medicalConditions?: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type PatientAppointment = Record<string, unknown>;
+export type PatientDocument = Record<string, unknown>;
+export type PatientNotification = Record<string, unknown>;
+export type PatientTimelineItem = Record<string, unknown>;
+
+export async function patientAuthSendOtp(email: string) {
+  const res = await fetch(`${API_URL}/patient/auth/send-otp`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  });
+  return res.json();
+}
+
+export async function patientAuthVerifyOtp(email: string, otp: string) {
+  const res = await fetch(`${API_URL}/patient/auth/verify-otp`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, otp }),
+  });
+  return res.json();
+}
+
+export async function patientAuthRegister(data: {
+  fullName: string;
+  email: string;
+  mobile: string;
+  dateOfBirth?: string;
+  gender?: string;
+  bloodGroup?: string;
+  address?: string;
+}) {
+  const res = await fetch(`${API_URL}/patient/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  return res.json();
+}
+
+export function patientGetProfile() {
+  return patientFetch<PatientProfileData>('patient/profile');
+}
+
+export function patientUpdateProfile(data: Record<string, unknown>) {
+  return patientFetch<PatientProfileData>('patient/profile', {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+}
+
+export function patientGetAppointments() {
+  return patientFetch<PatientAppointment[]>('patient/appointments');
+}
+
+export function patientCreateAppointment(data: Record<string, unknown>) {
+  return patientFetch<PatientAppointment>('patient/appointments', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export function patientGetDocuments() {
+  return patientFetch<PatientDocument[]>('patient/documents');
+}
+
+export function patientGetNotifications() {
+  return patientFetch<PatientNotification[]>('patient/notifications');
+}
+
+export function patientMarkNotificationRead(id: string) {
+  return patientFetch<PatientNotification>(`patient/notifications/${id}/read`, {
+    method: 'PATCH',
+  });
+}
+
+export function patientMarkAllNotificationsRead() {
+  return patientFetch<null>('patient/notifications/read-all', {
+    method: 'PATCH',
+  });
+}
+
+export function patientGetTimeline() {
+  return patientFetch<PatientTimelineItem[]>('patient/timeline');
 }
 
 // ── Appointment submission ─────────────────────────────────────────────────────

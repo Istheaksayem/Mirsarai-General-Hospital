@@ -9,6 +9,7 @@ export interface NewPatient {
   id: string;
   name: string;
   phone: string;
+  email: string;
   dob: string;
   age: number;
   gender: string;
@@ -46,7 +47,7 @@ const DEPARTMENTS = [
   "Radiology", "Pathology", "Emergency",
 ];
 
-const BLOOD_GROUPS = ["A+", "A−", "B+", "B−", "AB+", "AB−", "O+", "O−"];
+const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
 // ── Field wrapper ─────────────────────────────────────────────────────────────
 function Field({
@@ -111,6 +112,7 @@ export function RegisterPatientModal({ onClose, onRegister, existingCount }: Reg
   const [form, setForm] = useState({
     name: "",
     phone: "",
+    email: "",
     dob: "",
     gender: "",
     address: "",
@@ -133,6 +135,8 @@ export function RegisterPatientModal({ onClose, onRegister, existingCount }: Reg
     if (!form.phone.trim()) e.phone = "Mobile number is required";
     else if (!/^01[3-9]\d{8}$/.test(form.phone.replace(/[-\s]/g, "")))
       e.phone = "Enter a valid BD mobile number";
+    if (!form.email.trim()) e.email = "Email is required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) e.email = "Enter a valid email address";
     if (!form.dob) e.dob = "Date of birth is required";
     else if (age < 0 || age > 150) e.dob = "Invalid date of birth";
     if (!form.gender) e.gender = "Gender is required";
@@ -149,6 +153,7 @@ export function RegisterPatientModal({ onClose, onRegister, existingCount }: Reg
       id: generatedId,
       name: form.name.trim(),
       phone: form.phone.trim(),
+      email: form.email.trim(),
       dob: form.dob,
       age,
       gender: form.gender,
@@ -237,6 +242,14 @@ export function RegisterPatientModal({ onClose, onRegister, existingCount }: Reg
                 value={form.phone}
                 onChange={(e) => set("phone", e.target.value)}
                 maxLength={14}
+              />
+            </Field>
+            <Field label="Email Address" required icon={User} error={errors.email}>
+              <Input
+                type="email"
+                placeholder="e.g. patient@example.com"
+                value={form.email}
+                onChange={(e) => set("email", e.target.value)}
               />
             </Field>
           </div>
