@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/context/LanguageContext";
+import { getImageUrl } from "@/lib/getImageUrl";
 import {
   FaUserMd,
   FaHeart,
@@ -129,7 +130,6 @@ const CareerPage = () => {
       }
     }
   }, [data, lang]);
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-tertiary/5">
@@ -199,7 +199,8 @@ const CareerPage = () => {
               className="relative h-[400px] rounded-2xl overflow-hidden shadow-2xl"
             >
               <Image
-                src={data.hero.image}
+                src={getImageUrl(data.hero.image)}
+                
                 alt="Career"
                 fill
                 className="object-cover"

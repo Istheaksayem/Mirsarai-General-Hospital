@@ -48,7 +48,7 @@ export default function AboutUsCmsPage() {
     setIsSaving(true);
     setStatus(null);
     try {
-      await updateAboutUs(data);
+      const result = await updateAboutUs(data); setData(result);
       setStatus({ type: "success", text: "About Us content saved successfully!" });
       setTimeout(() => setStatus(null), 4000);
     } catch (e: any) {

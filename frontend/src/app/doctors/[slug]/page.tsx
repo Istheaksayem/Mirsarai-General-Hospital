@@ -9,6 +9,7 @@ import {
   FaCalendarAlt, FaMapMarkerAlt, FaStar, FaUserMd,
 } from "react-icons/fa";
 import { useLanguage } from "@/context/LanguageContext";
+import { getImageUrl } from "@/lib/getImageUrl";
 import { useDoctors } from "@/hooks/useDoctors";
 import Link from "next/link";
 
@@ -71,7 +72,7 @@ export default function DoctorProfilePage({ params }: { params: Promise<{ slug: 
               {/* Image */}
               <div className="relative h-80 bg-gradient-to-b from-[#1E2B7A]/10 to-transparent">
                 <img
-                  src={doctor.image}
+                  src={getImageUrl(doctor.image)}
                   alt={lang === "bn" ? doctor.name.bn : doctor.name.en}
                   className="w-full h-full object-cover"
                   onError={(e) => {

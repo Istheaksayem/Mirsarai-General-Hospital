@@ -57,7 +57,7 @@ export default function OurTeamCmsPage() {
     setIsSaving(true);
     setStatus(null);
     try {
-      await updateOurTeamData(data);
+      const result = await updateOurTeamData(data); setData(result);
       setStatus({ type: "success", text: "Our Team content saved successfully!" });
       setTimeout(() => setStatus(null), 4000);
     } catch (e: any) {

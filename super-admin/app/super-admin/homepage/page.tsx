@@ -37,7 +37,7 @@ export default function EditHomepageCMS() {
     setStatusMessage(null);
     try {
       // Use PUT to save full data replacement
-      await updateAdminHomepage(data, "PUT");
+      const result = await updateAdminHomepage(data, "PUT"); setData(result);
       setStatusMessage({ type: "success", text: "Homepage content updated successfully!" });
       setTimeout(() => setStatusMessage(null), 4000);
     } catch (err: any) {
