@@ -24,7 +24,7 @@ export default function AuthLayout({
 
         {/* Mobile Branding (Visible only on small screens) */}
         <div className="w-full md:hidden bg-gradient-to-br from-primary to-blue-800 p-8 text-white text-center">
-          <img src="/genaral_Hospital_logo.jpeg.jpg" alt="Hospital Logo" className="h-16 w-auto mx-auto mb-4 rounded-full" />
+          <img src="/genaral_Hospital_logo.jpeg" alt="Hospital Logo" className="h-16 w-auto mx-auto mb-4 rounded-full" />
           <h2 className="text-2xl font-bold mb-2">Mirsarai General Hospital</h2>
           <p className="text-blue-100 text-sm">Your Health, Our Priority</p>
         </div>
