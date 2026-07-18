@@ -6,7 +6,7 @@ import { ArrowLeft, Save, CheckCircle2, Loader2 } from "lucide-react";
 import { LanguageTabs } from "@/components/cms/LanguageTabs";
 import { RichTextEditor } from "@/components/cms/RichTextEditor";
 import { ImageUploader } from "@/components/cms/ImageUploader";
-import { SeoFields } from "@/components/cms/SeoFields";
+import { SeoFields, type SeoValue } from "@/components/cms/SeoFields";
 import { FormField, FormInput, FormSelect } from "@/components/ui/FormPage";
 import { env } from "@/config/env";
 
@@ -297,7 +297,7 @@ export default function EditDoctorCmsPage({ params }: { params: Promise<{ id: st
       </section>
 
       {/* SEO */}
-      <SeoFields value={form.seo as Parameters<typeof SeoFields>[0]["value"]} onChange={v => set("seo", v)} helpText="SEO for /doctors/[slug] page" />
+      <SeoFields value={form.seo as SeoValue} onChange={(v: SeoValue) => set("seo", v)} helpText="SEO for /doctors/[slug] page" />
 
       {/* Footer */}
       <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-800">

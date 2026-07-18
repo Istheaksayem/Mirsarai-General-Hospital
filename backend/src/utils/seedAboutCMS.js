@@ -19,7 +19,7 @@ const __dirname = path.dirname(__filename);
 // Load env variables
 dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://mirsaraiDB:doXgpGjpy6BJCBE4@cluster0.ssnb3vx.mongodb.net/?appName=Cluster0';
+const MONGODB_URI = process.env.MONGODB_URI
 
 async function seedData() {
   try {

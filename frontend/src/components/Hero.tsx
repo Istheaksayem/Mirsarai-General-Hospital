@@ -45,7 +45,7 @@ interface HeroData {
 // ── Fetcher ────────────────────────────────────────────────────────────────
 const fetchHeroData = async (): Promise<HeroData> => {
   try {
-    const res = await fetch("http://localhost:5000/api/homepage/hero", { cache: "no-store" });
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/homepage/hero`, { cache: "no-store" });
     if (!res.ok) throw new Error("API responded with an error status");
     const result = await res.json();
     if (result.success && result.data) return result.data;

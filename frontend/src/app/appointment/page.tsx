@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import type { Metadata } from "next";
 import { FaHospital, FaShieldAlt, FaHeadset } from "react-icons/fa";
 import { MdVerified } from "react-icons/md";
@@ -129,7 +129,9 @@ export default function AppointmentPage() {
                 <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight">Fill in Your Details</h2>
                 <p className="text-gray-500 text-sm mt-1.5">Complete the form below to book your appointment.</p>
               </div>
-              <AppointmentForm />
+              <Suspense fallback={<div className="text-center py-8 text-gray-400">Loading form...</div>}>
+                <AppointmentForm />
+              </Suspense>
             </div>
           </div>
         </div>

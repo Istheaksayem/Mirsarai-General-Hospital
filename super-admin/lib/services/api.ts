@@ -172,14 +172,21 @@ export const getReports = () => fetchMock<Report[]>("reports.json");
 export interface LabReportData {
   _id: string;
   patientId: string;
+  patientName: string;
   testName: string;
   reportType: string;
   requestingDoctor: string;
   fileUrl: string;
-  status: "pending" | "completed";
+  status: "pending" | "in-progress" | "completed";
   uploadedBy: string;
   createdAt: string;
   updatedAt: string;
+  department?: string;
+  requestedBy?: string;
+  requestDate?: string;
+  completedDate?: string;
+  notes?: string;
+  results?: Record<string, unknown>;
 }
 
 export interface LabReportListResponse {
@@ -366,7 +373,7 @@ export const getLabReports = () => fetchAdminReal<{ data: LabReportData[] }>("la
 export const getLabReportById = (id: string) => fetchAdminReal<{ data: LabReportData }>(`lab-reports/${id}`);
 
 // Update lab report status
-export const updateLabReportStatus = (id: string, status: "pending" | "completed") =>
+export const updateLabReportStatus = (id: string, status: LabReportData["status"]) =>
   mutateAdminReal<LabReportData>(`lab-reports/${id}/status`, { status }, "PATCH");
 
 // Delete lab report
@@ -1358,7 +1365,7 @@ export interface ServicePageCategory {
 
 export interface ServicePageWorkingHours {
   weekdays: string;
-  weekends: string;
+  weekends?: string;
   emergency: BilingualField;
 }
 

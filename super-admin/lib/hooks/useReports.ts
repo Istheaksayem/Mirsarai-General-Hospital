@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getLabReports, updateLabReportStatus, deleteLabReport, downloadLabReport } from "@/lib/services/api";
+import { getLabReports, updateLabReportStatus, deleteLabReport, downloadLabReport, type LabReportData } from "@/lib/services/api";
 
 export function useReports() {
   return useQuery({ 
@@ -16,7 +16,7 @@ export function useUpdateReportStatus() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: ({ id, status }: { id: string; status: "pending" | "completed" }) =>
+    mutationFn: ({ id, status }: { id: string; status: LabReportData["status"] }) =>
       updateLabReportStatus(id, status),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["lab-reports"] });

@@ -120,8 +120,8 @@ const Doctors = () => {
                         </div>
                         <span className="text-gray-600 dark:text-gray-400 font-medium">
                           {lang === "bn"
-                            ? (doctor.experience?.label?.bn || `${doctor.experience?.years}+ বছর`)
-                            : (doctor.experience?.label?.en || `${doctor.experience?.years}+ Years`)}
+                            ? (doctor.experience?.bn || "অভিজ্ঞ")
+                            : (doctor.experience?.en || "Experienced")}
                         </span>
                       </div>
                       <div className="text-right">

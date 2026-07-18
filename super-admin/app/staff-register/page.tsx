@@ -17,7 +17,7 @@ const staffRegisterSchema = z
     phone: z.string().min(7, "Enter a valid phone number"),
     password: z.string().min(6, "Password must be at least 6 characters"),
     confirmPassword: z.string(),
-    role: z.enum(["doctor", "reception", "lab"], { required_error: "Select a staff role" }),
+    role: z.enum(["doctor", "reception", "lab"]),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",

@@ -6,7 +6,7 @@ import { ArrowLeft, Save, Stethoscope, CheckCircle2 } from "lucide-react";
 import { LanguageTabs } from "@/components/cms/LanguageTabs";
 import { RichTextEditor } from "@/components/cms/RichTextEditor";
 import { ImageUploader } from "@/components/cms/ImageUploader";
-import { SeoFields } from "@/components/cms/SeoFields";
+import { SeoFields, type SeoValue } from "@/components/cms/SeoFields";
 import { FormField, FormInput, FormSelect, FormSection } from "@/components/ui/FormPage";
 import { ChamberTimePicker } from "@/components/doctors/ChamberTimePicker";
 import { LanguageMultiSelect } from "@/components/doctors/LanguageMultiSelect";
@@ -338,7 +338,7 @@ export default function AddDoctorCmsPage() {
       {/* ── SEO ── */}
       <SeoFields
         value={form.seo}
-        onChange={v => set("seo", v)}
+        onChange={(v: SeoValue) => set("seo", v)}
         helpText="SEO fields for /doctors/[slug] page"
       />
 

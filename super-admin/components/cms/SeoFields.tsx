@@ -10,7 +10,7 @@ interface BilingualField {
   bn: string;
 }
 
-interface SeoValue {
+export interface SeoValue {
   metaTitle: BilingualField;
   metaDescription: BilingualField;
   keywords: string[] | BilingualField;
