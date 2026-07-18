@@ -67,3 +67,36 @@ export const staffRegisterSchema = z.object({
   message: 'Passwords do not match',
   path: ['confirmPassword'],
 });
+
+export const forgotPasswordSchema = z.object({
+  email: z
+    .string({
+      required_error: 'Email is required',
+    })
+    .email('Please provide a valid email address'),
+});
+
+export const resetPasswordSchema = z.object({
+  email: z
+    .string({
+      required_error: 'Email is required',
+    })
+    .email('Please provide a valid email address'),
+  otp: z
+    .string({
+      required_error: 'OTP is required',
+    })
+    .length(6, 'OTP must be exactly 6 digits'),
+  newPassword: z
+    .string({
+      required_error: 'New password is required',
+    })
+    .min(6, 'Password must be at least 6 characters'),
+  confirmNewPassword: z
+    .string({
+      required_error: 'Please confirm your new password',
+    }),
+}).refine((data) => data.newPassword === data.confirmNewPassword, {
+  message: 'Passwords do not match',
+  path: ['confirmNewPassword'],
+});
