@@ -4,38 +4,54 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Eye, EyeOff, Lock, Mail, ShieldCheck } from "lucide-react";
-import Link from "next/link";
+import { Mail, ShieldCheck } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { toast } from "react-hot-toast";
 
 const schema = z.object({
   email: z.string().email("Enter a valid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 type FormValues = z.infer<typeof schema>;
 
-
-
-export function LoginForm() {
-  const { login } = useAuth();
-  const [showPassword, setShowPassword] = useState(false);
+export function ForgotPasswordForm() {
+  const router = useRouter();
   const [serverError, setServerError] = useState<string | null>(null);
 
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({ resolver: zodResolver(schema) });
 
   const onSubmit = async (values: FormValues) => {
     setServerError(null);
-    const result = await login(values);
-    if (result.error) setServerError(result.error);
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/forgot-password`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(values),
+        }
+      );
+
+      const resData = await res.json();
+
+      if (!res.ok) {
+        setServerError(resData.message || "Failed to request password reset.");
+        return;
+      }
+
+      toast.success(resData.message || "OTP sent to your email.");
+      router.push(`/reset-password?email=${encodeURIComponent(values.email)}`);
+    } catch {
+      setServerError("An unexpected error occurred. Please try again.");
+    }
   };
 
   return (
@@ -53,10 +69,10 @@ export function LoginForm() {
             <ShieldCheck className="h-7 w-7 text-white" strokeWidth={1.8} />
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-50">
-            Admin Portal
+            Forgot Password
           </h1>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            Mirsarai General Hospital
+            Enter your email to receive an OTP
           </p>
         </div>
 
@@ -70,37 +86,6 @@ export function LoginForm() {
             error={errors.email?.message}
             {...register("email")}
           />
-
-          <div className="flex flex-col gap-1.5">
-            <Input
-              label="Password"
-              type={showPassword ? "text" : "password"}
-              placeholder="••••••••"
-              autoComplete="current-password"
-              leftIcon={<Lock className="h-4 w-4" />}
-              rightIcon={
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </button>
-              }
-              error={errors.password?.message}
-              {...register("password")}
-            />
-            <div className="flex justify-end">
-              <Link href="/forgot-password" className="text-xs font-semibold text-[#1E2B7A] hover:text-[#2d3fa8] dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
-                Forgot Password?
-              </Link>
-            </div>
-          </div>
 
           {/* Server error */}
           <AnimatePresence>
@@ -124,22 +109,19 @@ export function LoginForm() {
             loading={isSubmitting}
             className="w-full"
           >
-            {isSubmitting ? "Signing in…" : "Sign In"}
+            {isSubmitting ? "Sending OTP…" : "Send OTP"}
           </Button>
         </form>
-
-
       </div>
 
-      {/* Staff registration link */}
       <p className="mt-6 text-center text-xs text-gray-400 dark:text-gray-500">
-        Don&apos;t have an account?{" "}
-        <a
-          href="/staff-register"
+        Remember your password?{" "}
+        <Link
+          href="/login"
           className="font-semibold text-[#1E2B7A] hover:text-[#2d3fa8] dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
         >
-          Register here
-        </a>
+          Sign In
+        </Link>
       </p>
     </motion.div>
   );
