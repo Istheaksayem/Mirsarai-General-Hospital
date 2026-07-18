@@ -8,9 +8,7 @@ import {
   updateCareerData,
   uploadCmsImage,
   CareerData,
-  CareerBenefit,
   CareerPosition,
-  CareerStep,
 } from "@/lib/services/api";
 import { CmsTabNav, CmsTab, CmsCard, CmsStatusBar, CmsPageHeader } from "@/components/cms/CmsLayout";
 import { LanguageTabs } from "@/components/cms/LanguageTabs";
@@ -21,14 +19,9 @@ import { LocalizedInput, LocalizedTextarea, SectionDivider } from "@/components/
 import { FormField, FormInput } from "@/components/ui/FormPage";
 
 const SECTION_DEFS = [
-  { key: "hero",               label: "Hero Section",          description: "Top banner with career page title and image" },
-  { key: "whyJoinUs",          label: "Why Join Us",           description: "Benefits and perks of working at the hospital" },
-  { key: "openPositions",      label: "Open Positions",        description: "Current job listings with details" },
-  { key: "applicationProcess", label: "Application Process",   description: "Step-by-step guide to applying" },
-  { key: "contact",            label: "Contact Section",       description: "HR contact details for applicants" },
+  { key: "hero",        label: "Hero Section", description: "Top banner with page title, description and background image" },
+  { key: "jobListings", label: "Job Listings", description: "List of open positions shown on the careers page" },
 ];
-
-const ICON_OPTIONS = ["FaHeart", "FaUsers", "FaGraduationCap", "FaBriefcase", "FaAward", "FaHandshake", "FaStar", "FaShieldAlt", "FaLaptopMedical", "FaBuilding"];
 
 export default function CareerCmsPage() {
   const router = useRouter();
@@ -42,7 +35,32 @@ export default function CareerCmsPage() {
 
   useEffect(() => {
     getCareerData()
-      .then(setData)
+      .then((raw) => {
+        // Safe mapping / normalization to handle the transition between old and new schema
+        const normalized: CareerData = {
+          ...raw,
+          title: raw.title || (raw as any).hero?.title || { en: "Join Our Team", bn: "আমাদের দলে যোগ দিন" },
+          description: raw.description || (raw as any).hero?.description || { en: "Build your career in healthcare excellence...", bn: "স্বাস্থ্যসেবায় আপনার ক্যারিয়ার গড়ে তুলুন..." },
+          image: raw.image || (raw as any).hero?.image || "/about-us.jpg",
+          jobListings: (raw.jobListings || (raw as any).openPositions || []).map((job: any) => ({
+            id: job.id,
+            title: job.title || job.jobTitle || { en: "Position", bn: "পদ" },
+            department: job.department || { en: "Department", bn: "বিভাগ" },
+            location: job.location || { en: "Mirsarai, Chittagong", bn: "মীরসরাই, চট্টগ্রাম" },
+            jobType: job.jobType || job.type || job.employmentType || { en: "Full-time", bn: "পূর্ণকালীন" },
+            description: job.description || job.jobDescription || { en: "", bn: "" },
+            requirements: job.requirements || { en: "", bn: "" },
+            applyLink: job.applyLink || job.applyButtonUrl || "mailto:careers@mirsaraihospital.com",
+            bannerImage: job.bannerImage || job.image || "/about-us.jpg",
+            isActive: job.isActive !== undefined ? job.isActive : (job.status === "Open" || true)
+          })),
+          sections: raw.sections || {
+            hero: { isVisible: true, order: 1 },
+            jobListings: { isVisible: true, order: 2 }
+          }
+        };
+        setData(normalized);
+      })
       .catch((e) => setStatus({ type: "error", text: e.message || "Failed to load data" }))
       .finally(() => setIsLoading(false));
   }, []);
@@ -68,7 +86,7 @@ export default function CareerCmsPage() {
 
   const handleImageUpload = async (base64: string) => uploadCmsImage(base64);
 
-  const nextPositionId = () => (data?.openPositions.reduce((max, p) => (p.id > max ? p.id : max), 0) ?? 0) + 1;
+  const nextPositionId = () => (data?.jobListings.reduce((max, p) => (p.id > max ? p.id : max), 0) ?? 0) + 1;
 
   if (isLoading) {
     return (
@@ -93,7 +111,7 @@ export default function CareerCmsPage() {
     <div className="space-y-6 pb-10">
       <CmsPageHeader
         title="Career CMS"
-        description="Manage job listings, benefits, application process, and contact details"
+        description="Manage page banner, overview description, and active job listings"
         onBack={() => router.push("/super-admin/cms")}
         onSave={handleSave}
         isSaving={isSaving}
@@ -115,215 +133,211 @@ export default function CareerCmsPage() {
                 <LanguageTabs activeTab={langTab} onTabChange={setLangTab} />
               </div>
 
-              {/* Hero */}
+              {/* Hero / Page Overview */}
               <div className="space-y-4">
-                <SectionDivider title="Hero Section" description="Top banner of the Career page with title, subtitle, and background image" />
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <LocalizedInput label="Hero Title" value={data.hero.title} activeTab={langTab}
-                    onChange={(v) => set((d) => ({ ...d, hero: { ...d.hero, title: v } }))}
-                    placeholder={{ en: "Join Our Team", bn: "আমাদের দলে যোগ দিন" }} required />
-                  <LocalizedInput label="Hero Subtitle" value={data.hero.subtitle} activeTab={langTab}
-                    onChange={(v) => set((d) => ({ ...d, hero: { ...d.hero, subtitle: v } }))}
-                    placeholder={{ en: "Build your career…", bn: "আপনার ক্যারিয়ার গড়ুন…" }} />
+                <SectionDivider title="Hero Section" description="Header banner settings for the careers page" />
+                <div className="grid grid-cols-1 gap-4">
+                  <LocalizedInput 
+                    label="Page Title" 
+                    value={data.title} 
+                    activeTab={langTab}
+                    onChange={(v) => set((d) => ({ ...d, title: v }))}
+                    placeholder={{ en: "Join Our Team", bn: "আমাদের দলে যোগ দিন" }} 
+                    required 
+                  />
+                  <LocalizedTextarea 
+                    label="Page Description / Subtitle" 
+                    value={data.description} 
+                    activeTab={langTab}
+                    onChange={(v) => set((d) => ({ ...d, description: v }))}
+                    placeholder={{ en: "Build your career in healthcare excellence...", bn: "স্বাস্থ্যসেবায় আপনার ক্যারিয়ার গড়ে তুলুন..." }} 
+                    rows={3} 
+                    required
+                  />
                 </div>
-                <LocalizedTextarea label="Hero Description" value={data.hero.description} activeTab={langTab}
-                  onChange={(v) => set((d) => ({ ...d, hero: { ...d.hero, description: v } }))}
-                  placeholder={{ en: "We are looking for dedicated…", bn: "আমরা নিবেদিতপ্রাণ পেশাদারদের খুঁজছি…" }} rows={3} />
-                <ImageUploader label="Hero Background Image" value={data.hero.image}
-                  onChange={(url) => set((d) => ({ ...d, hero: { ...d.hero, image: url } }))}
+                <ImageUploader 
+                  label="Hero Banner Background Image" 
+                  value={data.image}
+                  onChange={(url) => set((d) => ({ ...d, image: url }))}
                   onUpload={handleImageUpload}
-                  helpText="Background image for the career hero section (recommended: 1200×600px)" />
+                  helpText="Background image shown behind the page title (recommended: 1200×600px)" 
+                />
               </div>
 
               <hr className="border-gray-100 dark:border-gray-800" />
 
-              {/* Why Join Us */}
+              {/* Job Listings */}
               <div className="space-y-4">
-                <SectionDivider title="Why Join Us — Benefits" description="Cards highlighting the benefits of working at the hospital" />
-                <LocalizedInput label="Section Title" value={data.whyJoinUs.title} activeTab={langTab}
-                  onChange={(v) => set((d) => ({ ...d, whyJoinUs: { ...d.whyJoinUs, title: v } }))}
-                  placeholder={{ en: "Why Join Our Team?", bn: "কেন আমাদের দলে যোগ দেবেন?" }} />
-                <div className="space-y-3">
-                  {data.whyJoinUs.benefits.map((benefit, i) => (
-                    <div key={i} className="rounded-xl border border-gray-100 dark:border-gray-800 p-4 space-y-3 bg-gray-50/50 dark:bg-gray-800/30">
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Benefit #{i + 1}</span>
-                        <button type="button" onClick={() => set((d) => ({ ...d, whyJoinUs: { ...d.whyJoinUs, benefits: d.whyJoinUs.benefits.filter((_, idx) => idx !== i) } }))}
-                          className="flex h-7 w-7 items-center justify-center rounded-lg border border-red-200 text-red-500 hover:bg-red-50 transition-colors">
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <FormField label="Icon (React Icon Name)">
-                          <select value={benefit.icon}
-                            onChange={(e) => {
-                              const updated = [...data.whyJoinUs.benefits];
-                              updated[i] = { ...benefit, icon: e.target.value };
-                              set((d) => ({ ...d, whyJoinUs: { ...d.whyJoinUs, benefits: updated } }));
-                            }}
-                            className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1E2B7A]/20">
-                            {ICON_OPTIONS.map((icon) => <option key={icon} value={icon}>{icon}</option>)}
-                          </select>
-                        </FormField>
-                        <LocalizedInput label="Title" value={benefit.title} activeTab={langTab}
-                          onChange={(v) => {
-                            const updated = [...data.whyJoinUs.benefits];
-                            updated[i] = { ...benefit, title: v };
-                            set((d) => ({ ...d, whyJoinUs: { ...d.whyJoinUs, benefits: updated } }));
-                          }}
-                          placeholder={{ en: "Health Insurance", bn: "স্বাস্থ্য বীমা" }} />
-                        <LocalizedInput label="Description" value={benefit.description} activeTab={langTab}
-                          onChange={(v) => {
-                            const updated = [...data.whyJoinUs.benefits];
-                            updated[i] = { ...benefit, description: v };
-                            set((d) => ({ ...d, whyJoinUs: { ...d.whyJoinUs, benefits: updated } }));
-                          }}
-                          placeholder={{ en: "Full coverage…", bn: "সম্পূর্ণ কভারেজ…" }} />
-                      </div>
-                    </div>
-                  ))}
-                  <button type="button"
-                    onClick={() => set((d) => ({ ...d, whyJoinUs: { ...d.whyJoinUs, benefits: [...d.whyJoinUs.benefits, { icon: "FaStar", title: { en: "New Benefit", bn: "নতুন সুবিধা" }, description: { en: "Description…", bn: "বিবরণ…" } }] } }))}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl border border-dashed border-gray-300 dark:border-gray-600 text-sm text-gray-500 hover:border-[#1E2B7A] hover:text-[#1E2B7A] transition-colors">
-                    <Plus className="h-4 w-4" /> Add Benefit
-                  </button>
-                </div>
-              </div>
-
-              <hr className="border-gray-100 dark:border-gray-800" />
-
-              {/* Open Positions */}
-              <div className="space-y-4">
-                <SectionDivider title="Open Positions" description="Current job openings displayed on the career page" />
-                <div className="space-y-3">
-                  {data.openPositions.map((pos, i) => (
-                    <div key={i} className="rounded-xl border border-gray-100 dark:border-gray-800 p-4 space-y-3 bg-gray-50/50 dark:bg-gray-800/30">
+                <SectionDivider title="Job Listings" description="Create and modify available employment positions" />
+                <div className="space-y-6">
+                  {data.jobListings.map((pos, i) => (
+                    <div key={pos.id} className="rounded-xl border border-gray-200 dark:border-gray-800 p-5 space-y-4 bg-gray-50/50 dark:bg-gray-800/30">
                       <div className="flex justify-between items-center">
                         <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Position #{i + 1}</span>
-                        <button type="button" onClick={() => set((d) => ({ ...d, openPositions: d.openPositions.filter((_, idx) => idx !== i) }))}
-                          className="flex h-7 w-7 items-center justify-center rounded-lg border border-red-200 text-red-500 hover:bg-red-50 transition-colors">
+                        <button 
+                          type="button" 
+                          onClick={() => set((d) => ({ ...d, jobListings: d.jobListings.filter((_, idx) => idx !== i) }))}
+                          className="flex h-7 w-7 items-center justify-center rounded-lg border border-red-200 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                        >
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
                       </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <LocalizedInput label="Job Title" value={pos.title} activeTab={langTab}
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <LocalizedInput 
+                          label="Job Title" 
+                          value={pos.title} 
+                          activeTab={langTab}
                           onChange={(v) => {
-                            const updated = [...data.openPositions];
+                            const updated = [...data.jobListings];
                             updated[i] = { ...pos, title: v };
-                            set((d) => ({ ...d, openPositions: updated }));
+                            set((d) => ({ ...d, jobListings: updated }));
                           }}
-                          placeholder={{ en: "Cardiologist", bn: "হৃদরোগ বিশেষজ্ঞ" }} required />
-                        <LocalizedInput label="Department" value={pos.department} activeTab={langTab}
+                          placeholder={{ en: "Senior Staff Nurse", bn: "সিনিয়র স্টাফ নার্স" }} 
+                          required 
+                        />
+                        <LocalizedInput 
+                          label="Department" 
+                          value={pos.department} 
+                          activeTab={langTab}
                           onChange={(v) => {
-                            const updated = [...data.openPositions];
+                            const updated = [...data.jobListings];
                             updated[i] = { ...pos, department: v };
-                            set((d) => ({ ...d, openPositions: updated }));
+                            set((d) => ({ ...d, jobListings: updated }));
                           }}
-                          placeholder={{ en: "Cardiology", bn: "কার্ডিওলজি" }} />
-                        <LocalizedInput label="Job Type" value={pos.type} activeTab={langTab}
+                          placeholder={{ en: "Pediatrics / Cardiology", bn: "শিশুরোগ / হৃদরোগ বিভাগ" }} 
+                          required
+                        />
+                        <LocalizedInput 
+                          label="Location" 
+                          value={pos.location} 
+                          activeTab={langTab}
                           onChange={(v) => {
-                            const updated = [...data.openPositions];
-                            updated[i] = { ...pos, type: v };
-                            set((d) => ({ ...d, openPositions: updated }));
+                            const updated = [...data.jobListings];
+                            updated[i] = { ...pos, location: v };
+                            set((d) => ({ ...d, jobListings: updated }));
                           }}
-                          placeholder={{ en: "Full-time", bn: "পূর্ণকালীন" }} />
-                        <LocalizedInput label="Experience Required" value={pos.experience} activeTab={langTab}
+                          placeholder={{ en: "Mirsarai, Chittagong", bn: "মীরসরাই, চট্টগ্রাম" }} 
+                          required
+                        />
+                        <LocalizedInput 
+                          label="Job Type" 
+                          value={pos.jobType} 
+                          activeTab={langTab}
                           onChange={(v) => {
-                            const updated = [...data.openPositions];
-                            updated[i] = { ...pos, experience: v };
-                            set((d) => ({ ...d, openPositions: updated }));
+                            const updated = [...data.jobListings];
+                            updated[i] = { ...pos, jobType: v };
+                            set((d) => ({ ...d, jobListings: updated }));
                           }}
-                          placeholder={{ en: "5+ years", bn: "৫+ বছর" }} />
+                          placeholder={{ en: "Full-time / Part-time", bn: "পূর্ণকালীন / খণ্ডকালীন" }} 
+                          required
+                        />
                       </div>
-                      <LocalizedTextarea label="Job Description" value={pos.description} activeTab={langTab}
-                        onChange={(v) => {
-                          const updated = [...data.openPositions];
-                          updated[i] = { ...pos, description: v };
-                          set((d) => ({ ...d, openPositions: updated }));
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <FormField label="Apply Link / Email" required>
+                          <FormInput 
+                            type="text" 
+                            value={pos.applyLink} 
+                            placeholder="mailto:hr@hospital.com or url link"
+                            onChange={(e) => {
+                              const updated = [...data.jobListings];
+                              updated[i] = { ...pos, applyLink: e.target.value };
+                              set((d) => ({ ...d, jobListings: updated }));
+                            }} 
+                          />
+                        </FormField>
+
+                        <FormField label="Status" required>
+                          <select 
+                            value={pos.isActive ? "active" : "inactive"}
+                            onChange={(e) => {
+                              const updated = [...data.jobListings];
+                              updated[i] = { ...pos, isActive: e.target.value === "active" };
+                              set((d) => ({ ...d, jobListings: updated }));
+                            }}
+                            className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1E2B7A]/20"
+                          >
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                          </select>
+                        </FormField>
+                      </div>
+
+                      <ImageUploader 
+                        label="Job Listing Banner Image" 
+                        value={pos.bannerImage}
+                        onChange={(url) => {
+                          const updated = [...data.jobListings];
+                          updated[i] = { ...pos, bannerImage: url };
+                          set((d) => ({ ...d, jobListings: updated }));
                         }}
-                        placeholder={{ en: "Responsibilities include…", bn: "দায়িত্বসমূহের মধ্যে রয়েছে…" }} rows={3} />
+                        onUpload={handleImageUpload}
+                        helpText="A thumbnail/banner image representing this role" 
+                      />
+
+                      <LocalizedTextarea 
+                        label="Job Description" 
+                        value={pos.description} 
+                        activeTab={langTab}
+                        onChange={(v) => {
+                          const updated = [...data.jobListings];
+                          updated[i] = { ...pos, description: v };
+                          set((d) => ({ ...d, jobListings: updated }));
+                        }}
+                        placeholder={{ en: "Briefly explain the role...", bn: "কাজের বিবরণ সংক্ষেপে লিখুন..." }} 
+                        rows={3} 
+                        required
+                      />
+
+                      <LocalizedTextarea 
+                        label="Job Requirements" 
+                        value={pos.requirements} 
+                        activeTab={langTab}
+                        onChange={(v) => {
+                          const updated = [...data.jobListings];
+                          updated[i] = { ...pos, requirements: v };
+                          set((d) => ({ ...d, jobListings: updated }));
+                        }}
+                        placeholder={{ en: "List experience, skills, and qualifications...", bn: "অভিজ্ঞতা, দক্ষতা এবং শিক্ষাগত যোগ্যতা উল্লেখ করুন..." }} 
+                        rows={3} 
+                        required
+                      />
                     </div>
                   ))}
-                  <button type="button"
-                    onClick={() => set((d) => ({ ...d, openPositions: [...d.openPositions, { id: nextPositionId(), title: { en: "New Position", bn: "নতুন পদ" }, department: { en: "Department", bn: "বিভাগ" }, type: { en: "Full-time", bn: "পূর্ণকালীন" }, experience: { en: "2+ years", bn: "২+ বছর" }, description: { en: "Description…", bn: "বিবরণ…" } }] }))}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl border border-dashed border-gray-300 dark:border-gray-600 text-sm text-gray-500 hover:border-[#1E2B7A] hover:text-[#1E2B7A] transition-colors">
-                    <Plus className="h-4 w-4" /> Add Position
+
+                  <button 
+                    type="button"
+                    onClick={() => set((d) => ({ 
+                      ...d, 
+                      jobListings: [
+                        ...d.jobListings, 
+                        { 
+                          id: nextPositionId(), 
+                          title: { en: "New Position", bn: "নতুন পদ" }, 
+                          department: { en: "Department", bn: "বিভাগ" }, 
+                          location: { en: "Mirsarai, Chittagong", bn: "মীরসরাই, চট্টগ্রাম" }, 
+                          jobType: { en: "Full-time", bn: "পূর্ণকালীন" }, 
+                          description: { en: "Role description...", bn: "কাজের বিবরণ..." },
+                          requirements: { en: "Qualifications...", bn: "প্রয়োজনীয় যোগ্যতা..." },
+                          applyLink: "mailto:careers@mirsaraihospital.com",
+                          bannerImage: "/about-us.jpg",
+                          isActive: true
+                        }
+                      ] 
+                    }))}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-dashed border-gray-300 dark:border-gray-600 text-sm text-gray-500 hover:border-[#1E2B7A] hover:text-[#1E2B7A] transition-colors"
+                  >
+                    <Plus className="h-4 w-4" /> Add Job Position
                   </button>
                 </div>
-              </div>
-
-              <hr className="border-gray-100 dark:border-gray-800" />
-
-              {/* Application Process */}
-              <div className="space-y-4">
-                <SectionDivider title="Application Process" description="Step-by-step guide shown to applicants" />
-                <LocalizedInput label="Section Title" value={data.applicationProcess.title} activeTab={langTab}
-                  onChange={(v) => set((d) => ({ ...d, applicationProcess: { ...d.applicationProcess, title: v } }))}
-                  placeholder={{ en: "How to Apply", bn: "কীভাবে আবেদন করবেন" }} />
-                <div className="space-y-3">
-                  {data.applicationProcess.steps.map((step, i) => (
-                    <div key={i} className="rounded-xl border border-gray-100 dark:border-gray-800 p-4 space-y-3 bg-gray-50/50 dark:bg-gray-800/30">
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Step {step.step}</span>
-                        <button type="button" onClick={() => set((d) => ({ ...d, applicationProcess: { ...d.applicationProcess, steps: d.applicationProcess.steps.filter((_, idx) => idx !== i) } }))}
-                          className="flex h-7 w-7 items-center justify-center rounded-lg border border-red-200 text-red-500 hover:bg-red-50 transition-colors">
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <LocalizedInput label="Step Title" value={step.title} activeTab={langTab}
-                          onChange={(v) => {
-                            const updated = [...data.applicationProcess.steps];
-                            updated[i] = { ...step, title: v };
-                            set((d) => ({ ...d, applicationProcess: { ...d.applicationProcess, steps: updated } }));
-                          }}
-                          placeholder={{ en: "Submit Application", bn: "আবেদন জমা দিন" }} />
-                        <LocalizedInput label="Step Description" value={step.description} activeTab={langTab}
-                          onChange={(v) => {
-                            const updated = [...data.applicationProcess.steps];
-                            updated[i] = { ...step, description: v };
-                            set((d) => ({ ...d, applicationProcess: { ...d.applicationProcess, steps: updated } }));
-                          }}
-                          placeholder={{ en: "Fill out the form…", bn: "ফর্মটি পূরণ করুন…" }} />
-                      </div>
-                    </div>
-                  ))}
-                  <button type="button"
-                    onClick={() => set((d) => ({ ...d, applicationProcess: { ...d.applicationProcess, steps: [...d.applicationProcess.steps, { step: d.applicationProcess.steps.length + 1, title: { en: "New Step", bn: "নতুন ধাপ" }, description: { en: "Description…", bn: "বিবরণ…" } }] } }))}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl border border-dashed border-gray-300 dark:border-gray-600 text-sm text-gray-500 hover:border-[#1E2B7A] hover:text-[#1E2B7A] transition-colors">
-                    <Plus className="h-4 w-4" /> Add Step
-                  </button>
-                </div>
-              </div>
-
-              <hr className="border-gray-100 dark:border-gray-800" />
-
-              {/* Contact */}
-              <div className="space-y-4">
-                <SectionDivider title="Contact Section" description="HR contact details shown to potential applicants" />
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <LocalizedInput label="Section Title" value={data.contact.title} activeTab={langTab}
-                    onChange={(v) => set((d) => ({ ...d, contact: { ...d.contact, title: v } }))}
-                    placeholder={{ en: "Contact HR", bn: "এইচআর-এর সাথে যোগাযোগ করুন" }} />
-                  <FormField label="HR Email" required>
-                    <FormInput type="email" value={data.contact.email} placeholder="hr@hospital.com"
-                      onChange={(e) => set((d) => ({ ...d, contact: { ...d.contact, email: e.target.value } }))} />
-                  </FormField>
-                  <FormField label="HR Phone" required>
-                    <FormInput type="tel" value={data.contact.phone} placeholder="+880-XXX-XXXXXX"
-                      onChange={(e) => set((d) => ({ ...d, contact: { ...d.contact, phone: e.target.value } }))} />
-                  </FormField>
-                </div>
-                <LocalizedTextarea label="Contact Description" value={data.contact.description} activeTab={langTab}
-                  onChange={(v) => set((d) => ({ ...d, contact: { ...d.contact, description: v } }))}
-                  placeholder={{ en: "For career inquiries, please contact…", bn: "ক্যারিয়ার সম্পর্কিত তথ্যের জন্য যোগাযোগ করুন…" }} rows={2} />
               </div>
             </>
           )}
 
           {cmsTab === "visibility" && (
             <div className="space-y-4">
-              <SectionDivider title="Section Visibility & Display Order" description="Show or hide career sections and set their rendering order" />
+              <SectionDivider title="Section Visibility & Display Order" description="Show or hide sections and set their rendering order" />
               <VisibilityOrderControl
                 sections={data.sections}
                 sectionDefs={SECTION_DEFS}

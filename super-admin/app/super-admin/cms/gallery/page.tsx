@@ -21,10 +21,10 @@ import { LocalizedInput, LocalizedTextarea, SectionDivider } from "@/components/
 import { FormField, FormInput } from "@/components/ui/FormPage";
 
 const SECTION_DEFS = [
-  { key: "hero",       label: "Hero Section",    description: "Top banner with gallery title and description" },
-  { key: "stats",      label: "Gallery Stats",   description: "Numeric highlights (total photos, categories, etc.)" },
-  { key: "categories", label: "Categories",      description: "Category filter tabs shown above the photo grid" },
-  { key: "images",     label: "Photo Grid",      description: "The main gallery photo grid" },
+  { key: "hero", label: "Hero Section", description: "Top banner with gallery title and description" },
+  { key: "stats", label: "Gallery Stats", description: "Numeric highlights (total photos, categories, etc.)" },
+  { key: "categories", label: "Categories", description: "Category filter tabs shown above the photo grid" },
+  { key: "images", label: "Photo Grid", description: "The main gallery photo grid" },
 ];
 
 export default function GalleryCmsPage() {
