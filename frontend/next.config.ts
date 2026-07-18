@@ -7,6 +7,11 @@ const nextConfig: NextConfig = {
         protocol: "http",
         hostname: "localhost",
       },
+      {
+        protocol: "https",
+        hostname: "mirsarai-general-hospital.onrender.com",
+        pathname: "/**",
+      },
     ],
   },
 };

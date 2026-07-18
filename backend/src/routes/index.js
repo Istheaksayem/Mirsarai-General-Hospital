@@ -154,8 +154,8 @@ router.use('/reception/patients', authenticate, authorize('reception'), receptio
 router.use('/reception/appointments', authenticate, authorize('reception'), receptionAppointmentRoutes);
 
 // ── Lab Routes ───────────────────────────────────────────────────────────────
-router.use('/lab/documents', authenticate, authorize('lab'), labDocumentRoutes);
-router.use('/patients/lookup', authenticate, authorize('reception', 'lab'), patientLookupRoutes);
+router.use('/lab/documents', authenticate, authorize('lab', 'super-admin', 'doctor'), labDocumentRoutes);
+router.use('/patients/lookup', authenticate, authorize('reception', 'lab', 'super-admin', 'doctor'), patientLookupRoutes);
 
 // ── Patient Portal Routes ────────────────────────────────────────────────────
 router.use('/patient/auth', patientAuthRoutes);

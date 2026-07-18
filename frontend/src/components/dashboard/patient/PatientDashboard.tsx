@@ -18,7 +18,7 @@ export default function PatientDashboard() {
   const stats = [
     { label: "Upcoming Appointments", value: upcoming.length, icon: FiCalendar, color: "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400" },
     { label: "Unread Notifications",  value: unread.length, icon: FiBell,     color: "bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400" },
-    { label: "Documents", value: (documents as Record<string, unknown>[]).length, icon: FiFileText, color: "bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400" },
+    { label: "Documents", value: documents.length, icon: FiFileText, color: "bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400" },
     { label: "Active Prescriptions",  value: 0, icon: FiHeart,    color: "bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400" },
   ];
 
