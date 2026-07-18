@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/context/LanguageContext";
@@ -120,10 +119,13 @@ const GalleryPage = () => {
     );
   }
 
-  const filteredImages =
-    selectedCategory === "all"
+  // Only render images that have a valid src
+  const filteredImages = (() => {
+    const base = selectedCategory === "all"
       ? data.images
       : data.images.filter((img) => img.category === selectedCategory);
+    return base.filter(img => !!img.src);
+  })();
 
   const openLightbox = (image: GalleryImage, index: number) => {
     setLightboxImage(image);
@@ -306,11 +308,11 @@ const GalleryPage = () => {
                     className="group relative aspect-square rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer"
                     onClick={() => openLightbox(image, index)}
                   >
-                    <Image
+                    {/* Use regular img — avoids Next.js domain restriction for backend uploads */}
+                    <img
                       src={getImageUrl(image.src)}
                       alt={lang === "bn" ? image.title.bn : image.title.en}
-                      fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-500"
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
@@ -382,15 +384,15 @@ const GalleryPage = () => {
               className="max-w-5xl w-full"
             >
               <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl mb-4">
-                <Image
+                {/* Use regular img for lightbox — avoids Next.js domain restriction */}
+                <img
                   src={getImageUrl(lightboxImage.src)}
                   alt={
                     lang === "bn"
                       ? lightboxImage.title.bn
                       : lightboxImage.title.en
                   }
-                  fill
-                  className="object-contain"
+                  className="w-full h-full object-contain"
                 />
               </div>
               <div className="text-center text-white space-y-2">

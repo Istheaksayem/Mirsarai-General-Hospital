@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 import { useCareerData, CareerPosition } from "@/hooks/useAboutData";
+import { getImageUrl } from "@/lib/getImageUrl";
 import {
   FaBriefcase,
   FaClock,
@@ -97,12 +97,11 @@ const CareerPage = () => {
     <section key="hero" className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
       {/* Background Image Layer */}
       <div className="absolute inset-0">
-        <Image
-          src={pageImage}
+        {/* Use regular img — avoids Next.js domain restrictions for backend uploads */}
+        <img
+          src={getImageUrl(pageImage)}
           alt="Career Banner"
-          fill
-          className="object-cover"
-          priority
+          className="w-full h-full object-cover"
         />
       </div>
       {/* Dark overlay for readability */}
@@ -166,11 +165,11 @@ const CareerPage = () => {
               >
                 {/* Thumbnail Banner */}
                 <div className="relative h-48 w-full bg-gray-100 overflow-hidden shrink-0">
-                  <Image
-                    src={job.bannerImage}
+                  {/* Use regular img — avoids Next.js domain restrictions for backend uploads */}
+                  <img
+                    src={getImageUrl(job.bannerImage)}
                     alt={t(job.title.en, job.title.bn)}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute top-4 right-4 bg-secondary text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">
                     {t(job.jobType.en, job.jobType.bn)}
@@ -271,11 +270,11 @@ const CareerPage = () => {
 
               {/* Banner Image in Modal */}
               <div className="relative h-48 sm:h-56 w-full shrink-0">
-                <Image
-                  src={selectedJob.bannerImage}
+                {/* Use regular img — avoids Next.js domain restrictions for backend uploads */}
+                <img
+                  src={getImageUrl(selectedJob.bannerImage)}
                   alt={t(selectedJob.title.en, selectedJob.title.bn)}
-                  fill
-                  className="object-cover"
+                  className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-black/45" />
                 <div className="absolute bottom-6 left-6 text-white pr-12">
