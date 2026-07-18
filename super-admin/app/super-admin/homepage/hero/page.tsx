@@ -37,7 +37,7 @@ export default function EditHeroCMS() {
     setIsSaving(true);
     setStatusMessage(null);
     try {
-      await updateAdminHero(data, "PUT");
+    const result = await updateAdminHero(data, "PUT"); setData(result);
       setStatusMessage({ type: "success", text: "Hero content updated successfully!" });
       setTimeout(() => setStatusMessage(null), 4000);
     } catch (err: any) {

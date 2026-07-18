@@ -63,7 +63,7 @@ export default function DepartmentsCmsPage() {
     setIsSaving(true);
     setStatus(null);
     try {
-      await updateCmsDepartmentsPageConfig(data);
+      const result = await updateCmsDepartmentsPageConfig(data); setData(result);
       setStatus({ type: "success", text: "Departments landing page settings saved successfully!" });
       setTimeout(() => setStatus(null), 4000);
     } catch (e: any) {

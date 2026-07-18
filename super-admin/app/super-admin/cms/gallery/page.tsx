@@ -49,7 +49,7 @@ export default function GalleryCmsPage() {
     setIsSaving(true);
     setStatus(null);
     try {
-      await updateGalleryData(data);
+      const result = await updateGalleryData(data); setData(result);
       setStatus({ type: "success", text: "Gallery content saved successfully!" });
       setTimeout(() => setStatus(null), 4000);
     } catch (e: any) {

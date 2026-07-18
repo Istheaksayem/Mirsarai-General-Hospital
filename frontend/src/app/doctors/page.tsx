@@ -6,6 +6,7 @@ import Link from "next/link";
 import { FaUserMd, FaCalendarAlt, FaCheckCircle } from "react-icons/fa";
 import { useLanguage } from "@/context/LanguageContext";
 import { useDoctors } from "@/hooks/useDoctors";
+import { getImageUrl } from "@/lib/getImageUrl";
 
 export default function DoctorDirectoryPage() {
   const { data: doctors, isLoading, isError } = useDoctors();
@@ -88,7 +89,7 @@ export default function DoctorDirectoryPage() {
                 {/* Image */}
                 <div className="relative h-72 overflow-hidden bg-gradient-to-b from-[#1E2B7A]/5 to-transparent">
                   <img
-                    src={doctor.image}
+                    src={getImageUrl(doctor.image)}
                     alt={doctor.name ? (lang === "bn" ? doctor.name.bn : doctor.name.en) : "Doctor"}
                     className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-700"
                     onError={(e) => {

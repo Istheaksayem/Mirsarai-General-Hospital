@@ -48,7 +48,7 @@ export default function EmergencyInfoCmsPage() {
     setIsSaving(true);
     setStatus(null);
     try {
-      await updateEmergencyInfo(data);
+      const result = await updateEmergencyInfo(data); setData(result);
       setStatus({ type: "success", text: "Emergency Information saved successfully!" });
       setTimeout(() => setStatus(null), 4000);
     } catch (e: any) {

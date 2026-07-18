@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useTheme } from "@/components/ThemeProvider";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FiGrid, FiCalendar, FiBell, FiFileText, FiUser,
   FiClock, FiFolder, FiActivity, FiSun, FiMoon,
   FiMenu, FiX, FiChevronLeft, FiChevronRight, FiLogOut,
-  FiSearch, FiHeart,
+  FiSearch, FiHeart, FiLoader,
 } from "react-icons/fi";
 import Breadcrumbs from "@/components/dashboard/Breadcrumbs";
 import Tooltip from "@/components/dashboard/Tooltip";
@@ -67,17 +68,36 @@ function ActiveModule({ mod }: { mod: string }) {
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 export default function PatientPortalPage() {
+  const router = useRouter();
   const { theme, toggleTheme } = useTheme();
+  const [authChecked, setAuthChecked] = useState(false);
   const [activeModule, setActiveModule]       = useState("Dashboard");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
-  // Close mobile sidebar on resize
+  // Close mobile sidebar on resize (must be before any early return)
   useEffect(() => {
     const h = () => { if (window.innerWidth >= 1280) setMobileSidebarOpen(false); };
     window.addEventListener("resize", h);
     return () => window.removeEventListener("resize", h);
   }, []);
+
+  useEffect(() => {
+    const token = sessionStorage.getItem("mgh_patient_token");
+    if (!token) {
+      router.replace("/login-patient");
+    } else {
+      setAuthChecked(true);
+    }
+  }, [router]);
+
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen bg-slate-50/50 dark:bg-[#060913] flex items-center justify-center">
+        <FiLoader className="animate-spin text-[#1E2B7A]" size={32} />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50/50 dark:bg-[#060913] flex text-slate-800 dark:text-slate-200 transition-colors duration-300 font-sans">
@@ -179,9 +199,9 @@ export default function PatientPortalPage() {
             </button>
             <div className="pl-3 border-l border-slate-200 dark:border-slate-800 flex items-center gap-2">
               <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#1E2B7A] to-[#76BC21] text-white font-extrabold text-xs flex items-center justify-center shadow-md">P</div>
-              <a href="/login" className="p-1.5 text-slate-400 hover:text-rose-500 transition" title="Sign Out">
+              <button onClick={() => { sessionStorage.removeItem("mgh_patient_token"); router.push("/login-patient"); }} className="p-1.5 text-slate-400 hover:text-rose-500 transition" title="Sign Out">
                 <FiLogOut size={14} />
-              </a>
+              </button>
             </div>
           </div>
         </header>

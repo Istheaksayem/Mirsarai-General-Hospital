@@ -70,7 +70,8 @@ export default function CareerCmsPage() {
     setIsSaving(true);
     setStatus(null);
     try {
-      await updateCareerData(data);
+      const result = await updateCareerData(data);
+      setData(result);
       setStatus({ type: "success", text: "Career content saved successfully!" });
       setTimeout(() => setStatus(null), 4000);
     } catch (e: any) {

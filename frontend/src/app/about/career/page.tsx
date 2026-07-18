@@ -38,7 +38,6 @@ const CareerPage = () => {
       }
     }
   }, [data, lang]);
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-secondary/5">

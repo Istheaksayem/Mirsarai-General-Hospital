@@ -8,10 +8,11 @@ import { RichTextEditor } from "@/components/cms/RichTextEditor";
 import { ImageUploader } from "@/components/cms/ImageUploader";
 import { SeoFields } from "@/components/cms/SeoFields";
 import { FormField, FormInput, FormSelect, FormSection } from "@/components/ui/FormPage";
+import { ChamberTimePicker } from "@/components/doctors/ChamberTimePicker";
+import { LanguageMultiSelect } from "@/components/doctors/LanguageMultiSelect";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
 const DEPARTMENTS = ["General Medicine","Cardiology","Orthopedics","Neurology","Gynecology","Pediatrics","Gastroenterology","Dermatology","ENT","Ophthalmology","Urology","Radiology","Pathology","Emergency"];
-const DAYS = ["Saturday","Sunday","Monday","Tuesday","Wednesday","Thursday","Friday"];
 
 type Bi = { en: string; bn: string };
 const bi = (en = "", bn = ""): Bi => ({ en, bn });
@@ -231,6 +232,13 @@ export default function AddDoctorCmsPage() {
             </label>
           ))}
         </div>
+        <div className="max-w-md">
+          <LanguageMultiSelect
+            value={form.languages}
+            onChange={(languages) => set("languages", languages)}
+            required
+          />
+        </div>
       </section>
 
       {/* ── 📌 Biography ── */}
@@ -277,42 +285,19 @@ export default function AddDoctorCmsPage() {
             <p className="text-xs text-gray-400 mt-0.5">Controls appointment availability shown on <strong>/doctors/[slug]</strong> detail page</p>
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <FormField label="Consultation Fee (৳)">
-            <FormInput type="number" min="0" value={String(form.consultationFee)} onChange={e => set("consultationFee", parseInt(e.target.value) || 0)} placeholder="800" />
-          </FormField>
-          <FormField label="Chamber Time (English)">
-            <FormInput value={form.chamberTimeEn} onChange={e => set("chamberTimeEn", e.target.value)} placeholder="Sat-Thu | 5:00 PM - 9:00 PM" />
-          </FormField>
-          <FormField label="Chamber Time (বাংলা)">
-            <FormInput value={form.chamberTimeBn} onChange={e => set("chamberTimeBn", e.target.value)} placeholder="শনি-বৃহ | বিকাল ৫:০০ - রাত ৯:০০" />
-          </FormField>
-        </div>
-        <div>
-          <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Available Days</p>
-          <div className="flex flex-wrap gap-2">
-            {DAYS.map(day => (
-              <button
-                key={day}
-                type="button"
-                onClick={() => {
-                  const days = form.availableDays.includes(day)
-                    ? form.availableDays.filter(d => d !== day)
-                    : [...form.availableDays, day];
-                  set("availableDays", days);
-                }}
-                className={[
-                  "px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors",
-                  form.availableDays.includes(day)
-                    ? "bg-[#76BC21] text-white"
-                    : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700",
-                ].join(" ")}
-              >
-                {day}
-              </button>
-            ))}
-          </div>
-        </div>
+        <FormField label="Consultation Fee (৳)">
+          <FormInput type="number" min="0" value={String(form.consultationFee)} onChange={e => set("consultationFee", parseInt(e.target.value) || 0)} placeholder="800" />
+        </FormField>
+        <ChamberTimePicker
+          availableDays={form.availableDays}
+          chamberTime={{ en: form.chamberTimeEn, bn: form.chamberTimeBn }}
+          onDaysChange={(days) => set("availableDays", days)}
+          onChamberTimeChange={(ct) => {
+            set("chamberTimeEn", ct.en);
+            set("chamberTimeBn", ct.bn);
+          }}
+          showTitle={false}
+        />
       </section>
 
       {/* ── Contact ── */}

@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { useMyReceptionistProfile, useUpdateMyReceptionistProfile } from "@/lib/hooks/useMyReceptionistProfile";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import { uploadProfilePhoto } from "@/lib/services/api";
 import type { ReceptionistProfileData } from "@/lib/services/api";
 
 interface FormState {
@@ -22,7 +23,7 @@ interface FormState {
 
 const emptyForm: FormState = {
   profilePhoto: "",
-  gender: "other",
+  gender: "",
   dateOfBirth: "",
   address: "",
   emergencyContact: "",
@@ -39,13 +40,14 @@ export default function ReceptionistProfilePage() {
   const [form, setForm] = useState<FormState>(emptyForm);
   const [formErrors, setFormErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [saving, setSaving] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [saveMessage, setSaveMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   useEffect(() => {
     if (profile) {
       setForm({
         profilePhoto: profile.profilePhoto || "",
-        gender: profile.gender || "other",
+        gender: profile.gender || "",
         dateOfBirth: profile.dateOfBirth ? new Date(profile.dateOfBirth).toISOString().split("T")[0] : "",
         address: profile.address || "",
         emergencyContact: profile.emergencyContact || "",
@@ -61,8 +63,24 @@ export default function ReceptionistProfilePage() {
     []
   );
 
+  const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingPhoto(true);
+    try {
+      const { url } = await uploadProfilePhoto(file);
+      updateField("profilePhoto", url);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to upload photo";
+      setSaveMessage({ type: "error", text: message });
+    } finally {
+      setUploadingPhoto(false);
+    }
+  }, [updateField]);
+
   const validate = useCallback((): boolean => {
     const errors: Partial<Record<keyof FormState, string>> = {};
+    if (!form.profilePhoto.trim()) errors.profilePhoto = "Profile photo is required";
     if (!form.gender.trim()) errors.gender = "Gender is required";
     if (!form.dateOfBirth.trim()) errors.dateOfBirth = "Date of birth is required";
     if (!form.address.trim()) errors.address = "Address is required";
@@ -101,7 +119,7 @@ export default function ReceptionistProfilePage() {
     if (profile) {
       setForm({
         profilePhoto: profile.profilePhoto || "",
-        gender: profile.gender || "other",
+        gender: profile.gender || "",
         dateOfBirth: profile.dateOfBirth ? new Date(profile.dateOfBirth).toISOString().split("T")[0] : "",
         address: profile.address || "",
         emergencyContact: profile.emergencyContact || "",
@@ -172,21 +190,18 @@ export default function ReceptionistProfilePage() {
               <label className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 flex items-center justify-center cursor-pointer shadow hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                 <Camera className="h-4 w-4 text-gray-500" />
                 <input
-                  type="text"
+                  type="file"
                   className="hidden"
-                  placeholder="Photo URL"
-                  value={form.profilePhoto}
-                  onChange={(e) => updateField("profilePhoto", e.target.value)}
+                  accept="image/*"
+                  onChange={handleFileSelect}
+                  disabled={uploadingPhoto}
                 />
               </label>
             </div>
-            <input
-              type="text"
-              placeholder="Profile photo URL"
-              value={form.profilePhoto}
-              onChange={(e) => updateField("profilePhoto", e.target.value)}
-              className="w-full text-center rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 focus:outline-none focus:border-emerald-600"
-            />
+            <p className="text-xs text-gray-400 mt-1">
+              {uploadingPhoto ? "Uploading..." : "Click camera icon to upload photo"}
+            </p>
+            {formErrors.profilePhoto && <p className="mt-1 text-xs text-red-500">{formErrors.profilePhoto}</p>}
             <div className="mt-6 w-full space-y-3 border-t border-gray-100 dark:border-gray-800 pt-5">
               <FormField label="Gender" required error={formErrors.gender}>
                 <select

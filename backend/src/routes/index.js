@@ -15,6 +15,7 @@ import authRoutes from './auth.routes.js';
 import receptionistRoutes from './receptionist.routes.js';
 import labAdminRoutes from './labAdmin.routes.js';
 import labReportRoutes from './labReport.routes.js';
+import uploadRoutes from './upload.routes.js';
 import appointmentRoutes from './appointment.routes.js';
 import adminAppointmentRoutes from './admin/appointment.admin.routes.js';
 import serviceRoutes from './service.routes.js';
@@ -29,7 +30,20 @@ import faqRoutes from './faq.routes.js';
 import adminHealthBlogRoutes from './admin/healthBlog.admin.routes.js';
 import adminEmergencyInfoRoutes from './admin/emergencyInfo.admin.routes.js';
 import adminFaqRoutes from './admin/faq.admin.routes.js';
+import adminStaffRoutes from './admin/staff.admin.routes.js';
+import adminPatientRoutes from './admin/patient.admin.routes.js';
+import receptionPatientRoutes from './reception/patient.reception.routes.js';
+import receptionAppointmentRoutes from './reception/appointment.reception.routes.js';
+import labDocumentRoutes from './lab/document.lab.routes.js';
+import patientLookupRoutes from './patient/lookup.routes.js';
+import patientAuthRoutes from './patient/auth.patient.routes.js';
+import patientProfileRoutes from './patient/profile.patient.routes.js';
+import patientAppointmentRoutes from './patient/appointment.patient.routes.js';
+import patientDocumentRoutes from './patient/document.patient.routes.js';
+import patientNotificationRoutes from './patient/notification.patient.routes.js';
+import patientTimelineRoutes from './patient/timeline.patient.routes.js';
 import { authenticate, authorize } from '../middlewares/auth.middleware.js';
+import { authenticatePatient } from '../middlewares/auth.patient.middleware.js';
 import catchAsync from '../utils/catchAsync.js';
 import { sendSuccess } from '../utils/ApiResponse.js';
 import ApiError from '../utils/ApiError.js';
@@ -119,6 +133,7 @@ router.use('/appointments', appointmentRoutes);
 router.use('/receptionists', receptionistRoutes);
 router.use('/lab', labAdminRoutes);
 router.use('/lab-reports', labReportRoutes);
+router.use('/upload', uploadRoutes);
 
 // ── Admin Routes ────────────────────────────────────────────────────────────────
 router.use('/admin/services', authenticate, authorize('super-admin'), adminServiceRoutes);
@@ -130,6 +145,24 @@ router.use('/admin/specializations', authenticate, authorize('super-admin'), adm
 router.use('/admin/health-blog', authenticate, authorize('super-admin'), adminHealthBlogRoutes);
 router.use('/admin/emergency-information', authenticate, authorize('super-admin'), adminEmergencyInfoRoutes);
 router.use('/admin/faq', authenticate, authorize('super-admin'), adminFaqRoutes);
+router.use('/admin/staff', authenticate, authorize('super-admin'), adminStaffRoutes);
 router.use('/admin/appointments', authenticate, authorize('super-admin'), adminAppointmentRoutes);
+router.use('/admin/patients', authenticate, authorize('super-admin'), adminPatientRoutes);
+
+// ── Reception Routes ─────────────────────────────────────────────────────────
+router.use('/reception/patients', authenticate, authorize('reception'), receptionPatientRoutes);
+router.use('/reception/appointments', authenticate, authorize('reception'), receptionAppointmentRoutes);
+
+// ── Lab Routes ───────────────────────────────────────────────────────────────
+router.use('/lab/documents', authenticate, authorize('lab'), labDocumentRoutes);
+router.use('/patients/lookup', authenticate, authorize('reception', 'lab'), patientLookupRoutes);
+
+// ── Patient Portal Routes ────────────────────────────────────────────────────
+router.use('/patient/auth', patientAuthRoutes);
+router.use('/patient/profile', authenticatePatient, patientProfileRoutes);
+router.use('/patient/appointments', authenticatePatient, patientAppointmentRoutes);
+router.use('/patient/documents', authenticatePatient, patientDocumentRoutes);
+router.use('/patient/notifications', authenticatePatient, patientNotificationRoutes);
+router.use('/patient/timeline', authenticatePatient, patientTimelineRoutes);
 
 export default router;

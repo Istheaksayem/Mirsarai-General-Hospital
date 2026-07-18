@@ -1,5 +1,6 @@
 import {
   Activity,
+  BadgeCheck,
   BarChart3,
   Bell,
   Building2,
@@ -45,6 +46,7 @@ export const NAV_CONFIG: Record<Role, NavSection[]> = {
         { label: "Doctors", href: "/super-admin/doctors", icon: Stethoscope, badge: "CMS" },
         { label: "Pending Registrations", href: "/super-admin/doctors/pending-registrations", icon: UserCheck },
         { label: "Departments", href: "/super-admin/departments", icon: Building2 },
+        { label: "Staff Management", href: "/super-admin/staff", icon: BadgeCheck },
       ],
     },
     {
