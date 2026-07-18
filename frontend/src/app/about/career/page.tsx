@@ -1,117 +1,25 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
-import { motion } from "framer-motion";
-import { useQuery } from "@tanstack/react-query";
+import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
+import { useCareerData, CareerPosition } from "@/hooks/useAboutData";
 import { getImageUrl } from "@/lib/getImageUrl";
 import {
-  FaUserMd,
-  FaHeart,
-  FaHandHoldingMedical,
-  FaUsers,
   FaBriefcase,
   FaClock,
   FaEnvelope,
   FaPhone,
-  FaCheckCircle,
+  FaMapMarkerAlt,
+  FaTimes,
+  FaChevronRight,
 } from "react-icons/fa";
 
-// ── Types ──────────────────────────────────────────────────────────────────
-interface Benefit {
-  icon: string;
-  title: { en: string; bn: string };
-  description: { en: string; bn: string };
-}
-
-interface Position {
-  id: number;
-  title: { en: string; bn: string };
-  department: { en: string; bn: string };
-  type: { en: string; bn: string };
-  experience: { en: string; bn: string };
-  description: { en: string; bn: string };
-}
-
-interface Step {
-  step: number;
-  title: { en: string; bn: string };
-  description: { en: string; bn: string };
-}
-
-interface SEOConfig {
-  metaTitle: { en: string; bn: string };
-  metaDescription: { en: string; bn: string };
-  keywords: { en: string; bn: string };
-  ogImage: string;
-}
-
-interface CareerData {
-  hero: {
-    title: { en: string; bn: string };
-    subtitle: { en: string; bn: string };
-    description: { en: string; bn: string };
-    image: string;
-  };
-  whyJoinUs: {
-    title: { en: string; bn: string };
-    benefits: Benefit[];
-  };
-  openPositions: Position[];
-  applicationProcess: {
-    title: { en: string; bn: string };
-    steps: Step[];
-  };
-  contact: {
-    title: { en: string; bn: string };
-    description: { en: string; bn: string };
-    email: string;
-    phone: string;
-  };
-  seo?: SEOConfig;
-}
-
-// ── Icon Mapper ────────────────────────────────────────────────────────────
-const iconMap: { [key: string]: React.ElementType } = {
-  FaUserMd,
-  FaHeart,
-  FaHandHoldingMedical,
-  FaUsers,
-};
-
-// ── Fetch Career Data ──────────────────────────────────────────────────────
-const fetchCareerData = async (): Promise<CareerData> => {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
-  try {
-    const res = await fetch(`${apiUrl}/about/career`, { cache: "no-store" });
-    if (!res.ok) throw new Error("Failed to fetch from backend");
-    const result = await res.json();
-    return result.data;
-  } catch (error) {
-    console.warn("Backend API not reachable for career data. Falling back to local data/career.json", error);
-    const res = await fetch("/data/career.json", { cache: "no-store" });
-    if (!res.ok) throw new Error("Failed to fetch fallback career data");
-    return res.json();
-  }
-};
-
-// ── Main Career Page ───────────────────────────────────────────────────────
 const CareerPage = () => {
-  const { lang } = useLanguage();
-  const [selectedPosition, setSelectedPosition] = useState<Position | null>(null);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    position: "",
-    message: "",
-  });
+  const { lang, t } = useLanguage();
+  const [selectedJob, setSelectedJob] = useState<CareerPosition | null>(null);
 
-  const { data, isLoading, error } = useQuery<CareerData>({
-    queryKey: ["career"],
-    queryFn: fetchCareerData,
-  });
+  const { data, isLoading, isError } = useCareerData();
 
   // Dynamic SEO Meta tags
   useEffect(() => {
@@ -132,287 +40,307 @@ const CareerPage = () => {
   }, [data, lang]);
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-tertiary/5">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-secondary/5">
         <div className="text-center space-y-4">
           <div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" />
           <p className="text-gray-600 font-medium">
-            {lang === "bn" ? "লোড হচ্ছে..." : "Loading..."}
+            {t("Loading...", "লোড হচ্ছে...")}
           </p>
         </div>
       </div>
     );
   }
 
-  if (error || !data) {
+  if (isError || !data) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center space-y-3">
-          <p className="text-red-600 font-semibold text-lg">
-            {lang === "bn" ? "ডেটা লোড করতে ব্যর্থ" : "Failed to load data"}
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center p-8 bg-white rounded-3xl shadow-xl border border-gray-100 max-w-md mx-auto">
+          <div className="text-red-500 text-6xl mb-4">⚠️</div>
+          <p className="text-red-600 text-lg font-semibold mb-4">
+            {t("Failed to load Career content.", "ক্যারিয়ার ডেটা লোড করতে ব্যর্থ হয়েছে।")}
           </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-6 py-2.5 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-all shadow-md"
+          >
+            {t("Retry", "আবার চেষ্টা করুন")}
+          </button>
         </div>
       </div>
     );
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Form submitted:", formData);
+  // Schema-independent field mappings (safeguards for database migration)
+  const pageTitle = data.title || (data as any).hero?.title || { en: "Join Our Team", bn: "আমাদের দলে যোগ দিন" };
+  const pageDesc = data.description || (data as any).hero?.description || { en: "Build your career in healthcare excellence...", bn: "স্বাস্থ্যসেবায় আপনার ক্যারিয়ার গড়ে তুলুন..." };
+  const pageImage = data.image || (data as any).hero?.image || "/about-us.jpg";
+
+  const rawListings = data.jobListings || (data as any).openPositions || [];
+  const normalizedListings: CareerPosition[] = rawListings.map((job: any) => ({
+    id: job.id,
+    title: job.title || job.jobTitle || { en: "Position", bn: "পদ" },
+    department: job.department || { en: "Department", bn: "বিভাগ" },
+    location: job.location || { en: "Mirsarai, Chittagong", bn: "মীরসরাই, চট্টগ্রাম" },
+    jobType: job.jobType || job.type || job.employmentType || { en: "Full-time", bn: "পূর্ণকালীন" },
+    description: job.description || job.jobDescription || { en: "", bn: "" },
+    requirements: job.requirements || { en: "", bn: "" },
+    applyLink: job.applyLink || job.applyButtonUrl || "mailto:careers@mirsaraihospital.com",
+    bannerImage: job.bannerImage || job.image || "/about-us.jpg",
+    isActive: job.isActive !== undefined ? job.isActive : (job.status === "Open" || true)
+  }));
+
+  // Filter only active positions
+  const activeJobs = normalizedListings.filter(job => job.isActive !== false);
+
+  const renderHero = () => (
+    <section key="hero" className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+      {/* Background Image Layer */}
+      <div className="absolute inset-0">
+        {/* Use regular img — avoids Next.js domain restrictions for backend uploads */}
+        <img
+          src={getImageUrl(pageImage)}
+          alt="Career Banner"
+          className="w-full h-full object-cover"
+        />
+      </div>
+      {/* Dark overlay for readability */}
+      <div className="absolute inset-0 bg-black/60" />
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="border-l-4 border-secondary pl-6"
+        >
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-4 tracking-tight">
+            {t(pageTitle.en, pageTitle.bn)}
+          </h1>
+          <p className="text-lg md:text-xl font-light text-white/90 mt-4 leading-relaxed max-w-3xl">
+            {t(pageDesc.en, pageDesc.bn)}
+          </p>
+        </motion.div>
+      </div>
+    </section>
+  );
+
+  const renderJobListings = () => (
+    <section key="jobListings" className="py-20 bg-gradient-to-b from-gray-50 to-white">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-3xl md:text-4xl font-extrabold text-primary mb-4">
+            {t("Open Positions", "খোলা পদসমূহ")}
+          </h2>
+          <p className="text-gray-500 max-w-2xl mx-auto">
+            {t(
+              "Join our team of healthcare experts and help shape the future of medical care in Mirsarai.",
+              "আমাদের স্বাস্থ্যসেবা বিশেষজ্ঞদের দলে যোগ দিন এবং মীরসরাইয়ে চিকিৎসা সেবার ভবিষ্যৎ গঠনে সহায়তা করুন।"
+            )}
+          </p>
+        </motion.div>
+
+        {activeJobs.length === 0 ? (
+          <div className="text-center py-12 bg-white rounded-2xl border border-dashed border-gray-200">
+            <p className="text-gray-500 font-medium">
+              {t("No job vacancies available at the moment.", "এই মুহূর্তে কোনো চাকরির সুযোগ নেই।")}
+            </p>
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {activeJobs.map((job, index) => (
+              <motion.div
+                key={job.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="bg-white rounded-3xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden group cursor-pointer"
+                onClick={() => setSelectedJob(job)}
+              >
+                {/* Thumbnail Banner */}
+                <div className="relative h-48 w-full bg-gray-100 overflow-hidden shrink-0">
+                  {/* Use regular img — avoids Next.js domain restrictions for backend uploads */}
+                  <img
+                    src={getImageUrl(job.bannerImage)}
+                    alt={t(job.title.en, job.title.bn)}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute top-4 right-4 bg-secondary text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">
+                    {t(job.jobType.en, job.jobType.bn)}
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="p-6 flex flex-col flex-grow justify-between space-y-4">
+                  <div className="space-y-2">
+                    <p className="text-xs font-bold text-secondary uppercase tracking-wider">
+                      {t(job.department.en, job.department.bn)}
+                    </p>
+                    <h3 className="text-xl font-bold text-gray-900 group-hover:text-primary transition-colors line-clamp-1">
+                      {t(job.title.en, job.title.bn)}
+                    </h3>
+                    <p className="text-gray-500 text-sm line-clamp-2">
+                      {t(job.description.en, job.description.bn)}
+                    </p>
+                  </div>
+
+                  <div className="space-y-2 pt-2 border-t border-gray-50 text-sm text-gray-500">
+                    <div className="flex items-center gap-2">
+                      <FaMapMarkerAlt className="text-secondary shrink-0" />
+                      <span className="line-clamp-1">{t(job.location.en, job.location.bn)}</span>
+                    </div>
+                  </div>
+
+                  <button 
+                    className="w-full bg-primary text-white py-3 rounded-xl font-semibold hover:bg-secondary transition-all flex items-center justify-center gap-2"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedJob(job);
+                    }}
+                  >
+                    <span>{t("View Details & Apply", "বিস্তারিত ও আবেদন করুন")}</span>
+                    <FaChevronRight size={12} />
+                  </button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+
+  // Read section settings
+  const sectionConfig = data.sections || {
+    hero: { isVisible: true, order: 1 },
+    jobListings: { isVisible: true, order: 2 }
   };
 
+  const activeSections = Object.entries(sectionConfig)
+    .filter(([_, config]) => config.isVisible)
+    .sort(([_, a], [__, b]) => a.order - b.order)
+    .map(([name]) => name);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30">
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary via-primary/95 to-tertiary text-white py-20 overflow-hidden">
-        {/* Animated Background */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="hero-pattern-grid absolute inset-0" />
-          <div className="absolute top-20 right-20 w-64 h-64 bg-white/10 rounded-full blur-3xl animate-float" />
-          <div className="absolute bottom-20 left-20 w-80 h-80 bg-tertiary/20 rounded-full blur-3xl animate-float delay-700" />
-        </div>
+    <main className="bg-white min-h-screen">
+      {activeSections.map((sectionName) => {
+        switch (sectionName) {
+          case "hero":
+            return renderHero();
+          case "jobListings":
+            return renderJobListings();
+          default:
+            return null;
+        }
+      })}
 
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+      {/* Modal Detailed View */}
+      <AnimatePresence>
+        {selectedJob && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Overlay */}
             <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              className="space-y-6"
-            >
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
-                {lang === "bn" ? data.hero.title.bn : data.hero.title.en}
-              </h1>
-              <p className="text-xl md:text-2xl font-light text-white/90">
-                {lang === "bn" ? data.hero.subtitle.bn : data.hero.subtitle.en}
-              </p>
-              <p className="text-base md:text-lg text-white/80">
-                {lang === "bn"
-                  ? data.hero.description.bn
-                  : data.hero.description.en}
-              </p>
-            </motion.div>
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedJob(null)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
 
+            {/* Modal Box */}
             <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="relative h-[400px] rounded-2xl overflow-hidden shadow-2xl"
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-2xl bg-white rounded-3xl overflow-hidden shadow-2xl z-10 max-h-[85vh] flex flex-col"
             >
-              <Image
-                src={getImageUrl(data.hero.image)}
-                
-                alt="Career"
-                fill
-                className="object-cover"
-              />
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Why Join Us */}
-      <section className="py-20">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
-              {lang === "bn"
-                ? data.whyJoinUs.title.bn
-                : data.whyJoinUs.title.en}
-            </h2>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {data.whyJoinUs.benefits.map((benefit, index) => {
-              const IconComponent = iconMap[benefit.icon] || FaUserMd;
-              return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  className="glass-card p-6 rounded-2xl text-center space-y-4 hover:shadow-xl transition-all duration-300 hover:-translate-y-2"
-                >
-                  <div className="w-16 h-16 mx-auto bg-gradient-to-br from-primary to-tertiary rounded-full flex items-center justify-center text-white">
-                    <IconComponent size={32} />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-800">
-                    {lang === "bn" ? benefit.title.bn : benefit.title.en}
-                  </h3>
-                  <p className="text-gray-600">
-                    {lang === "bn"
-                      ? benefit.description.bn
-                      : benefit.description.en}
-                  </p>
-                </motion.div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Open Positions */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
-              {lang === "bn" ? "খোলা পদসমূহ" : "Open Positions"}
-            </h2>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {data.openPositions.map((position, index) => (
-              <motion.div
-                key={position.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="glass-card p-6 rounded-2xl space-y-4 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer"
-                onClick={() => setSelectedPosition(position)}
+              {/* Close Button */}
+              <button
+                onClick={() => setSelectedJob(null)}
+                className="absolute top-4 right-4 bg-white/80 hover:bg-white text-gray-700 hover:text-black p-2 rounded-full z-20 shadow-md transition-all"
               >
-                <div className="flex items-start justify-between">
-                  <div className="w-12 h-12 bg-gradient-to-br from-primary to-tertiary rounded-xl flex items-center justify-center text-white">
-                    <FaBriefcase size={24} />
-                  </div>
-                  <span className="px-3 py-1 bg-tertiary/10 text-tertiary rounded-full text-xs font-semibold">
-                    {lang === "bn" ? position.type.bn : position.type.en}
+                <FaTimes size={16} />
+              </button>
+
+              {/* Banner Image in Modal */}
+              <div className="relative h-48 sm:h-56 w-full shrink-0">
+                {/* Use regular img — avoids Next.js domain restrictions for backend uploads */}
+                <img
+                  src={getImageUrl(selectedJob.bannerImage)}
+                  alt={t(selectedJob.title.en, selectedJob.title.bn)}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-black/45" />
+                <div className="absolute bottom-6 left-6 text-white pr-12">
+                  <span className="bg-secondary px-3 py-1 rounded-full text-xs font-bold mb-2 inline-block">
+                    {t(selectedJob.jobType.en, selectedJob.jobType.bn)}
                   </span>
+                  <h2 className="text-2xl sm:text-3xl font-extrabold">
+                    {t(selectedJob.title.en, selectedJob.title.bn)}
+                  </h2>
                 </div>
+              </div>
 
-                <h3 className="text-xl font-bold text-gray-800">
-                  {lang === "bn" ? position.title.bn : position.title.en}
-                </h3>
-
-                <div className="space-y-2 text-sm text-gray-600">
-                  <div className="flex items-center gap-2">
-                    <FaBriefcase className="text-primary" />
-                    <span>
-                      {lang === "bn"
-                        ? position.department.bn
-                        : position.department.en}
-                    </span>
+              {/* Scrollable Content */}
+              <div className="p-6 overflow-y-auto space-y-6 flex-grow">
+                <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-500 border-b border-gray-100 pb-4">
+                  <div>
+                    <span className="font-bold text-gray-900">{t("Department:", "বিভাগ:")} </span>
+                    {t(selectedJob.department.en, selectedJob.department.bn)}
                   </div>
-                  <div className="flex items-center gap-2">
-                    <FaClock className="text-primary" />
-                    <span>
-                      {lang === "bn"
-                        ? position.experience.bn
-                        : position.experience.en}
-                    </span>
+                  <div>
+                    <span className="font-bold text-gray-900">{t("Location:", "অবস্থান:")} </span>
+                    {t(selectedJob.location.en, selectedJob.location.bn)}
                   </div>
                 </div>
 
-                <p className="text-gray-600 text-sm">
-                  {lang === "bn"
-                    ? position.description.bn
-                    : position.description.en}
-                </p>
-
-                <button className="w-full bg-primary text-white py-3 rounded-xl font-semibold hover:bg-primary/90 transition-colors">
-                  {lang === "bn" ? "আবেদন করুন" : "Apply Now"}
-                </button>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Application Process */}
-      <section className="py-20">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
-              {lang === "bn"
-                ? data.applicationProcess.title.bn
-                : data.applicationProcess.title.en}
-            </h2>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {data.applicationProcess.steps.map((step, index) => (
-              <motion.div
-                key={step.step}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="relative"
-              >
-                <div className="glass-card p-6 rounded-2xl space-y-4 h-full">
-                  <div className="w-12 h-12 bg-gradient-to-br from-primary to-tertiary rounded-full flex items-center justify-center text-white text-xl font-bold">
-                    {step.step}
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-800">
-                    {lang === "bn" ? step.title.bn : step.title.en}
-                  </h3>
-                  <p className="text-gray-600">
-                    {lang === "bn" ? step.description.bn : step.description.en}
+                <div className="space-y-2">
+                  <h4 className="text-lg font-bold text-primary">
+                    {t("Job Description", "কাজের বিবরণ")}
+                  </h4>
+                  <p className="text-gray-600 leading-relaxed text-sm whitespace-pre-line">
+                    {t(selectedJob.description.en, selectedJob.description.bn)}
                   </p>
                 </div>
-                {index < data.applicationProcess.steps.length - 1 && (
-                  <div className="hidden lg:block absolute top-1/2 -right-4 w-8 h-0.5 bg-primary/30" />
-                )}
-              </motion.div>
-            ))}
+
+                <div className="space-y-2">
+                  <h4 className="text-lg font-bold text-primary">
+                    {t("Requirements", "প্রয়োজনীয় যোগ্যতা")}
+                  </h4>
+                  <p className="text-gray-600 leading-relaxed text-sm whitespace-pre-line">
+                    {t(selectedJob.requirements.en, selectedJob.requirements.bn)}
+                  </p>
+                </div>
+              </div>
+
+              {/* Bottom Apply Action */}
+              <div className="p-6 border-t border-gray-100 bg-gray-50/50 flex gap-4">
+                <button
+                  onClick={() => setSelectedJob(null)}
+                  className="px-5 py-3 rounded-xl border border-gray-200 hover:bg-gray-100 font-semibold text-gray-600 text-sm transition-colors"
+                >
+                  {t("Close", "বন্ধ করুন")}
+                </button>
+                <a
+                  href={selectedJob.applyLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-grow bg-primary hover:bg-secondary text-white py-3 rounded-xl font-bold text-sm text-center shadow-lg transition-colors flex items-center justify-center gap-2"
+                >
+                  <FaBriefcase />
+                  <span>{t("Apply Now", "আবেদন করুন")}</span>
+                </a>
+              </div>
+            </motion.div>
           </div>
-        </div>
-      </section>
-
-      {/* Contact Section */}
-      <section className="py-20 bg-gradient-to-br from-primary to-tertiary text-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="max-w-3xl mx-auto text-center space-y-6"
-          >
-            <FaCheckCircle className="mx-auto text-6xl mb-4" />
-            <h2 className="text-3xl md:text-4xl font-bold">
-              {lang === "bn" ? data.contact.title.bn : data.contact.title.en}
-            </h2>
-            <p className="text-xl text-white/90">
-              {lang === "bn"
-                ? data.contact.description.bn
-                : data.contact.description.en}
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-6">
-              <a
-                href={`mailto:${data.contact.email}`}
-                className="flex items-center gap-3 bg-white/10 hover:bg-white/20 px-6 py-3 rounded-xl transition-colors backdrop-blur-sm"
-              >
-                <FaEnvelope size={20} />
-                <span className="font-medium">{data.contact.email}</span>
-              </a>
-              <a
-                href={`tel:${data.contact.phone}`}
-                className="flex items-center gap-3 bg-white/10 hover:bg-white/20 px-6 py-3 rounded-xl transition-colors backdrop-blur-sm"
-              >
-                <FaPhone size={20} />
-                <span className="font-medium">{data.contact.phone}</span>
-              </a>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-    </div>
+        )}
+      </AnimatePresence>
+    </main>
   );
 };
 

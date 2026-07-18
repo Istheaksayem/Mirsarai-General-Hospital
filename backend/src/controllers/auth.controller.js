@@ -3,7 +3,7 @@ import User from '../models/user.model.js';
 import PendingRegistration from '../models/pendingRegistration.model.js';
 import env from '../config/env.js';
 import { StatusCodes } from 'http-status-codes';
-import { registerSchema, loginSchema, staffRegisterSchema } from '../validators/auth.validator.js';
+import { registerSchema, loginSchema, staffRegisterSchema, forgotPasswordSchema, resetPasswordSchema } from '../validators/auth.validator.js';
 import * as AuthService from '../services/auth.service.js';
 import sendEmail from '../utils/sendEmail.js';
 
@@ -374,6 +374,133 @@ export const getMe = async (req, res) => {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: 'Server error',
+    });
+  }
+};
+
+/**
+ * @desc    Forgot Password - Send OTP to email
+ * @route   POST /api/v1/auth/forgot-password
+ * @access  Public
+ */
+export const forgotPassword = async (req, res) => {
+  try {
+    const validatedData = forgotPasswordSchema.parse(req.body);
+
+    const user = await User.findOne({ email: validatedData.email });
+    if (!user) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        success: false,
+        message: 'There is no user with that email address.',
+      });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    user.otp = otp;
+    user.otpExpires = otpExpires;
+    // Turn off validation to avoid password issues if user didn't have one initially
+    await user.save({ validateBeforeSave: false });
+
+    try {
+      await sendEmail({
+        email: user.email,
+        subject: 'Password Reset OTP',
+        message: `Your OTP for password reset is: ${otp}\nIt is valid for 10 minutes.`,
+      });
+      
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: 'OTP sent to your email. Please verify to reset your password.',
+      });
+    } catch (emailError) {
+      console.error('Email Sending Error:', emailError);
+      user.otp = undefined;
+      user.otpExpires = undefined;
+      await user.save({ validateBeforeSave: false });
+
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: 'Failed to send OTP email. Please try again.',
+      });
+    }
+  } catch (error) {
+    if (error.name === 'ZodError') {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'Validation Error',
+        errors: error.errors,
+      });
+    }
+
+    console.error('Forgot Password Error:', error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: 'Server error during forgot password',
+    });
+  }
+};
+
+/**
+ * @desc    Reset Password
+ * @route   POST /api/v1/auth/reset-password
+ * @access  Public
+ */
+export const resetPassword = async (req, res) => {
+  try {
+    const validatedData = resetPasswordSchema.parse(req.body);
+
+    const user = await User.findOne({ email: validatedData.email }).select('+password +otp +otpExpires');
+
+    if (!user) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        success: false,
+        message: 'User not found.',
+      });
+    }
+
+    if (user.otp !== validatedData.otp) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'Invalid OTP',
+      });
+    }
+
+    if (user.otpExpires < new Date()) {
+      user.otp = undefined;
+      user.otpExpires = undefined;
+      await user.save({ validateBeforeSave: false });
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'OTP has expired. Please request a new one.',
+      });
+    }
+
+    // Set new password (will be hashed by pre-save hook in the User model)
+    user.password = validatedData.newPassword;
+    user.otp = undefined;
+    user.otpExpires = undefined;
+
+    await user.save();
+
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: 'Password reset successful. You can now login.',
+    });
+  } catch (error) {
+    if (error.name === 'ZodError') {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'Validation Error',
+        errors: error.errors,
+      });
+    }
+
+    console.error('Reset Password Error:', error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: 'Server error during reset password',
     });
   }
 };

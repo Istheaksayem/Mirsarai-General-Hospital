@@ -6,6 +6,7 @@ import { FaUserMd, FaCalendarAlt, FaArrowRight, FaCheckCircle } from "react-icon
 import { useLanguage } from "@/context/LanguageContext";
 import { useDoctors } from "@/hooks/useDoctors";
 import Link from "next/link";
+import Image from "next/image";
 
 const DoctorsSkeleton = () => (
   <section className="py-20 bg-white dark:bg-gray-900">
@@ -83,15 +84,12 @@ const Doctors = () => {
               <Link href={`/doctors/${doctor.slug}`}>
                 <div className="relative h-full bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-850 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-gray-700 hover:border-[#76BC21]/30">
                   <div className="relative h-80 overflow-hidden bg-gradient-to-b from-[#1E2B7A]/5 to-transparent">
-                    <img
-                      src={doctor.image}
+                    <Image
+                      src={doctor.image?.trim() || "/images/doctor-placeholder.svg"}
                       alt={lang === "bn" ? doctor.name.bn : doctor.name.en}
+                      width={400}
+                      height={500}
                       className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-700"
-                      onError={(e) => {
-                        e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                          lang === "bn" ? doctor.name.bn : doctor.name.en
-                        )}&background=1E2B7A&color=fff&size=512`;
-                      }}
                     />
                     {doctor.available && (
                       <div className="absolute top-4 right-4 flex items-center gap-2 px-3 py-1.5 bg-[#76BC21] text-white rounded-full text-xs font-bold shadow-lg">

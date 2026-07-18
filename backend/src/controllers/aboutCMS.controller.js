@@ -154,13 +154,13 @@ export const addCareerPosition = catchAsync(async (req, res) => {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Career content not found.');
   }
   
-  const highestId = data.openPositions.reduce((max, pos) => (pos.id > max ? pos.id : max), 0);
+  const highestId = data.jobListings.reduce((max, pos) => (pos.id > max ? pos.id : max), 0);
   const newPosition = {
     id: highestId + 1,
     ...req.body
   };
 
-  data.openPositions.push(newPosition);
+  data.jobListings.push(newPosition);
   if (req.user) data.updatedBy = req.user.email || req.user.id;
   await data.save();
   return sendSuccess(res, StatusCodes.CREATED, newPosition, 'Career position added successfully');
@@ -174,10 +174,10 @@ export const deleteCareerPosition = catchAsync(async (req, res) => {
   }
   
   const positionId = parseInt(req.params.id, 10);
-  const initialLength = data.openPositions.length;
-  data.openPositions = data.openPositions.filter(pos => pos.id !== positionId);
+  const initialLength = data.jobListings.length;
+  data.jobListings = data.jobListings.filter(pos => pos.id !== positionId);
 
-  if (data.openPositions.length === initialLength) {
+  if (data.jobListings.length === initialLength) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Position not found.');
   }
 
