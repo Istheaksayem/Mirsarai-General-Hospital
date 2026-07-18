@@ -52,17 +52,10 @@ interface GalleryData {
 // ── Fetch Gallery Data ─────────────────────────────────────────────────────
 const fetchGalleryData = async (): Promise<GalleryData> => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
-  try {
-    const res = await fetch(`${apiUrl}/about/gallery`, { cache: "no-store" });
-    if (!res.ok) throw new Error("Failed to fetch from backend");
-    const result = await res.json();
-    return result.data;
-  } catch (error) {
-    console.warn("Backend API not reachable for gallery data. Falling back to local data/gallery.json", error);
-    const res = await fetch("/data/gallery.json", { cache: "no-store" });
-    if (!res.ok) throw new Error("Failed to fetch fallback gallery data");
-    return res.json();
-  }
+  const res = await fetch(`${apiUrl}/about/gallery`, { cache: "no-store" });
+  if (!res.ok) throw new Error(`Failed to fetch gallery data: ${res.statusText}`);
+  const result = await res.json();
+  return result.data;
 };
 
 // ── Main Gallery Page ──────────────────────────────────────────────────────
@@ -94,6 +87,13 @@ const GalleryPage = () => {
       }
     }
   }, [data, lang]);
+
+  // Reset to "all" if the selected category tab no longer exists in backend data
+  useEffect(() => {
+    if (!data || selectedCategory === "all") return;
+    const stillExists = data.categories.some(c => c.id === selectedCategory);
+    if (!stillExists) setSelectedCategory("all");
+  }, [data, selectedCategory]);
 
   if (isLoading) {
     return (
@@ -225,79 +225,115 @@ const GalleryPage = () => {
         </div>
       </section>
 
-      {/* Category Filter */}
+      {/* Category Filter + Gallery Grid */}
       <section className="py-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+
+          {/* Tab Buttons — driven by backend categories */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="flex flex-wrap justify-center gap-3 mb-12"
           >
+            {/* "All" tab */}
             <button
               onClick={() => setSelectedCategory("all")}
-              className={`px-6 py-3 rounded-full font-semibold text-sm transition-all duration-300 ${
+              className={`flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-sm transition-all duration-300 ${
                 selectedCategory === "all"
                   ? "bg-primary text-white shadow-lg scale-105"
-                  : "bg-white text-gray-700 hover:bg-gray-100 shadow"
+                  : "bg-white text-gray-700 hover:bg-primary hover:text-white shadow"
               }`}
             >
               {lang === "bn" ? "সব" : "All"}
+              <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+                selectedCategory === "all" ? "bg-white/20" : "bg-gray-100"
+              }`}>
+                {data.images.length}
+              </span>
             </button>
-            {data.categories.map((category) => (
-              <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
-                className={`px-6 py-3 rounded-full font-semibold text-sm transition-all duration-300 ${
-                  selectedCategory === category.id
-                    ? "bg-primary text-white shadow-lg scale-105"
-                    : "bg-white text-gray-700 hover:bg-gray-100 shadow"
-                }`}
-              >
-                {lang === "bn" ? category.title.bn : category.title.en}
-              </button>
-            ))}
+
+            {/* Dynamic category tabs from backend */}
+            {data.categories.map((category) => {
+              const count = data.images.filter(img => img.category === category.id).length;
+              return (
+                <button
+                  key={category.id}
+                  onClick={() => setSelectedCategory(category.id)}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-sm transition-all duration-300 ${
+                    selectedCategory === category.id
+                      ? "bg-primary text-white shadow-lg scale-105"
+                      : "bg-white text-gray-700 hover:bg-primary hover:text-white shadow"
+                  }`}
+                >
+                  {lang === "bn" ? category.title.bn : category.title.en}
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+                    selectedCategory === category.id ? "bg-white/20" : "bg-gray-100"
+                  }`}>
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
           </motion.div>
 
           {/* Gallery Grid */}
-          <motion.div
-            layout
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-          >
-            <AnimatePresence mode="popLayout">
-              {filteredImages.map((image, index) => (
-                <motion.div
-                  key={image.id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{ duration: 0.3 }}
-                  className="group relative aspect-square rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer"
-                  onClick={() => openLightbox(image, index)}
-                >
-                  <Image
-                    src={getImageUrl(image.src)}
-                    alt={lang === "bn" ? image.title.bn : image.title.en}
-                    fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                      <h3 className="font-bold text-lg mb-1">
-                        {lang === "bn" ? image.title.bn : image.title.en}
-                      </h3>
-                      <p className="text-sm text-white/90 line-clamp-2">
-                        {lang === "bn"
-                          ? image.description.bn
-                          : image.description.en}
-                      </p>
+          {filteredImages.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-20 text-gray-400"
+            >
+              <p className="text-5xl mb-4">🖼️</p>
+              <p className="text-lg font-medium">
+                {lang === "bn" ? "এই বিভাগে কোনো ছবি নেই।" : "No images in this category yet."}
+              </p>
+            </motion.div>
+          ) : (
+            <motion.div
+              layout
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+            >
+              <AnimatePresence mode="popLayout">
+                {filteredImages.map((image, index) => (
+                  <motion.div
+                    key={image.id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ duration: 0.3 }}
+                    className="group relative aspect-square rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer"
+                    onClick={() => openLightbox(image, index)}
+                  >
+                    <Image
+                      src={getImageUrl(image.src)}
+                      alt={lang === "bn" ? image.title.bn : image.title.en}
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                        <h3 className="font-bold text-lg mb-1">
+                          {lang === "bn" ? image.title.bn : image.title.en}
+                        </h3>
+                        <p className="text-sm text-white/90 line-clamp-2">
+                          {lang === "bn" ? image.description.bn : image.description.en}
+                        </p>
+                        {/* Category badge */}
+                        <span className="inline-block mt-2 text-xs bg-white/20 px-2 py-0.5 rounded-full">
+                          {lang === "bn"
+                            ? (data.categories.find(c => c.id === image.category)?.title.bn ?? image.category)
+                            : (data.categories.find(c => c.id === image.category)?.title.en ?? image.category)
+                          }
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </motion.div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
+          )}
         </div>
       </section>
 
@@ -347,7 +383,7 @@ const GalleryPage = () => {
             >
               <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl mb-4">
                 <Image
-                  src={lightboxImage.src}
+                  src={getImageUrl(lightboxImage.src)}
                   alt={
                     lang === "bn"
                       ? lightboxImage.title.bn

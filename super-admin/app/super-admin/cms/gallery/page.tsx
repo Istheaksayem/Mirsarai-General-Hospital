@@ -229,12 +229,25 @@ export default function GalleryCmsPage() {
 
               {/* Images */}
               <div className="space-y-4">
-                <SectionDivider title="Gallery Images" description="Photos displayed in the gallery grid — assign each to a category" />
+                <SectionDivider title="Gallery Images" description="Assign each photo to a category. The category ID must match exactly for the filter tabs to work." />
                 <div className="space-y-3">
-                  {data.images.map((img, i) => (
-                    <div key={i} className="rounded-xl border border-gray-100 dark:border-gray-800 p-4 space-y-3 bg-gray-50/50 dark:bg-gray-800/30">
+                  {data.images.map((img, i) => {
+                    const isValidCategory = data.categories.some(c => c.id === img.category);
+                    return (
+                    <div key={i} className={`rounded-xl border p-4 space-y-3 ${
+                      isValidCategory
+                        ? "border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30"
+                        : "border-orange-200 dark:border-orange-800/40 bg-orange-50/50 dark:bg-orange-900/10"
+                    }`}>
                       <div className="flex justify-between items-center">
-                        <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Image #{i + 1}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Image #{i + 1}</span>
+                          {!isValidCategory && (
+                            <span className="flex items-center gap-1 text-xs font-semibold text-orange-600 bg-orange-100 dark:bg-orange-900/30 px-2 py-0.5 rounded-full">
+                              ⚠️ Category "{img.category}" not found — select a valid category
+                            </span>
+                          )}
+                        </div>
                         <button type="button" onClick={() => set((d) => ({ ...d, images: d.images.filter((_, idx) => idx !== i) }))}
                           className="flex h-7 w-7 items-center justify-center rounded-lg border border-red-200 text-red-500 hover:bg-red-50 transition-colors">
                           <Trash2 className="h-3.5 w-3.5" />
@@ -256,11 +269,25 @@ export default function GalleryCmsPage() {
                                 updated[i] = { ...img, category: e.target.value };
                                 set((d) => ({ ...d, images: updated }));
                               }}
-                              className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1E2B7A]/20">
+                              className={`w-full rounded-xl border px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E2B7A]/20 ${
+                                isValidCategory
+                                  ? "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                                  : "border-orange-300 dark:border-orange-700 bg-orange-50 dark:bg-orange-900/20 text-orange-800 dark:text-orange-200"
+                              }`}>
+                              {!isValidCategory && (
+                                <option value={img.category} disabled>
+                                  ⚠️ "{img.category}" (invalid — pick one below)
+                                </option>
+                              )}
                               {data.categories.map((c) => (
-                                <option key={c.id} value={c.id}>{c.title.en}</option>
+                                <option key={c.id} value={c.id}>
+                                  {c.title.en} (id: {c.id})
+                                </option>
                               ))}
                             </select>
+                            <p className="mt-1 text-xs text-gray-400">
+                              Stored value: <code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">{img.category || "(empty)"}</code>
+                            </p>
                           </FormField>
                           <LocalizedInput label="Image Title" value={img.title} activeTab={langTab}
                             onChange={(v) => {
@@ -272,9 +299,9 @@ export default function GalleryCmsPage() {
                         </div>
                       </div>
                     </div>
-                  ))}
+                  )})}
                   <button type="button"
-                    onClick={() => set((d) => ({ ...d, images: [...d.images, { id: nextImageId(), category: d.categories[0]?.id ?? "all", src: "", title: { en: "New Photo", bn: "নতুন ছবি" }, description: { en: "", bn: "" } }] }))}
+                    onClick={() => set((d) => ({ ...d, images: [...d.images, { id: nextImageId(), category: d.categories[0]?.id ?? "", src: "", title: { en: "New Photo", bn: "নতুন ছবি" }, description: { en: "", bn: "" } }] }))}
                     className="flex items-center gap-2 px-4 py-2 rounded-xl border border-dashed border-gray-300 dark:border-gray-600 text-sm text-gray-500 hover:border-[#1E2B7A] hover:text-[#1E2B7A] transition-colors">
                     <Plus className="h-4 w-4" /> Add Image
                   </button>
