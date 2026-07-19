@@ -5,12 +5,12 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { SearchFilter, SelectFilter } from "@/components/ui/SearchFilter";
 import { DataTable, Column } from "@/components/ui/DataTable";
 import { Badge } from "@/components/ui/Badge";
-import { useCmsAppointments } from "@/lib/hooks/useCmsAppointments";
-import { useAuth } from "@/context/AuthContext";
+import { useDoctorAppointments } from "@/lib/hooks/useCmsAppointments";
 import { createActionColumn } from "@/components/ui/ActionButtons";
 
-const statusVariant: Record<string, "success" | "warning" | "default" | "danger"> = {
+const statusVariant: Record<string, "success" | "warning" | "default" | "danger" | "info"> = {
   confirmed: "success", pending: "warning", completed: "default", cancelled: "danger", "no-show": "danger",
+  "checked-in": "info", "in-consultation": "info",
 };
 
 const columns: Column<Record<string, unknown>>[] = [
@@ -41,21 +41,19 @@ const columns: Column<Record<string, unknown>>[] = [
 ];
 
 export default function DoctorAppointmentsPage() {
-  const { user } = useAuth();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
 
   const params: Record<string, string> = {};
-  if (user?.doctorRef) params.doctorId = user.doctorRef;
   if (statusFilter) params.status = statusFilter;
   if (search) params.search = search;
 
-  const { data, isLoading } = useCmsAppointments(params);
+  const { data, isLoading } = useDoctorAppointments(params);
   const appointments = data?.data || [];
 
   return (
     <div className="space-y-6">
-      <PageHeader title="My Appointments" description={`${data?.total || 0} appointments`} icon={CalendarDays} />
+      <PageHeader title="My Appointments" description={`${appointments.length} appointments`} icon={CalendarDays} />
       <div className="flex flex-col sm:flex-row gap-3">
         <SearchFilter value={search} onChange={setSearch} placeholder="Search patient..." className="flex-1" />
         <SelectFilter value={statusFilter} onChange={setStatusFilter}
@@ -65,6 +63,8 @@ export default function DoctorAppointmentsPage() {
             { label: "Completed", value: "completed" },
             { label: "Cancelled", value: "cancelled" },
             { label: "No Show", value: "no-show" },
+            { label: "Checked In", value: "checked-in" },
+            { label: "In Consultation", value: "in-consultation" },
           ]}
           placeholder="All Status" />
       </div>

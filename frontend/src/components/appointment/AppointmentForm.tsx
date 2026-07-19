@@ -15,6 +15,8 @@ import {
   FaArrowLeft,
   FaDownload,
   FaSpinner,
+  FaIdBadge,
+  FaInfoCircle,
 } from "react-icons/fa";
 import jsPDF from "jspdf";
 import { useDoctors } from "@/hooks/useDoctors";
@@ -38,6 +40,11 @@ export default function AppointmentForm() {
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [result, setResult] = useState<{
+    appointmentId: string;
+    patientId: string;
+    status: string;
+  } | null>(null);
 
   const { data: rawDoctors, isLoading, error } = useDoctors();
   const createAppointment = useCreateAppointment();
@@ -139,7 +146,7 @@ export default function AppointmentForm() {
     setIsSubmitting(true);
     setSubmitError("");
     try {
-      await createAppointment.mutateAsync({
+      const response = await createAppointment.mutateAsync({
         patientName: form.fullName,
         patientPhone: form.phone,
         patientEmail: form.email || undefined,
@@ -151,6 +158,13 @@ export default function AppointmentForm() {
         date: form.date,
         time: form.time,
         reason: form.message || undefined,
+      });
+      const appointment = response?.appointment || response;
+      const patient = response?.patient || {};
+      setResult({
+        appointmentId: appointment?.appointmentId || "",
+        patientId: patient?.patientId || response?.patientId || "",
+        status: appointment?.status || "pending",
       });
       setSubmitted(true);
     } catch (err: any) {
@@ -179,6 +193,24 @@ export default function AppointmentForm() {
     yPos += 10;
     doc.setFontSize(11);
     doc.setFont("helvetica", "normal");
+
+    doc.setFont("helvetica", "bold");
+    doc.text("Appointment ID:", 20, yPos);
+    doc.setFont("helvetica", "normal");
+    doc.text(`${result?.appointmentId || "—"}`, 80, yPos);
+    yPos += 7;
+
+    doc.setFont("helvetica", "bold");
+    doc.text("Patient ID:", 20, yPos);
+    doc.setFont("helvetica", "normal");
+    doc.text(`${result?.patientId || "—"}`, 80, yPos);
+    yPos += 7;
+
+    doc.setFont("helvetica", "bold");
+    doc.text("Status:", 20, yPos);
+    doc.setFont("helvetica", "normal");
+    doc.text(`${result?.status || "pending"}`, 80, yPos);
+    yPos += 12;
 
     doc.setFont("helvetica", "bold");
     doc.text("Patient Information:", 20, yPos);
@@ -253,14 +285,30 @@ export default function AppointmentForm() {
         <h2 className="text-3xl font-bold text-gray-900 mb-3">Appointment Booked!</h2>
         <p className="text-gray-500 max-w-md mb-2">
           Thank you, <strong>{form.fullName}</strong>. Your appointment with{" "}
-          <strong>{form.doctor}</strong> has been confirmed.
+          <strong>{form.doctor}</strong> has been submitted.
         </p>
-        <p className="text-gray-500 mb-8">
-          📅 <strong>{form.date}</strong> at <strong>{form.time}</strong>
+        <p className="text-gray-500 mb-6">
+          <FaCalendarAlt className="inline mr-1" /> <strong>{form.date}</strong> at <strong>{form.time}</strong>
         </p>
-        <div className="bg-blue-50 border border-blue-100 rounded-2xl px-6 py-4 text-sm text-blue-700 max-w-sm mb-8">
-          A confirmation will be sent to your phone{form.email ? " and email" : ""}. Please arrive 10 minutes early.
+
+        <div className="bg-blue-50 border border-blue-100 rounded-2xl px-6 py-5 text-sm text-blue-800 max-w-sm mb-6 space-y-2 text-left">
+          <div className="flex items-center gap-2">
+            <FaIdBadge className="text-blue-500 shrink-0" />
+            <span><strong>Appointment ID:</strong> {result?.appointmentId || "—"}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <FaIdBadge className="text-blue-500 shrink-0" />
+            <span><strong>Patient ID:</strong> {result?.patientId || "—"}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <FaInfoCircle className="text-blue-500 shrink-0" />
+            <span><strong>Status:</strong> <span className="capitalize">{result?.status || "pending"}</span></span>
+          </div>
         </div>
+
+        <p className="text-gray-500 text-sm mb-6">
+          A confirmation will be sent to your phone{form.email ? " and email" : ""}. Please arrive 10 minutes early.
+        </p>
 
         <button
           onClick={downloadPDF}
@@ -270,7 +318,7 @@ export default function AppointmentForm() {
         </button>
 
         <button
-          onClick={() => { setSubmitted(false); setStep(0); setForm({ fullName: "", phone: "", email: "", age: "", gender: "", department: "", doctor: "", date: "", time: "", message: "" }); }}
+          onClick={() => { setSubmitted(false); setStep(0); setForm({ fullName: "", phone: "", email: "", age: "", gender: "", department: "", doctor: "", date: "", time: "", message: "" }); setResult(null); }}
           className="text-primary underline underline-offset-4 text-sm hover:opacity-75 transition"
         >
           Book another appointment

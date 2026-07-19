@@ -11,8 +11,9 @@ import { useCmsAppointments } from "@/lib/hooks/useCmsAppointments";
 import { createActionColumn } from "@/components/ui/ActionButtons";
 import Link from "next/link";
 
-const statusVariant: Record<string, "success" | "warning" | "default" | "danger"> = {
+const statusVariant: Record<string, "success" | "warning" | "default" | "danger" | "info"> = {
   confirmed: "success", pending: "warning", completed: "default", cancelled: "danger", "no-show": "danger",
+  "checked-in": "info", "in-consultation": "info",
 };
 
 const typeVariant: Record<string, "info" | "default" | "success"> = {
@@ -20,6 +21,10 @@ const typeVariant: Record<string, "info" | "default" | "success"> = {
 };
 
 const columns: Column<Record<string, unknown>>[] = [
+  {
+    key: "appointmentId", header: "Appt ID",
+    cell: (r) => <span className="font-mono text-xs font-bold text-[#1E2B7A] dark:text-blue-400">{(r.appointmentId as string) || "—"}</span>,
+  },
   {
     key: "_id", header: "ID",
     cell: (r) => <span className="font-mono text-xs text-gray-400">{(r._id as string)?.slice(-6)}</span>,
@@ -61,16 +66,22 @@ const columns: Column<Record<string, unknown>>[] = [
     key: "status", header: "Status",
     cell: (r) => <Badge variant={statusVariant[r.status as string] || "default"}>{r.status as string}</Badge>,
   },
+  {
+    key: "appointmentSource", header: "Source",
+    cell: (r) => <Badge variant="default">{(r.appointmentSource as string) || "—"}</Badge>,
+  },
   createActionColumn({ basePath: "/super-admin/appointments" }),
 ];
 
 export default function AppointmentsPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [sourceFilter, setSourceFilter] = useState("");
   const [page, setPage] = useState(1);
 
   const params: Record<string, string> = { page: String(page), limit: "10" };
   if (statusFilter) params.status = statusFilter;
+  if (sourceFilter) params.source = sourceFilter;
   if (search) params.search = search;
 
   const { data, isLoading } = useCmsAppointments(params);
@@ -114,8 +125,19 @@ export default function AppointmentsPage() {
             { label: "Completed", value: "completed" },
             { label: "Cancelled", value: "cancelled" },
             { label: "No Show", value: "no-show" },
+            { label: "Checked In", value: "checked-in" },
+            { label: "In Consultation", value: "in-consultation" },
           ]}
           placeholder="All Status"
+        />
+        <SelectFilter value={sourceFilter} onChange={setSourceFilter}
+          options={[
+            { label: "Online", value: "online" },
+            { label: "Receptionist", value: "receptionist" },
+            { label: "Super Admin", value: "super-admin" },
+            { label: "Patient Portal", value: "patient-portal" },
+          ]}
+          placeholder="All Sources"
         />
       </div>
 

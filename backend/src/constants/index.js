@@ -77,9 +77,19 @@ export const HTTP_MESSAGES = {
 export const APPOINTMENT_STATUS = {
   PENDING: 'pending',
   CONFIRMED: 'confirmed',
-  CANCELLED: 'cancelled',
+  CHECKED_IN: 'checked-in',
+  IN_CONSULTATION: 'in-consultation',
   COMPLETED: 'completed',
+  CANCELLED: 'cancelled',
   NO_SHOW: 'no-show',
+};
+
+// Appointment Source
+export const APPOINTMENT_SOURCE = {
+  ONLINE: 'online',
+  RECEPTIONIST: 'receptionist',
+  SUPER_ADMIN: 'super-admin',
+  PATIENT_PORTAL: 'patient-portal',
 };
 
 // Report Status

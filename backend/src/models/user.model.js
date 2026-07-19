@@ -68,6 +68,10 @@ const userSchema = new mongoose.Schema(
     otp: {
       type: String,
     },
+    doctorRef: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Doctor',
+    },
     otpExpires: {
       type: Date,
     },

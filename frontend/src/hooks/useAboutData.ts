@@ -154,3 +154,46 @@ export const useOurTeamData = () =>
     queryFn: fetchOurTeamData,
     staleTime: 1000 * 60 * 15,
   });
+
+// ── Career Types ──────────────────────────────────────────────────────────────
+export interface CareerPosition {
+  id: number;
+  title: BiText;
+  department: BiText;
+  location: BiText;
+  jobType: BiText;
+  description: BiText;
+  requirements: BiText;
+  applyLink: string;
+  bannerImage: string;
+  isActive: boolean;
+}
+
+export interface CareerData {
+  title: BiText;
+  description: BiText;
+  image: string;
+  jobListings: CareerPosition[];
+  sections?: {
+    hero: SectionConfig;
+    jobListings: SectionConfig;
+  };
+  seo?: SEOConfig;
+}
+
+// ── Career Fetcher ─────────────────────────────────────────────────────────────
+const fetchCareerData = async (): Promise<CareerData> => {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+  const res = await fetch(`${apiUrl}/about/career`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch Career data");
+  const json = await res.json();
+  return normalizeImages(json.data) as CareerData;
+};
+
+// ── Career Hook ────────────────────────────────────────────────────────────────
+export const useCareerData = () =>
+  useQuery<CareerData>({
+    queryKey: ["careerData"],
+    queryFn: fetchCareerData,
+    staleTime: 1000 * 60 * 15,
+  });

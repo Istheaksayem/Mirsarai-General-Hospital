@@ -35,6 +35,8 @@ export const registerPatient = async (data, userId) => {
 
 You have been added as a patient at Mirsarai General Hospital.
 
+Your Patient ID: ${patientId}
+
 You can now access all your information — prescriptions, lab reports, and more — through your patient dashboard.
 
 Visit: ${env.clientUrl}/login-patient?email=${encodeURIComponent(data.email)}
@@ -110,6 +112,9 @@ export const updateAppointmentStatus = async (id, status, userId) => {
       confirmed: 'Your appointment has been confirmed.',
       cancelled: 'Your appointment has been cancelled.',
       completed: 'Your appointment has been marked as completed.',
+      'checked-in': 'You have been checked in for your appointment.',
+      'in-consultation': 'You are now in consultation with the doctor.',
+      'no-show': 'You missed your appointment.',
     };
     const message = statusMessages[status];
     if (message) {
@@ -117,7 +122,7 @@ export const updateAppointmentStatus = async (id, status, userId) => {
         patientId: patient._id,
         type: 'status_update',
         title: `Appointment ${status}`,
-        message: `${message} — ${appointment.patientName} with ${updated.doctor?.name || 'doctor'} on ${new Date(appointment.date).toLocaleDateString()}`,
+        message: `${message} — ${appointment.patientName} with ${updated.doctor?.name?.en || 'doctor'} on ${new Date(appointment.date).toLocaleDateString()}`,
       });
     }
   }

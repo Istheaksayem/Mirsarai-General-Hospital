@@ -90,11 +90,6 @@ router.get('/', (req, res) => {
 // ============================================
 // MODULE ROUTES
 // ============================================
-// import authRoutes from './auth.routes.js';
-// import userRoutes from './user.routes.js';
-// import doctorRoutes from './doctor.routes.js';
-// import patientRoutes from './patient.routes.js';
-// import appointmentRoutes from './appointment.routes.js';
 
 // ── Auth Routes ───────────────────────────────────────────────────────────────
 router.use('/auth', authRoutes);

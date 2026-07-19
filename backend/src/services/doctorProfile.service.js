@@ -1,8 +1,10 @@
+import jwt from 'jsonwebtoken';
 import DoctorProfile from '../models/doctorProfile.model.js';
 import Doctor from '../models/doctor.model.js';
 import User from '../models/user.model.js';
 import ApiError from '../utils/ApiError.js';
 import { StatusCodes } from 'http-status-codes';
+import env from '../config/env.js';
 
 /**
  * Auto-generate the next doctor code
@@ -119,11 +121,8 @@ export const createOrUpdateMyProfile = async (userId, data) => {
       ...doctorData,
     });
 
-    // Mark profile as completed on the User
-    await User.findByIdAndUpdate(userId, { profileCompleted: true });
-
     // Create corresponding Doctor document
-    await Doctor.create({
+    const doctorDoc = await Doctor.create({
       slug,
       name: { en: doctorData.name?.en || user.fullName || 'Doctor', bn: doctorData.name?.bn || '' },
       'designation.en': doctorData.designation || 'Staff',
@@ -141,6 +140,9 @@ export const createOrUpdateMyProfile = async (userId, data) => {
       createdBy: userId,
       updatedBy: userId,
     });
+
+    // Link User to Doctor document and mark profile completed
+    await User.findByIdAndUpdate(userId, { doctorRef: doctorDoc._id, profileCompleted: true });
   } else {
     // ── Update existing profile ──────────────────────────────────────────
 
@@ -230,8 +232,27 @@ export const createOrUpdateMyProfile = async (userId, data) => {
           createdBy: userId,
         });
       }
+
+      // Link User to Doctor document
+      const doctorDoc = await Doctor.findOne({ slug: profileSlug }).select('_id').lean();
+      if (doctorDoc) {
+        await User.findByIdAndUpdate(userId, { doctorRef: doctorDoc._id });
+      }
     }
   }
 
-  return profile;
+  // Fetch updated user for JWT payload
+  const updatedUser = await User.findById(userId).select('role doctorRef').lean();
+
+  const token = jwt.sign(
+    {
+      id: userId,
+      role: updatedUser.role,
+      doctorRef: updatedUser.doctorRef || null,
+    },
+    env.jwt.secret,
+    { expiresIn: env.jwt.expiresIn || '7d' }
+  );
+
+  return { profile, token };
 };

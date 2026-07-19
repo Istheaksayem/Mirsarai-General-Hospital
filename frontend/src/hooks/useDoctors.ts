@@ -27,7 +27,7 @@ export interface Doctor {
   availableDays: string[];
   phone: string;
   email: string;
-  image: string;
+  image?: string;
   featured: boolean;
   displayOrder: number;
   isVisible: boolean;
@@ -44,7 +44,11 @@ const normalizeDoctor = (d: Record<string, unknown>): Doctor => {
   if (exp && exp.label) {
     d.experience = exp.label;
   }
-  if (d.image) d.image = getImageUrl(d.image as string);
+  if (d.image && typeof d.image === 'string' && d.image.trim()) {
+    d.image = getImageUrl(d.image.trim());
+  } else {
+    delete d.image;
+  }
   return d as unknown as Doctor;
 };
 

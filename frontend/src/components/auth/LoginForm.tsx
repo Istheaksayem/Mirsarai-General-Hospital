@@ -135,9 +135,9 @@ const LoginForm = () => {
             />
             Remember Me
           </label>
-          <a href="#" className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors">
+          <Link href="/forgot-password" className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors">
             Forgot Password?
-          </a>
+          </Link>
         </div>
 
         <SubmitButton text={isSubmitting ? "Signing In..." : "Sign In"} />

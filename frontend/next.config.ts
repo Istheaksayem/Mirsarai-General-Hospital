@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
+    dangerouslyAllowSVG: true,
+    contentDispositionType: "attachment",
     remotePatterns: [
       {
         protocol: "http",
@@ -10,7 +12,10 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "mirsarai-general-hospital.onrender.com",
-        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
       },
     ],
   },

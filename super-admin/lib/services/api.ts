@@ -404,7 +404,7 @@ export const uploadLabReport = (formData: FormData) => {
       try {
         const parsed = JSON.parse(errorText);
         errorMessage = parsed.message || errorMessage;
-      } catch {}
+      } catch { }
       throw new ApiError(res.status, errorMessage);
     }
     return res.json();
@@ -651,6 +651,7 @@ export interface GalleryData {
 }
 
 export interface CareerBenefit {
+  id?: number;
   icon: string;
   title: LocalizedString;
   description: LocalizedString;
@@ -660,24 +661,29 @@ export interface CareerPosition {
   id: number;
   title: LocalizedString;
   department: LocalizedString;
-  type: LocalizedString;
-  experience: LocalizedString;
+  location: LocalizedString;
+  jobType: LocalizedString;
   description: LocalizedString;
+  requirements: LocalizedString;
+  applyLink: string;
+  bannerImage: string;
+  isActive: boolean;
 }
 
 export interface CareerStep {
+  id?: number;
   step: number;
+  icon: string;
   title: LocalizedString;
   description: LocalizedString;
 }
 
 export interface CareerData {
   _id?: string;
-  hero: { title: LocalizedString; subtitle: LocalizedString; description: LocalizedString; image: string };
-  whyJoinUs: { title: LocalizedString; benefits: CareerBenefit[] };
-  openPositions: CareerPosition[];
-  applicationProcess: { title: LocalizedString; steps: CareerStep[] };
-  contact: { title: LocalizedString; description: LocalizedString; email: string; phone: string };
+  title: LocalizedString;
+  description: LocalizedString;
+  image: string;
+  jobListings: CareerPosition[];
   sections: Record<string, SectionConfig>;
   seo: SeoConfig;
   createdBy?: string;
@@ -744,7 +750,10 @@ export const updateOurTeamData = (data: Partial<OurTeamData>) => saveReal<OurTea
 export async function uploadCmsImage(base64Data: string): Promise<string> {
   const res = await fetch(`${BACKEND_API}/about/upload`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeaders()
+    },
     body: JSON.stringify({ base64Data }),
   });
   if (!res.ok) {
@@ -879,7 +888,7 @@ function getAuthHeaders(): Record<string, string> {
         const user = JSON.parse(raw);
         if (user.token) headers["Authorization"] = `Bearer ${user.token}`;
       }
-    } catch {}
+    } catch { }
   }
   return headers;
 }
@@ -892,9 +901,8 @@ async function fetchAdminReal<T>(path: string): Promise<T> {
   if (!res.ok) {
     const errorText = await res.text();
     let errorMessage = `Failed to fetch ${path}`;
-    let errors: { field: string; message: string }[] | undefined;
-    try { const parsed = JSON.parse(errorText); errorMessage = parsed.message || errorMessage; errors = parsed.errors; } catch {}
-    throw new ApiError(res.status, errorMessage, errors);
+    try { const parsed = JSON.parse(errorText); errorMessage = parsed.message || errorMessage; } catch { }
+    throw new ApiError(res.status, errorMessage);
   }
   const result = await res.json();
   return normalizeImages(result) as T;
@@ -909,9 +917,8 @@ async function mutateAdminReal<T>(path: string, data: unknown, method: "POST" | 
   if (!res.ok) {
     const errorText = await res.text();
     let errorMessage = `Failed to ${method} ${path}`;
-    let errors: { field: string; message: string }[] | undefined;
-    try { const parsed = JSON.parse(errorText); errorMessage = parsed.message || errorMessage; errors = parsed.errors; } catch {}
-    throw new ApiError(res.status, errorMessage, errors);
+    try { const parsed = JSON.parse(errorText); errorMessage = parsed.message || errorMessage; } catch { }
+    throw new ApiError(res.status, errorMessage);
   }
   const result = await res.json();
   return normalizeImages(result.data) as T;
@@ -1016,7 +1023,7 @@ function getDoctorAuthHeaders(): Record<string, string> {
         const user = JSON.parse(raw);
         if (user.token) headers["Authorization"] = `Bearer ${user.token}`;
       }
-    } catch {}
+    } catch { }
   }
   return headers;
 }
@@ -1029,7 +1036,7 @@ async function fetchDoctorProfile<T>(path: string): Promise<T> {
   if (!res.ok) {
     const errorText = await res.text();
     let errorMessage = `Failed to fetch ${path}`;
-    try { const parsed = JSON.parse(errorText); errorMessage = parsed.message || errorMessage; } catch {}
+    try { const parsed = JSON.parse(errorText); errorMessage = parsed.message || errorMessage; } catch { }
     throw new ApiError(res.status, errorMessage);
   }
   const result = await res.json();
@@ -1045,7 +1052,7 @@ async function updateDoctorProfile<T>(path: string, data: unknown): Promise<T> {
   if (!res.ok) {
     const errorText = await res.text();
     let errorMessage = `Failed to update ${path}`;
-    try { const parsed = JSON.parse(errorText); errorMessage = parsed.message || errorMessage; } catch {}
+    try { const parsed = JSON.parse(errorText); errorMessage = parsed.message || errorMessage; } catch { }
     throw new ApiError(res.status, errorMessage);
   }
   const result = await res.json();
@@ -1346,6 +1353,17 @@ export const deleteCmsAppointment = (id: string) =>
 
 export const updateCmsAppointmentStatus = (id: string, status: string) =>
   mutateAdminReal<CmsAppointment>(`admin/appointments/${id}/status`, { status }, "PATCH");
+
+// ─── Doctor Appointment API (uses dedicated /doctors/appointments endpoints) ──
+
+export const getDoctorAppointments = (params: Record<string, string> = {}) => {
+  const q = new URLSearchParams(params).toString();
+  return fetchAdminReal<CmsAppointmentListResponse>(`doctors/appointments${q ? `?${q}` : ""}`);
+};
+
+export const getDoctorTodaysAppointments = () => {
+  return fetchAdminReal<{ data: CmsAppointment[]; success?: boolean; message?: string }>("doctors/appointments/today");
+};
 
 // ─── Service Page CMS Types ─────────────────────────────────────────────────
 

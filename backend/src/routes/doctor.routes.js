@@ -1,5 +1,6 @@
 import express from 'express';
 import * as DoctorController from '../controllers/doctor.controller.js';
+import * as AppointmentController from '../controllers/appointment.controller.js';
 import validate from '../middlewares/validate.middleware.js';
 import { authenticate, authorize } from '../middlewares/auth.middleware.js';
 import {
@@ -28,6 +29,20 @@ router.get('/me', authenticate, authorize('doctor'), DoctorController.getMyProfi
  * @access Private (doctor)
  */
 router.put('/me', authenticate, authorize('doctor'), validate(doctorProfileSchema), DoctorController.createOrUpdateMyProfile);
+
+/**
+ * @route  GET /api/v1/doctors/appointments
+ * @desc   Get all appointments for the logged-in doctor
+ * @access Private (doctor)
+ */
+router.get('/appointments', authenticate, authorize('doctor'), AppointmentController.getMyAppointments);
+
+/**
+ * @route  GET /api/v1/doctors/appointments/today
+ * @desc   Get today's appointments for the logged-in doctor
+ * @access Private (doctor)
+ */
+router.get('/appointments/today', authenticate, authorize('doctor'), AppointmentController.getMyTodaysAppointments);
 
 // ── PUBLIC ROUTES ──────────────────────────────────────────────────────────────
 // These are open — no auth required
