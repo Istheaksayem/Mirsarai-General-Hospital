@@ -23,15 +23,30 @@ const statSchema = z.object({
   value: z.string().min(1, 'Stat value is required')
 });
 
+const featureItemValSchema = z.object({
+  title: localizedStringSchema,
+  description: localizedStringSchema,
+  color: z.string().optional().default('from-blue-500 via-primary to-blue-900')
+});
+
+const featuresSectionValSchema = z.object({
+  badge: localizedStringSchema,
+  heading: localizedStringSchema,
+  description: localizedStringSchema,
+  items: z.array(featureItemValSchema).default([])
+});
+
 export const putAboutUsSchema = z.object({
   body: z.object({
     title: localizedStringSchema,
     subtitle: localizedStringSchema,
+    storyHeading: localizedStringSchema,
     description: localizedStringSchema,
     content: z.array(localizedStringSchema).default([]),
     statistics: z.array(statSchema).default([]),
     image: z.string().min(1, 'Image path/URL is required'),
     features: z.array(localizedStringSchema).default([]),
+    featuresSection: featuresSectionValSchema.optional(),
     sections: z.object({
       hero: sectionConfigSchema,
       story: sectionConfigSchema,
@@ -49,6 +64,12 @@ const coreValueValSchema = z.object({
   description: localizedStringSchema
 });
 
+const whyItMattersItemValSchema = z.object({
+  title: localizedStringSchema,
+  description: localizedStringSchema,
+  color: z.string().optional().default('from-red-500 to-pink-600')
+});
+
 export const putMissionVisionSchema = z.object({
   body: z.object({
     title: localizedStringSchema,
@@ -61,6 +82,15 @@ export const putMissionVisionSchema = z.object({
       description: localizedStringSchema
     }),
     coreValues: z.array(coreValueValSchema).default([]),
+    commitmentHeading: localizedStringSchema.optional(),
+    commitmentDescription: localizedStringSchema.optional(),
+    whyItMattersHeading: localizedStringSchema.optional(),
+    whyItMattersDescription: localizedStringSchema.optional(),
+    whyItMattersItems: z.array(whyItMattersItemValSchema).optional().default([]),
+    ctaHeading: localizedStringSchema.optional(),
+    ctaDescription: localizedStringSchema.optional(),
+    ctaPrimaryButtonText: localizedStringSchema.optional(),
+    ctaSecondaryButtonText: localizedStringSchema.optional(),
     image: z.string().min(1, 'Image path/URL is required'),
     sections: z.object({
       hero: sectionConfigSchema,

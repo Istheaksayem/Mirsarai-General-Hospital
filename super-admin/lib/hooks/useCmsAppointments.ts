@@ -2,10 +2,15 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getCmsAppointments,
   getCmsAppointmentById,
+  getDoctorAppointments,
+  getDoctorTodaysAppointments,
+  getDoctorAppointmentById,
+  getDoctorCompletedAppointments,
   createCmsAppointment,
   updateCmsAppointment,
   deleteCmsAppointment,
   updateCmsAppointmentStatus,
+  updateDoctorAppointmentStatus,
   type CmsAppointment,
 } from "@/lib/services/api";
 
@@ -22,6 +27,39 @@ export function useCmsAppointmentById(id: string) {
     queryKey: ["cms-appointments", id],
     queryFn: () => getCmsAppointmentById(id),
     enabled: !!id,
+    staleTime: 1000 * 60 * 2,
+  });
+}
+
+export function useDoctorAppointments(params: Record<string, string> = {}) {
+  return useQuery({
+    queryKey: ["doctor-appointments", params],
+    queryFn: () => getDoctorAppointments(params),
+    staleTime: 1000 * 60 * 2,
+  });
+}
+
+export function useDoctorTodaysAppointments() {
+  return useQuery({
+    queryKey: ["doctor-today-appointments"],
+    queryFn: () => getDoctorTodaysAppointments(),
+    staleTime: 1000 * 60 * 2,
+  });
+}
+
+export function useDoctorAppointmentById(id: string) {
+  return useQuery({
+    queryKey: ["doctor-appointments", id],
+    queryFn: () => getDoctorAppointmentById(id),
+    enabled: !!id,
+    staleTime: 1000 * 60 * 2,
+  });
+}
+
+export function useDoctorCompletedAppointments(params: Record<string, string> = {}) {
+  return useQuery({
+    queryKey: ["doctor-completed-appointments", params],
+    queryFn: () => getDoctorCompletedAppointments(params),
     staleTime: 1000 * 60 * 2,
   });
 }
@@ -64,6 +102,19 @@ export function useUpdateCmsAppointmentStatus() {
       updateCmsAppointmentStatus(id, status),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cms-appointments"] });
+    },
+  });
+}
+
+export function useUpdateDoctorAppointmentStatus() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, status }: { id: string; status: string }) =>
+      updateDoctorAppointmentStatus(id, status),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["doctor-appointments"] });
+      queryClient.invalidateQueries({ queryKey: ["doctor-today-appointments"] });
+      queryClient.invalidateQueries({ queryKey: ["doctor-completed-appointments"] });
     },
   });
 }

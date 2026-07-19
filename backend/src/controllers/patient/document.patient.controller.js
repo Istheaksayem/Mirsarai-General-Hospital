@@ -8,9 +8,24 @@ import Document from '../../models/document.model.js';
 
 export const getMyDocuments = catchAsync(async (req, res) => {
   const documents = await Document.find({ patientId: req.patient.id, isDeleted: false })
+    .populate('uploadedBy.id', 'fullName')
     .sort({ createdAt: -1 })
     .lean();
-  sendSuccess(res, StatusCodes.OK, documents, 'Documents fetched successfully');
+
+  const mapped = documents.map((doc) => {
+    const d = { ...doc };
+    if (d.uploadedBy && typeof d.uploadedBy === 'object') {
+      const ub = d.uploadedBy;
+      const nestedUser = ub && ub.id;
+      if (nestedUser && nestedUser.fullName) {
+        ub.fullName = nestedUser.fullName;
+        ub.id = nestedUser._id || nestedUser.id || ub.id;
+      }
+    }
+    return d;
+  });
+
+  sendSuccess(res, StatusCodes.OK, mapped, 'Documents fetched successfully');
 });
 
 export const downloadDocument = catchAsync(async (req, res) => {

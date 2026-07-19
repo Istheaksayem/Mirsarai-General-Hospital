@@ -10,13 +10,13 @@ export default function EditReportPage({ params }: { params: Promise<{ id: strin
   const { id } = use(params);
   const router = useRouter();
   const { data = [], isLoading } = useReports();
-  const report = data.find(r => r.id === decodeURIComponent(id));
+  const report = data.find(r => r._id === decodeURIComponent(id));
 
-  const [form, setForm] = useState({ patientName: "", patientId: "", testName: "", reportType: "", department: "", requestedBy: "", requestDate: "", completedDate: "", status: "pending", notes: "" });
+  const [form, setForm] = useState({ patientName: "", patientId: "", testName: "", reportType: "", department: "", requestingDoctor: "", createdAt: "", completedDate: "", status: "pending", notes: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    if (report) setForm({ patientName: report.patientName, patientId: report.patientId, testName: report.testName, reportType: report.reportType, department: report.department, requestedBy: report.requestedBy, requestDate: report.requestDate, completedDate: report.completedDate || "", status: report.status, notes: report.notes || "" });
+    if (report) setForm({ patientName: report.patientName || "", patientId: report.patientId, testName: report.testName, reportType: report.reportType, department: report.department || "", requestingDoctor: report.requestingDoctor || "", createdAt: report.createdAt?.split("T")[0] || "", completedDate: report.completedDate || "", status: report.status, notes: report.notes || "" });
   }, [report]);
 
   const set = (k: string, v: string) => { setForm(f => ({ ...f, [k]: v })); setErrors(e => { const n = { ...e }; delete n[k]; return n; }); };
@@ -39,10 +39,10 @@ export default function EditReportPage({ params }: { params: Promise<{ id: strin
   if (!report) return <div className="p-16 text-center text-gray-400">Report not found</div>;
 
   return (
-    <FormPage title="Edit Report" description={`Editing: ${report.id}`} backHref={`/super-admin/reports/${encodeURIComponent(id)}`} onSubmit={handleSubmit} submitLabel="Save Changes">
+    <FormPage title="Edit Report" description={`Editing: ${report._id}`} backHref={`/super-admin/reports/${encodeURIComponent(id)}`} onSubmit={handleSubmit} submitLabel="Save Changes">
       <div className="flex items-center gap-3 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 px-5 py-3">
         <p className="text-xs font-semibold text-gray-400 uppercase">Report ID</p>
-        <p className="font-mono font-bold text-[#1E2B7A] dark:text-blue-400">{report.id}</p>
+        <p className="font-mono font-bold text-[#1E2B7A] dark:text-blue-400">{report._id}</p>
       </div>
       <FormSection title="Patient & Test Information">
         <FormField label="Patient Name" required error={errors.patientName}><FormInput value={form.patientName} onChange={e => set("patientName", e.target.value)} /></FormField>
@@ -55,8 +55,8 @@ export default function EditReportPage({ params }: { params: Promise<{ id: strin
             {DEPARTMENTS.map(d => <option key={d} value={d}>{d}</option>)}
           </FormSelect>
         </FormField>
-        <FormField label="Requested By"><FormInput value={form.requestedBy} onChange={e => set("requestedBy", e.target.value)} /></FormField>
-        <FormField label="Request Date"><FormInput type="date" value={form.requestDate} onChange={e => set("requestDate", e.target.value)} /></FormField>
+        <FormField label="Requested By"><FormInput value={form.requestingDoctor} onChange={e => set("requestingDoctor", e.target.value)} /></FormField>
+        <FormField label="Request Date"><FormInput type="date" value={form.createdAt} onChange={e => set("createdAt", e.target.value)} /></FormField>
         <FormField label="Completed Date"><FormInput type="date" value={form.completedDate} onChange={e => set("completedDate", e.target.value)} /></FormField>
         <FormField label="Status">
           <FormSelect value={form.status} onChange={e => set("status", e.target.value)}>

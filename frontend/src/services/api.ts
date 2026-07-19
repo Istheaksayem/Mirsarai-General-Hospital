@@ -185,7 +185,22 @@ export interface PatientProfileData {
 }
 
 export type PatientAppointment = Record<string, unknown>;
-export type PatientDocument = Record<string, unknown>;
+
+export interface PatientDocument {
+  _id: string;
+  patientId: string;
+  documentType: 'prescription' | 'diagnostic_report' | 'admission_form' | 'discharge_summary' | 'certificate' | 'bill_receipt' | 'other';
+  title: string;
+  department?: string;
+  fileUrl: string;
+  uploadedBy: { _id?: string; id?: string; role: string; fullName?: string };
+  notes?: string;
+  isDeleted: boolean;
+  date: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export type PatientNotification = Record<string, unknown>;
 export type PatientTimelineItem = Record<string, unknown>;
 
@@ -248,6 +263,29 @@ export function patientCreateAppointment(data: Record<string, unknown>) {
 
 export function patientGetDocuments() {
   return patientFetch<PatientDocument[]>('patient/documents');
+}
+
+export function patientGetDocumentFileUrl(docId: string) {
+  return `${API_URL}/patient/documents/${docId}/file`;
+}
+
+export async function patientFetchDocumentFile(docId: string): Promise<{ blob: Blob; filename: string }> {
+  const token = getPatientToken();
+  const res = await fetch(`${API_URL}/patient/documents/${docId}/file`, {
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: 'Failed to fetch document' }));
+    throw new Error(err.message || 'Failed to fetch document');
+  }
+  const blob = await res.blob();
+  const disposition = res.headers.get('Content-Disposition') || '';
+  const match = disposition.match(/filename="?(.+?)"?$/);
+  const filename = match ? match[1] : 'document';
+  return { blob, filename };
 }
 
 export function patientGetNotifications() {

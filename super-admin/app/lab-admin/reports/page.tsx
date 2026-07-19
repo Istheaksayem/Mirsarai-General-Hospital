@@ -8,74 +8,41 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { StatsCard } from "@/components/ui/StatsCard";
 import { StatsCardSkeleton } from "@/components/ui/Skeleton";
-import { useReports, useUpdateReportStatus, useDeleteReport, useDownloadReport } from "@/lib/hooks/useReports";
-import type { Report } from "@/lib/services/api";
+import { useReports, useReportStats, useUpdateReportStatus, useDeleteReport } from "@/lib/hooks/useReports";
+import type { UnifiedReport } from "@/lib/services/api";
 import { ActionButtons } from "@/components/ui/ActionButtons";
+import { env } from "@/config/env";
 
-const statusVariant: Record<Report["status"], "warning" | "info" | "success"> = {
+const statusVariant: Record<string, "warning" | "info" | "success"> = {
   pending: "warning",
   "in-progress": "info",
   completed: "success",
 };
 
-// Transform backend data to match frontend Report interface
-interface TransformedReport extends Record<string, unknown> {
-  id: string;
-  patientId: string;
-  patientName: string;
-  reportType: string;
-  testName: string;
-  status: "pending" | "in-progress" | "completed";
-  requestedBy: string;
-  department: string;
-  requestDate: string;
-  completedDate: string | null;
-  results: Record<string, string> | null;
-  notes: string;
-  _id: string;
-}
-
 export default function LabReportsPage() {
-  const { data: rawData = [], isLoading, refetch } = useReports();
+  const { data: rawData = [], isLoading } = useReports();
+  const { data: stats } = useReportStats();
   const updateStatus = useUpdateReportStatus();
   const deleteReport = useDeleteReport();
-  const downloadReport = useDownloadReport();
-  
+
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
   const [notification, setNotification] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
-  // Show notification
   const showNotification = (type: "success" | "error", message: string) => {
     setNotification({ type, message });
     setTimeout(() => setNotification(null), 3000);
   };
 
-  // Transform backend data to match expected format
-  const data: TransformedReport[] = rawData.map((report: any) => ({
-    id: report._id || report.id,
-    _id: report._id || report.id,
-    patientId: report.patientId,
-    patientName: report.patientId, // In real scenario, this should come from patient lookup
-    reportType: report.reportType,
-    testName: report.testName,
-    status: report.status === "completed" ? "completed" : report.status === "pending" ? "pending" : "in-progress",
-    requestedBy: report.requestingDoctor || report.requestedBy,
-    department: getDepartmentFromType(report.reportType),
-    requestDate: formatDate(report.createdAt),
-    completedDate: report.status === "completed" ? formatDate(report.updatedAt) : null,
-    results: null,
-    notes: "",
-  }));
+  const data = rawData as UnifiedReport[];
 
   const pending = data.filter((r) => r.status === "pending").length;
   const inProgress = data.filter((r) => r.status === "in-progress").length;
   const completed = data.filter((r) => r.status === "completed").length;
   const completionRate = data.length > 0 ? Math.round((completed / data.length) * 100) : 0;
 
-  const reportTypes = [...new Set(data.map((r) => r.reportType))];
-  const departments = [...new Set(data.map((r) => r.department))];
+  const reportTypes = [...new Set(data.map((r) => r.reportType).filter(Boolean))];
 
   const filtered = data.filter((r) => {
     const matchSearch =
@@ -87,20 +54,6 @@ export default function LabReportsPage() {
     const matchType = !typeFilter || r.reportType === typeFilter;
     return matchSearch && matchStatus && matchType;
   });
-
-  const handleView = async (row: Record<string, unknown>) => {
-    try {
-      const result = await downloadReport.mutateAsync(row._id as string);
-      if (result.data?.fileUrl) {
-        // Open file in new tab
-        window.open(result.data.fileUrl, '_blank');
-        showNotification("success", "Report opened successfully");
-      }
-    } catch (error) {
-      showNotification("error", "Failed to open report");
-      console.error(error);
-    }
-  };
 
   const handleDelete = async (row: Record<string, unknown>) => {
     try {
@@ -144,41 +97,37 @@ export default function LabReportsPage() {
       cell: (r) => <span className="text-sm text-gray-600 dark:text-gray-400">{r.department as string}</span>,
     },
     {
-      key: "requestedBy",
+      key: "requestingDoctor",
       header: "Requested By",
-      cell: (r) => <span className="text-sm text-gray-700 dark:text-gray-300">{r.requestedBy as string}</span>,
+      cell: (r) => <span className="text-sm text-gray-700 dark:text-gray-300">{(r.requestingDoctor as string) || "—"}</span>,
     },
     {
-      key: "requestDate",
+      key: "createdAt",
       header: "Request Date",
-      cell: (r) => <span className="text-sm text-gray-500">{r.requestDate as string}</span>,
+      cell: (r) => <span className="text-sm text-gray-500">{formatDate(r.createdAt as string)}</span>,
     },
     {
       key: "completedDate",
       header: "Completed",
       cell: (r) => (
-        <span className="text-sm text-gray-400">{(r.completedDate as string) || "—"}</span>
+        <span className="text-sm text-gray-400">{(r.completedDate as string) ? formatDate(r.completedDate as string) : "—"}</span>
       ),
     },
     {
       key: "status",
       header: "Status",
       cell: (r) => {
-        const s = r.status as Report["status"];
+        const s = r.status as string;
         return (
           <select
             value={s}
             onChange={async (e) => {
-              const newStatus = e.target.value as Report["status"];
+              const newStatus = e.target.value;
               try {
-                await updateStatus.mutateAsync({ 
-                  id: r._id as string, 
-                  status: newStatus 
-                });
+                await updateStatus.mutateAsync({ id: r._id as string, status: newStatus });
                 showNotification("success", `Report marked as ${newStatus}`);
-              } catch (error) {
+              } catch {
                 showNotification("error", "Failed to update report status");
-                console.error(error);
               }
             }}
             className={`text-xs px-2 py-1 rounded-md font-medium border focus:ring-2 focus:ring-offset-1 focus:outline-none ${
@@ -199,32 +148,32 @@ export default function LabReportsPage() {
       header: "Actions",
       headerClassName: "text-right",
       className: "text-right",
-      cell: (row) => (
-        <ActionButtons
-          row={row}
-          onView={handleView}
-          onDelete={handleDelete}
-          hideEdit
-        />
-      ),
+      cell: (row) => {
+        const r = row as Record<string, unknown>;
+        return (
+          <ActionButtons
+            row={r}
+            onView={() => {
+              const rawUrl = r.fileUrl as string;
+              if (!rawUrl) { showNotification("error", "No file available"); return; }
+              const backendBase = env.backendUrl || env.apiUrl.replace('/api/v1', '') || '';
+              const fullUrl = rawUrl.startsWith('http') ? rawUrl : `${backendBase}${rawUrl}`;
+              window.open(fullUrl, '_blank');
+            }}
+            onDelete={() => handleDelete(r)}
+            hideEdit
+          />
+        );
+      },
     },
   ];
 
   const handleExport = () => {
-    // Export to CSV
     const csvContent = [
       ["Report ID", "Patient ID", "Patient Name", "Test Name", "Report Type", "Status", "Requested By", "Department", "Request Date", "Completed Date"],
       ...filtered.map(r => [
-        r.id,
-        r.patientId,
-        r.patientName,
-        r.testName,
-        r.reportType,
-        r.status,
-        r.requestedBy,
-        r.department,
-        r.requestDate,
-        r.completedDate || "N/A"
+        r.id, r.patientId, r.patientName, r.testName, r.reportType,
+        r.status, r.requestingDoctor, r.department, r.createdAt?.split("T")[0], r.completedDate ? r.completedDate.split("T")[0] : "N/A",
       ])
     ].map(row => row.join(",")).join("\n");
 
@@ -240,13 +189,10 @@ export default function LabReportsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Notification Toast */}
       {notification && (
         <div className="fixed top-6 right-6 z-50 animate-in slide-in-from-top-5 fade-in duration-300">
           <div className={`rounded-lg px-4 py-3 shadow-lg ${
-            notification.type === "success" 
-              ? "bg-green-500 text-white" 
-              : "bg-red-500 text-white"
+            notification.type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"
           }`}>
             <p className="text-sm font-medium">{notification.message}</p>
           </div>
@@ -263,7 +209,6 @@ export default function LabReportsPage() {
         </Button>
       </PageHeader>
 
-      {/* Stats */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {isLoading ? (
           Array.from({ length: 4 }).map((_, i) => <StatsCardSkeleton key={i} />)
@@ -277,41 +222,6 @@ export default function LabReportsPage() {
         )}
       </div>
 
-      {/* Department breakdown */}
-      {!isLoading && departments.length > 0 && (
-        <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-5">
-          <div className="mb-4 flex items-center gap-2">
-            <TrendingUp className="h-4 w-4 text-[#76BC21]" />
-            <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-sm">Reports by Department</h3>
-          </div>
-          <div className="space-y-3">
-            {departments.map((dept) => {
-              const count = data.filter((r) => r.department === dept).length;
-              const pct = Math.round((count / data.length) * 100);
-              const deptCompleted = data.filter((r) => r.department === dept && r.status === "completed").length;
-              return (
-                <div key={dept}>
-                  <div className="mb-1 flex items-center justify-between">
-                    <span className="text-sm text-gray-700 dark:text-gray-300">{dept}</span>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-400">{deptCompleted}/{count} done</span>
-                      <span className="text-xs font-medium text-gray-500 dark:text-gray-400 w-8 text-right">{pct}%</span>
-                    </div>
-                  </div>
-                  <div className="h-2 w-full rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
-                    <div
-                      className="h-full rounded-full bg-gradient-to-r from-[#1E2B7A] to-[#76BC21] transition-all duration-500"
-                      style={{ width: `${pct}%` }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <SearchFilter
           value={search}
@@ -337,10 +247,9 @@ export default function LabReportsPage() {
         />
       </div>
 
-      {/* Table */}
       <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-4">
         <DataTable
-          data={filtered}
+          data={filtered as unknown as Record<string, unknown>[]}
           columns={columns}
           isLoading={isLoading}
           pageSize={10}
@@ -350,17 +259,6 @@ export default function LabReportsPage() {
       </div>
     </div>
   );
-}
-
-// Helper functions
-function getDepartmentFromType(type: string): string {
-  const map: Record<string, string> = {
-    blood: "Pathology",
-    imaging: "Radiology",
-    pathology: "Pathology",
-    microbiology: "Microbiology",
-  };
-  return map[type.toLowerCase()] || "General";
 }
 
 function formatDate(dateString: string | null | undefined): string {

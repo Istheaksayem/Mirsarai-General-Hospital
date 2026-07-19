@@ -147,6 +147,22 @@ export default function HealthBlogCmsPage() {
                   onUpload={handleImageUpload}
                   helpText="Main banner image (recommended: 1920×600px)"
                 />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <FormField label="Accent Color">
+                    <FormInput
+                      value={data.hero.color ?? "#1E2B7A"}
+                      disabled
+                      className="cursor-not-allowed opacity-60"
+                    />
+                  </FormField>
+                  <FormField label="Icon (Hero)">
+                    <FormInput
+                      value={data.hero.icon ?? "FaBlog"}
+                      disabled
+                      className="cursor-not-allowed opacity-60"
+                    />
+                  </FormField>
+                </div>
               </div>
 
               <hr className="border-gray-100 dark:border-gray-800" />

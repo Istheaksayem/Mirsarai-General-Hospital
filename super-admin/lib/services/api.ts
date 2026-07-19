@@ -127,8 +127,9 @@ export function formatApiError(err: ApiError): string {
   return err.message || "Something went wrong";
 }
 
-// ─── Image URL Normalization ──────────────────────────────────────────────────
+// ─── Imports ─────────────────────────────────────────────────────────────────
 
+import { env } from '@/config/env';
 import { getImageUrl } from '../getImageUrl';
 
 function normalizeImages(obj: unknown): unknown {
@@ -146,7 +147,7 @@ function normalizeImages(obj: unknown): unknown {
 
 // ─── Base Fetcher ─────────────────────────────────────────────────────────────
 
-const MOCK_BASE = "/mock-data";
+const MOCK_BASE = env.mockBase;
 
 async function fetchMock<T>(path: string): Promise<T> {
   const res = await fetch(`${MOCK_BASE}/${path}`, { cache: "no-store" });
@@ -171,14 +172,21 @@ export const getReports = () => fetchMock<Report[]>("reports.json");
 export interface LabReportData {
   _id: string;
   patientId: string;
+  patientName: string;
   testName: string;
   reportType: string;
   requestingDoctor: string;
   fileUrl: string;
-  status: "pending" | "completed";
+  status: "pending" | "in-progress" | "completed";
   uploadedBy: string;
   createdAt: string;
   updatedAt: string;
+  department?: string;
+  requestedBy?: string;
+  requestDate?: string;
+  completedDate?: string;
+  notes?: string;
+  results?: Record<string, unknown>;
 }
 
 export interface LabReportListResponse {
@@ -249,7 +257,7 @@ export const uploadDocument = (formData: FormData) => {
   const headers: Record<string, string> = {};
   if (typeof window !== 'undefined') {
     try {
-      const raw = sessionStorage.getItem('mgh_admin_user');
+      const raw = sessionStorage.getItem(env.authStorageKey);
       if (raw) { const user = JSON.parse(raw); if (user.token) headers['Authorization'] = `Bearer ${user.token}`; }
     } catch {}
   }
@@ -275,6 +283,9 @@ export const getDocuments = (params?: Record<string, string>) => {
 
 export const deleteDocument = (id: string) =>
   mutateAdminReal<null>(`lab/documents/${id}`, undefined, 'DELETE');
+
+export const updateDocument = (id: string, data: Record<string, unknown>) =>
+  mutateAdminReal<Record<string, unknown>>(`lab/documents/${id}`, data, 'PUT');
 
 // ─── Patient Portal API ──────────────────────────────────────────────────────
 
@@ -365,7 +376,7 @@ export const getLabReports = () => fetchAdminReal<{ data: LabReportData[] }>("la
 export const getLabReportById = (id: string) => fetchAdminReal<{ data: LabReportData }>(`lab-reports/${id}`);
 
 // Update lab report status
-export const updateLabReportStatus = (id: string, status: "pending" | "completed") =>
+export const updateLabReportStatus = (id: string, status: LabReportData["status"]) =>
   mutateAdminReal<LabReportData>(`lab-reports/${id}/status`, { status }, "PATCH");
 
 // Delete lab report
@@ -381,7 +392,7 @@ export const uploadLabReport = (formData: FormData) => {
   const headers: Record<string, string> = {};
   if (typeof window !== 'undefined') {
     try {
-      const raw = sessionStorage.getItem('mgh_admin_user');
+      const raw = sessionStorage.getItem(env.authStorageKey);
       if (raw) { const user = JSON.parse(raw); if (user.token) headers['Authorization'] = `Bearer ${user.token}`; }
     } catch {}
   }
@@ -405,6 +416,74 @@ export const uploadLabReport = (formData: FormData) => {
 
 // Get recent lab reports
 export const getRecentLabReports = () => fetchAdminReal<{ data: LabReportData[] }>("lab-reports/recent");
+
+// ─── Unified Reports (Document-backed, replaces LabReport) ─────────────────
+
+export interface UnifiedReport {
+  _id: string;
+  id: string;
+  patientId: string;
+  patientName: string;
+  testName: string;
+  reportType: string;
+  requestingDoctor: string;
+  department: string;
+  fileUrl: string;
+  status: 'pending' | 'in-progress' | 'completed';
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+  completedDate: string | null;
+}
+
+export interface ReportStats {
+  total: number;
+  pending: number;
+  inProgress: number;
+  completed: number;
+  completionRate: number;
+}
+
+export const getUnifiedReports = (params?: Record<string, string>) => {
+  const q = params ? '?' + new URLSearchParams(params).toString() : '';
+  return fetchAdminReal<{ data: UnifiedReport[]; meta: { total: number; page: number; limit: number } }>(`reports${q}`);
+};
+
+export const getUnifiedReportById = (id: string) =>
+  fetchAdminReal<{ data: UnifiedReport }>(`reports/${id}`);
+
+export const updateUnifiedReportStatus = (id: string, status: UnifiedReport['status']) =>
+  mutateAdminReal<UnifiedReport>(`reports/${id}/status`, { status }, 'PATCH');
+
+export const deleteUnifiedReport = (id: string) =>
+  mutateAdminReal<null>(`reports/${id}`, undefined, 'DELETE');
+
+export const getReportStats = () =>
+  fetchAdminReal<{ data: ReportStats }>('reports/stats');
+
+export const createUnifiedReport = (formData: FormData) => {
+  const headers: Record<string, string> = {};
+  if (typeof window !== 'undefined') {
+    try {
+      const raw = sessionStorage.getItem(env.authStorageKey);
+      if (raw) { const user = JSON.parse(raw); if (user.token) headers['Authorization'] = `Bearer ${user.token}`; }
+    } catch {}
+  }
+  return fetch(`${BACKEND_API}/reports`, {
+    method: 'POST',
+    headers,
+    body: formData,
+  }).then(async (res) => {
+    if (!res.ok) {
+      const errorText = await res.text();
+      let errorMessage = 'Failed to upload report';
+      try { const parsed = JSON.parse(errorText); errorMessage = parsed.message || errorMessage; } catch {}
+      throw new ApiError(res.status, errorMessage);
+    }
+    return res.json();
+  });
+};
+
 export const getNotifications = () => fetchMock<Notification[]>("notifications.json");
 export const getRoles = () => fetchMock<RoleData[]>("roles.json");
 export const getActivities = () => fetchMock<Activity[]>("activities.json");
@@ -508,7 +587,7 @@ export interface HeroData {
   decorativeShapes: DecorativeShapesConfig;
 }
 
-const BACKEND_API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+const BACKEND_API = env.apiUrl;
 
 async function fetchReal<T>(path: string): Promise<T> {
   const res = await fetch(`${BACKEND_API}/${path}`, {
@@ -548,7 +627,7 @@ async function saveReal<T>(path: string, data: Partial<T>, method: "PUT" | "PATC
     throw new ApiError(res.status, errorMessage);
   }
   const result = await res.json();
-  return normalizeImages(result.data) as T;
+  return result.data as T;
 }
 
 export const getAdminHomepage = () => fetchReal<HomepageData>("homepage");
@@ -578,15 +657,30 @@ export interface AboutUsStat {
   value: string;
 }
 
+export interface FeatureItem {
+  title: LocalizedString;
+  description: LocalizedString;
+  color: string;
+}
+
+export interface FeaturesSection {
+  badge: LocalizedString;
+  heading: LocalizedString;
+  description: LocalizedString;
+  items: FeatureItem[];
+}
+
 export interface AboutUsData {
   _id?: string;
   title: LocalizedString;
   subtitle: LocalizedString;
+  storyHeading: LocalizedString;
   description: LocalizedString;
   content: LocalizedString[];
   statistics: AboutUsStat[];
   image: string;
   features: LocalizedString[];
+  featuresSection: FeaturesSection;
   sections: Record<string, SectionConfig>;
   seo: SeoConfig;
   createdBy?: string;
@@ -598,12 +692,27 @@ export interface CoreValue {
   description: LocalizedString;
 }
 
+export interface WhyItMattersItem {
+  title: LocalizedString;
+  description: LocalizedString;
+  color: string;
+}
+
 export interface MissionVisionData {
   _id?: string;
   title: LocalizedString;
   mission: { title: LocalizedString; description: LocalizedString };
   vision: { title: LocalizedString; description: LocalizedString };
   coreValues: CoreValue[];
+  commitmentHeading: LocalizedString;
+  commitmentDescription: LocalizedString;
+  whyItMattersHeading: LocalizedString;
+  whyItMattersDescription: LocalizedString;
+  whyItMattersItems: WhyItMattersItem[];
+  ctaHeading: LocalizedString;
+  ctaDescription: LocalizedString;
+  ctaPrimaryButtonText: LocalizedString;
+  ctaSecondaryButtonText: LocalizedString;
   image: string;
   sections: Record<string, SectionConfig>;
   seo: SeoConfig;
@@ -736,7 +845,7 @@ export interface OurTeamData {
 }
 
 export const getOurTeamData = () => fetchReal<OurTeamData>("about/our-team");
-export const updateOurTeamData = (data: Partial<OurTeamData>) => saveReal<OurTeamData>("about/our-team", data, "PUT");
+export const updateOurTeamData = (data: Partial<OurTeamData>) => mutateAdminReal<OurTeamData>("about/our-team", data, "PUT");
 
 // Image upload helper
 export async function uploadCmsImage(base64Data: string): Promise<string> {
@@ -847,7 +956,7 @@ export async function uploadProfilePhoto(file: File): Promise<{ url: string }> {
   const headers: Record<string, string> = {};
   if (typeof window !== "undefined") {
     try {
-      const raw = sessionStorage.getItem("mgh_admin_user");
+      const raw = sessionStorage.getItem(env.authStorageKey);
       if (raw) {
         const user = JSON.parse(raw);
         if (user.token) headers["Authorization"] = `Bearer ${user.token}`;
@@ -875,7 +984,7 @@ function getAuthHeaders(): Record<string, string> {
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (typeof window !== "undefined") {
     try {
-      const raw = sessionStorage.getItem("mgh_admin_user");
+      const raw = sessionStorage.getItem(env.authStorageKey);
       if (raw) {
         const user = JSON.parse(raw);
         if (user.token) headers["Authorization"] = `Bearer ${user.token}`;
@@ -913,7 +1022,7 @@ async function mutateAdminReal<T>(path: string, data: unknown, method: "POST" | 
     throw new ApiError(res.status, errorMessage);
   }
   const result = await res.json();
-  return normalizeImages(result.data) as T;
+  return result.data as T;
 }
 
 export const getCmsDoctors = (params: DoctorQueryParams = {}) => {
@@ -968,6 +1077,9 @@ export const activateStaffMember = (id: string) =>
 export const deactivateStaffMember = (id: string) =>
   mutateAdminReal<StaffMember>(`admin/staff/${id}/deactivate`, {}, "PATCH");
 
+export const createStaffMember = (data: { fullName: string; email: string; phone?: string; password: string; role: string }) =>
+  mutateAdminReal<StaffMember>("admin/staff", data, "POST");
+
 // ─── Doctor Self Profile (authenticated doctor) ────────────────────────────────
 
 export interface DoctorProfileData {
@@ -1010,7 +1122,7 @@ function getDoctorAuthHeaders(): Record<string, string> {
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (typeof window !== "undefined") {
     try {
-      const raw = sessionStorage.getItem("mgh_admin_user");
+      const raw = sessionStorage.getItem(env.authStorageKey);
       if (raw) {
         const user = JSON.parse(raw);
         if (user.token) headers["Authorization"] = `Bearer ${user.token}`;
@@ -1346,6 +1458,28 @@ export const deleteCmsAppointment = (id: string) =>
 export const updateCmsAppointmentStatus = (id: string, status: string) =>
   mutateAdminReal<CmsAppointment>(`admin/appointments/${id}/status`, { status }, "PATCH");
 
+// ─── Doctor Appointment API (uses dedicated /doctors/appointments endpoints) ──
+
+export const getDoctorAppointments = (params: Record<string, string> = {}) => {
+  const q = new URLSearchParams(params).toString();
+  return fetchAdminReal<CmsAppointmentListResponse>(`doctors/appointments${q ? `?${q}` : ""}`);
+};
+
+export const getDoctorTodaysAppointments = () => {
+  return fetchAdminReal<{ data: CmsAppointment[]; success?: boolean; message?: string }>("doctors/appointments/today");
+};
+
+export const getDoctorAppointmentById = (id: string) =>
+  fetchAdminReal<{ data: CmsAppointment }>(`doctors/appointments/${id}`);
+
+export const getDoctorCompletedAppointments = (params: Record<string, string> = {}) => {
+  const q = new URLSearchParams(params).toString();
+  return fetchAdminReal<CmsAppointmentListResponse>(`doctors/appointments/completed${q ? `?${q}` : ""}`);
+};
+
+export const updateDoctorAppointmentStatus = (id: string, status: string) =>
+  mutateAdminReal<CmsAppointment>(`doctors/appointments/${id}/status`, { status }, "PATCH");
+
 // ─── Service Page CMS Types ─────────────────────────────────────────────────
 
 export interface ServicePageFeature {
@@ -1364,7 +1498,7 @@ export interface ServicePageCategory {
 
 export interface ServicePageWorkingHours {
   weekdays: string;
-  weekends: string;
+  weekends?: string;
   emergency: BilingualField;
 }
 
@@ -1440,6 +1574,8 @@ export interface HealthBlogData {
     subtitle: BilingualField;
     description: BilingualField;
     image: string;
+    color?: string;
+    icon?: string;
   };
   categories: { id: string; name: BilingualField }[];
   posts: HealthBlogPost[];
@@ -1542,6 +1678,47 @@ export interface FAQData {
   updatedBy?: string;
 }
 
+export interface AppointmentPageFeatureCard {
+  icon: string;
+  title: LocalizedString;
+  description: LocalizedString;
+}
+
+export interface AppointmentPageData {
+  _id?: string;
+  hero: {
+    title: LocalizedString;
+    subtitle: LocalizedString;
+    description: LocalizedString;
+    image: string;
+  };
+  features: AppointmentPageFeatureCard[];
+  whyChooseUs: {
+    title: LocalizedString;
+    items: LocalizedString[];
+  };
+  emergencyBanner: {
+    title: LocalizedString;
+    description: LocalizedString;
+    buttonText: LocalizedString;
+    phone: string;
+  };
+  contactCard: {
+    title: LocalizedString;
+    description: LocalizedString;
+    phone: string;
+  };
+  formSection: {
+    title: LocalizedString;
+    description: LocalizedString;
+  };
+  disclaimer: LocalizedString;
+  sections: Record<string, SectionConfig>;
+  seo: SeoConfig;
+  createdBy?: string;
+  updatedBy?: string;
+}
+
 // ─── Resource Page CMS API Functions ──────────────────────────────────────
 
 export const getHealthBlog = () => fetchReal<HealthBlogData>("health-blog");
@@ -1555,3 +1732,7 @@ export const updateEmergencyInfo = (data: Partial<EmergencyInfoData>) =>
 export const getFAQData = () => fetchReal<FAQData>("faq");
 export const updateFAQData = (data: Partial<FAQData>) =>
   mutateAdminReal<FAQData>("admin/faq", data, "PUT");
+
+export const getAppointmentPageData = () => fetchReal<AppointmentPageData>("appointment-page");
+export const updateAppointmentPageData = (data: Partial<AppointmentPageData>) =>
+  mutateAdminReal<AppointmentPageData>("admin/appointment-page", data, "PUT");

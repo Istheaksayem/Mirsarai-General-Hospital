@@ -1,48 +1,77 @@
 "use client";
 import { useState } from "react";
-import { Users } from "lucide-react";
+import { Users, Eye } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SearchFilter } from "@/components/ui/SearchFilter";
 import { DataTable, Column } from "@/components/ui/DataTable";
 import { Badge } from "@/components/ui/Badge";
-import { usePatients } from "@/lib/hooks/usePatients";
-import { createActionColumn } from "@/components/ui/ActionButtons";
-
-const columns: Column<Record<string, unknown>>[] = [
-  { key: "id", header: "ID", cell: (r) => <span className="font-mono text-xs text-gray-400">{r.id as string}</span> },
-  {
-    key: "name", header: "Patient",
-    cell: (r) => (
-      <div className="flex items-center gap-2.5">
-        <div className="h-8 w-8 shrink-0 rounded-full bg-[#1E2B7A]/10 flex items-center justify-center">
-          <span className="text-xs font-semibold text-[#1E2B7A] dark:text-blue-400">{(r.name as string).charAt(0)}</span>
-        </div>
-        <div>
-          <p className="font-medium text-gray-900 dark:text-gray-100">{r.name as string}</p>
-          <p className="text-xs text-gray-400">{r.gender as string} · {r.age as number}y</p>
-        </div>
-      </div>
-    ),
-  },
-  { key: "phone", header: "Phone" },
-  { key: "diagnosis", header: "Diagnosis", cell: (r) => <span className="text-sm text-gray-500 dark:text-gray-400">{(r.diagnosis as string) || "—"}</span> },
-  { key: "lastVisit", header: "Last Visit", cell: (r) => <span className="text-sm text-gray-400">{(r.lastVisit as string) || "—"}</span> },
-  { key: "status", header: "Status", cell: (r) => <Badge variant={r.status === "active" ? "success" : r.status === "admitted" ? "info" : "warning"}>{r.status as string}</Badge> },
-  createActionColumn(),
-];
+import { useDoctorCompletedAppointments } from "@/lib/hooks/useCmsAppointments";
+import { useRouter } from "next/navigation";
 
 export default function DoctorPatientsPage() {
-  const { data = [], isLoading } = usePatients();
+  const router = useRouter();
   const [search, setSearch] = useState("");
-  const filtered = data.filter((p) =>
-    !search || p.name.toLowerCase().includes(search.toLowerCase()) || p.id.toLowerCase().includes(search.toLowerCase())
-  ) as unknown as Record<string, unknown>[];
+  const [page, setPage] = useState(1);
+
+  const params: Record<string, string> = { page: String(page), limit: "10" };
+  if (search) params.search = search;
+
+  const { data, isLoading } = useDoctorCompletedAppointments(params);
+  const appointments = data?.data || [];
+  const total = data?.total || 0;
+
+  const columns: Column<Record<string, unknown>>[] = [
+    {
+      key: "patientName", header: "Patient",
+      cell: (r) => (
+        <div>
+          <p className="font-medium text-gray-900 dark:text-gray-100">{r.patientName as string}</p>
+          <p className="text-xs text-gray-400">{r.patientAge as number}y · {r.patientGender as string} · {r.patientPhone as string}</p>
+        </div>
+      ),
+    },
+    {
+      key: "date", header: "Date & Time",
+      cell: (r) => {
+        const d = r.date as string;
+        const formatted = d ? new Date(d).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "—";
+        return <div><p className="font-medium">{formatted}</p><p className="text-xs text-gray-400">{r.time as string}</p></div>;
+      },
+    },
+    { key: "type", header: "Type", cell: (r) => <Badge variant="info">{r.type as string}</Badge> },
+    { key: "reason", header: "Reason / Notes", cell: (r) => <span className="text-sm text-gray-500 dark:text-gray-400">{(r.reason as string) || (r.notes as string) || "—"}</span> },
+    {
+      key: "__actions__",
+      header: "Actions",
+      headerClassName: "text-right",
+      className: "text-right",
+      cell: (row) => {
+        const id = row._id as string;
+        return (
+          <button
+            onClick={() => router.push(`/doctor/appointments/${id}`)}
+            title="View"
+            className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors"
+          >
+            <Eye className="h-3.5 w-3.5" />
+          </button>
+        );
+      },
+    },
+  ];
+
   return (
     <div className="space-y-6">
-      <PageHeader title="Patient History" description={`${data.length} patients`} icon={Users} />
-      <SearchFilter value={search} onChange={setSearch} placeholder="Search patient..." className="max-w-sm" />
+      <PageHeader title="Patient History" description={`${total} completed appointments`} icon={Users} />
+      <SearchFilter value={search} onChange={(v) => { setSearch(v); setPage(1); }} placeholder="Search patient..." className="max-w-sm" />
       <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-4">
-        <DataTable data={filtered} columns={columns} isLoading={isLoading} pageSize={8} emptyTitle="No patients found" />
+        <DataTable
+          data={appointments as unknown as Record<string, unknown>[]}
+          columns={columns}
+          isLoading={isLoading}
+          pageSize={10}
+          emptyTitle="No completed appointments"
+        />
       </div>
     </div>
   );

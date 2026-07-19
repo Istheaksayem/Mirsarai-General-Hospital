@@ -1,5 +1,6 @@
 import express from 'express';
 import * as DoctorController from '../controllers/doctor.controller.js';
+import * as AppointmentController from '../controllers/appointment.controller.js';
 import validate from '../middlewares/validate.middleware.js';
 import { authenticate, authorize } from '../middlewares/auth.middleware.js';
 import {
@@ -8,6 +9,7 @@ import {
   doctorQuerySchema,
   doctorProfileSchema,
 } from '../validators/doctor.validator.js';
+import { updateDoctorStatusSchema } from '../validators/appointment.validator.js';
 
 const router = express.Router();
 
@@ -28,6 +30,41 @@ router.get('/me', authenticate, authorize('doctor'), DoctorController.getMyProfi
  * @access Private (doctor)
  */
 router.put('/me', authenticate, authorize('doctor'), validate(doctorProfileSchema), DoctorController.createOrUpdateMyProfile);
+
+/**
+ * @route  GET /api/v1/doctors/appointments
+ * @desc   Get all appointments for the logged-in doctor
+ * @access Private (doctor)
+ */
+router.get('/appointments', authenticate, authorize('doctor'), AppointmentController.getMyAppointments);
+
+/**
+ * @route  GET /api/v1/doctors/appointments/today
+ * @desc   Get today's appointments for the logged-in doctor
+ * @access Private (doctor)
+ */
+router.get('/appointments/today', authenticate, authorize('doctor'), AppointmentController.getMyTodaysAppointments);
+
+/**
+ * @route  GET /api/v1/doctors/appointments/completed
+ * @desc   Get completed appointments for the logged-in doctor (Patient History)
+ * @access Private (doctor)
+ */
+router.get('/appointments/completed', authenticate, authorize('doctor'), AppointmentController.getMyCompletedAppointments);
+
+/**
+ * @route  GET /api/v1/doctors/appointments/:id
+ * @desc   Get a single appointment by ID (must be assigned doctor)
+ * @access Private (doctor)
+ */
+router.get('/appointments/:id', authenticate, authorize('doctor'), AppointmentController.getMyAppointmentById);
+
+/**
+ * @route  PATCH /api/v1/doctors/appointments/:id/status
+ * @desc   Update appointment status (assigned doctor only)
+ * @access Private (doctor)
+ */
+router.patch('/appointments/:id/status', authenticate, authorize('doctor'), validate(updateDoctorStatusSchema), AppointmentController.updateDoctorAppointmentStatus);
 
 // ── PUBLIC ROUTES ──────────────────────────────────────────────────────────────
 // These are open — no auth required

@@ -18,7 +18,7 @@ export default function PatientDashboard() {
   const stats = [
     { label: "Upcoming Appointments", value: upcoming.length, icon: FiCalendar, color: "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400" },
     { label: "Unread Notifications",  value: unread.length, icon: FiBell,     color: "bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400" },
-    { label: "Documents", value: (documents as Record<string, unknown>[]).length, icon: FiFileText, color: "bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400" },
+    { label: "Documents", value: documents.length, icon: FiFileText, color: "bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400" },
     { label: "Active Prescriptions",  value: 0, icon: FiHeart,    color: "bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400" },
   ];
 
@@ -48,8 +48,8 @@ export default function PatientDashboard() {
       {nextAppointment && (
         <div className="bg-gradient-to-r from-[#1E2B7A] to-[#243282] rounded-2xl p-6 text-white shadow-lg">
           <p className="text-xs font-bold uppercase tracking-widest opacity-70 mb-2">Next Appointment</p>
-          <h3 className="text-xl font-black mb-1">{doc?.name as string || "Doctor"}</h3>
-          <p className="text-sm opacity-80 mb-4">{doc?.department as string || ""}</p>
+          <h3 className="text-xl font-black mb-1">{(doc?.name as any)?.en ?? (doc?.name as any)?.bn ?? "Doctor"}</h3>
+          <p className="text-sm opacity-80 mb-4">{(doc?.department as any)?.en ?? (doc?.department as any)?.bn ?? ""}</p>
           <div className="flex items-center gap-6 text-sm">
             <div className="flex items-center gap-2"><FiCalendar size={14} /><span>{new Date(nextAppointment.date as string).toLocaleDateString()}</span></div>
             <div className="flex items-center gap-2"><FiClock size={14} /><span>{nextAppointment.time as string}</span></div>

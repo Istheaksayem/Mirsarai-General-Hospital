@@ -1,9 +1,18 @@
 import { z } from 'zod';
 
-const bilingualZ = z.object({ en: z.string().min(1), bn: z.string().default('') });
+// Bilingual: en required, bn optional (defaults to '')
+const bilingualZ = z.object({ en: z.string().min(1, 'English text is required'), bn: z.string().default('') });
+// Bilingual: both en and bn required
+const bilingualReqZ = z.object({
+  en: z.string().min(1, 'English text is required'),
+  bn: z.string().min(1, 'Bangla text is required'),
+});
+// Bilingual: optional, but when provided both en and bn are required
 const bilingualOptZ = z.object({ en: z.string().default(''), bn: z.string().default('') }).optional();
+// Bilingual: optional, but when provided both en and bn must be non-empty
+const bilingualReqOptZ = bilingualReqZ.optional();
 
-const serviceZ = z.object({ en: z.string().min(1), bn: z.string().default('') });
+const serviceZ = z.object({ en: z.string().min(1, 'Service English text is required'), bn: z.string().default('') });
 
 const timeSlotZ = z.object({
   day:       z.string().min(1),
@@ -15,31 +24,31 @@ const timeSlotZ = z.object({
 // ── Create Doctor Schema ──────────────────────────────────────────────────────
 export const createDoctorSchema = z.object({
   body: z.object({
-    name:           bilingualZ,
+    name:           bilingualReqZ,
     slug:           z.string().min(1).regex(/^[a-z0-9-]+$/, 'Slug must be lowercase alphanumeric with hyphens').optional(),
-    designation:    bilingualZ,
-    specialization: bilingualZ,
-    department:     bilingualZ,
-    qualification:  z.string().min(1),
+    designation:    bilingualReqZ,
+    specialization: bilingualReqZ,
+    department:     bilingualReqZ,
+    qualification:  z.string().min(1, 'Qualification is required'),
     experience: z.object({
-      years: z.number().min(0).default(0),
-      label: bilingualOptZ,
-    }).optional(),
+      years: z.number().min(0, 'Experience years must be 0 or more'),
+      label: bilingualReqZ,
+    }),
     registrationNumber: z.string().optional(),
     languages: z.array(z.string()).default(['Bangla', 'English']),
-    about:      bilingualOptZ,
+    about:      bilingualReqZ,
     services:   z.array(serviceZ).default([]),
     consultationFee: z.number().min(0).default(0),
-    chamberTime: bilingualOptZ,
+    chamberTime: bilingualReqZ,
     timeSlots:   z.array(timeSlotZ).default([]),
     availableDays: z.array(z.string()).default([]),
     onlineConsultation:   z.boolean().default(false),
     offlineConsultation:  z.boolean().default(true),
     appointmentAvailable: z.boolean().default(true),
-    phone:   z.string().optional(),
-    email:   z.string().email().optional(),
-    address: bilingualOptZ,
-    chamberAddress: bilingualOptZ,
+    phone:   z.string().min(1, 'Phone number is required'),
+    email:   z.string().email('Valid email is required'),
+    address: bilingualReqZ,
+    chamberAddress: bilingualReqZ,
     image:         z.string().optional(),
     bannerImage:   z.string().optional(),
     galleryImages: z.array(z.string()).default([]),
@@ -56,36 +65,34 @@ export const createDoctorSchema = z.object({
   }),
 });
 
-// ── Update Doctor Schema (all fields optional, no defaults) ────────────────────
-// Each field is explicitly .optional() WITHOUT .default() to prevent silently
-// overwriting existing data in MongoDB during partial updates.
+// ── Update Doctor Schema (all fields optional, but when provided enforce bilingual) ──
 export const updateDoctorSchema = z.object({
   body: z.object({
-    name:              bilingualZ.optional(),
+    name:              bilingualReqZ.optional(),
     slug:              z.string().min(1).regex(/^[a-z0-9-]+$/, 'Slug must be lowercase alphanumeric with hyphens').optional(),
-    designation:       bilingualZ.optional(),
-    specialization:    bilingualZ.optional(),
-    department:        bilingualZ.optional(),
+    designation:       bilingualReqZ.optional(),
+    specialization:    bilingualReqZ.optional(),
+    department:        bilingualReqZ.optional(),
     qualification:     z.string().min(1).optional(),
     experience: z.object({
       years: z.number().min(0),
-      label: bilingualOptZ,
+      label: bilingualReqZ,
     }).optional(),
     registrationNumber:   z.string().optional(),
     languages:            z.array(z.string()).optional(),
-    about:                bilingualOptZ,
+    about:                bilingualReqOptZ,
     services:             z.array(serviceZ).optional(),
     consultationFee:      z.number().min(0).optional(),
-    chamberTime:          bilingualOptZ,
+    chamberTime:          bilingualReqOptZ,
     timeSlots:            z.array(timeSlotZ).optional(),
     availableDays:        z.array(z.string()).optional(),
     onlineConsultation:   z.boolean().optional(),
     offlineConsultation:  z.boolean().optional(),
     appointmentAvailable: z.boolean().optional(),
-    phone:                z.string().optional(),
+    phone:                z.string().min(1).optional(),
     email:                z.string().email().optional(),
-    address:              bilingualOptZ,
-    chamberAddress:       bilingualOptZ,
+    address:              bilingualReqOptZ,
+    chamberAddress:       bilingualReqOptZ,
     image:                z.string().optional(),
     bannerImage:          z.string().optional(),
     galleryImages:        z.array(z.string()).optional(),
@@ -153,7 +160,7 @@ export const doctorProfileSchema = z.object({
 
     // ── Bilingual fields (all mandatory) ────────────────────────────────
     name: z.object({
-      en: z.string().optional().default(''),
+      en: z.string().min(1, 'Name (English) is required'),
       bn: z.string().min(1, 'Name (Bengali) is required'),
     }),
     about: z.object({
@@ -165,9 +172,9 @@ export const doctorProfileSchema = z.object({
       bn: z.string().min(1, 'Chamber time (Bengali) is required'),
     }),
     chamberAddress: z.object({
-      en: z.string().optional().default(''),
-      bn: z.string().optional().default(''),
-    }).optional(),
+      en: z.string().min(1, 'Chamber address (English) is required'),
+      bn: z.string().min(1, 'Chamber address (Bengali) is required'),
+    }),
     services: z.array(
       z.object({ en: z.string().default(''), bn: z.string().default('') })
     ).default([]),

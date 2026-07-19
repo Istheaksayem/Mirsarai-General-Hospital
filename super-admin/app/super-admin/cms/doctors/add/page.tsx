@@ -2,22 +2,37 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Save, Stethoscope, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Save, Stethoscope, CheckCircle2, AlertCircle } from "lucide-react";
 import { LanguageTabs } from "@/components/cms/LanguageTabs";
 import { RichTextEditor } from "@/components/cms/RichTextEditor";
 import { ImageUploader } from "@/components/cms/ImageUploader";
-import { SeoFields } from "@/components/cms/SeoFields";
+import { SeoFields, type SeoValue } from "@/components/cms/SeoFields";
 import { FormField, FormInput, FormSelect, FormSection } from "@/components/ui/FormPage";
 import { ChamberTimePicker } from "@/components/doctors/ChamberTimePicker";
 import { LanguageMultiSelect } from "@/components/doctors/LanguageMultiSelect";
+import { env } from "@/config/env";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+const API_URL = env.apiUrl;
 const DEPARTMENTS = ["General Medicine","Cardiology","Orthopedics","Neurology","Gynecology","Pediatrics","Gastroenterology","Dermatology","ENT","Ophthalmology","Urology","Radiology","Pathology","Emergency"];
+const SPECIALIZATIONS = ["Medicine Specialist","Cardiologist","Orthopedic Surgeon","Neurologist","Gynecologist","Pediatrician","Gastroenterologist","Dermatologist","ENT Specialist","Ophthalmologist","Urologist","Radiologist","Pathologist","Emergency Medicine Specialist"];
 
 type Bi = { en: string; bn: string };
 const bi = (en = "", bn = ""): Bi => ({ en, bn });
 
 interface ServiceItem { en: string; bn: string }
+
+interface Errors {
+  nameEn?: string; nameBn?: string;
+  designationEn?: string; designationBn?: string;
+  specializationEn?: string; specializationBn?: string;
+  departmentEn?: string; departmentBn?: string;
+  qualification?: string;
+  chamberTimeEn?: string; chamberTimeBn?: string;
+  aboutEn?: string; aboutBn?: string;
+  addressEn?: string; addressBn?: string;
+  phone?: string; email?: string;
+  experience?: string;
+}
 
 export default function AddDoctorCmsPage() {
   const router = useRouter();
@@ -25,36 +40,24 @@ export default function AddDoctorCmsPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
+  const [errors, setErrors] = useState<Errors>({});
 
   const [form, setForm] = useState({
-    // ── ⭐ Basic Information ──────────────────────────────
     name:        bi(), designation: bi(), specialization: bi(), department: bi(),
     qualification: "", registrationNumber: "", languages: ["Bangla", "English"],
     status: "active", available: true, featured: false, isVisible: true,
     displayOrder: 0,
-
-    // ── 📌 Biography ─────────────────────────────────────
     about:    bi(),
-
-    // ── Professional ─────────────────────────────────────
     experienceYears: 0,
     services: [] as ServiceItem[],
-
-    // ── 🔥 Consultation Schedule ─────────────────────────
     consultationFee: 0,
     chamberTimeEn: "", chamberTimeBn: "",
     availableDays: [] as string[],
     onlineConsultation: false, offlineConsultation: true,
     appointmentAvailable: true,
-
-    // ── Contact ───────────────────────────────────────────
     phone: "", email: "",
     addressEn: "", addressBn: "",
-
-    // ── ⭐ Media ──────────────────────────────────────────
     image: "", bannerImage: "",
-
-    // ── SEO ───────────────────────────────────────────────
     seo: { metaTitle: bi(), metaDescription: bi(), keywords: [] as string[] },
   });
 
@@ -86,11 +89,32 @@ export default function AddDoctorCmsPage() {
     set("services", form.services.filter((_, idx) => idx !== i));
   };
 
+  const validate = (): boolean => {
+    const e: Errors = {};
+    if (!form.name.en?.trim()) e.nameEn = "Name (English) is required";
+    if (!form.name.bn?.trim()) e.nameBn = "Name (Bangla) is required";
+    if (!form.designation.en?.trim()) e.designationEn = "Designation (English) is required";
+    if (!form.designation.bn?.trim()) e.designationBn = "Designation (Bangla) is required";
+    if (!form.specialization.en?.trim()) e.specializationEn = "Specialization (English) is required";
+    if (!form.specialization.bn?.trim()) e.specializationBn = "Specialization (Bangla) is required";
+    if (!form.department.en?.trim()) e.departmentEn = "Department (English) is required";
+    if (!form.department.bn?.trim()) e.departmentBn = "Department (Bangla) is required";
+    if (!form.qualification?.trim()) e.qualification = "Qualification is required";
+    if (!form.chamberTimeEn?.trim()) e.chamberTimeEn = "Chamber time (English) is required";
+    if (!form.chamberTimeBn?.trim()) e.chamberTimeBn = "Chamber time (Bangla) is required";
+    if (!form.about.en?.trim()) e.aboutEn = "About (English) is required";
+    if (!form.about.bn?.trim()) e.aboutBn = "About (Bangla) is required";
+    if (!form.addressEn?.trim()) e.addressEn = "Address (English) is required";
+    if (!form.addressBn?.trim()) e.addressBn = "Address (Bangla) is required";
+    if (!form.phone?.trim()) e.phone = "Phone number is required";
+    if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = "Valid email is required";
+    if (form.experienceYears < 0) e.experience = "Experience years cannot be negative";
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
   const handleSave = async () => {
-    if (!form.name.en || !form.specialization.en || !form.department.en || !form.qualification) {
-      setError("Name (EN), Specialization (EN), Department (EN), and Qualification are required.");
-      return;
-    }
+    if (!validate()) return;
     setSaving(true); setError("");
     try {
       const payload = {
@@ -169,12 +193,24 @@ export default function AddDoctorCmsPage() {
       </div>
 
       {error && (
-        <div className="rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 px-4 py-3 text-sm text-red-600 dark:text-red-400">
-          ⚠️ {error}
+        <div className="rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 px-4 py-3 text-sm text-red-600 dark:text-red-400 flex items-start gap-2">
+          <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+          <span>{error}</span>
         </div>
       )}
 
-      {/* ── ⭐ Basic Information ── */}
+      {Object.keys(errors).length > 0 && (
+        <div className="rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 px-4 py-3">
+          <p className="text-sm font-semibold text-red-600 dark:text-red-400 flex items-center gap-2 mb-1">
+            <AlertCircle className="h-4 w-4" /> Please fix the following errors:
+          </p>
+          <ul className="text-xs text-red-500 space-y-0.5 list-disc list-inside">
+            {Object.values(errors).map((err, i) => err && <li key={i}>{err}</li>)}
+          </ul>
+        </div>
+      )}
+
+      {/* ⭐ Basic Information */}
       <section className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 space-y-5">
         <div className="flex items-center gap-2 pb-3 border-b border-gray-100 dark:border-gray-800">
           <span className="text-lg">⭐</span>
@@ -185,22 +221,30 @@ export default function AddDoctorCmsPage() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <FormField label={`Full Name (${langTab.toUpperCase()})`} required>
-            <FormInput value={form.name[langTab]} onChange={e => setBi("name", langTab, e.target.value)} placeholder={langTab === "en" ? "Dr. Aminul Islam" : "ডা. আমিনুল ইসলাম"} />
+            <FormInput value={form.name[langTab]} onChange={e => { setBi("name", langTab, e.target.value); setErrors(e => ({...e, [langTab === 'en' ? 'nameEn' : 'nameBn']: undefined})); }} placeholder={langTab === "en" ? "Dr. Aminul Islam" : "ডা. আমিনুল ইসলাম"} />
           </FormField>
           <FormField label={`Designation (${langTab.toUpperCase()})`} required>
-            <FormInput value={form.designation[langTab]} onChange={e => setBi("designation", langTab, e.target.value)} placeholder={langTab === "en" ? "Consultant Physician" : "পরামর্শক চিকিৎসক"} />
+            <FormInput value={form.designation[langTab]} onChange={e => { setBi("designation", langTab, e.target.value); setErrors(e => ({...e, [langTab === 'en' ? 'designationEn' : 'designationBn']: undefined})); }} placeholder={langTab === "en" ? "Consultant Physician" : "পরামর্শক চিকিৎসক"} />
           </FormField>
           <FormField label={`Specialization (${langTab.toUpperCase()})`} required>
-            <FormInput value={form.specialization[langTab]} onChange={e => setBi("specialization", langTab, e.target.value)} placeholder={langTab === "en" ? "Medicine Specialist" : "মেডিসিন বিশেষজ্ঞ"} />
+            <FormSelect value={form.specialization[langTab]} onChange={e => { setBi("specialization", langTab, e.target.value); setErrors(e => ({...e, [langTab === 'en' ? 'specializationEn' : 'specializationBn']: undefined})); }}>
+              <option value="">{langTab === 'en' ? 'Select specialization...' : 'বিশেষায়ন নির্বাচন করুন...'}</option>
+              {SPECIALIZATIONS.map(s => <option key={s} value={s}>{s}</option>)}
+              <option value="__other__">{langTab === 'en' ? 'Other (type below)' : 'অন্যান্য (নিচে লিখুন)'}</option>
+            </FormSelect>
           </FormField>
           <FormField label={`Department (${langTab.toUpperCase()})`} required>
-            <FormInput value={form.department[langTab]} onChange={e => setBi("department", langTab, e.target.value)} placeholder={langTab === "en" ? "General Medicine" : "সাধারণ চিকিৎসা"} />
+            <FormSelect value={form.department[langTab]} onChange={e => { setBi("department", langTab, e.target.value); setErrors(e => ({...e, [langTab === 'en' ? 'departmentEn' : 'departmentBn']: undefined})); }}>
+              <option value="">{langTab === 'en' ? 'Select department...' : 'বিভাগ নির্বাচন করুন...'}</option>
+              {DEPARTMENTS.map(d => <option key={d} value={d}>{d}</option>)}
+              <option value="__other__">{langTab === 'en' ? 'Other (type below)' : 'অন্যান্য (নিচে লিখুন)'}</option>
+            </FormSelect>
           </FormField>
           <FormField label="Qualification" required>
-            <FormInput value={form.qualification} onChange={e => set("qualification", e.target.value)} placeholder="MBBS, FCPS (Medicine)" />
+            <FormInput value={form.qualification} onChange={e => { set("qualification", e.target.value); setErrors(e => ({...e, qualification: undefined})); }} placeholder="MBBS, FCPS (Medicine)" />
           </FormField>
           <FormField label="Experience (years)">
-            <FormInput type="number" min="0" value={String(form.experienceYears)} onChange={e => set("experienceYears", parseInt(e.target.value) || 0)} placeholder="12" />
+            <FormInput type="number" min="0" value={String(form.experienceYears)} onChange={e => { set("experienceYears", parseInt(e.target.value) || 0); setErrors(e => ({...e, experience: undefined})); }} placeholder="12" />
           </FormField>
           <FormField label="Status">
             <FormSelect value={form.status} onChange={e => set("status", e.target.value)}>
@@ -241,19 +285,19 @@ export default function AddDoctorCmsPage() {
         </div>
       </section>
 
-      {/* ── 📌 Biography ── */}
+      {/* 📌 Biography */}
       <section className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 space-y-4">
         <div className="flex items-center gap-2 pb-3 border-b border-gray-100 dark:border-gray-800">
           <span className="text-lg">📌</span>
           <div>
-            <h2 className="font-bold text-gray-900 dark:text-gray-100 text-sm">Biography</h2>
+            <h2 className="font-bold text-gray-900 dark:text-gray-100 text-sm">Biography <span className="text-red-500">*</span></h2>
             <p className="text-xs text-gray-400 mt-0.5">Updates the "About" section on the doctor detail page <strong>/doctors/[slug]</strong></p>
           </div>
         </div>
         <RichTextEditor
           label={`Biography — ${langTab === "en" ? "English" : "বাংলা"}`}
           value={form.about[langTab]}
-          onChange={v => setBi("about", langTab, v)}
+          onChange={v => { setBi("about", langTab, v); setErrors(e => ({...e, [langTab === 'en' ? 'aboutEn' : 'aboutBn']: undefined})); }}
           placeholder={langTab === "en" ? "Write doctor biography in English..." : "বাংলায় ডাক্তারের জীবনী লিখুন..."}
           rows={5}
           helpText="Supports **bold**, *italic*, ## heading, - list"
@@ -276,12 +320,12 @@ export default function AddDoctorCmsPage() {
         </div>
       </section>
 
-      {/* ── 🔥 Consultation Schedule ── */}
+      {/* 🔥 Consultation Schedule */}
       <section className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 space-y-4">
         <div className="flex items-center gap-2 pb-3 border-b border-gray-100 dark:border-gray-800">
           <span className="text-lg">🔥</span>
           <div>
-            <h2 className="font-bold text-gray-900 dark:text-gray-100 text-sm">Consultation Schedule <span className="text-xs text-amber-500 font-normal">(Frequently Updated)</span></h2>
+            <h2 className="font-bold text-gray-900 dark:text-gray-100 text-sm">Consultation Schedule <span className="text-red-500">*</span></h2>
             <p className="text-xs text-gray-400 mt-0.5">Controls appointment availability shown on <strong>/doctors/[slug]</strong> detail page</p>
           </div>
         </div>
@@ -295,26 +339,35 @@ export default function AddDoctorCmsPage() {
           onChamberTimeChange={(ct) => {
             set("chamberTimeEn", ct.en);
             set("chamberTimeBn", ct.bn);
+            setErrors(e => ({...e, chamberTimeEn: undefined, chamberTimeBn: undefined}));
           }}
           showTitle={false}
         />
       </section>
 
-      {/* ── Contact ── */}
+      {/* 📞 Contact */}
       <section className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 space-y-4">
         <div className="flex items-center gap-2 pb-3 border-b border-gray-100 dark:border-gray-800">
           <span>📞</span>
-          <h2 className="font-bold text-gray-900 dark:text-gray-100 text-sm">Contact Information</h2>
+          <h2 className="font-bold text-gray-900 dark:text-gray-100 text-sm">Contact Information <span className="text-red-500">*</span></h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <FormField label="Phone"><FormInput value={form.phone} onChange={e => set("phone", e.target.value)} placeholder="+8801711-234567" /></FormField>
-          <FormField label="Email"><FormInput type="email" value={form.email} onChange={e => set("email", e.target.value)} placeholder="doctor@hospital.com" /></FormField>
-          <FormField label="Address (English)"><FormInput value={form.addressEn} onChange={e => set("addressEn", e.target.value)} placeholder="Mirsarai General Hospital" /></FormField>
-          <FormField label="Address (বাংলা)"><FormInput value={form.addressBn} onChange={e => set("addressBn", e.target.value)} placeholder="মীরসরাই জেনারেল হাসপাতাল" /></FormField>
+          <FormField label="Phone" required>
+            <FormInput value={form.phone} onChange={e => { set("phone", e.target.value); setErrors(e => ({...e, phone: undefined})); }} placeholder="+8801711-234567" />
+          </FormField>
+          <FormField label="Email">
+            <FormInput type="email" value={form.email} onChange={e => { set("email", e.target.value); setErrors(e => ({...e, email: undefined})); }} placeholder="doctor@hospital.com" />
+          </FormField>
+          <FormField label="Address (English)" required>
+            <FormInput value={form.addressEn} onChange={e => { set("addressEn", e.target.value); setErrors(e => ({...e, addressEn: undefined})); }} placeholder="Mirsarai General Hospital" />
+          </FormField>
+          <FormField label="Address (বাংলা)" required>
+            <FormInput value={form.addressBn} onChange={e => { set("addressBn", e.target.value); setErrors(e => ({...e, addressBn: undefined})); }} placeholder="মীরসরাই জেনারেল হাসপাতাল" />
+          </FormField>
         </div>
       </section>
 
-      {/* ── ⭐ Media ── */}
+      {/* ⭐ Media */}
       <section className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 space-y-5">
         <div className="flex items-center gap-2 pb-3 border-b border-gray-100 dark:border-gray-800">
           <span className="text-lg">⭐</span>
@@ -330,14 +383,14 @@ export default function AddDoctorCmsPage() {
             helpText="Wide banner image for doctor profile header" />
         </div>
         <FormField label="Or paste external image URL">
-          <FormInput value={form.image} onChange={e => set("image", e.target.value)} placeholder="https://images.unsplash.com/..." />
+          <FormInput value={form.image} onChange={e => set("image", e.target.value)} placeholder="https://example.com/image.jpg" />
         </FormField>
       </section>
 
-      {/* ── SEO ── */}
+      {/* SEO */}
       <SeoFields
         value={form.seo}
-        onChange={v => set("seo", v)}
+        onChange={(v: SeoValue) => set("seo", v)}
         helpText="SEO fields for /doctors/[slug] page"
       />
 

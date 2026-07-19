@@ -7,6 +7,21 @@ import env from './env.js';
  */
 const connectDatabase = async () => {
   try {
+    console.log("Connecting...");
+    console.log("URI exists:", !!env.mongodb.uri);
+
+    const conn = await mongoose.connect(env.mongodb.uri);
+
+    console.log("Connected");
+    console.log(conn.connection.readyState);
+    console.log(conn.connection.host);
+    console.log(conn.connection.name);
+  } catch (err) {
+    console.error("FULL ERROR");
+    console.error(err);
+    throw err;
+  }
+  try {
     const options = {
       maxPoolSize: 10,
       serverSelectionTimeoutMS: 5000,

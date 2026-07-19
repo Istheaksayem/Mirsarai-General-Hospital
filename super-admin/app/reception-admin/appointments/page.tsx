@@ -10,7 +10,16 @@ import { createActionColumn } from "@/components/ui/ActionButtons";
 import { useQuery } from "@tanstack/react-query";
 import { getReceptionAppointments } from "@/lib/services/api";
 
+const statusVariant: Record<string, "success" | "warning" | "default" | "danger" | "info"> = {
+  confirmed: "success", pending: "warning", completed: "default", cancelled: "danger", "no-show": "danger",
+  "checked-in": "info", "in-consultation": "info",
+};
+
 const columns: Column<Record<string, unknown>>[] = [
+  {
+    key: "appointmentId", header: "Appt ID",
+    cell: (r) => <span className="font-mono text-xs font-bold text-[#1E2B7A] dark:text-blue-400">{(r.appointmentId as string) || "—"}</span>,
+  },
   { key: "_id", header: "ID", cell: (r) => <span className="font-mono text-xs text-gray-400">{String(r._id).slice(-6)}</span> },
   {
     key: "patientName", header: "Patient",
@@ -33,7 +42,14 @@ const columns: Column<Record<string, unknown>>[] = [
   },
   { key: "date", header: "Date", cell: (r) => <div><p className="font-medium">{new Date(String(r.date ?? "")).toLocaleDateString()}</p><p className="text-xs text-gray-400">{String(r.time ?? "")}</p></div> },
   { key: "type", header: "Type", cell: (r) => <Badge variant="info">{String(r.type ?? "")}</Badge> },
-  { key: "status", header: "Status", cell: (r) => <Badge variant={r.status === "confirmed" ? "success" : r.status === "pending" ? "warning" : r.status === "cancelled" ? "danger" : "default"}>{String(r.status ?? "")}</Badge> },
+  {
+    key: "status", header: "Status",
+    cell: (r) => <Badge variant={statusVariant[String(r.status)] || "default"}>{String(r.status ?? "")}</Badge>,
+  },
+  {
+    key: "appointmentSource", header: "Source",
+    cell: (r) => <Badge variant="default">{(r.appointmentSource as string) || "—"}</Badge>,
+  },
   createActionColumn(),
 ];
 
@@ -65,7 +81,14 @@ export default function ReceptionAppointmentsPage() {
       <div className="flex flex-col sm:flex-row gap-3">
         <SearchFilter value={search} onChange={setSearch} placeholder="Search patient or doctor..." className="flex-1" />
         <SelectFilter value={status} onChange={setStatus}
-          options={[{ label: "Confirmed", value: "confirmed" }, { label: "Pending", value: "pending" }, { label: "Completed", value: "completed" }, { label: "Cancelled", value: "cancelled" }]}
+          options={[
+            { label: "Confirmed", value: "confirmed" },
+            { label: "Pending", value: "pending" },
+            { label: "Completed", value: "completed" },
+            { label: "Cancelled", value: "cancelled" },
+            { label: "Checked In", value: "checked-in" },
+            { label: "In Consultation", value: "in-consultation" },
+          ]}
           placeholder="All Status" />
       </div>
       <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-4">

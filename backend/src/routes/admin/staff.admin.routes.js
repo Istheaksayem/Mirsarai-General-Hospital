@@ -4,12 +4,14 @@ import validate from '../../middlewares/validate.middleware.js';
 import {
   staffQuerySchema,
   updateStaffSchema,
+  createStaffSchema,
 } from '../../validators/staff.validator.js';
 
 const router = express.Router();
 
 router.get('/', validate(staffQuerySchema), StaffController.getAllStaff);
 router.get('/:id', StaffController.getStaffById);
+router.post('/', validate(createStaffSchema), StaffController.createStaff);
 router.put('/:id', validate(updateStaffSchema), StaffController.updateStaff);
 router.patch('/:id', validate(updateStaffSchema), StaffController.updateStaff);
 router.delete('/:id', StaffController.deleteStaff);

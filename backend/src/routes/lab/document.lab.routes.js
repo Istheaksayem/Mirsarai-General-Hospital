@@ -11,6 +11,9 @@ const uploadSchema = z.object({
     title: z.string().min(1, 'Title is required'),
     department: z.string().optional(),
     notes: z.string().optional(),
+    testName: z.string().optional(),
+    reportType: z.enum(['blood', 'imaging', 'pathology', 'microbiology']).optional(),
+    requestingDoctor: z.string().optional(),
   }),
 });
 

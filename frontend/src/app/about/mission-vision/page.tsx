@@ -1,6 +1,6 @@
 "use client";
 
-import { useAboutData, CoreValue } from "@/hooks/useAboutData";
+import { useAboutData, CoreValue, WhyItMattersItem } from "@/hooks/useAboutData";
 import { useLanguage } from "@/context/LanguageContext";
 import {
   FaHeartbeat,
@@ -17,6 +17,7 @@ import { motion } from "framer-motion";
 import { FiArrowRight, FiCheckCircle } from "react-icons/fi";
 import { useEffect, useRef } from "react";
 import { BsFillHeartPulseFill } from "react-icons/bs";
+import { getImageUrl } from "@/lib/getImageUrl";
 
 const valueIcons: Record<string, React.ElementType> = {
   Compassion: FaHeartbeat,
@@ -24,7 +25,9 @@ const valueIcons: Record<string, React.ElementType> = {
   Excellence: FaStar,
   Innovation: FaLightbulb,
   "Patient First": FaUserCheck,
-};  
+};
+
+const whyItMatterIcons = [FaHandHoldingHeart, FaRocket, FaShieldAlt];  
 
 const MissionVisionPage = () => {
   const { data, isLoading, isError } = useAboutData();
@@ -105,7 +108,7 @@ const MissionVisionPage = () => {
       {/* Background Image Layer */}
       <div
         className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url('${missionVision.image}')` }}
+        style={{ backgroundImage: `url('${getImageUrl(missionVision.image)}')` }}
       />
       <div className="absolute inset-0 bg-black/60" />
 
@@ -278,7 +281,7 @@ const MissionVisionPage = () => {
         <div
           className="absolute inset-0 bg-cover bg-center bg-fixed"
           style={{
-            backgroundImage: `url('${missionVision.image}')`,
+            backgroundImage: `url('${getImageUrl(missionVision.image)}')`,
           }}
         />
         <div className="absolute inset-0 bg-primary/60" />
@@ -301,13 +304,16 @@ const MissionVisionPage = () => {
           </div>
 
           <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-8 leading-tight text-shadow-strong">
-            {t("Our Commitment to You", "আপনার প্রতি আমাদের অঙ্গীকার")}
+            {t(
+              (missionVision.commitmentHeading?.en) || "Our Commitment to You",
+              (missionVision.commitmentHeading?.bn) || "আপনার প্রতি আমাদের অঙ্গীকার"
+            )}
           </h2>
 
           <p className="text-white/90 text-2xl md:text-3xl font-light italic leading-relaxed mb-6">
             {t(
-              "Every patient who walks through our doors deserves the very best care — and that is what we promise.",
-              "আমাদের দ্বারে আসা প্রতিটি রোগী সর্বোত্তম সেবা পাওয়ার যোগ্য — এবং আমরা ঠিক এই প্রতিশ্রুতিই দিই।"
+              (missionVision.commitmentDescription?.en) || "Every patient who walks through our doors deserves the very best care — and that is what we promise.",
+              (missionVision.commitmentDescription?.bn) || "আমাদের দ্বারে আসা প্রতিটি রোগী সর্বোত্তম সেবা পাওয়ার যোগ্য — এবং আমরা ঠিক এই প্রতিশ্রুতিই দিই।"
             )}
           </p>
 
@@ -320,114 +326,109 @@ const MissionVisionPage = () => {
     </section>
   );
 
-  const renderWhyItMatters = () => (
-    <section key="whyItMatters" className="py-24 px-4 bg-white">
-      <div className="max-w-6xl mx-auto">
+  const renderWhyItMatters = () => {
+    const heading = missionVision.whyItMattersHeading;
+    const description = missionVision.whyItMattersDescription;
+    const items = missionVision.whyItMattersItems || [];
+    return (
+      <section key="whyItMatters" className="py-24 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-extrabold text-primary mb-6">
+              {t(
+                heading?.en || "Why This Matters",
+                heading?.bn || "এটি কেন গুরুত্বপূর্ণ"
+              )}
+            </h2>
+            <p className="text-gray-600 text-xl max-w-3xl mx-auto">
+              {t(
+                description?.en || "Our mission and vision aren't just words — they're the foundation of every action we take.",
+                description?.bn || "আমাদের লক্ষ্য এবং দর্শন কেবল শব্দ নয় — এগুলো আমাদের প্রতিটি পদক্ষেপের ভিত্তি।"
+              )}
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {items.map((item, i) => {
+              const Icon = whyItMatterIcons[i % whyItMatterIcons.length];
+              return (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: i * 0.1 }}
+                  className="text-center group"
+                >
+                  <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center mx-auto mb-6 shadow-xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}>
+                    <Icon className="text-white text-4xl" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-primary mb-4">{t(item.title.en, item.title.bn)}</h3>
+                  <p className="text-gray-600 text-base leading-relaxed">{t(item.description.en, item.description.bn)}</p>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+    );
+  };
+
+  const renderCTA = () => {
+    const cta = missionVision;
+    return (
+      <section key="cta" className="py-24 px-4 text-center bg-gradient-to-br from-gray-50 via-blue-50/30 to-white">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="max-w-3xl mx-auto"
         >
           <h2 className="text-4xl md:text-5xl font-extrabold text-primary mb-6">
-            {t("Why This Matters", "এটি কেন গুরুত্বপূর্ণ")}
-          </h2>
-          <p className="text-gray-600 text-xl max-w-3xl mx-auto">
             {t(
-              "Our mission and vision aren't just words — they're the foundation of every action we take.",
-              "আমাদের লক্ষ্য এবং দর্শন কেবল শব্দ নয় — এগুলো আমাদের প্রতিটি পদক্ষেপের ভিত্তি।"
+              cta.ctaHeading?.en || "Experience Our Care Today",
+              cta.ctaHeading?.bn || "আজই আমাদের সেবার অভিজ্ঞতা নিন"
+            )}
+          </h2>
+          <p className="text-gray-600 text-xl mb-10 leading-relaxed">
+            {t(
+              cta.ctaDescription?.en || "Our mission is your health. Come and experience compassionate, world-class healthcare.",
+              cta.ctaDescription?.bn || "আমাদের লক্ষ্য আপনার স্বাস্থ্য। আসুন এবং সহানুভূতিশীল, বিশ্বমানের স্বাস্থ্যসেবার অভিজ্ঞতা নিন।"
             )}
           </p>
-        </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            {
-              icon: FaHandHoldingHeart,
-              title: t("Patient-Centered Care", "রোগী-কেন্দ্রিক সেবা"),
-              description: t(
-                "Your health, comfort, and satisfaction are at the heart of everything we do.",
-                "আপনার স্বাস্থ্য, আরাম এবং সন্তুষ্টি আমাদের প্রতিটি কাজের কেন্দ্রবিন্দুতে রয়েছে।"
-              ),
-              color: "from-red-500 to-pink-600",
-            },
-            {
-              icon: FaRocket,
-              title: t("Continuous Innovation", "ক্রমাগত উদ্ভাবন"),
-              description: t(
-                "We constantly evolve with the latest medical technology and treatment methods.",
-                "আমরা প্রতিনিয়ত সর্বাধুনিক চিকিৎসা প্রযুক্তি এবং চিকিৎসা পদ্ধতির সাথে নিজেদের উন্নত করছি।"
-              ),
-              color: "from-purple-500 to-purple-700",
-            },
-            {
-              icon: FaShieldAlt,
-              title: t("Trust & Integrity", "বিশ্বাস ও সততা"),
-              description: t(
-                "We maintain the highest ethical standards in all our medical practices.",
-                "আমরা আমাদের সমস্ত চিকিৎসা অনুশীলনে সর্বোচ্চ নৈতিক মান বজায় রাখি।"
-              ),
-              color: "from-blue-600 to-primary",
-            },
-          ].map((item, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="text-center group"
+          <div className="flex flex-wrap gap-6 justify-center">
+            <a
+              href="/appointment"
+              className="inline-flex items-center gap-3 bg-secondary hover:bg-secondary/90 text-white px-10 py-5 rounded-full font-bold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 transform group"
             >
-              <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center mx-auto mb-6 shadow-xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}>
-                <item.icon className="text-white text-4xl" />
-              </div>
-              <h3 className="text-2xl font-bold text-primary mb-4">{item.title}</h3>
-              <p className="text-gray-600 text-base leading-relaxed">{item.description}</p>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-
-  const renderCTA = () => (
-    <section key="cta" className="py-24 px-4 text-center bg-gradient-to-br from-gray-50 via-blue-50/30 to-white">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        whileInView={{ opacity: 1, scale: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
-        className="max-w-3xl mx-auto"
-      >
-        <h2 className="text-4xl md:text-5xl font-extrabold text-primary mb-6">
-          {t("Experience Our Care Today", "আজই আমাদের সেবার অভিজ্ঞতা নিন")}
-        </h2>
-        <p className="text-gray-600 text-xl mb-10 leading-relaxed">
-          {t(
-            "Our mission is your health. Come and experience compassionate, world-class healthcare.",
-            "আমাদের লক্ষ্য আপনার স্বাস্থ্য। আসুন এবং সহানুভূতিশীল, বিশ্বমানের স্বাস্থ্যসেবার অভিজ্ঞতা নিন।"
-          )}
-        </p>
-        <div className="flex flex-wrap gap-6 justify-center">
-          <a
-            href="/appointment"
-            className="inline-flex items-center gap-3 bg-secondary hover:bg-secondary/90 text-white px-10 py-5 rounded-full font-bold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 transform group"
-          >
-            <BsFillHeartPulseFill className="text-xl" />
-            {t("Book an Appointment", "অ্যাপয়েন্টমেন্ট বুক করুন")}
-            <FiArrowRight className="text-xl group-hover:translate-x-2 transition-transform" />
-          </a>
-          <a
-            href="/about"
-            className="inline-flex items-center gap-3 bg-white hover:bg-gray-50 text-primary border-2 border-gray-200 hover:border-primary/30 px-10 py-5 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 transform"
-          >
-            {t("← Back to About Us", "← আমাদের সম্পর্কে ফিরে যান")}
-          </a>
-        </div>
-      </motion.div>
-    </section>
-  );
+              <BsFillHeartPulseFill className="text-xl" />
+              {t(
+                cta.ctaPrimaryButtonText?.en || "Book an Appointment",
+                cta.ctaPrimaryButtonText?.bn || "অ্যাপয়েন্টমেন্ট বুক করুন"
+              )}
+              <FiArrowRight className="text-xl group-hover:translate-x-2 transition-transform" />
+            </a>
+            <a
+              href="/about"
+              className="inline-flex items-center gap-3 bg-white hover:bg-gray-50 text-primary border-2 border-gray-200 hover:border-primary/30 px-10 py-5 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 transform"
+            >
+              {t(
+                cta.ctaSecondaryButtonText?.en || "← Back to About Us",
+                cta.ctaSecondaryButtonText?.bn || "← আমাদের সম্পর্কে ফিরে যান"
+              )}
+            </a>
+          </div>
+        </motion.div>
+      </section>
+    );
+  };
 
   // Sorting and filtering based on database settings
   const sectionConfig = missionVision.sections || {

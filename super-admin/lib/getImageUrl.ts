@@ -1,7 +1,6 @@
-const BACKEND_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL ||
-  process.env.NEXT_PUBLIC_API_URL?.replace('/api/v1', '') ||
-  'http://localhost:5000';
+import { env } from '@/config/env';
+
+const BACKEND_URL = (env.backendUrl || env.apiUrl.replace('/api/v1', '') || '').replace(/\/$/, '');
 
 export function getImageUrl(path: string | null | undefined): string {
   if (!path) return '';

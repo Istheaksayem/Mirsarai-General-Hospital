@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { FormPage, FormField, FormInput, FormSelect, FormSection } from "@/components/ui/FormPage";
 import { useCmsDoctors } from "@/lib/hooks/useCmsDoctors";
 import { useCreateCmsAppointment } from "@/lib/hooks/useCmsAppointments";
+import toast from "react-hot-toast";
 
 export default function AddAppointmentPage() {
   const router = useRouter();
@@ -22,7 +23,7 @@ export default function AddAppointmentPage() {
   }, [doctors]);
 
   const [form, setForm] = useState({
-    patientName: "", patientAge: "", patientGender: "",
+    patientName: "", patientPhone: "", patientEmail: "", patientAge: "", patientGender: "",
     doctor: "", department: "", date: today, time: "",
     type: "new", reason: "", notes: "", status: "pending",
   });
@@ -57,7 +58,8 @@ export default function AddAppointmentPage() {
     try {
       await createAppointment.mutateAsync({
         patientName: form.patientName,
-        patientPhone: "",
+        patientPhone: form.patientPhone || "",
+        patientEmail: form.patientEmail || undefined,
         patientAge: form.patientAge ? Number(form.patientAge) : undefined,
         patientGender: form.patientGender?.toLowerCase() || undefined,
         doctor: form.doctor,
@@ -69,8 +71,10 @@ export default function AddAppointmentPage() {
         notes: form.notes,
         status: form.status as "pending" | "confirmed",
       } as any);
+      toast.success("Appointment created");
       router.push("/super-admin/appointments");
     } catch (err: any) {
+      toast.error(err?.message || "Failed to create appointment");
       setErrors({ form: err.message || "Failed to create appointment" });
     } finally {
       setSaving(false);
@@ -82,6 +86,12 @@ export default function AddAppointmentPage() {
       <FormSection title="Patient Information">
         <FormField label="Patient Name" required error={errors.patientName}>
           <FormInput placeholder="Full patient name" value={form.patientName} onChange={e => set("patientName", e.target.value)} />
+        </FormField>
+        <FormField label="Phone Number">
+          <FormInput placeholder="e.g. 01XXXXXXXXX" value={form.patientPhone} onChange={e => set("patientPhone", e.target.value)} />
+        </FormField>
+        <FormField label="Email">
+          <FormInput type="email" placeholder="patient@example.com" value={form.patientEmail} onChange={e => set("patientEmail", e.target.value)} />
         </FormField>
         <FormField label="Patient Age">
           <FormInput type="number" min="0" max="150" placeholder="Age in years" value={form.patientAge} onChange={e => set("patientAge", e.target.value)} />

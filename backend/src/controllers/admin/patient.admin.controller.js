@@ -58,5 +58,5 @@ export const deletePatient = catchAsync(async (req, res) => {
     targetEntity: 'Patient',
     targetId: existing._id.toString(),
   });
-  sendSuccess(res, StatusCodes.OK, null, 'Patient deleted successfully');
+  sendSuccess(res, StatusCodes.OK, null, 'Patient permanently deleted');
 });

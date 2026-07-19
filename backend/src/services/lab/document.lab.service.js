@@ -19,6 +19,10 @@ export const uploadDocument = async (data, file, user) => {
     fileUrl,
     uploadedBy: { id: user.id, role: user.role },
     notes: data.notes,
+    testName: data.testName,
+    reportType: data.reportType,
+    requestingDoctor: data.requestingDoctor,
+    status: 'pending',
   });
 
   await createNotification({

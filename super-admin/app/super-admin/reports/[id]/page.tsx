@@ -4,9 +4,9 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, Pencil, User, FlaskConical, Calendar, Stethoscope, FileText, Building2 } from "lucide-react";
 import { useReports } from "@/lib/hooks/useReports";
 import { Badge } from "@/components/ui/Badge";
-import { type Report } from "@/lib/services/api";
+import type { UnifiedReport } from "@/lib/services/api";
 
-const statusVariant: Record<Report["status"], "warning" | "info" | "success"> = {
+const statusVariant: Record<UnifiedReport["status"], "warning" | "info" | "success"> = {
   pending: "warning", "in-progress": "info", completed: "success",
 };
 
@@ -14,7 +14,7 @@ export default function ViewReportPage({ params }: { params: Promise<{ id: strin
   const { id } = use(params);
   const router = useRouter();
   const { data = [], isLoading } = useReports();
-  const report = data.find(r => r.id === decodeURIComponent(id));
+  const report = data.find(r => r._id === decodeURIComponent(id));
 
   if (isLoading) return <div className="flex items-center justify-center h-64"><div className="animate-spin h-8 w-8 rounded-full border-4 border-[#1E2B7A] border-t-transparent" /></div>;
   if (!report) return <div className="p-16 text-center text-gray-400">Report not found</div>;
@@ -25,8 +25,8 @@ export default function ViewReportPage({ params }: { params: Promise<{ id: strin
     { icon: FlaskConical, label: "Test Name", value: report.testName },
     { icon: FileText, label: "Report Type", value: report.reportType },
     { icon: Building2, label: "Department", value: report.department },
-    { icon: Stethoscope, label: "Requested By", value: report.requestedBy },
-    { icon: Calendar, label: "Request Date", value: report.requestDate },
+    { icon: Stethoscope, label: "Requested By", value: report.requestingDoctor || "—" },
+    { icon: Calendar, label: "Request Date", value: report.createdAt?.split("T")[0] || "—" },
     { icon: Calendar, label: "Completed Date", value: report.completedDate || "—" },
     { icon: FileText, label: "Notes", value: report.notes || "—" },
   ];
@@ -40,7 +40,7 @@ export default function ViewReportPage({ params }: { params: Promise<{ id: strin
           </button>
           <div><h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">Report Details</h1><p className="text-sm text-gray-500 mt-0.5">View lab report information</p></div>
         </div>
-        <button onClick={() => router.push(`/super-admin/reports/${encodeURIComponent(report.id)}/edit`)} className="flex items-center gap-2 px-4 py-2 bg-[#1E2B7A] hover:bg-[#76BC21] text-white rounded-xl text-sm font-semibold transition-all">
+        <button onClick={() => router.push(`/super-admin/reports/${encodeURIComponent(report._id)}/edit`)} className="flex items-center gap-2 px-4 py-2 bg-[#1E2B7A] hover:bg-[#76BC21] text-white rounded-xl text-sm font-semibold transition-all">
           <Pencil className="h-3.5 w-3.5" /> Edit
         </button>
       </div>
@@ -48,7 +48,7 @@ export default function ViewReportPage({ params }: { params: Promise<{ id: strin
       <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 space-y-4">
         <div className="flex items-start justify-between">
           <div>
-            <p className="font-mono text-xs text-gray-400 mb-1">{report.id}</p>
+            <p className="font-mono text-xs text-gray-400 mb-1">{report._id}</p>
             <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">{report.testName}</h2>
             <p className="text-sm text-[#1E2B7A] dark:text-blue-400 font-semibold mt-0.5">{report.patientName} · {report.department}</p>
           </div>
@@ -72,17 +72,10 @@ export default function ViewReportPage({ params }: { params: Promise<{ id: strin
           ))}
         </div>
 
-        {report.results && Object.keys(report.results).length > 0 && (
+        {report.notes && (
           <div className="mt-5 pt-5 border-t border-gray-100 dark:border-gray-800">
-            <h4 className="text-xs font-bold text-gray-500 uppercase mb-3">Test Results</h4>
-            <div className="grid grid-cols-2 gap-3">
-              {Object.entries(report.results).map(([k, v]) => (
-                <div key={k} className="flex items-center justify-between p-3 rounded-xl bg-[#76BC21]/5 border border-[#76BC21]/20">
-                  <span className="text-sm text-gray-600 dark:text-gray-400 capitalize">{k}</span>
-                  <span className="text-sm font-bold text-gray-900 dark:text-gray-100">{String(v)}</span>
-                </div>
-              ))}
-            </div>
+            <h4 className="text-xs font-bold text-gray-500 uppercase mb-3">Notes</h4>
+            <p className="text-sm text-gray-700 dark:text-gray-300">{report.notes}</p>
           </div>
         )}
       </div>

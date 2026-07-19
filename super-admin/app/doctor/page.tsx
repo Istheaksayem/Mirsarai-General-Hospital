@@ -4,15 +4,15 @@ import { StatsCard } from "@/components/ui/StatsCard";
 import { StatsCardSkeleton } from "@/components/ui/Skeleton";
 import { Badge } from "@/components/ui/Badge";
 import { useDashboard } from "@/lib/hooks/useDashboard";
-import { useAppointments } from "@/lib/hooks/useAppointments";
+import { useDoctorTodaysAppointments } from "@/lib/hooks/useCmsAppointments";
 import Link from "next/link";
 
 export default function DoctorDashboard() {
   const { data: stats, isLoading } = useDashboard("doctor");
-  const { data: appointments = [] } = useAppointments();
+  const { data: todayResponse } = useDoctorTodaysAppointments();
   const s = stats as Record<string, number> | undefined;
 
-  const todayApts = appointments.filter(a => a.date === "2026-07-08").slice(0, 5);
+  const todayApts = (todayResponse?.data || []).slice(0, 5);
 
   return (
     <div className="space-y-6">
@@ -23,7 +23,7 @@ export default function DoctorDashboard() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {isLoading ? Array.from({ length: 4 }).map((_, i) => <StatsCardSkeleton key={i} />) : (
           <>
-            <StatsCard title="Today's Appointments" value={s?.todayAppointments ?? 0} icon={CalendarDays} color="blue" index={0} />
+            <StatsCard title="Today's Appointments" value={todayApts.length} icon={CalendarDays} color="blue" index={0} />
             <StatsCard title="My Patients" value={s?.myPatients ?? 0} icon={Users} color="green" index={1} />
             <StatsCard title="Prescriptions Issued" value={s?.prescriptionsIssued ?? 0} icon={ClipboardList} color="purple" trend={{ value: 5, label: "vs last week" }} index={2} />
             <StatsCard title="Pending Reports" value={s?.pendingReports ?? 0} icon={FileText} color="amber" index={3} />
@@ -40,18 +40,21 @@ export default function DoctorDashboard() {
           <div className="space-y-2">
             {todayApts.length === 0 ? (
               <p className="text-sm text-center text-gray-400 py-8">No appointments today</p>
-            ) : todayApts.map((apt) => (
-              <div key={apt.id} className="flex items-center gap-3 rounded-xl border border-gray-100 dark:border-gray-800 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+            ) : todayApts.map((apt: any) => (
+              <div key={apt._id} className="flex items-center gap-3 rounded-xl border border-gray-100 dark:border-gray-800 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#1E2B7A]/10 dark:bg-[#1E2B7A]/20">
-                  <span className="text-xs font-semibold text-[#1E2B7A] dark:text-blue-400">{apt.patientName.charAt(0)}</span>
+                  <span className="text-xs font-semibold text-[#1E2B7A] dark:text-blue-400">{(apt.patientName || "?").charAt(0)}</span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-gray-900 dark:text-gray-100 text-sm">{apt.patientName}</p>
-                  <p className="text-xs text-gray-400">{apt.reason} · {apt.type}</p>
+                  <p className="text-xs text-gray-400">
+                    <span className="font-mono text-[#1E2B7A] dark:text-blue-400">{apt.appointmentId || apt._id?.slice(-6)}</span>
+                    {apt.reason ? ` · ${apt.reason}` : ""} · {apt.type}
+                  </p>
                 </div>
                 <div className="text-right shrink-0">
                   <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{apt.time}</p>
-                  <Badge variant={apt.status === "confirmed" ? "success" : "warning"} className="mt-0.5">{apt.status}</Badge>
+                  <Badge variant={apt.status === "confirmed" ? "success" : apt.status === "pending" ? "warning" : apt.status === "checked-in" ? "info" : "default"} className="mt-0.5">{apt.status}</Badge>
                 </div>
               </div>
             ))}

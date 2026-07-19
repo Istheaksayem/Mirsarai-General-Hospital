@@ -6,6 +6,7 @@ import { Globe, Save, ArrowLeft, Plus, Trash, Check, Loader2, Image as ImageIcon
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { getAdminHero, updateAdminHero, HeroData, HeroSlide, SlideButton, ShapeConfig } from "@/lib/services/api";
+import { env } from "@/config/env";
 
 export default function EditHeroCMS() {
   const router = useRouter();
@@ -88,7 +89,7 @@ export default function EditHeroCMS() {
       slideNumber: count < 10 ? `0${count}.` : `${count}.`,
       heading: { en: "New Slide Heading", bn: "নতুন স্লাইড হেডিং" },
       description: { en: "New slide description copy.", bn: "নতুন স্লাইডের বিবরণ।" },
-      image: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1920&h=1080&fit=crop",
+      image: env.defaultSlideImage,
       buttons: [
         { label: { en: "View Services", bn: "সেবা দেখুন" }, link: "/services", variant: "primary" },
         { label: { en: "Contact Us", bn: "যোগাযোগ করুন" }, link: "/contact", variant: "outline" }

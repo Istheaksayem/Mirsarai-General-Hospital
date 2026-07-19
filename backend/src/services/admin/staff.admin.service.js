@@ -96,7 +96,7 @@ export const updateStaff = async (id, data, adminId) => {
 };
 
 /**
- * Soft-delete a staff account — immediately loses all access
+ * Hard-delete a staff account — removes from database permanently
  */
 export const deleteStaff = async (id, adminId) => {
   const user = await User.findById(id);
@@ -104,12 +104,38 @@ export const deleteStaff = async (id, adminId) => {
   if (!STAFF_ROLES.includes(user.role))
     throw new ApiError(StatusCodes.BAD_REQUEST, 'User is not a staff member');
 
-  user.isActive = false;
-  user.accountStatus = 'inactive';
-  user.updatedBy = adminId;
-  await user.save();
+  const profileModel = PROFILE_ROLES[user.role];
+  if (profileModel) {
+    await profileModel.deleteOne({ userId: user._id });
+  }
 
-  return { message: 'Staff account deactivated and removed' };
+  await User.findByIdAndDelete(id);
+
+  return { message: 'Staff account permanently deleted' };
+};
+
+/**
+ * Create a new staff member directly (bypasses OTP)
+ */
+export const createStaff = async (data, adminId) => {
+  const existing = await User.findOne({ email: data.email });
+  if (existing) throw new ApiError(StatusCodes.CONFLICT, 'A user with this email already exists');
+
+  const user = await User.create({
+    fullName: data.fullName,
+    email: data.email,
+    phone: data.phone || '',
+    password: data.password,
+    role: data.role,
+    approvalStatus: 'pending',
+    accountStatus: 'inactive',
+    isActive: false,
+    isVerified: true,
+    profileCompleted: false,
+    updatedBy: adminId,
+  });
+
+  return user.toJSON();
 };
 
 /**

@@ -17,6 +17,7 @@ import { ImageUploader } from "@/components/cms/ImageUploader";
 import { ChamberTimePicker } from "@/components/doctors/ChamberTimePicker";
 import { LanguageMultiSelect } from "@/components/doctors/LanguageMultiSelect";
 import { cn } from "@/lib/utils";
+import toast from "react-hot-toast";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -211,10 +212,23 @@ export default function DoctorCmsEditorPage({
   const validate = () => {
     const e: Record<string, string> = {};
     if (!form.name?.en?.trim()) e["name.en"] = "Doctor name (English) is required";
-    if (!form.designation?.en?.trim()) e["designation.en"] = "Designation is required";
-    if (!form.specialization?.en?.trim()) e["specialization.en"] = "Specialization is required";
-    if (!form.department?.en?.trim()) e["department.en"] = "Department is required";
+    if (!form.name?.bn?.trim()) e["name.bn"] = "Doctor name (Bangla) is required";
+    if (!form.designation?.en?.trim()) e["designation.en"] = "Designation (English) is required";
+    if (!form.designation?.bn?.trim()) e["designation.bn"] = "Designation (Bangla) is required";
+    if (!form.specialization?.en?.trim()) e["specialization.en"] = "Specialization (English) is required";
+    if (!form.specialization?.bn?.trim()) e["specialization.bn"] = "Specialization (Bangla) is required";
+    if (!form.department?.en?.trim()) e["department.en"] = "Department (English) is required";
+    if (!form.department?.bn?.trim()) e["department.bn"] = "Department (Bangla) is required";
     if (!form.qualification?.trim()) e.qualification = "Qualification is required";
+    if (!form.chamberTime?.en?.trim()) e["chamberTime.en"] = "Chamber time (English) is required";
+    if (!form.chamberTime?.bn?.trim()) e["chamberTime.bn"] = "Chamber time (Bangla) is required";
+    if (!form.about?.en?.trim()) e["about.en"] = "About (English) is required";
+    if (!form.about?.bn?.trim()) e["about.bn"] = "About (Bangla) is required";
+    if (!form.address?.en?.trim()) e["address.en"] = "Address (English) is required";
+    if (!form.address?.bn?.trim()) e["address.bn"] = "Address (Bangla) is required";
+    if (!form.phone?.trim()) e.phone = "Phone number is required";
+    if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = "Valid email is required";
+    if (!form.experience || form.experience.years < 0) e.experience = "Experience years is required";
     return e;
   };
 
@@ -230,12 +244,13 @@ export default function DoctorCmsEditorPage({
         await updateMutation.mutateAsync(form);
       }
       setSaveStatus("saved");
+      toast.success(isNew ? "Doctor created" : "Doctor updated");
       setTimeout(() => setSaveStatus("idle"), 3000);
       if (isNew) router.push("/super-admin/doctors");
-    } catch (err) {
+    } catch (err: any) {
       setSaveStatus("error");
+      toast.error(err?.message || "Failed to save doctor");
       setTimeout(() => setSaveStatus("idle"), 4000);
-      console.error("Save failed:", err);
     }
   };
 
@@ -344,6 +359,7 @@ export default function DoctorCmsEditorPage({
               hint="Shown in /doctors listing cards and /doctors/[slug] page header"
             />
             {errors["name.en"] && <p className="text-xs text-red-500 -mt-3">{errors["name.en"]}</p>}
+            {errors["name.bn"] && <p className="text-xs text-red-500 -mt-3">{errors["name.bn"]}</p>}
 
             <BilingualField
               label="Designation"
@@ -351,6 +367,7 @@ export default function DoctorCmsEditorPage({
               onChange={(v) => setField("designation", v)}
               hint="Shown below name (e.g. 'Senior Consultant')"
             />
+            {errors["designation.en"] && <p className="text-xs text-red-500 -mt-3">{errors["designation.en"]}</p>}
 
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -361,6 +378,7 @@ export default function DoctorCmsEditorPage({
                   onChange={(v) => setField("department", v)}
                 />
                 {errors["department.en"] && <p className="text-xs text-red-500 mt-1">{errors["department.en"]}</p>}
+                {errors["department.bn"] && <p className="text-xs text-red-500 mt-1">{errors["department.bn"]}</p>}
               </div>
               <div>
                 <FieldLabel hint="Shown in doctor profile and specialty tags">Specialization</FieldLabel>
@@ -369,6 +387,8 @@ export default function DoctorCmsEditorPage({
                   value={form.specialization || emptyBilingual()}
                   onChange={(v) => setField("specialization", v)}
                 />
+                {errors["specialization.en"] && <p className="text-xs text-red-500 mt-1">{errors["specialization.en"]}</p>}
+                {errors["specialization.bn"] && <p className="text-xs text-red-500 mt-1">{errors["specialization.bn"]}</p>}
               </div>
             </div>
 
@@ -389,6 +409,7 @@ export default function DoctorCmsEditorPage({
                   value={form.experience?.years || 0}
                   onChange={(v) => setField("experience", { years: parseInt(v) || 0, label: { en: `${v}+ Years`, bn: `${v}+ বছর` } })}
                 />
+                {errors.experience && <p className="text-xs text-red-500 mt-1">{errors.experience}</p>}
               </div>
             </div>
 
@@ -415,6 +436,8 @@ export default function DoctorCmsEditorPage({
                 placeholder={activeTab === "en" ? "Write a comprehensive biography about the doctor..." : "ডাক্তারের সম্পর্কে বিস্তারিত জীবনী লিখুন..."}
                 rows={6}
               />
+              {errors["about.en"] && <p className="text-xs text-red-500 mt-1">{errors["about.en"]}</p>}
+              {errors["about.bn"] && <p className="text-xs text-red-500 mt-1">{errors["about.bn"]}</p>}
             </div>
 
             {/* Services List */}
@@ -485,6 +508,8 @@ export default function DoctorCmsEditorPage({
               onChamberTimeChange={(ct) => setField("chamberTime", ct)}
               showTitle={true}
             />
+            {errors["chamberTime.en"] && <p className="text-xs text-red-500 mt-1">{errors["chamberTime.en"]}</p>}
+            {errors["chamberTime.bn"] && <p className="text-xs text-red-500 mt-1">{errors["chamberTime.bn"]}</p>}
 
             <BilingualField
               label="Chamber Address"
@@ -519,10 +544,12 @@ export default function DoctorCmsEditorPage({
               <div>
                 <FieldLabel hint="Shown in doctor profile contact card">Phone</FieldLabel>
                 <Input value={form.phone || ""} onChange={(v) => setField("phone", v)} placeholder="+8801XXXXXXXXX" />
+              {errors.phone && <p className="text-xs text-red-500 mt-1">{errors.phone}</p>}
               </div>
               <div>
                 <FieldLabel hint="Shown in doctor profile contact card">Email</FieldLabel>
                 <Input type="email" value={form.email || ""} onChange={(v) => setField("email", v)} placeholder="doctor@hospital.com" />
+                {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
               </div>
             </div>
             <BilingualField
@@ -530,6 +557,8 @@ export default function DoctorCmsEditorPage({
               value={form.address || emptyBilingual()}
               onChange={(v) => setField("address", v)}
             />
+            {errors["address.en"] && <p className="text-xs text-red-500 -mt-3">{errors["address.en"]}</p>}
+            {errors["address.bn"] && <p className="text-xs text-red-500 -mt-3">{errors["address.bn"]}</p>}
             <LanguageMultiSelect
               value={form.languages || []}
               onChange={(languages) => setField("languages", languages)}

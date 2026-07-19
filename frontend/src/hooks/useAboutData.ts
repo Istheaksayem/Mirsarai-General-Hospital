@@ -21,15 +21,30 @@ export interface SectionConfig {
   order: number;
 }
 
+export interface FeatureItem {
+  title: BiText;
+  description: BiText;
+  color: string;
+}
+
+export interface FeaturesSection {
+  badge: BiText;
+  heading: BiText;
+  description: BiText;
+  items: FeatureItem[];
+}
+
 export interface AboutSection {
   id?: number;
   title: BiText;
   subtitle: BiText;
+  storyHeading?: BiText;
   description: BiText;
   content: BiText[];
   statistics: Statistic[];
   image: string;
   features?: BiText[];
+  featuresSection?: FeaturesSection;
   sections?: {
     hero: SectionConfig;
     story: SectionConfig;
@@ -45,12 +60,27 @@ export interface CoreValue {
   description: BiText;
 }
 
+export interface WhyItMattersItem {
+  title: BiText;
+  description: BiText;
+  color: string;
+}
+
 export interface MissionVisionSection {
   id?: number;
   title: BiText;
   mission: { title: BiText; description: BiText };
   vision: { title: BiText; description: BiText };
   coreValues: CoreValue[];
+  commitmentHeading?: BiText;
+  commitmentDescription?: BiText;
+  whyItMattersHeading?: BiText;
+  whyItMattersDescription?: BiText;
+  whyItMattersItems?: WhyItMattersItem[];
+  ctaHeading?: BiText;
+  ctaDescription?: BiText;
+  ctaPrimaryButtonText?: BiText;
+  ctaSecondaryButtonText?: BiText;
   image: string;
   sections?: {
     hero: SectionConfig;
@@ -74,29 +104,38 @@ import { normalizeImages } from "@/lib/getImageUrl";
 const fetchAboutData = async (): Promise<AboutData> => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
 
-  try {
-    const [aboutRes, mvRes] = await Promise.all([
-      fetch(`${apiUrl}/about/us`, { cache: "no-store" }),
-      fetch(`${apiUrl}/about/mission-vision`, { cache: "no-store" })
-    ]);
+  const [aboutSettled, mvSettled] = await Promise.allSettled([
+    fetch(`${apiUrl}/about/us`, { cache: "no-store" }).then(async (r) => {
+      if (!r.ok) throw new Error("Failed to fetch about us data");
+      const json = await r.json();
+      return normalizeImages(json.data) as AboutSection;
+    }),
+    fetch(`${apiUrl}/about/mission-vision`, { cache: "no-store" }).then(async (r) => {
+      if (!r.ok) throw new Error("Failed to fetch mission & vision data");
+      const json = await r.json();
+      return normalizeImages(json.data) as MissionVisionSection;
+    }),
+  ]);
 
-    if (!aboutRes.ok) throw new Error("Failed to fetch about us data");
-    if (!mvRes.ok) throw new Error("Failed to fetch mission & vision data");
-
-    const aboutData = await aboutRes.json();
-    const mvData = await mvRes.json();
-
-    return {
-      about: normalizeImages(aboutData.data),
-      missionVision: normalizeImages(mvData.data)
-    };
-  } catch (error) {
-    console.warn("Backend API not reachable for about data. Falling back to local data/aboutData.json", error);
-    const res = await fetch("/data/aboutData.json", { cache: "no-store" });
-    if (!res.ok) throw new Error("Failed to fetch fallback about data");
-    const localData = await res.json();
-    return localData;
+  // Both succeeded — return API data
+  if (aboutSettled.status === "fulfilled" && mvSettled.status === "fulfilled") {
+    return { about: aboutSettled.value, missionVision: mvSettled.value };
   }
+
+  // Partial failure — load fallback JSON and merge per-section
+  console.warn(
+    "Backend API partially unreachable. Falling back to local data/aboutData.json where needed.",
+    aboutSettled.status === "rejected" ? aboutSettled.reason : "",
+    mvSettled.status === "rejected" ? mvSettled.reason : "",
+  );
+  const fallbackRes = await fetch("/data/aboutData.json", { cache: "no-store" });
+  if (!fallbackRes.ok) throw new Error("Failed to fetch fallback about data");
+  const fallback: AboutData = await fallbackRes.json();
+
+  return {
+    about: aboutSettled.status === "fulfilled" ? aboutSettled.value : normalizeImages(fallback.about),
+    missionVision: mvSettled.status === "fulfilled" ? mvSettled.value : normalizeImages(fallback.missionVision),
+  };
 };
 
 // ── Hook ──────────────────────────────────────────────────────────────────────
@@ -142,7 +181,12 @@ export interface OurTeamSection {
 const fetchOurTeamData = async (): Promise<OurTeamSection> => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
   const res = await fetch(`${apiUrl}/about/our-team`, { cache: "no-store" });
-  if (!res.ok) throw new Error("Failed to fetch Our Team data");
+  if (!res.ok) {
+    console.warn("Backend API unreachable for Our Team. Falling back to local data/ourTeam.json.");
+    const fallbackRes = await fetch("/data/ourTeam.json", { cache: "no-store" });
+    if (!fallbackRes.ok) throw new Error("Failed to fetch fallback Our Team data");
+    return normalizeImages((await fallbackRes.json())) as OurTeamSection;
+  }
   const json = await res.json();
   return normalizeImages(json.data) as OurTeamSection;
 };
