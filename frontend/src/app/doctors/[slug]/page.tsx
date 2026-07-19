@@ -73,11 +73,11 @@ export default function DoctorProfilePage({ params }: { params: Promise<{ slug: 
               <div className="relative h-80 bg-gradient-to-b from-[#1E2B7A]/10 to-transparent">
                 <img
                   src={getImageUrl(doctor.image)}
-                  alt={lang === "bn" ? doctor.name.bn : doctor.name.en}
+                  alt={lang === "bn" ? (doctor.name?.bn ?? '') : (doctor.name?.en ?? '')}
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                      lang === "bn" ? doctor.name.bn : doctor.name.en
+                      lang === "bn" ? (doctor.name?.bn ?? '') : (doctor.name?.en ?? '')
                     )}&background=1E2B7A&color=fff&size=512`;
                   }}
                 />
@@ -99,10 +99,10 @@ export default function DoctorProfilePage({ params }: { params: Promise<{ slug: 
                 {/* Name & Title */}
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
-                    {lang === "bn" ? doctor.name.bn : doctor.name.en}
+                    {lang === "bn" ? (doctor.name?.bn ?? '') : (doctor.name?.en ?? '')}
                   </h1>
                   <p className="text-gray-500 dark:text-gray-400 text-sm">
-                    {lang === "bn" ? doctor.designation.bn : doctor.designation.en}
+                    {lang === "bn" ? (doctor.designation?.bn ?? '') : (doctor.designation?.en ?? '')}
                   </p>
                 </div>
 
@@ -130,8 +130,8 @@ export default function DoctorProfilePage({ params }: { params: Promise<{ slug: 
                       <p className="text-xs text-gray-400 font-semibold uppercase mb-1">
                         {lang === "bn" ? "ফোন নম্বর" : "Phone number"}
                       </p>
-                      <a href={`tel:${doctor.phone}`} className="text-sm text-gray-700 dark:text-gray-300 hover:text-[#1E2B7A] dark:hover:text-[#76BC21] transition-colors">
-                        {doctor.phone}
+                      <a href={`tel:${doctor.phone ?? ''}`} className="text-sm text-gray-700 dark:text-gray-300 hover:text-[#1E2B7A] dark:hover:text-[#76BC21] transition-colors">
+                        {doctor.phone ?? ''}
                       </a>
                     </div>
                   </div>
@@ -144,8 +144,8 @@ export default function DoctorProfilePage({ params }: { params: Promise<{ slug: 
                       <p className="text-xs text-gray-400 font-semibold uppercase mb-1">
                         {lang === "bn" ? "ইমেইল" : "Email"}
                       </p>
-                      <a href={`mailto:${doctor.email}`} className="text-sm text-gray-700 dark:text-gray-300 hover:text-[#1E2B7A] dark:hover:text-[#76BC21] transition-colors truncate block">
-                        {doctor.email}
+                      <a href={`mailto:${doctor.email ?? ''}`} className="text-sm text-gray-700 dark:text-gray-300 hover:text-[#1E2B7A] dark:hover:text-[#76BC21] transition-colors truncate block">
+                        {doctor.email ?? ''}
                       </a>
                     </div>
                   </div>
@@ -170,7 +170,7 @@ export default function DoctorProfilePage({ params }: { params: Promise<{ slug: 
               </h3>
               <div className="flex items-end gap-2 mb-1">
                 <span className="text-4xl font-black text-gray-900 dark:text-white">
-                  {lang === "bn" ? doctor.experience.bn.split("+")[0] : doctor.experience.en.split("+")[0]}
+                  {lang === "bn" ? (doctor.experience?.bn?.split("+")?.[0] ?? '0') : (doctor.experience?.en?.split("+")?.[0] ?? '0')}
                 </span>
                 <span className="text-xl font-bold text-gray-500 dark:text-gray-400 mb-1">
                   {lang === "bn" ? "বছর" : "years"}
@@ -229,7 +229,7 @@ export default function DoctorProfilePage({ params }: { params: Promise<{ slug: 
                 </h2>
               </div>
               <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                {lang === "bn" ? doctor.about.bn : doctor.about.en}
+                {lang === "bn" ? (doctor.about?.bn ?? '') : (doctor.about?.en ?? '')}
               </p>
             </div>
 
@@ -263,7 +263,7 @@ export default function DoctorProfilePage({ params }: { params: Promise<{ slug: 
                       {lang === "bn" ? "চেম্বার সময়" : "Chamber Time"}
                     </p>
                     <p className="text-sm font-bold text-gray-700 dark:text-gray-300">
-                      {lang === "bn" ? doctor.chamberTime.bn : doctor.chamberTime.en}
+                      {lang === "bn" ? (doctor.chamberTime?.bn ?? '') : (doctor.chamberTime?.en ?? '')}
                     </p>
                   </div>
                 </div>

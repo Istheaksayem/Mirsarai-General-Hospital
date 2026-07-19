@@ -20,7 +20,12 @@ export const updateStaff = catchAsync(async (req, res) => {
 
 export const deleteStaff = catchAsync(async (req, res) => {
   await StaffService.deleteStaff(req.params.id, req.user?.id);
-  sendSuccess(res, StatusCodes.OK, null, 'Staff deleted successfully');
+  sendSuccess(res, StatusCodes.OK, null, 'Staff permanently deleted');
+});
+
+export const createStaff = catchAsync(async (req, res) => {
+  const staff = await StaffService.createStaff(req.body, req.user?.id);
+  sendSuccess(res, StatusCodes.CREATED, staff, 'Staff created successfully');
 });
 
 export const activateStaff = catchAsync(async (req, res) => {

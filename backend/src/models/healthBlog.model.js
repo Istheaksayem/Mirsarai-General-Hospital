@@ -44,7 +44,9 @@ const healthBlogSchema = new mongoose.Schema(
       title: { type: localizedStringSchema, required: true },
       subtitle: { type: localizedStringSchema, required: true },
       description: { type: localizedStringSchema, required: true },
-      image: { type: String, required: true }
+      image: { type: String, required: true },
+      color: { type: String, default: '#1E2B7A' },
+      icon: { type: String, default: 'FaBlog' }
     },
     categories: { type: [categorySchema], default: [] },
     posts: { type: [postSchema], default: [] },

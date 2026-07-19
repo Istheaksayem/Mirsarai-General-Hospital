@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { Building2, Plus } from "lucide-react";
+import toast from "react-hot-toast";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SearchFilter } from "@/components/ui/SearchFilter";
 import { DataTable, Column } from "@/components/ui/DataTable";
@@ -22,7 +23,10 @@ export default function DepartmentsPage() {
   const handleDelete = useCallback(
     (id: string) => {
       if (window.confirm("Delete this department? This cannot be undone.")) {
-        deleteMutation.mutate(id);
+        deleteMutation.mutate(id, {
+          onSuccess: () => toast.success("Department deleted successfully"),
+          onError: (err: Error) => toast.error(err?.message || "Failed to delete department"),
+        });
       }
     },
     [deleteMutation]

@@ -15,6 +15,7 @@ import {
 } from "@/lib/hooks/useCmsDoctors";
 import type { PendingRegistration } from "@/lib/services/api";
 import type { AdminInfoData } from "@/lib/services/api";
+import toast from "react-hot-toast";
 
 interface ApprovalTarget {
   userId: string;
@@ -60,8 +61,10 @@ export default function PendingRegistrationsPage() {
       });
       await approveMutation.mutateAsync(approvalTarget.userId);
       setApprovalTarget(null);
+      toast.success("Staff approved successfully");
     } catch {
       setAdminInfoError("Failed to approve. Please try again.");
+      toast.error("Failed to approve staff");
     } finally {
       setApproving(false);
     }
@@ -82,7 +85,10 @@ export default function PendingRegistrationsPage() {
   const handleReject = useCallback(
     (userId: string, fullName: string) => {
       if (window.confirm(`Reject registration for "${fullName}"?`)) {
-        rejectMutation.mutate(userId);
+        rejectMutation.mutate(userId, {
+          onSuccess: () => toast.success("Registration rejected"),
+          onError: (err: Error) => toast.error(err?.message || "Failed to reject registration"),
+        });
       }
     },
     [rejectMutation]

@@ -183,6 +183,50 @@
         "bn": "৬ মিনিট পড়া"
       },
       "image": "/about-us.jpg"
+    },
+    {
+      "id": 7,
+      "category": "child-care",
+      "title": {
+        "en": "Healthy Eating Habits for Kids",
+        "bn": "শিশুদের জন্য স্বাস্থ্যকর খাদ্যাভ্যাস"
+      },
+      "excerpt": {
+        "en": "Teach your children healthy eating habits early to set them up for a lifetime of wellness.",
+        "bn": "আপনার শিশুদের আগে থেকেই স্বাস্থ্যকর খাদ্যাভ্যাস শেখান যাতে তারা সারা জীবন সুস্থ থাকে।"
+      },
+      "author": {
+        "en": "Dr. Tahmina Akter",
+        "bn": "ডা. তাহমিনা আক্তার"
+      },
+      "date": "2024-01-18",
+      "readTime": {
+        "en": "5 min read",
+        "bn": "৫ মিনিট পড়া"
+      },
+      "image": "/hospital-banner.jpg"
+    },
+    {
+      "id": 8,
+      "category": "mental-health",
+      "title": {
+        "en": "Mindfulness Meditation for Beginners",
+        "bn": "শুরুর দিকের জন্য মাইন্ডফুলনেস মেডিটেশন"
+      },
+      "excerpt": {
+        "en": "A simple guide to mindfulness meditation and how it can improve your mental health.",
+        "bn": "মাইন্ডফুলনেস মেডিটেশনের একটি সহজ গাইড এবং এটি কীভাবে আপনার মানসিক স্বাস্থ্যের উন্নতি করতে পারে।"
+      },
+      "author": {
+        "en": "Dr. Farzana Hossain",
+        "bn": "ডা. ফারজানা হোসেন"
+      },
+      "date": "2024-01-20",
+      "readTime": {
+        "en": "7 min read",
+        "bn": "৭ মিনিট পড়া"
+      },
+      "image": "/about-us.jpg"
     }
   ],
   "tags": [

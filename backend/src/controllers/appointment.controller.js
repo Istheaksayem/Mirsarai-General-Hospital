@@ -3,6 +3,9 @@ import { sendSuccess, sendPaginated } from '../utils/ApiResponse.js';
 import catchAsync from '../utils/catchAsync.js';
 import * as appointmentService from '../services/appointment.service.js';
 import { APPOINTMENT_SOURCE } from '../constants/index.js';
+import ApiError from '../utils/ApiError.js';
+import DoctorProfile from '../models/doctorProfile.model.js';
+import Doctor from '../models/doctor.model.js';
 
 /**
  * POST /api/v1/appointments
@@ -72,8 +75,73 @@ export const deleteAdminAppointment = catchAsync(async (req, res) => {
  */
 export const updateAdminAppointmentStatus = catchAsync(async (req, res) => {
   const { status } = req.body;
-  const appointment = await appointmentService.updateAppointmentStatus(req.params.id, status);
+  const appointment = await appointmentService.updateAppointmentStatus(req.params.id, status, 'super-admin');
   sendSuccess(res, StatusCodes.OK, appointment, 'Appointment status updated successfully');
+});
+
+/**
+ * GET /api/v1/doctors/appointments/completed
+ * Doctor: get all completed appointments for the logged-in doctor
+ */
+export const getMyCompletedAppointments = catchAsync(async (req, res) => {
+  const result = await appointmentService.getDoctorCompletedAppointments(req.user.doctorRef, req.user.id, req.query);
+  sendPaginated(
+    res,
+    result.data,
+    result.total,
+    result.page,
+    result.limit,
+    'Completed appointments fetched successfully'
+  );
+});
+
+/**
+ * GET /api/v1/doctors/appointments/:id
+ * Doctor: get a single appointment by ID (must be assigned doctor)
+ */
+export const getMyAppointmentById = catchAsync(async (req, res) => {
+  const appointment = await appointmentService.getAppointmentById(req.params.id);
+
+  let doctorRef = req.user.doctorRef;
+  if (!doctorRef && req.user.id) {
+    const profile = await DoctorProfile.findOne({ userId: req.user.id }).select('slug').lean();
+    if (profile?.slug) {
+      const doctorDoc = await Doctor.findOne({ slug: profile.slug }).select('_id').lean();
+      doctorRef = doctorDoc?._id;
+    }
+  }
+
+  if (!doctorRef || appointment.doctor?._id?.toString() !== doctorRef.toString()) {
+    throw new ApiError(StatusCodes.FORBIDDEN, 'You can only view your own appointments');
+  }
+
+  sendSuccess(res, StatusCodes.OK, appointment, 'Appointment fetched successfully');
+});
+
+/**
+ * PATCH /api/v1/doctors/appointments/:id/status
+ * Doctor: update their own appointment status (must be assigned doctor)
+ */
+export const updateDoctorAppointmentStatus = catchAsync(async (req, res) => {
+  const { status } = req.body;
+  const appointment = await appointmentService.getAppointmentById(req.params.id);
+
+  let doctorRef = req.user.doctorRef;
+  if (!doctorRef && req.user.id) {
+    const profile = await DoctorProfile.findOne({ userId: req.user.id }).select('slug').lean();
+    if (profile?.slug) {
+      const doctorDoc = await Doctor.findOne({ slug: profile.slug }).select('_id').lean();
+      doctorRef = doctorDoc?._id;
+    }
+  }
+
+  const doctorId = appointment.doctor?._id || appointment.doctor;
+  if (!doctorRef || doctorId?.toString() !== doctorRef.toString()) {
+    throw new ApiError(StatusCodes.FORBIDDEN, 'You can only update your own appointments');
+  }
+
+  const updated = await appointmentService.updateAppointmentStatus(req.params.id, status, 'doctor');
+  sendSuccess(res, StatusCodes.OK, updated, 'Appointment status updated successfully');
 });
 
 /**

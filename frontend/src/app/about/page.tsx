@@ -11,6 +11,7 @@ import { motion } from "framer-motion";
 import { getImageUrl } from "@/lib/getImageUrl";
 
 const statIcons = [FaUserMd, FaUsers, FaSmile, FaAward];
+const featureIcons = [FaStethoscope, MdSecurity, FaHeart];
 
 const fadeUp = {
   initial: { opacity: 0, y: 30 },
@@ -93,37 +94,6 @@ const AboutPage = () => {
   }
 
   const { about } = data;
-
-  // Bilingual feature cards (icons are component-level, text from t())
-  const featureCards = [
-    {
-      icon: FaStethoscope,
-      title: t("Expert Medical Team", "বিশেষজ্ঞ চিকিৎসা দল"),
-      description: t(
-        "Board-certified doctors and healthcare professionals dedicated to your well-being.",
-        "আপনার সুস্বাস্থ্যের জন্য নিবেদিত বোর্ড-সার্টিফাইড ডাক্তার এবং স্বাস্থ্যসেবা পেশাদার।"
-      ),
-      color: "from-blue-500 via-primary to-blue-900",
-    },
-    {
-      icon: MdSecurity,
-      title: t("Patient Safety First", "রোগীর নিরাপত্তা সর্বপ্রথম"),
-      description: t(
-        "Highest standards of safety protocols and hygiene in all our facilities.",
-        "আমাদের সকল সুবিধায় সর্বোচ্চ মানের সুরক্ষা প্রোটোকল এবং স্বাস্থ্যবিধি।"
-      ),
-      color: "from-secondary via-green-600 to-green-700",
-    },
-    {
-      icon: FaHeart,
-      title: t("Compassionate Care", "সহানুভূতিশীল সেবা"),
-      description: t(
-        "Every patient receives empathy, respect, and personalized attention.",
-        "প্রতিটি রোগী সহানুভূতি, সম্মান এবং ব্যক্তিগত মনোযোগ পায়।"
-      ),
-      color: "from-red-500 via-pink-600 to-pink-700",
-    },
-  ];
 
   // Section components
   const renderHero = () => (
@@ -242,11 +212,7 @@ const AboutPage = () => {
               </span>
 
               <h2 className="text-4xl md:text-5xl font-extrabold text-primary mb-6 leading-tight">
-                {t("Dedicated to", "নিবেদিত")}{" "}
-                <span className="text-gradient">
-                  {t("Better Healthcare", "উন্নত স্বাস্থ্যসেবায়")}
-                </span>{" "}
-                {t("for All", "সকলের জন্য")}
+                {t(about.storyHeading?.en || "Dedicated to Better Healthcare for All", about.storyHeading?.bn || "নিবেদিত উন্নত স্বাস্থ্যসেবায় সকলের জন্য")}
               </h2>
 
               <p className="text-gray-600 text-lg leading-relaxed mb-6">
@@ -290,60 +256,64 @@ const AboutPage = () => {
     </section>
   );
 
-  const renderFeatures = () => (
-    <section key="features" className="relative py-24 px-4 overflow-hidden">
-      {/* Background Image with Overlay */}
-      <div className="absolute inset-0">
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-fixed"
-          style={{
-            backgroundImage: `url('${getImageUrl(about.image)}')`,
-          }}
-        />
-        <div className="absolute inset-0 bg-primary/50" />
-      </div>
-
-      {/* Decorative Blobs */}
-      <div className="absolute top-20 left-20 w-80 h-80 bg-secondary/20 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-20 right-20 w-96 h-96 bg-cyan-400/20 rounded-full blur-3xl animate-pulse delay-1000" />
-
-      <div className="max-w-6xl mx-auto relative z-10">
-        <motion.div className="text-center mb-16" {...fadeUp}>
-          <span className="inline-block px-6 py-2 rounded-full glass-card-dark text-secondary text-sm font-bold mb-6">
-            {t("Why Choose Us", "কেন আমাদের বেছে নেবেন")}
-          </span>
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 text-shadow-strong">
-            {t("Excellence in Every Aspect", "প্রতিটি দিক থেকে উৎকর্ষ")}
-          </h2>
-          <p className="text-white/90 text-xl max-w-2xl mx-auto">
-            {t(
-              "We combine expertise, compassion, and modern technology to deliver exceptional healthcare.",
-              "আমরা ব্যতিক্রমী স্বাস্থ্যসেবা প্রদানের জন্য দক্ষতা, সহানুভূতি এবং আধুনিক প্রযুক্তির সমন্বয় করি।"
-            )}
-          </p>
-        </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {featureCards.map((item, i) => (
-            <motion.div
-              key={i}
-              className="group glass-card rounded-3xl p-8 hover:scale-105 transition-all duration-500 hover:shadow-2xl"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.1 }}
-            >
-              <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center mb-6 group-hover:rotate-6 group-hover:scale-110 transition-all duration-300 shadow-xl`}>
-                <item.icon className="text-white text-4xl" />
-              </div>
-              <h3 className="text-2xl font-bold text-primary mb-4">{item.title}</h3>
-              <p className="text-gray-600 leading-relaxed text-lg">{item.description}</p>
-            </motion.div>
-          ))}
+  const renderFeatures = () => {
+    const fs = about.featuresSection;
+    if (!fs) return null;
+    return (
+      <section key="features" className="relative py-24 px-4 overflow-hidden">
+        {/* Background Image with Overlay */}
+        <div className="absolute inset-0">
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-fixed"
+            style={{
+              backgroundImage: `url('${getImageUrl(about.image)}')`,
+            }}
+          />
+          <div className="absolute inset-0 bg-primary/50" />
         </div>
-      </div>
-    </section>
-  );
+
+        {/* Decorative Blobs */}
+        <div className="absolute top-20 left-20 w-80 h-80 bg-secondary/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 right-20 w-96 h-96 bg-cyan-400/20 rounded-full blur-3xl animate-pulse delay-1000" />
+
+        <div className="max-w-6xl mx-auto relative z-10">
+          <motion.div className="text-center mb-16" {...fadeUp}>
+            <span className="inline-block px-6 py-2 rounded-full glass-card-dark text-secondary text-sm font-bold mb-6">
+              {t(fs.badge.en, fs.badge.bn)}
+            </span>
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 text-shadow-strong">
+              {t(fs.heading.en, fs.heading.bn)}
+            </h2>
+            <p className="text-white/90 text-xl max-w-2xl mx-auto">
+              {t(fs.description.en, fs.description.bn)}
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {fs.items.map((item, i) => {
+              const Icon = featureIcons[i % featureIcons.length];
+              return (
+                <motion.div
+                  key={i}
+                  className="group glass-card rounded-3xl p-8 hover:scale-105 transition-all duration-500 hover:shadow-2xl"
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: i * 0.1 }}
+                >
+                  <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center mb-6 group-hover:rotate-6 group-hover:scale-110 transition-all duration-300 shadow-xl`}>
+                    <Icon className="text-white text-4xl" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-primary mb-4">{t(item.title.en, item.title.bn)}</h3>
+                  <p className="text-gray-600 leading-relaxed text-lg">{t(item.description.en, item.description.bn)}</p>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+    );
+  };
 
   const renderStatistics = () => (
     <section key="statistics" className="py-20 px-4 bg-gradient-to-br from-gray-50 via-blue-50/30 to-white">

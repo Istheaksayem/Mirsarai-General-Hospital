@@ -13,6 +13,7 @@ import { uploadCmsImage, type CmsDepartment, type BilingualField } from "@/lib/s
 import { LanguageTabs } from "@/components/cms/LanguageTabs";
 import { ImageUploader } from "@/components/cms/ImageUploader";
 import { cn } from "@/lib/utils";
+import toast from "react-hot-toast";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -198,12 +199,13 @@ export default function DepartmentCmsEditorPage({
         await updateMutation.mutateAsync(form);
       }
       setSaveStatus("saved");
+      toast.success(isNew ? "Department created" : "Department updated");
       setTimeout(() => setSaveStatus("idle"), 3000);
       if (isNew) router.push("/super-admin/departments");
-    } catch (err) {
+    } catch (err: any) {
       setSaveStatus("error");
+      toast.error(err?.message || "Failed to save department");
       setTimeout(() => setSaveStatus("idle"), 4000);
-      console.error("Save failed:", err);
     }
   };
 

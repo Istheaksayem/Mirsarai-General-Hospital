@@ -7,11 +7,12 @@ import { DataTable, Column } from "@/components/ui/DataTable";
 import { Badge } from "@/components/ui/Badge";
 import { useReports } from "@/lib/hooks/useReports";
 import { createActionColumn } from "@/components/ui/ActionButtons";
+import type { UnifiedReport } from "@/lib/services/api";
 
 const sv = { pending: "warning", "in-progress": "info", completed: "success" } as const;
 
 const columns: Column<Record<string, unknown>>[] = [
-  { key: "id", header: "ID", cell: (r) => <span className="font-mono text-xs text-gray-400">{r.id as string}</span> },
+  { key: "_id", header: "ID", cell: (r) => <span className="font-mono text-xs text-gray-400">{(r._id as string)?.slice(-6)}</span> },
   {
     key: "patientName", header: "Patient",
     cell: (r) => (
@@ -30,8 +31,8 @@ const columns: Column<Record<string, unknown>>[] = [
       </div>
     ),
   },
-  { key: "requestDate", header: "Date" },
-  { key: "completedDate", header: "Completed", cell: (r) => <span className="text-gray-400">{(r.completedDate as string) || "—"}</span> },
+  { key: "createdAt", header: "Date", cell: (r) => <span className="text-sm text-gray-500">{(r.createdAt as string)?.split("T")[0]}</span> },
+  { key: "completedDate", header: "Completed", cell: (r) => <span className="text-gray-400">{(r.completedDate as string)?.split("T")[0] || "—"}</span> },
   {
     key: "status", header: "Status",
     cell: (r) => {
@@ -45,12 +46,13 @@ const columns: Column<Record<string, unknown>>[] = [
 export default function DoctorReportsPage() {
   const { data = [], isLoading } = useReports();
   const [search, setSearch] = useState("");
-  const filtered = data.filter((r) =>
+  const unified = data as UnifiedReport[];
+  const filtered = unified.filter((r) =>
     !search || r.patientName.toLowerCase().includes(search.toLowerCase()) || r.testName.toLowerCase().includes(search.toLowerCase())
   ) as unknown as Record<string, unknown>[];
   return (
     <div className="space-y-6">
-      <PageHeader title="Medical Reports" description={`${data.length} reports`} icon={FileText} />
+      <PageHeader title="Medical Reports" description={`${unified.length} reports`} icon={FileText} />
       <SearchFilter value={search} onChange={setSearch} placeholder="Search patient or test..." className="max-w-sm" />
       <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-4">
         <DataTable data={filtered} columns={columns} isLoading={isLoading} pageSize={8} emptyTitle="No reports found" />

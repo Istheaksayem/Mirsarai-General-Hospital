@@ -9,6 +9,7 @@ import {
   doctorQuerySchema,
   doctorProfileSchema,
 } from '../validators/doctor.validator.js';
+import { updateDoctorStatusSchema } from '../validators/appointment.validator.js';
 
 const router = express.Router();
 
@@ -43,6 +44,27 @@ router.get('/appointments', authenticate, authorize('doctor'), AppointmentContro
  * @access Private (doctor)
  */
 router.get('/appointments/today', authenticate, authorize('doctor'), AppointmentController.getMyTodaysAppointments);
+
+/**
+ * @route  GET /api/v1/doctors/appointments/completed
+ * @desc   Get completed appointments for the logged-in doctor (Patient History)
+ * @access Private (doctor)
+ */
+router.get('/appointments/completed', authenticate, authorize('doctor'), AppointmentController.getMyCompletedAppointments);
+
+/**
+ * @route  GET /api/v1/doctors/appointments/:id
+ * @desc   Get a single appointment by ID (must be assigned doctor)
+ * @access Private (doctor)
+ */
+router.get('/appointments/:id', authenticate, authorize('doctor'), AppointmentController.getMyAppointmentById);
+
+/**
+ * @route  PATCH /api/v1/doctors/appointments/:id/status
+ * @desc   Update appointment status (assigned doctor only)
+ * @access Private (doctor)
+ */
+router.patch('/appointments/:id/status', authenticate, authorize('doctor'), validate(updateDoctorStatusSchema), AppointmentController.updateDoctorAppointmentStatus);
 
 // ── PUBLIC ROUTES ──────────────────────────────────────────────────────────────
 // These are open — no auth required

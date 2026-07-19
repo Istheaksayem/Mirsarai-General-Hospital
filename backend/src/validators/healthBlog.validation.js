@@ -44,7 +44,9 @@ export const putHealthBlogSchema = z.object({
       title: localizedStringSchema,
       subtitle: localizedStringSchema,
       description: localizedStringSchema,
-      image: z.string().min(1, 'Hero image is required')
+      image: z.string().min(1, 'Hero image is required'),
+      color: z.string().optional().default('#1E2B7A'),
+      icon: z.string().optional().default('FaBlog')
     }),
     categories: z.array(categorySchema).default([]),
     posts: z.array(postSchema).default([]),

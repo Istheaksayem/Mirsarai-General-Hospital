@@ -1,59 +1,61 @@
 import { StatusCodes } from 'http-status-codes';
-import mongoose from 'mongoose';
 import Appointment from '../models/appointment.model.js';
-import Patient from '../models/patient.model.js';
 import Doctor from '../models/doctor.model.js';
 import DoctorProfile from '../models/doctorProfile.model.js';
 import ApiError from '../utils/ApiError.js';
-import generatePatientId from '../utils/generatePatientId.js';
 import generateAppointmentId from '../utils/generateAppointmentId.js';
 import sendEmail from '../utils/sendEmail.js';
-import env from '../config/env.js';
+import { createNotification } from './notification.service.js';
 import { APPOINTMENT_SOURCE } from '../constants/index.js';
+import { isTransitionAllowed } from '../constants/statusTransitions.js';
+import { findOrCreatePatient, linkPatientToAppointment } from './patient/shared-patient.service.js';
 
 /**
- * Find existing patient by phone number, or create a new one.
- * This prevents duplicate patient records.
+ * When an appointment is confirmed: find or create the patient,
+ * link the appointment, and send confirmation notification.
  */
-export const findOrCreatePatient = async ({ patientPhone, patientName, patientEmail, patientAge, patientGender }) => {
-  let patient = await Patient.findOne({ mobile: patientPhone }).lean();
+const handleAppointmentConfirmed = async (appointment) => {
+  const patient = await findOrCreatePatient({
+    phone: appointment.patientPhone,
+    name: appointment.patientName,
+    email: appointment.patientEmail,
+    age: appointment.patientAge,
+    gender: appointment.patientGender,
+  });
 
-  if (!patient) {
-    const patientId = await generatePatientId();
-    const patientData = {
-      patientId,
-      fullName: patientName,
-      mobile: patientPhone,
-    };
-    if (patientEmail) patientData.email = patientEmail;
-    if (patientAge !== undefined && patientAge !== null) patientData.age = patientAge;
-    if (patientGender) patientData.gender = patientGender;
+  if (patient) {
+    await linkPatientToAppointment(appointment._id, patient);
+  }
 
-    patient = await Patient.create(patientData);
-    patient = patient.toObject();
+  try {
+    await createNotification({
+      patientId: patient._id,
+      type: 'status_update',
+      title: 'Appointment Confirmed',
+      message: `Your appointment has been confirmed successfully. — ${appointment.patientName} with ${appointment.doctor?.name?.en || 'doctor'} on ${new Date(appointment.date).toLocaleDateString()}`,
+    });
+  } catch (err) {
+    console.log('Confirmation notification failed:', err.message);
+  }
 
-    // Send welcome email for new patients
-    if (patientEmail) {
-      try {
-        await sendEmail({
-          email: patientEmail,
-          subject: 'Welcome to Mirsarai General Hospital Patient Portal',
-          message: `Dear ${patientName},
+  if (appointment.patientEmail) {
+    try {
+      await sendEmail({
+        email: appointment.patientEmail,
+        subject: 'Appointment Confirmed — Mirsarai General Hospital',
+        message: `Dear ${appointment.patientName},
 
-You have been registered at Mirsarai General Hospital.
+Your appointment has been confirmed successfully.
 
-Your Patient ID: ${patientId}
-
-You can access your information — prescriptions, lab reports, and more — through your patient dashboard.
-
-Visit: ${env.clientUrl || 'http://localhost:3000'}/login-patient?email=${encodeURIComponent(patientEmail)}
+Doctor: ${appointment.doctor?.name?.en || 'Assigned doctor'}
+Date: ${new Date(appointment.date).toLocaleDateString()}
+Time: ${appointment.time}
 
 Thank you,
 Mirsarai General Hospital`,
-        });
-      } catch (err) {
-        console.log('Welcome email sending failed:', err.message);
-      }
+      });
+    } catch (err) {
+      console.log('Confirmation email sending failed:', err.message);
     }
   }
 
@@ -61,8 +63,49 @@ Mirsarai General Hospital`,
 };
 
 /**
- * Create an appointment with centralized ID generation and patient lookup.
- * Always generates appointmentId on the backend — never trusts client IDs.
+ * When an appointment is rejected: send notification (no patient record created).
+ */
+const handleAppointmentRejected = async (appointment) => {
+  if (appointment.patientId) {
+    try {
+      await createNotification({
+        patientId: appointment.patientId,
+        type: 'status_update',
+        title: 'Appointment Rejected',
+        message: `Unfortunately, your appointment request has been rejected. — ${appointment.patientName} on ${new Date(appointment.date).toLocaleDateString()}`,
+      });
+    } catch (err) {
+      console.log('Rejection notification failed:', err.message);
+    }
+  }
+
+  if (appointment.patientEmail) {
+    try {
+      await sendEmail({
+        email: appointment.patientEmail,
+        subject: 'Appointment Request Update — Mirsarai General Hospital',
+        message: `Dear ${appointment.patientName},
+
+Unfortunately, your appointment request has been rejected.
+
+Doctor: ${appointment.doctor?.name?.en || 'Assigned doctor'}
+Date: ${new Date(appointment.date).toLocaleDateString()}
+Time: ${appointment.time}
+
+If you have any questions, please contact the hospital.
+
+Thank you,
+Mirsarai General Hospital`,
+      });
+    } catch (err) {
+      console.log('Rejection email sending failed:', err.message);
+    }
+  }
+};
+
+/**
+ * Create an appointment with centralized ID generation.
+ * Does NOT create a Patient record at booking time — that happens when status changes to "confirmed".
  */
 export const createAppointment = async (data, source = APPOINTMENT_SOURCE.ONLINE) => {
   const doctor = await Doctor.findById(data.doctor);
@@ -70,26 +113,16 @@ export const createAppointment = async (data, source = APPOINTMENT_SOURCE.ONLINE
     throw new ApiError(StatusCodes.NOT_FOUND, 'Doctor not found');
   }
 
-  // Find existing patient by phone or create new one
-  const patient = await findOrCreatePatient({
-    patientPhone: data.patientPhone,
-    patientName: data.patientName,
-    patientEmail: data.patientEmail,
-    patientAge: data.patientAge,
-    patientGender: data.patientGender,
-  });
-
-  // Generate appointment ID (never trust client-provided IDs)
   const appointmentId = await generateAppointmentId();
 
   const appointmentData = {
     appointmentId,
-    patientId: patient._id,
-    patientName: patient.fullName,
-    patientPhone: patient.mobile,
-    patientEmail: patient.email,
-    patientAge: patient.age,
-    patientGender: patient.gender,
+    patientId: null,
+    patientName: data.patientName,
+    patientPhone: data.patientPhone,
+    patientEmail: data.patientEmail,
+    patientAge: data.patientAge,
+    patientGender: data.patientGender,
     doctor: data.doctor,
     department: data.department || doctor.department?.en,
     service: data.service,
@@ -104,19 +137,22 @@ export const createAppointment = async (data, source = APPOINTMENT_SOURCE.ONLINE
   };
 
   const appointment = await Appointment.create(appointmentData);
-  const populated = await Appointment.findById(appointment._id)
+  let populated = await Appointment.findById(appointment._id)
     .populate('doctor', 'name designation image department')
     .lean();
 
+  let patient = null;
+
+  if (populated.status === 'confirmed') {
+    patient = await handleAppointmentConfirmed(populated);
+    populated = await Appointment.findById(appointment._id)
+      .populate('doctor', 'name designation image department')
+      .lean();
+  }
+
   return {
     appointment: populated,
-    patient: {
-      _id: patient._id,
-      patientId: patient.patientId,
-      fullName: patient.fullName,
-      mobile: patient.mobile,
-      email: patient.email,
-    },
+    patient: patient ? { _id: patient._id, patientId: patient.patientId, fullName: patient.fullName, mobile: patient.mobile, email: patient.email } : null,
   };
 };
 
@@ -207,12 +243,29 @@ export const getDoctorTodaysAppointments = async (doctorRef, userId) => {
   const appointments = await Appointment.find({
     doctor: resolvedRef,
     date: { $gte: today, $lt: tomorrow },
+    status: { $ne: 'completed' },
   })
     .populate('doctor', 'name designation image department')
     .sort({ time: 1 })
     .lean();
 
   return appointments;
+};
+
+export const getDoctorCompletedAppointments = async (doctorRef, userId, filters = {}) => {
+  let resolvedRef = doctorRef;
+
+  if (!resolvedRef && userId) {
+    const profile = await DoctorProfile.findOne({ userId }).select('slug').lean();
+    if (profile?.slug) {
+      const doctorDoc = await Doctor.findOne({ slug: profile.slug }).select('_id').lean();
+      resolvedRef = doctorDoc?._id;
+    }
+  }
+
+  if (!resolvedRef) return { data: [], total: 0, page: 1, limit: 10 };
+
+  return getAppointments({ ...filters, doctorId: resolvedRef.toString(), status: 'completed' });
 };
 
 /**
@@ -276,7 +329,21 @@ export const deleteAppointment = async (id) => {
   return appointment;
 };
 
-export const updateAppointmentStatus = async (id, status) => {
+export const updateAppointmentStatus = async (id, status, role = 'super-admin') => {
+  const existing = await Appointment.findById(id)
+    .populate('doctor', 'name designation image department')
+    .lean();
+  if (!existing) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Appointment not found');
+  }
+
+  if (!isTransitionAllowed(role, status)) {
+    throw new ApiError(
+      StatusCodes.FORBIDDEN,
+      `Role '${role}' is not allowed to set status to '${status}'`
+    );
+  }
+
   const appointment = await Appointment.findByIdAndUpdate(
     id,
     { status },
@@ -285,8 +352,17 @@ export const updateAppointmentStatus = async (id, status) => {
     .populate('doctor', 'name designation image department')
     .lean();
 
-  if (!appointment) {
-    throw new ApiError(StatusCodes.NOT_FOUND, 'Appointment not found');
+  if (status === 'confirmed') {
+    await handleAppointmentConfirmed(appointment);
+    const refreshed = await Appointment.findById(id)
+      .populate('doctor', 'name designation image department')
+      .lean();
+    return refreshed;
   }
+
+  if (status === 'rejected') {
+    await handleAppointmentRejected(existing);
+  }
+
   return appointment;
 };

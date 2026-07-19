@@ -2,19 +2,35 @@
 
 import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Save, CheckCircle2, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, CheckCircle2, Loader2, AlertCircle } from "lucide-react";
 import { LanguageTabs } from "@/components/cms/LanguageTabs";
 import { RichTextEditor } from "@/components/cms/RichTextEditor";
 import { ImageUploader } from "@/components/cms/ImageUploader";
 import { SeoFields, type SeoValue } from "@/components/cms/SeoFields";
 import { FormField, FormInput, FormSelect } from "@/components/ui/FormPage";
+import { ChamberTimePicker } from "@/components/doctors/ChamberTimePicker";
+import { LanguageMultiSelect } from "@/components/doctors/LanguageMultiSelect";
 import { env } from "@/config/env";
 
 const API_URL = env.apiUrl;
-const DAYS = ["Saturday","Sunday","Monday","Tuesday","Wednesday","Thursday","Friday"];
+const DEPARTMENTS = ["General Medicine","Cardiology","Orthopedics","Neurology","Gynecology","Pediatrics","Gastroenterology","Dermatology","ENT","Ophthalmology","Urology","Radiology","Pathology","Emergency"];
+const SPECIALIZATIONS = ["Medicine Specialist","Cardiologist","Orthopedic Surgeon","Neurologist","Gynecologist","Pediatrician","Gastroenterologist","Dermatologist","ENT Specialist","Ophthalmologist","Urologist","Radiologist","Pathologist","Emergency Medicine Specialist"];
 
 type Bi = { en: string; bn: string };
 const bi = (en = "", bn = ""): Bi => ({ en, bn });
+
+interface Errors {
+  nameEn?: string; nameBn?: string;
+  designationEn?: string; designationBn?: string;
+  specializationEn?: string; specializationBn?: string;
+  departmentEn?: string; departmentBn?: string;
+  qualification?: string;
+  chamberTimeEn?: string; chamberTimeBn?: string;
+  aboutEn?: string; aboutBn?: string;
+  addressEn?: string; addressBn?: string;
+  phone?: string; email?: string;
+  experience?: string;
+}
 
 export default function EditDoctorCmsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -24,6 +40,7 @@ export default function EditDoctorCmsPage({ params }: { params: Promise<{ id: st
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
+  const [errors, setErrors] = useState<Errors>({});
 
   const [form, setForm] = useState<Record<string, unknown>>({});
 
@@ -46,6 +63,7 @@ export default function EditDoctorCmsPage({ params }: { params: Promise<{ id: st
           chamberTimeEn:   d.chamberTime?.en  || "",
           chamberTimeBn:   d.chamberTime?.bn  || "",
           availableDays:   d.availableDays    || [],
+          languages:       d.languages || ["Bangla", "English"],
           phone:           d.phone            || "",
           email:           d.email            || "",
           addressEn:       d.address?.en      || "",
@@ -82,20 +100,45 @@ export default function EditDoctorCmsPage({ params }: { params: Promise<{ id: st
     return json.data.url as string;
   };
 
-  const handleSave = async () => {
+  const validate = (): boolean => {
     const name = form.name as Bi;
+    const desig = form.designation as Bi;
     const spec = form.specialization as Bi;
     const dept = form.department as Bi;
-    if (!name?.en || !spec?.en || !dept?.en || !form.qualification) {
-      setError("Name (EN), Specialization (EN), Department (EN), Qualification required.");
-      return;
-    }
+    const about = form.about as Bi;
+    const e: Errors = {};
+    if (!name?.en?.trim()) e.nameEn = "Name (English) is required";
+    if (!name?.bn?.trim()) e.nameBn = "Name (Bangla) is required";
+    if (!desig?.en?.trim()) e.designationEn = "Designation (English) is required";
+    if (!desig?.bn?.trim()) e.designationBn = "Designation (Bangla) is required";
+    if (!spec?.en?.trim()) e.specializationEn = "Specialization (English) is required";
+    if (!spec?.bn?.trim()) e.specializationBn = "Specialization (Bangla) is required";
+    if (!dept?.en?.trim()) e.departmentEn = "Department (English) is required";
+    if (!dept?.bn?.trim()) e.departmentBn = "Department (Bangla) is required";
+    if (!(form.qualification as string)?.trim()) e.qualification = "Qualification is required";
+    if (!(form.chamberTimeEn as string)?.trim()) e.chamberTimeEn = "Chamber time (English) is required";
+    if (!(form.chamberTimeBn as string)?.trim()) e.chamberTimeBn = "Chamber time (Bangla) is required";
+    if (!about?.en?.trim()) e.aboutEn = "About (English) is required";
+    if (!about?.bn?.trim()) e.aboutBn = "About (Bangla) is required";
+    if (!(form.addressEn as string)?.trim()) e.addressEn = "Address (English) is required";
+    if (!(form.addressBn as string)?.trim()) e.addressBn = "Address (Bangla) is required";
+    if (!(form.phone as string)?.trim()) e.phone = "Phone number is required";
+    const email = form.email as string;
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = "Valid email is required";
+    if ((form.experienceYears as number) < 0) e.experience = "Experience years cannot be negative";
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const handleSave = async () => {
+    if (!validate()) return;
     setSaving(true); setError("");
     try {
       const payload = {
         name: form.name, designation: form.designation,
         specialization: form.specialization, department: form.department,
         qualification: form.qualification, registrationNumber: form.registrationNumber,
+        languages: form.languages,
         about: form.about, services: form.services,
         experience: { years: form.experienceYears, label: { en: `${form.experienceYears}+ Years`, bn: `${form.experienceYears}+ বছর` } },
         consultationFee: form.consultationFee,
@@ -145,6 +188,8 @@ export default function EditDoctorCmsPage({ params }: { params: Promise<{ id: st
   const n = (k: string) => (form[k] as number) || 0;
   const b = (k: string) => !!(form[k]);
 
+  const clearError = (key: keyof Errors) => setErrors(e => ({ ...e, [key]: undefined }));
+
   return (
     <div className="space-y-6 pb-12">
       {/* Sticky header */}
@@ -165,33 +210,53 @@ export default function EditDoctorCmsPage({ params }: { params: Promise<{ id: st
       </div>
 
       {error && (
-        <div className="rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 px-4 py-3 text-sm text-red-600 dark:text-red-400">⚠️ {error}</div>
+        <div className="rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 px-4 py-3 text-sm text-red-600 dark:text-red-400 flex items-start gap-2">
+          <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+          <span>{error}</span>
+        </div>
+      )}
+
+      {Object.keys(errors).length > 0 && (
+        <div className="rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 px-4 py-3">
+          <p className="text-sm font-semibold text-red-600 dark:text-red-400 flex items-center gap-2 mb-1">
+            <AlertCircle className="h-4 w-4" /> Please fix the following errors:
+          </p>
+          <ul className="text-xs text-red-500 space-y-0.5 list-disc list-inside">
+            {Object.values(errors).map((err, i) => err && <li key={i}>{err}</li>)}
+          </ul>
+        </div>
       )}
 
       {/* ⭐ Basic Information */}
       <section className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 space-y-4">
         <div className="pb-3 border-b border-gray-100 dark:border-gray-800">
-          <h2 className="font-bold text-gray-900 dark:text-gray-100 text-sm">⭐ Basic Information</h2>
+          <h2 className="font-bold text-gray-900 dark:text-gray-100 text-sm">⭐ Basic Information <span className="text-red-500">*</span></h2>
           <p className="text-xs text-gray-400 mt-0.5">📌 Updates doctor card on /doctors and /doctors/[slug] detail page</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <FormField label={`Name (${langTab.toUpperCase()})`} required>
-            <FormInput value={f("name")[langTab]} onChange={e => setBi("name", langTab, e.target.value)} placeholder="Dr. Name" />
+            <FormInput value={f("name")[langTab]} onChange={e => { setBi("name", langTab, e.target.value); clearError(langTab === 'en' ? 'nameEn' : 'nameBn'); }} placeholder="Dr. Name" />
           </FormField>
-          <FormField label={`Designation (${langTab.toUpperCase()})`}>
-            <FormInput value={f("designation")[langTab]} onChange={e => setBi("designation", langTab, e.target.value)} />
+          <FormField label={`Designation (${langTab.toUpperCase()})`} required>
+            <FormInput value={f("designation")[langTab]} onChange={e => { setBi("designation", langTab, e.target.value); clearError(langTab === 'en' ? 'designationEn' : 'designationBn'); }} />
           </FormField>
           <FormField label={`Specialization (${langTab.toUpperCase()})`} required>
-            <FormInput value={f("specialization")[langTab]} onChange={e => setBi("specialization", langTab, e.target.value)} />
+            <FormSelect value={f("specialization")[langTab]} onChange={e => { setBi("specialization", langTab, e.target.value); clearError(langTab === 'en' ? 'specializationEn' : 'specializationBn'); }}>
+              <option value="">{langTab === 'en' ? 'Select specialization...' : 'বিশেষায়ন নির্বাচন করুন...'}</option>
+              {SPECIALIZATIONS.map(s => <option key={s} value={s}>{s}</option>)}
+            </FormSelect>
           </FormField>
           <FormField label={`Department (${langTab.toUpperCase()})`} required>
-            <FormInput value={f("department")[langTab]} onChange={e => setBi("department", langTab, e.target.value)} />
+            <FormSelect value={f("department")[langTab]} onChange={e => { setBi("department", langTab, e.target.value); clearError(langTab === 'en' ? 'departmentEn' : 'departmentBn'); }}>
+              <option value="">{langTab === 'en' ? 'Select department...' : 'বিভাগ নির্বাচন করুন...'}</option>
+              {DEPARTMENTS.map(d => <option key={d} value={d}>{d}</option>)}
+            </FormSelect>
           </FormField>
           <FormField label="Qualification" required>
-            <FormInput value={s("qualification")} onChange={e => set("qualification", e.target.value)} />
+            <FormInput value={s("qualification")} onChange={e => { set("qualification", e.target.value); clearError('qualification'); }} />
           </FormField>
           <FormField label="Experience (years)">
-            <FormInput type="number" value={String(n("experienceYears"))} onChange={e => set("experienceYears", parseInt(e.target.value)||0)} />
+            <FormInput type="number" value={String(n("experienceYears"))} onChange={e => { set("experienceYears", parseInt(e.target.value)||0); clearError('experience'); }} />
           </FormField>
           <FormField label="Status">
             <FormSelect value={s("status")} onChange={e => set("status", e.target.value)}>
@@ -218,18 +283,25 @@ export default function EditDoctorCmsPage({ params }: { params: Promise<{ id: st
             </label>
           ))}
         </div>
+        <div className="max-w-md">
+          <LanguageMultiSelect
+            value={form.languages as string[] || []}
+            onChange={(languages) => set("languages", languages)}
+            required
+          />
+        </div>
       </section>
 
       {/* 📌 Biography */}
       <section className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 space-y-4">
         <div className="pb-3 border-b border-gray-100 dark:border-gray-800">
-          <h2 className="font-bold text-gray-900 dark:text-gray-100 text-sm">📌 Biography</h2>
+          <h2 className="font-bold text-gray-900 dark:text-gray-100 text-sm">📌 Biography <span className="text-red-500">*</span></h2>
           <p className="text-xs text-gray-400 mt-0.5">Updates the About section on /doctors/[slug]</p>
         </div>
         <RichTextEditor
           label={`Biography — ${langTab === "en" ? "English" : "বাংলা"}`}
           value={f("about")[langTab]}
-          onChange={v => setBi("about", langTab, v)}
+          onChange={v => { setBi("about", langTab, v); clearError(langTab === 'en' ? 'aboutEn' : 'aboutBn'); }}
           rows={5}
           helpText="Supports **bold**, *italic*, ## heading, - list"
         />
@@ -238,46 +310,42 @@ export default function EditDoctorCmsPage({ params }: { params: Promise<{ id: st
       {/* 🔥 Consultation Schedule */}
       <section className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 space-y-4">
         <div className="pb-3 border-b border-gray-100 dark:border-gray-800">
-          <h2 className="font-bold text-gray-900 dark:text-gray-100 text-sm">🔥 Consultation Schedule <span className="text-xs text-amber-500 font-normal">(Frequently Updated)</span></h2>
+          <h2 className="font-bold text-gray-900 dark:text-gray-100 text-sm">🔥 Consultation Schedule <span className="text-red-500">*</span></h2>
           <p className="text-xs text-gray-400 mt-0.5">Controls appointment availability on /doctors/[slug]</p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <FormField label="Consultation Fee (৳)">
-            <FormInput type="number" value={String(n("consultationFee"))} onChange={e => set("consultationFee", parseInt(e.target.value)||0)} />
-          </FormField>
-          <FormField label="Chamber Time (EN)">
-            <FormInput value={s("chamberTimeEn")} onChange={e => set("chamberTimeEn", e.target.value)} />
-          </FormField>
-          <FormField label="Chamber Time (BN)">
-            <FormInput value={s("chamberTimeBn")} onChange={e => set("chamberTimeBn", e.target.value)} />
-          </FormField>
-        </div>
-        <div>
-          <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Available Days</p>
-          <div className="flex flex-wrap gap-2">
-            {DAYS.map(day => {
-              const days = (form.availableDays as string[]) || [];
-              return (
-                <button key={day} type="button"
-                  onClick={() => set("availableDays", days.includes(day) ? days.filter(d => d !== day) : [...days, day])}
-                  className={["px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors", days.includes(day) ? "bg-[#76BC21] text-white" : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"].join(" ")}
-                >
-                  {day}
-                </button>
-              );
-            })}
-          </div>
-        </div>
+        <FormField label="Consultation Fee (৳)">
+          <FormInput type="number" value={String(n("consultationFee"))} onChange={e => set("consultationFee", parseInt(e.target.value)||0)} />
+        </FormField>
+        <ChamberTimePicker
+          availableDays={form.availableDays as string[] || []}
+          chamberTime={{ en: s("chamberTimeEn"), bn: s("chamberTimeBn") }}
+          onDaysChange={(days) => set("availableDays", days)}
+          onChamberTimeChange={(ct) => {
+            set("chamberTimeEn", ct.en);
+            set("chamberTimeBn", ct.bn);
+            clearError('chamberTimeEn');
+            clearError('chamberTimeBn');
+          }}
+          showTitle={false}
+        />
       </section>
 
       {/* Contact */}
       <section className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 space-y-4">
-        <h2 className="font-bold text-gray-900 dark:text-gray-100 text-sm pb-3 border-b border-gray-100 dark:border-gray-800">📞 Contact Information</h2>
+        <h2 className="font-bold text-gray-900 dark:text-gray-100 text-sm pb-3 border-b border-gray-100 dark:border-gray-800">📞 Contact Information <span className="text-red-500">*</span></h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <FormField label="Phone"><FormInput value={s("phone")} onChange={e => set("phone", e.target.value)} /></FormField>
-          <FormField label="Email"><FormInput type="email" value={s("email")} onChange={e => set("email", e.target.value)} /></FormField>
-          <FormField label="Address (EN)"><FormInput value={s("addressEn")} onChange={e => set("addressEn", e.target.value)} /></FormField>
-          <FormField label="Address (BN)"><FormInput value={s("addressBn")} onChange={e => set("addressBn", e.target.value)} /></FormField>
+          <FormField label="Phone" required>
+            <FormInput value={s("phone")} onChange={e => { set("phone", e.target.value); clearError('phone'); }} />
+          </FormField>
+          <FormField label="Email">
+            <FormInput type="email" value={s("email")} onChange={e => { set("email", e.target.value); clearError('email'); }} />
+          </FormField>
+          <FormField label="Address (EN)" required>
+            <FormInput value={s("addressEn")} onChange={e => { set("addressEn", e.target.value); clearError('addressEn'); }} />
+          </FormField>
+          <FormField label="Address (BN)" required>
+            <FormInput value={s("addressBn")} onChange={e => { set("addressBn", e.target.value); clearError('addressBn'); }} />
+          </FormField>
         </div>
       </section>
 

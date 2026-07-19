@@ -1,5 +1,5 @@
 const BACKEND_URL =
-  (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1').replace('/api/v1', '');
+  (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1').replace('/api/v1', '').replace(/\/$/, '');
 
 export function getImageUrl(path: string | null | undefined): string {
   if (!path) return '';

@@ -33,6 +33,22 @@ export default function FAQCmsPage() {
   const [langTab, setLangTab] = useState<"en" | "bn">("en");
   const [seoLangTab, setSeoLangTab] = useState<"en" | "bn">("en");
   const [status, setStatus] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [phoneError, setPhoneError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
+
+  const validatePhone = (value: string): string | null => {
+    if (!value) return null;
+    const digits = value.replace(/\D/g, '');
+    if (digits.length < 6) return 'Phone number must contain at least 6 digits';
+    if (digits.length > 15) return 'Phone number is too long';
+    return null;
+  };
+
+  const validateEmail = (value: string): string | null => {
+    if (!value) return null;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'Invalid email format';
+    return null;
+  };
 
   useEffect(() => {
     getFAQData()
@@ -43,6 +59,14 @@ export default function FAQCmsPage() {
 
   const handleSave = async () => {
     if (!data) return;
+    const phoneErr = validatePhone(data.contactInfo.phone);
+    const emailErr = validateEmail(data.contactInfo.email);
+    setPhoneError(phoneErr);
+    setEmailError(emailErr);
+    if (phoneErr || emailErr) {
+      setStatus({ type: "error", text: "Please fix validation errors before saving." });
+      return;
+    }
     setIsSaving(true);
     setStatus(null);
     try {
@@ -173,13 +197,9 @@ export default function FAQCmsPage() {
                         </FormField>
                         <FormField label="Icon Name">
                           <FormInput
-                            value={cat.icon}
-                            onChange={(e) => {
-                              const updated = [...data.categories];
-                              updated[i] = { ...cat, icon: e.target.value };
-                              set((d) => ({ ...d, categories: updated }));
-                            }}
-                            placeholder="FaQuestionCircle"
+                            value={cat.icon ?? "FaQuestionCircle"}
+                            disabled
+                            className="cursor-not-allowed opacity-60"
                           />
                         </FormField>
                         <LocalizedInput
@@ -331,16 +351,26 @@ export default function FAQCmsPage() {
                   <FormField label="Phone Number">
                     <FormInput
                       value={data.contactInfo.phone}
-                      onChange={(e) => set((d) => ({ ...d, contactInfo: { ...d.contactInfo, phone: e.target.value } }))}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        set((d) => ({ ...d, contactInfo: { ...d.contactInfo, phone: val } }));
+                        setPhoneError(validatePhone(val));
+                      }}
                       placeholder="+880 1234-567890"
                     />
+                    {phoneError && <p className="text-red-500 text-xs mt-1">{phoneError}</p>}
                   </FormField>
                   <FormField label="Email Address">
                     <FormInput
                       value={data.contactInfo.email}
-                      onChange={(e) => set((d) => ({ ...d, contactInfo: { ...d.contactInfo, email: e.target.value } }))}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        set((d) => ({ ...d, contactInfo: { ...d.contactInfo, email: val } }));
+                        setEmailError(validateEmail(val));
+                      }}
                       placeholder="info@mirsaraihospital.com"
                     />
+                    {emailError && <p className="text-red-500 text-xs mt-1">{emailError}</p>}
                   </FormField>
                 </div>
               </div>

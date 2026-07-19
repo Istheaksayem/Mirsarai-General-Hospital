@@ -19,6 +19,7 @@ import {
   toggleCmsDoctorFeatured,
   toggleCmsDoctorVisibility,
 } from "@/lib/services/api";
+import toast from "react-hot-toast";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface AdminDoctor {
@@ -61,12 +62,20 @@ export default function DoctorsCmsPage() {
 
   const featuredMutation = useMutation({
     mutationFn: toggleCmsDoctorFeatured,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-doctors"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-doctors"] });
+      toast.success("Featured status updated");
+    },
+    onError: (err: Error) => toast.error(err?.message || "Failed to update featured status"),
   });
 
   const visibilityMutation = useMutation({
     mutationFn: toggleCmsDoctorVisibility,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-doctors"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-doctors"] });
+      toast.success("Visibility updated");
+    },
+    onError: (err: Error) => toast.error(err?.message || "Failed to update visibility"),
   });
 
   const deleteMutation = useMutation({
@@ -74,7 +83,9 @@ export default function DoctorsCmsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-doctors"] });
       setDeleteConfirm(null);
+      toast.success("Doctor deleted");
     },
+    onError: (err: Error) => toast.error(err?.message || "Failed to delete doctor"),
   });
 
   const filtered = doctors.filter((d) => {

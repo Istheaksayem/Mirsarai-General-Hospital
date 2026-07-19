@@ -8,6 +8,7 @@ import { FaUserMd, FaUsers, FaHeartbeat } from "react-icons/fa";
 import { BsFillHeartPulseFill } from "react-icons/bs";
 import Image from "next/image";
 import { useEffect } from "react";
+import { getImageUrl } from "@/lib/getImageUrl";
 
 const OurTeamPage = () => {
   const { data, isLoading, isError } = useOurTeamData();
@@ -77,7 +78,7 @@ const OurTeamPage = () => {
       {data.hero.image ? (
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url('${data.hero.image}')` }}
+          style={{ backgroundImage: `url('${getImageUrl(data.hero.image)}')` }}
         />
       ) : (
         <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-blue-900" />
@@ -168,7 +169,7 @@ const OurTeamPage = () => {
                   <div className="relative h-56 bg-gradient-to-br from-primary/10 to-blue-100 overflow-hidden">
                     {member.image ? (
                       <Image
-                        src={member.image}
+                        src={getImageUrl(member.image)}
                         alt={lang === "bn" ? member.name.bn : member.name.en}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-500"

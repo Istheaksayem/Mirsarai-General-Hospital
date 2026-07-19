@@ -29,6 +29,11 @@ const documentSchema = new mongoose.Schema(
       id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
       role: { type: String },
     },
+    testName: { type: String, trim: true },
+    reportType: { type: String, enum: ['blood', 'imaging', 'pathology', 'microbiology'] },
+    requestingDoctor: { type: String, trim: true },
+    requestingDoctorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    status: { type: String, enum: ['pending', 'in-progress', 'completed'], default: 'pending' },
     notes: {
       type: String,
       trim: true,
@@ -49,6 +54,7 @@ const documentSchema = new mongoose.Schema(
 
 documentSchema.index({ patientId: 1, createdAt: -1 });
 documentSchema.index({ documentType: 1 });
+documentSchema.index({ status: 1, documentType: 1 });
 
 const Document = mongoose.model('Document', documentSchema);
 export default Document;

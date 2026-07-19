@@ -159,6 +159,14 @@ export default function AboutUsCmsPage() {
                   title="Our Story Paragraphs"
                   description="Additional paragraphs shown in the hospital story narrative section"
                 />
+                <LocalizedInput
+                  label="Story Heading"
+                  value={data.storyHeading}
+                  activeTab={langTab}
+                  onChange={(v) => set((d) => ({ ...d, storyHeading: v }))}
+                  placeholder={{ en: "Dedicated to Better Healthcare for All", bn: "নিবেদিত উন্নত স্বাস্থ্যসেবায় সকলের জন্য" }}
+                  required
+                />
                 <div className="space-y-3">
                   {data.content.map((item, i) => (
                     <div key={i} className="flex gap-3 items-start">
@@ -196,42 +204,86 @@ export default function AboutUsCmsPage() {
 
               <hr className="border-gray-100 dark:border-gray-800" />
 
-              {/* Features */}
+              {/* Features Section */}
               <div className="space-y-4">
                 <SectionDivider
-                  title="Feature / Service Points"
-                  description="Bullet points shown below the story section highlighting key services"
+                  title="Why Choose Us Section"
+                  description="Badge, heading, description, and feature cards for the 'Why Choose Us' section"
                 />
-                <div className="space-y-3">
-                  {data.features.map((item, i) => (
-                    <div key={i} className="flex gap-3 items-start">
-                      <div className="flex-1">
-                        <LocalizedInput
-                          label={`Feature ${i + 1}`}
-                          value={item}
-                          activeTab={langTab}
-                          onChange={(v) => {
-                            const updated = [...data.features];
-                            updated[i] = v;
-                            set((d) => ({ ...d, features: updated }));
-                          }}
-                        />
+                <LocalizedInput
+                  label="Badge Text"
+                  value={data.featuresSection.badge}
+                  activeTab={langTab}
+                  onChange={(v) => set((d) => ({ ...d, featuresSection: { ...d.featuresSection, badge: v } }))}
+                  placeholder={{ en: "Why Choose Us", bn: "কেন আমাদের বেছে নেবেন" }}
+                />
+                <LocalizedInput
+                  label="Heading"
+                  value={data.featuresSection.heading}
+                  activeTab={langTab}
+                  onChange={(v) => set((d) => ({ ...d, featuresSection: { ...d.featuresSection, heading: v } }))}
+                  placeholder={{ en: "Excellence in Every Aspect", bn: "প্রতিটি দিক থেকে উৎকর্ষ" }}
+                />
+                <LocalizedTextarea
+                  label="Description"
+                  value={data.featuresSection.description}
+                  activeTab={langTab}
+                  onChange={(v) => set((d) => ({ ...d, featuresSection: { ...d.featuresSection, description: v } }))}
+                  placeholder={{ en: "We combine expertise…", bn: "আমরা ব্যতিক্রমী স্বাস্থ্যসেবা…" }}
+                />
+                <div className="space-y-3 pt-2">
+                  <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Feature Cards</p>
+                  {data.featuresSection.items.map((item, i) => (
+                    <div key={i} className="rounded-xl border border-gray-100 dark:border-gray-800 p-4 space-y-3 bg-gray-50/50 dark:bg-gray-800/30">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Card #{i + 1}</span>
+                        <button
+                          type="button"
+                          onClick={() => set((d) => ({ ...d, featuresSection: { ...d.featuresSection, items: d.featuresSection.items.filter((_, idx) => idx !== i) } }))}
+                          className="flex h-7 w-7 items-center justify-center rounded-lg border border-red-200 text-red-500 hover:bg-red-50 transition-colors"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => set((d) => ({ ...d, features: d.features.filter((_, idx) => idx !== i) }))}
-                        className="mt-7 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-red-200 text-red-500 hover:bg-red-50 transition-colors"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
+                      <LocalizedInput
+                        label="Title"
+                        value={item.title}
+                        activeTab={langTab}
+                        onChange={(v) => {
+                          const updated = [...data.featuresSection.items];
+                          updated[i] = { ...item, title: v };
+                          set((d) => ({ ...d, featuresSection: { ...d.featuresSection, items: updated } }));
+                        }}
+                      />
+                      <LocalizedTextarea
+                        label="Description"
+                        value={item.description}
+                        activeTab={langTab}
+                        onChange={(v) => {
+                          const updated = [...data.featuresSection.items];
+                          updated[i] = { ...item, description: v };
+                          set((d) => ({ ...d, featuresSection: { ...d.featuresSection, items: updated } }));
+                        }}
+                      />
+                      <FormField label="Color Gradient Class">
+                        <FormInput
+                          value={item.color}
+                          onChange={(e) => {
+                            const updated = [...data.featuresSection.items];
+                            updated[i] = { ...item, color: e.target.value };
+                            set((d) => ({ ...d, featuresSection: { ...d.featuresSection, items: updated } }));
+                          }}
+                          placeholder="from-blue-500 via-primary to-blue-900"
+                        />
+                      </FormField>
                     </div>
                   ))}
                   <button
                     type="button"
-                    onClick={() => set((d) => ({ ...d, features: [...d.features, { en: "New feature", bn: "নতুন বৈশিষ্ট্য" }] }))}
+                    onClick={() => set((d) => ({ ...d, featuresSection: { ...d.featuresSection, items: [...d.featuresSection.items, { title: { en: "New Feature", bn: "নতুন বৈশিষ্ট্য" }, description: { en: "Description…", bn: "বিবরণ…" }, color: "from-blue-500 via-primary to-blue-900" }] } }))}
                     className="flex items-center gap-2 px-4 py-2 rounded-xl border border-dashed border-gray-300 dark:border-gray-600 text-sm text-gray-500 hover:border-[#1E2B7A] hover:text-[#1E2B7A] transition-colors"
                   >
-                    <Plus className="h-4 w-4" /> Add Feature
+                    <Plus className="h-4 w-4" /> Add Card
                   </button>
                 </div>
               </div>

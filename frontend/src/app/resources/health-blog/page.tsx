@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 import { FaClock, FaUser, FaTag } from "react-icons/fa";
 import { useHealthBlog, HealthBlogData } from "@/hooks/useHealthBlog";
+import { getImageUrl } from "@/lib/getImageUrl";
 
 const HealthBlogPage = () => {
   const { lang } = useLanguage();
@@ -65,7 +66,7 @@ const HealthBlogPage = () => {
       <section className="relative h-[400px] overflow-hidden">
         <div className="absolute inset-0">
           <Image
-            src={data.hero.image}
+            src={getImageUrl(data.hero.image)}
             alt="Health Blog"
             fill
             className="object-cover"
@@ -148,7 +149,7 @@ const HealthBlogPage = () => {
               >
                 <div className="relative h-48 overflow-hidden">
                   <Image
-                    src={post.image}
+                    src={getImageUrl(post.image)}
                     alt={lang === "bn" ? post.title.bn : post.title.en}
                     fill
                     className="object-cover group-hover:scale-110 transition-transform duration-500"

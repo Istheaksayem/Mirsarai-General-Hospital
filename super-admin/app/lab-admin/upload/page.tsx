@@ -40,6 +40,8 @@ export default function UploadReportsPage() {
     documentType: "",
     department: "",
     notes: "",
+    testName: "",
+    reportType: "",
   });
 
   const handleLookup = async () => {
@@ -101,13 +103,15 @@ export default function UploadReportsPage() {
       data.append('patientId', verifiedPatient._id);
       data.append('title', formData.title);
       data.append('documentType', formData.documentType);
+      if (formData.testName) data.append('testName', formData.testName);
+      if (formData.reportType) data.append('reportType', formData.reportType);
       if (formData.department) data.append('department', formData.department);
       if (formData.notes) data.append('notes', formData.notes);
       data.append('file', file);
 
       await uploadDocument(data);
       toast.success("Document uploaded successfully!");
-      setFormData({ patientId: "", title: "", documentType: "", department: "", notes: "" });
+      setFormData({ patientId: "", title: "", documentType: "", department: "", notes: "", testName: "", reportType: "" });
       setFile(null);
       setVerifiedPatient(null);
       setPatientLookupQuery("");
@@ -200,6 +204,19 @@ export default function UploadReportsPage() {
                   <option value="certificate">Certificate</option>
                   <option value="bill_receipt">Bill Receipt</option>
                   <option value="other">Other</option>
+                </select>
+              </div>
+              <Input name="testName" value={formData.testName} onChange={handleChange} label="Test Name" placeholder="e.g. Complete Blood Count" />
+              <div className="space-y-1.5">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Report Type</label>
+                <select name="reportType" value={formData.reportType} onChange={handleChange}
+                  className="h-10 w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 text-sm text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1E2B7A]/40"
+                >
+                  <option value="">Select type...</option>
+                  <option value="blood">Blood</option>
+                  <option value="imaging">Imaging</option>
+                  <option value="pathology">Pathology</option>
+                  <option value="microbiology">Microbiology</option>
                 </select>
               </div>
               <Input name="department" value={formData.department} onChange={handleChange} label="Department" placeholder="e.g. Pathology" />

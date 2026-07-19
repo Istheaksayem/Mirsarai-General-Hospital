@@ -77,6 +77,7 @@ export const HTTP_MESSAGES = {
 export const APPOINTMENT_STATUS = {
   PENDING: 'pending',
   CONFIRMED: 'confirmed',
+  REJECTED: 'rejected',
   CHECKED_IN: 'checked-in',
   IN_CONSULTATION: 'in-consultation',
   COMPLETED: 'completed',
