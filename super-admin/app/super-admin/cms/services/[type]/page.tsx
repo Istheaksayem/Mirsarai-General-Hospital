@@ -243,11 +243,8 @@ export default function ServicePageCmsEditor() {
                         <FormField label="Icon">
                           <FormInput
                             value={feature.icon}
-                            onChange={(e) => {
-                              const updated = [...data.features];
-                              updated[i] = { ...feature, icon: e.target.value };
-                              set((d) => ({ ...d, features: updated }));
-                            }}
+                            disabled
+                            className="cursor-not-allowed opacity-60"
                             placeholder="FaMicroscope"
                             list="icon-suggestions"
                           />
@@ -327,11 +324,8 @@ export default function ServicePageCmsEditor() {
                         <FormField label="Icon">
                           <FormInput
                             value={svc.icon}
-                            onChange={(e) => {
-                              const updated = [...data.services];
-                              updated[i] = { ...svc, icon: e.target.value };
-                              set((d) => ({ ...d, services: updated }));
-                            }}
+                            disabled
+                            className="cursor-not-allowed opacity-60"
                             placeholder="FaFlask"
                             list="icon-suggestions"
                           />
@@ -342,12 +336,8 @@ export default function ServicePageCmsEditor() {
                               <button
                                 key={c.value}
                                 type="button"
-                                onClick={() => {
-                                  const updated = [...data.services];
-                                  updated[i] = { ...svc, accent: c.value };
-                                  set((d) => ({ ...d, services: updated }));
-                                }}
-                                className={`h-8 w-8 rounded-xl border-2 transition-all ${
+                                disabled
+                                className={`h-8 w-8 rounded-xl border-2 cursor-not-allowed opacity-60 ${
                                   svc.accent === c.value ? "border-gray-900 dark:border-white scale-110" : "border-transparent"
                                 }`}
                                 style={{ background: c.value }}
@@ -356,12 +346,8 @@ export default function ServicePageCmsEditor() {
                             ))}
                             <FormInput
                               value={svc.accent}
-                              onChange={(e) => {
-                                const updated = [...data.services];
-                                updated[i] = { ...svc, accent: e.target.value };
-                                set((d) => ({ ...d, services: updated }));
-                              }}
-                              className="w-24"
+                              disabled
+                              className="w-24 cursor-not-allowed opacity-60"
                               placeholder="#1E2B7A"
                             />
                           </div>

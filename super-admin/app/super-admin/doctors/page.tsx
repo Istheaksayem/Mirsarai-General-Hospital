@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { Stethoscope, UserPlus, Star } from "lucide-react";
+import toast from "react-hot-toast";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SearchFilter, SelectFilter } from "@/components/ui/SearchFilter";
 import { DataTable, Column } from "@/components/ui/DataTable";
@@ -23,7 +24,10 @@ export default function DoctorsPage() {
   const handleDelete = useCallback(
     (id: string) => {
       if (window.confirm("Delete this doctor? This cannot be undone.")) {
-        deleteMutation.mutate(id);
+        deleteMutation.mutate(id, {
+          onSuccess: () => toast.success("Doctor deleted successfully"),
+          onError: (err: Error) => toast.error(err?.message || "Failed to delete doctor"),
+        });
       }
     },
     [deleteMutation]

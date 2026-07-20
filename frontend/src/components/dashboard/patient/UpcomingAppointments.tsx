@@ -36,8 +36,8 @@ export default function UpcomingAppointments() {
               className="bg-white dark:bg-[#0f1524] rounded-2xl border border-slate-100 dark:border-slate-800 p-6 shadow-sm">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <p className="font-black text-slate-900 dark:text-white text-lg">{doc?.name as string || "Doctor"}</p>
-                  <p className="text-sm text-[#1E2B7A] dark:text-[#76BC21] font-semibold">{doc?.department as string || apt.department as string || ""}</p>
+                  <p className="font-black text-slate-900 dark:text-white text-lg">{(doc?.name as any)?.en ?? (doc?.name as any)?.bn ?? "Doctor"}</p>
+                  <p className="text-sm text-[#1E2B7A] dark:text-[#76BC21] font-semibold">{(doc?.department as any)?.en ?? (doc?.department as any)?.bn ?? (apt.department as string) ?? ""}</p>
                 </div>
                 <span className={`px-3 py-1 rounded-full text-xs font-black ${statusStyle[apt.status as string] || statusStyle.pending}`}>{apt.status as string}</span>
               </div>

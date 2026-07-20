@@ -2,7 +2,7 @@
 import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FormPage, FormField, FormInput, FormSelect, FormSection } from "@/components/ui/FormPage";
-import { usePatients, useUpdatePatient } from "@/lib/hooks/usePatients";
+import { usePatientById, useUpdatePatient } from "@/lib/hooks/usePatients";
 import toast from "react-hot-toast";
 
 const DEPARTMENTS = ["General Medicine","Cardiology","Orthopedics","Neurology","Gynecology","Pediatrics","Gastroenterology","Dermatology","ENT","Ophthalmology","Urology","Oncology","Radiology","Pathology","Emergency"];
@@ -11,9 +11,9 @@ const BLOOD_GROUPS = ["A+","A−","B+","B−","AB+","AB−","O+","O−"];
 export default function EditPatientPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
-  const { data = [], isLoading } = usePatients();
+  const decodedId = decodeURIComponent(id);
+  const { data: patient, isLoading, isError } = usePatientById(decodedId);
   const updateMutation = useUpdatePatient();
-  const patient = data.find(p => p.id === decodeURIComponent(id));
 
   const [form, setForm] = useState({ name: "", phone: "", email: "", age: "", gender: "", bloodGroup: "", address: "", department: "", status: "", diagnosis: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -69,7 +69,7 @@ export default function EditPatientPage({ params }: { params: Promise<{ id: stri
     }, {
       onSuccess: () => {
         toast.success("Patient updated successfully");
-        router.push(`/super-admin/patients/${encodeURIComponent(patient!.id)}`);
+        router.push(`/super-admin/patients/${patient!._id}`);
       },
       onError: (err) => {
         toast.error(err.message || "Failed to update patient");
@@ -78,10 +78,10 @@ export default function EditPatientPage({ params }: { params: Promise<{ id: stri
   }
 
   if (isLoading) return <div className="flex items-center justify-center h-64"><div className="animate-spin h-8 w-8 rounded-full border-4 border-[#1E2B7A] border-t-transparent" /></div>;
-  if (!patient) return <div className="rounded-2xl border border-dashed border-gray-200 dark:border-gray-700 p-16 text-center text-gray-400">Patient not found</div>;
+  if (isError || !patient) return <div className="rounded-2xl border border-dashed border-gray-200 dark:border-gray-700 p-16 text-center text-gray-400">Patient not found</div>;
 
   return (
-    <FormPage title="Edit Patient" description={`Editing: ${patient.id}`} backHref={`/super-admin/patients/${encodeURIComponent(id)}`} onSubmit={handleSubmit} submitLabel="Save Changes">
+    <FormPage title="Edit Patient" description={`Editing: ${patient.id}`} backHref={`/super-admin/patients/${patient._id}`} onSubmit={handleSubmit} submitLabel="Save Changes">
       <div className="flex items-center gap-3 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 px-5 py-3">
         <p className="text-xs font-semibold text-gray-400 uppercase">Patient ID (read-only)</p>
         <p className="font-mono font-bold text-[#1E2B7A] dark:text-blue-400">{patient.id}</p>

@@ -14,7 +14,13 @@ const errorConverter = (err, req, res, next) => {
       error = new ApiError(StatusCodes.BAD_REQUEST, `Validation Error: ${messages}`);
     } else if (error.code === 11000) {
       const field = Object.keys(error.keyPattern)[0];
-      error = new ApiError(StatusCodes.CONFLICT, `${field} already exists`);
+      const friendlyMessages = {
+        mobile: 'A patient with this phone number already exists.',
+        patientId: 'A patient with this ID already exists.',
+        email: 'A patient with this email address already exists.',
+      };
+      const message = friendlyMessages[field] || `${field} already exists`;
+      error = new ApiError(StatusCodes.CONFLICT, message);
     } else if (error.name === 'CastError') {
       error = new ApiError(StatusCodes.BAD_REQUEST, `Invalid ${error.path}: ${error.value}`);
     } else {

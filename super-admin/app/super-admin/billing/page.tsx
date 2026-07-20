@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { CreditCard, Plus, Download } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SearchFilter, SelectFilter } from "@/components/ui/SearchFilter";
@@ -12,38 +12,53 @@ import { formatCurrency } from "@/lib/date-utils";
 import { type Invoice } from "@/lib/services/api";
 import { createActionColumn } from "@/components/ui/ActionButtons";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 const statusVariant: Record<Invoice["status"], "success" | "warning" | "danger"> = {
   paid: "success", partial: "warning", unpaid: "danger",
 };
 
-const columns: Column<Record<string, unknown>>[] = [
-  { key: "id", header: "Invoice", cell: (r) => <span className="font-mono text-xs font-semibold text-[#1E2B7A] dark:text-blue-400">{r.id as string}</span> },
-  {
-    key: "patientName", header: "Patient",
-    cell: (r) => <div><p className="font-medium text-gray-900 dark:text-gray-100">{r.patientName as string}</p><p className="text-xs text-gray-400">{r.date as string}</p></div>,
-  },
-  { key: "total", header: "Total", cell: (r) => <span className="font-semibold">{formatCurrency(r.total as number)}</span> },
-  { key: "paid", header: "Paid", cell: (r) => <span className="text-green-600 dark:text-green-400">{formatCurrency(r.paid as number)}</span> },
-  { key: "due", header: "Due", cell: (r) => <span className={(r.due as number) > 0 ? "text-red-500 dark:text-red-400 font-medium" : "text-gray-400"}>{formatCurrency(r.due as number)}</span> },
-  { key: "status", header: "Status", cell: (r) => <Badge variant={statusVariant[r.status as Invoice["status"]]}>{r.status as string}</Badge> },
-  {
-    key: "dueDate", header: "Due Date",
-    cell: (r) => <span className="text-sm text-gray-500 dark:text-gray-400">{r.dueDate as string}</span>,
-  },
-  createActionColumn({ basePath: "/super-admin/billing" }),
-];
-
 export default function BillingPage() {
-  const { data = [], isLoading } = useBilling();
+  const { data: initialData = [], isLoading } = useBilling();
+  const [data, setData] = useState<Invoice[]>([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+
+  // Sync initial data into state
+  useEffect(() => {
+    if (initialData.length > 0) {
+      setData(initialData);
+    }
+  }, [initialData]);
 
   const filtered = data.filter((inv) => {
     const ms = !search || inv.patientName.toLowerCase().includes(search.toLowerCase()) || inv.id.toLowerCase().includes(search.toLowerCase());
     const mst = !statusFilter || inv.status === statusFilter;
     return ms && mst;
   }) as unknown as Record<string, unknown>[];
+
+  const handleDelete = (row: Record<string, unknown>) => {
+    const invoiceId = row.id as string;
+    setData(prev => prev.filter(inv => inv.id !== invoiceId));
+    toast.success("Invoice removed");
+  };
+
+  const columns: Column<Record<string, unknown>>[] = useMemo(() => [
+    { key: "id", header: "Invoice", cell: (r) => <span className="font-mono text-xs font-semibold text-[#1E2B7A] dark:text-blue-400">{r.id as string}</span> },
+    {
+      key: "patientName", header: "Patient",
+      cell: (r) => <div><p className="font-medium text-gray-900 dark:text-gray-100">{r.patientName as string}</p><p className="text-xs text-gray-400">{r.date as string}</p></div>,
+    },
+    { key: "total", header: "Total", cell: (r) => <span className="font-semibold">{formatCurrency(r.total as number)}</span> },
+    { key: "paid", header: "Paid", cell: (r) => <span className="text-green-600 dark:text-green-400">{formatCurrency(r.paid as number)}</span> },
+    { key: "due", header: "Due", cell: (r) => <span className={(r.due as number) > 0 ? "text-red-500 dark:text-red-400 font-medium" : "text-gray-400"}>{formatCurrency(r.due as number)}</span> },
+    { key: "status", header: "Status", cell: (r) => <Badge variant={statusVariant[r.status as Invoice["status"]]}>{r.status as string}</Badge> },
+    {
+      key: "dueDate", header: "Due Date",
+      cell: (r) => <span className="text-sm text-gray-500 dark:text-gray-400">{r.dueDate as string}</span>,
+    },
+    createActionColumn({ basePath: "/super-admin/billing", onDelete: handleDelete }),
+  ], [handleDelete]);
 
   const totalRevenue = data.filter(i => i.status === "paid").reduce((s, i) => s + i.paid, 0);
   const totalOutstanding = data.reduce((s, i) => s + i.due, 0);

@@ -612,8 +612,8 @@ export default function EditHeroCMS() {
                       <input
                         type="text"
                         value={shape.color}
-                        onChange={(e) => handleShapeChange(idx, "color", e.target.value)}
-                        className="w-full rounded-lg border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-850 px-2.5 py-1.5 text-xs text-gray-700"
+                        disabled
+                        className="w-full rounded-lg border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-850 px-2.5 py-1.5 text-xs text-gray-700 cursor-not-allowed opacity-60"
                       />
                     </div>
                     <div className="space-y-1">

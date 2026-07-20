@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { FormPage, FormField, FormInput, FormSelect, FormSection } from "@/components/ui/FormPage";
 import { useCmsAppointmentById, useUpdateCmsAppointment } from "@/lib/hooks/useCmsAppointments";
 import { useCmsDoctors } from "@/lib/hooks/useCmsDoctors";
+import toast from "react-hot-toast";
 
 export default function EditAppointmentPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -91,8 +92,10 @@ export default function EditAppointmentPage({ params }: { params: Promise<{ id: 
           status: form.status as any,
         } as any,
       });
+      toast.success("Appointment updated");
       router.push(`/super-admin/appointments/${encodeURIComponent(id)}`);
     } catch (err: any) {
+      toast.error(err?.message || "Failed to update appointment");
       setErrors({ form: err.message || "Failed to update appointment" });
     } finally {
       setSaving(false);

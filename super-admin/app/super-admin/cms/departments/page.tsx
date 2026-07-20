@@ -296,8 +296,8 @@ export default function DepartmentsCmsPage() {
                     <FormField label="Icon">
                       <select
                         value={newFeature.icon}
-                        onChange={(e) => setNewFeature({ ...newFeature, icon: e.target.value })}
-                        className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-gray-100"
+                        disabled
+                        className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-gray-100 cursor-not-allowed opacity-60"
                       >
                         <option value="FiAward">Award / Ribbon</option>
                         <option value="FiClock">Clock / Time</option>
@@ -308,7 +308,8 @@ export default function DepartmentsCmsPage() {
                     <FormField label="Accent Color">
                       <FormInput
                         value={newFeature.color}
-                        onChange={(e) => setNewFeature({ ...newFeature, color: e.target.value })}
+                        disabled
+                        className="cursor-not-allowed opacity-60"
                         placeholder="#1E2B7A"
                       />
                     </FormField>

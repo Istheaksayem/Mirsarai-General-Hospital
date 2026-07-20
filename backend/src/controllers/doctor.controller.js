@@ -145,8 +145,8 @@ export const getMyProfile = catchAsync(async (req, res) => {
  * Desc: create or update the logged-in doctor's profile
  */
 export const createOrUpdateMyProfile = catchAsync(async (req, res) => {
-  const profile = await DoctorProfileService.createOrUpdateMyProfile(req.user.id, req.body);
-  sendSuccess(res, StatusCodes.OK, profile, 'Profile saved successfully');
+  const { profile, token } = await DoctorProfileService.createOrUpdateMyProfile(req.user.id, req.body);
+  sendSuccess(res, StatusCodes.OK, { profile, token }, 'Profile saved successfully');
 });
 
 // ── SUPER ADMIN — ASSIGN ADMIN INFO ────────────────────────────────────────────

@@ -4,9 +4,9 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, Pencil, User, FlaskConical, Calendar, Stethoscope, FileText, Building2 } from "lucide-react";
 import { useReports } from "@/lib/hooks/useReports";
 import { Badge } from "@/components/ui/Badge";
-import { type Report } from "@/lib/services/api";
+import type { UnifiedReport } from "@/lib/services/api";
 
-const statusVariant: Record<Report["status"], "warning" | "info" | "success"> = {
+const statusVariant: Record<UnifiedReport["status"], "warning" | "info" | "success"> = {
   pending: "warning", "in-progress": "info", completed: "success",
 };
 
@@ -25,8 +25,8 @@ export default function ViewReportPage({ params }: { params: Promise<{ id: strin
     { icon: FlaskConical, label: "Test Name", value: report.testName },
     { icon: FileText, label: "Report Type", value: report.reportType },
     { icon: Building2, label: "Department", value: report.department },
-    { icon: Stethoscope, label: "Requested By", value: report.requestedBy },
-    { icon: Calendar, label: "Request Date", value: report.requestDate },
+    { icon: Stethoscope, label: "Requested By", value: report.requestingDoctor || "—" },
+    { icon: Calendar, label: "Request Date", value: report.createdAt?.split("T")[0] || "—" },
     { icon: Calendar, label: "Completed Date", value: report.completedDate || "—" },
     { icon: FileText, label: "Notes", value: report.notes || "—" },
   ];
@@ -72,17 +72,10 @@ export default function ViewReportPage({ params }: { params: Promise<{ id: strin
           ))}
         </div>
 
-        {report.results && Object.keys(report.results).length > 0 && (
+        {report.notes && (
           <div className="mt-5 pt-5 border-t border-gray-100 dark:border-gray-800">
-            <h4 className="text-xs font-bold text-gray-500 uppercase mb-3">Test Results</h4>
-            <div className="grid grid-cols-2 gap-3">
-              {Object.entries(report.results).map(([k, v]) => (
-                <div key={k} className="flex items-center justify-between p-3 rounded-xl bg-[#76BC21]/5 border border-[#76BC21]/20">
-                  <span className="text-sm text-gray-600 dark:text-gray-400 capitalize">{k}</span>
-                  <span className="text-sm font-bold text-gray-900 dark:text-gray-100">{String(v)}</span>
-                </div>
-              ))}
-            </div>
+            <h4 className="text-xs font-bold text-gray-500 uppercase mb-3">Notes</h4>
+            <p className="text-sm text-gray-700 dark:text-gray-300">{report.notes}</p>
           </div>
         )}
       </div>

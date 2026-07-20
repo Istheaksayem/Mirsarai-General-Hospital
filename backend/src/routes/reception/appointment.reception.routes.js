@@ -5,7 +5,7 @@ import { z } from 'zod';
 
 const statusSchema = z.object({
   body: z.object({
-    status: z.enum(['confirmed', 'cancelled', 'completed', 'no-show']),
+    status: z.enum(['pending', 'confirmed', 'checked-in', 'in-consultation', 'completed', 'cancelled', 'no-show']),
   }),
   params: z.object({ id: z.string().min(1) }),
 });

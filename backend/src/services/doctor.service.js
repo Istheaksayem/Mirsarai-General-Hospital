@@ -516,7 +516,7 @@ export const assignAdminInfo = async (userId, adminData, adminId) => {
         ...adminFields,
       });
 
-      await Doctor.create({
+      const doctorDoc = await Doctor.create({
         slug,
         name: { en: user.fullName || 'Doctor', bn: '' },
         designation: { en: adminData.designation || 'Staff', bn: '' },
@@ -528,6 +528,8 @@ export const assignAdminInfo = async (userId, adminData, adminId) => {
         createdBy: adminId,
         updatedBy: adminId,
       });
+
+      await User.findByIdAndUpdate(userId, { doctorRef: doctorDoc._id });
     } else {
       profile = await DoctorProfile.findOneAndUpdate(
         { userId },
@@ -567,20 +569,25 @@ export const assignAdminInfo = async (userId, adminData, adminId) => {
           qualification: 'TBD',
           'experience.years': 0,
           'experience.label.en': '0+ Years',
-          'experience.label.bn': '০+ বছর',
+          'experience.label.bn': '০+ Years',
           isVisible: false,
           updatedBy: adminId,
         };
+        let doctorDoc;
         if (existingDoctor) {
-          await Doctor.findOneAndUpdate(
+          doctorDoc = await Doctor.findOneAndUpdate(
             { slug: profileSlug },
-            { $set: doctorPayload }
+            { $set: doctorPayload },
+            { new: true }
           );
         } else {
-          await Doctor.create({
+          doctorDoc = await Doctor.create({
             ...doctorPayload,
             createdBy: adminId,
           });
+        }
+        if (doctorDoc) {
+          await User.findByIdAndUpdate(userId, { doctorRef: doctorDoc._id });
         }
       }
     }

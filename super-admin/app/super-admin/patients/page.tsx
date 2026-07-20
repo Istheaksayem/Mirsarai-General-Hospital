@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Users, UserPlus, Download } from "lucide-react";
 import Link from "next/link";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -15,39 +15,6 @@ import toast from "react-hot-toast";
 const statusVariant: Record<string, "success" | "warning" | "info"> = {
   active: "success", inactive: "warning", admitted: "info",
 };
-
-const columns: Column<Record<string, unknown>>[] = [
-  {
-    key: "id", header: "Patient ID",
-    cell: (r) => <span className="font-mono text-xs font-bold text-[#1E2B7A] dark:text-blue-400">{r.id as string}</span>,
-  },
-  {
-    key: "name", header: "Patient",
-    cell: (r) => (
-      <div className="flex items-center gap-3">
-        <div className="h-8 w-8 shrink-0 rounded-full bg-[#1E2B7A]/10 dark:bg-[#1E2B7A]/20 flex items-center justify-center">
-          <span className="text-xs font-semibold text-[#1E2B7A] dark:text-blue-400">{(r.name as string).charAt(0)}</span>
-        </div>
-        <div>
-          <p className="font-medium text-gray-900 dark:text-gray-100">{r.name as string}</p>
-          <p className="text-xs text-gray-400">{r.gender as string} · {r.bloodGroup as string}</p>
-        </div>
-      </div>
-    ),
-  },
-  { key: "age", header: "Age", cell: (r) => `${r.age as number} yrs` },
-  { key: "phone", header: "Phone" },
-  { key: "department", header: "Department" },
-  {
-    key: "status", header: "Status",
-    cell: (r) => <Badge variant={statusVariant[r.status as string] ?? "default"}>{r.status as string}</Badge>,
-  },
-  {
-    key: "lastVisit", header: "Last Visit",
-    cell: (r) => <span className="text-sm text-gray-500 dark:text-gray-400">{(r.lastVisit as string) || "—"}</span>,
-  },
-  createActionColumn({ basePath: "/super-admin/patients" }),
-];
 
 export default function PatientsPage() {
   const { data: fetchedData = [], isLoading } = usePatients();
@@ -67,10 +34,43 @@ export default function PatientsPage() {
   const handleDelete = (row: Record<string, unknown>) => {
     const patient = row as unknown as PatientRow;
     deleteMutation.mutate(patient._id, {
-      onSuccess: () => toast.success("Patient deactivated"),
-      onError: () => toast.error("Failed to deactivate patient"),
+      onSuccess: () => { toast.success("Patient deleted"); },
+      onError: () => toast.error("Failed to delete patient"),
     });
   };
+
+  const columns: Column<Record<string, unknown>>[] = useMemo(() => [
+    {
+      key: "id", header: "Patient ID",
+      cell: (r) => <span className="font-mono text-xs font-bold text-[#1E2B7A] dark:text-blue-400">{r.id as string}</span>,
+    },
+    {
+      key: "name", header: "Patient",
+      cell: (r) => (
+        <div className="flex items-center gap-3">
+          <div className="h-8 w-8 shrink-0 rounded-full bg-[#1E2B7A]/10 dark:bg-[#1E2B7A]/20 flex items-center justify-center">
+            <span className="text-xs font-semibold text-[#1E2B7A] dark:text-blue-400">{(r.name as string).charAt(0)}</span>
+          </div>
+          <div>
+            <p className="font-medium text-gray-900 dark:text-gray-100">{r.name as string}</p>
+            <p className="text-xs text-gray-400">{r.gender as string} · {r.bloodGroup as string}</p>
+          </div>
+        </div>
+      ),
+    },
+    { key: "age", header: "Age", cell: (r) => `${r.age as number} yrs` },
+    { key: "phone", header: "Phone" },
+    { key: "department", header: "Department" },
+    {
+      key: "status", header: "Status",
+      cell: (r) => <Badge variant={statusVariant[r.status as string] ?? "default"}>{r.status as string}</Badge>,
+    },
+    {
+      key: "lastVisit", header: "Last Visit",
+      cell: (r) => <span className="text-sm text-gray-500 dark:text-gray-400">{(r.lastVisit as string) || "—"}</span>,
+    },
+    createActionColumn({ basePath: "/super-admin/patients", idKey: "_id", onDelete: handleDelete }),
+  ], [handleDelete]);
 
   return (
     <div className="space-y-6">

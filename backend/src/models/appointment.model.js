@@ -1,8 +1,14 @@
 import mongoose from 'mongoose';
-import { APPOINTMENT_STATUS, GENDER } from '../constants/index.js';
+import { APPOINTMENT_STATUS, APPOINTMENT_SOURCE, GENDER } from '../constants/index.js';
 
 const appointmentSchema = new mongoose.Schema(
   {
+    appointmentId: {
+      type: String,
+      unique: true,
+      required: true,
+      trim: true,
+    },
     patientId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Patient',
@@ -58,6 +64,11 @@ const appointmentSchema = new mongoose.Schema(
       enum: Object.values(APPOINTMENT_STATUS),
       default: APPOINTMENT_STATUS.PENDING,
     },
+    appointmentSource: {
+      type: String,
+      enum: Object.values(APPOINTMENT_SOURCE),
+      default: APPOINTMENT_SOURCE.ONLINE,
+    },
     reason: {
       type: String,
       trim: true,
@@ -79,6 +90,7 @@ appointmentSchema.index({ doctor: 1, date: -1 });
 appointmentSchema.index({ status: 1 });
 appointmentSchema.index({ date: -1 });
 appointmentSchema.index({ department: 1 });
+appointmentSchema.index({ appointmentSource: 1 });
 
 const Appointment = mongoose.model('Appointment', appointmentSchema);
 export default Appointment;

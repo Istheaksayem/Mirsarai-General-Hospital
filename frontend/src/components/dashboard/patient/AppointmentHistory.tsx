@@ -37,8 +37,8 @@ export default function AppointmentHistory() {
                 return (
                   <tr key={apt._id as string} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
                     <td className="px-4 py-3.5">
-                      <p className="font-bold text-slate-800 dark:text-slate-200">{doc?.name as string || "Doctor"}</p>
-                      <p className="text-xs text-slate-400">{doc?.department as string || apt.department as string || ""}</p>
+                      <p className="font-bold text-slate-800 dark:text-slate-200">{(doc?.name as any)?.en ?? (doc?.name as any)?.bn ?? "Doctor"}</p>
+                      <p className="text-xs text-slate-400">{(doc?.department as any)?.en ?? (doc?.department as any)?.bn ?? (apt.department as string) ?? ""}</p>
                     </td>
                     <td className="px-4 py-3.5 text-slate-600 dark:text-slate-400">
                       <div className="flex items-center gap-1.5"><FiCalendar size={12} />{new Date(apt.date as string).toLocaleDateString()}</div>

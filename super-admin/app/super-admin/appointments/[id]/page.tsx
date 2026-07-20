@@ -6,9 +6,10 @@ import { useCmsAppointmentById, useUpdateCmsAppointmentStatus } from "@/lib/hook
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 const statusVariant: Record<string, "success" | "warning" | "default" | "danger"> = {
-  confirmed: "success", pending: "warning", completed: "default", cancelled: "danger", "no-show": "danger",
+  confirmed: "success", pending: "warning", rejected: "danger", completed: "default", cancelled: "danger", "no-show": "danger",
 };
 
 export default function ViewAppointmentPage({ params }: { params: Promise<{ id: string }> }) {
@@ -27,6 +28,9 @@ export default function ViewAppointmentPage({ params }: { params: Promise<{ id: 
     setStatusUpdating(true);
     try {
       await updateStatus.mutateAsync({ id: apt._id, status: newStatus });
+      toast.success(`Appointment ${newStatus}`);
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to update appointment status");
     } finally {
       setStatusUpdating(false);
     }
@@ -74,17 +78,20 @@ export default function ViewAppointmentPage({ params }: { params: Promise<{ id: 
             <Badge variant="info">{apt.type}</Badge>
           </div>
         </div>
-        {apt.status !== "completed" && apt.status !== "cancelled" && apt.status !== "no-show" && (
-          <div className="flex gap-2 pt-2 border-t border-gray-100 dark:border-gray-800">
-            {apt.status === "pending" && (
-              <Button size="sm" onClick={() => handleStatusChange("confirmed")} loading={statusUpdating}>Confirm</Button>
-            )}
-            {apt.status === "confirmed" && (
-              <Button size="sm" onClick={() => handleStatusChange("completed")} loading={statusUpdating}>Mark Completed</Button>
-            )}
-            <Button size="sm" variant="outline" onClick={() => handleStatusChange("cancelled")} loading={statusUpdating}>Cancel</Button>
-          </div>
-        )}
+        <div className="flex gap-2 pt-2 border-t border-gray-100 dark:border-gray-800 items-center">
+          <label className="text-xs font-semibold text-gray-500">Change Status:</label>
+          <select
+            value={apt.status}
+            onChange={(e) => handleStatusChange(e.target.value)}
+            disabled={statusUpdating}
+            className="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E2B7A] dark:text-gray-100 disabled:opacity-50"
+          >
+            <option value="pending">Pending</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="rejected">Rejected</option>
+          </select>
+          {statusUpdating && <span className="text-xs text-gray-400">Updating...</span>}
+        </div>
       </div>
 
       <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">

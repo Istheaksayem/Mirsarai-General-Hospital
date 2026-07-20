@@ -157,8 +157,18 @@ async function fetchMock<T>(path: string): Promise<T> {
 
 // ─── API Functions ────────────────────────────────────────────────────────────
 
-export const getDashboardStats = (role: DashboardRole) =>
-  fetchMock<Record<string, unknown>>(`dashboard/${role}.json`);
+export const getDashboardStats = async (role: DashboardRole): Promise<Record<string, unknown>> => {
+  if (role === "super-admin") {
+    const res = await fetch(`${BACKEND_API}/admin/dashboard/stats`, {
+      cache: "no-store",
+      headers: getAuthHeaders(),
+    });
+    if (!res.ok) throw new ApiError(res.status, "Failed to fetch dashboard stats");
+    const json: { success: boolean; data: Record<string, unknown> } = await res.json();
+    return json.data;
+  }
+  return fetchMock<Record<string, unknown>>(`dashboard/${role}.json`);
+};
 
 export const getPatients = () => fetchMock<Patient[]>("patients.json");
 export const getDoctors = () => fetchMock<Doctor[]>("doctors.json");
@@ -284,6 +294,9 @@ export const getDocuments = (params?: Record<string, string>) => {
 export const deleteDocument = (id: string) =>
   mutateAdminReal<null>(`lab/documents/${id}`, undefined, 'DELETE');
 
+export const updateDocument = (id: string, data: Record<string, unknown>) =>
+  mutateAdminReal<Record<string, unknown>>(`lab/documents/${id}`, data, 'PUT');
+
 // ─── Patient Portal API ──────────────────────────────────────────────────────
 
 export const patientSendOtp = (email: string) =>
@@ -404,7 +417,7 @@ export const uploadLabReport = (formData: FormData) => {
       try {
         const parsed = JSON.parse(errorText);
         errorMessage = parsed.message || errorMessage;
-      } catch {}
+      } catch { }
       throw new ApiError(res.status, errorMessage);
     }
     return res.json();
@@ -413,9 +426,89 @@ export const uploadLabReport = (formData: FormData) => {
 
 // Get recent lab reports
 export const getRecentLabReports = () => fetchAdminReal<{ data: LabReportData[] }>("lab-reports/recent");
+
+// ─── Unified Reports (Document-backed, replaces LabReport) ─────────────────
+
+export interface UnifiedReport {
+  _id: string;
+  id: string;
+  patientId: string;
+  patientName: string;
+  testName: string;
+  reportType: string;
+  requestingDoctor: string;
+  department: string;
+  fileUrl: string;
+  status: 'pending' | 'in-progress' | 'completed';
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+  completedDate: string | null;
+}
+
+export interface ReportStats {
+  total: number;
+  pending: number;
+  inProgress: number;
+  completed: number;
+  completionRate: number;
+}
+
+export const getUnifiedReports = (params?: Record<string, string>) => {
+  const q = params ? '?' + new URLSearchParams(params).toString() : '';
+  return fetchAdminReal<{ data: UnifiedReport[]; meta: { total: number; page: number; limit: number } }>(`reports${q}`);
+};
+
+export const getUnifiedReportById = (id: string) =>
+  fetchAdminReal<{ data: UnifiedReport }>(`reports/${id}`);
+
+export const updateUnifiedReportStatus = (id: string, status: UnifiedReport['status']) =>
+  mutateAdminReal<UnifiedReport>(`reports/${id}/status`, { status }, 'PATCH');
+
+export const deleteUnifiedReport = (id: string) =>
+  mutateAdminReal<null>(`reports/${id}`, undefined, 'DELETE');
+
+export const getReportStats = () =>
+  fetchAdminReal<{ data: ReportStats }>('reports/stats');
+
+export const createUnifiedReport = (formData: FormData) => {
+  const headers: Record<string, string> = {};
+  if (typeof window !== 'undefined') {
+    try {
+      const raw = sessionStorage.getItem(env.authStorageKey);
+      if (raw) { const user = JSON.parse(raw); if (user.token) headers['Authorization'] = `Bearer ${user.token}`; }
+    } catch {}
+  }
+  return fetch(`${BACKEND_API}/reports`, {
+    method: 'POST',
+    headers,
+    body: formData,
+  }).then(async (res) => {
+    if (!res.ok) {
+      const errorText = await res.text();
+      let errorMessage = 'Failed to upload report';
+      try { const parsed = JSON.parse(errorText); errorMessage = parsed.message || errorMessage; } catch {}
+      throw new ApiError(res.status, errorMessage);
+    }
+    return res.json();
+  });
+};
+
 export const getNotifications = () => fetchMock<Notification[]>("notifications.json");
 export const getRoles = () => fetchMock<RoleData[]>("roles.json");
-export const getActivities = () => fetchMock<Activity[]>("activities.json");
+export const getActivities = async (): Promise<Activity[]> => {
+  try {
+    const res = await fetch(`${BACKEND_API}/admin/dashboard/activities`, {
+      cache: "no-store",
+      headers: getAuthHeaders(),
+    });
+    if (!res.ok) throw new Error("Not available");
+    const json: { success: boolean; data: Activity[] } = await res.json();
+    return json.data;
+  } catch {
+    return fetchMock<Activity[]>("activities.json");
+  }
+};
 export const getWebsiteContent = () => fetchMock<WebsiteContent>("website-content.json");
 export const getLabTests = () => fetchMock<LabTest[]>("lab-tests.json");
 export const getPrescriptions = () => fetchMock<Prescription[]>("prescriptions.json");
@@ -556,7 +649,7 @@ async function saveReal<T>(path: string, data: Partial<T>, method: "PUT" | "PATC
     throw new ApiError(res.status, errorMessage);
   }
   const result = await res.json();
-  return normalizeImages(result.data) as T;
+  return result.data as T;
 }
 
 export const getAdminHomepage = () => fetchReal<HomepageData>("homepage");
@@ -586,15 +679,30 @@ export interface AboutUsStat {
   value: string;
 }
 
+export interface FeatureItem {
+  title: LocalizedString;
+  description: LocalizedString;
+  color: string;
+}
+
+export interface FeaturesSection {
+  badge: LocalizedString;
+  heading: LocalizedString;
+  description: LocalizedString;
+  items: FeatureItem[];
+}
+
 export interface AboutUsData {
   _id?: string;
   title: LocalizedString;
   subtitle: LocalizedString;
+  storyHeading: LocalizedString;
   description: LocalizedString;
   content: LocalizedString[];
   statistics: AboutUsStat[];
   image: string;
   features: LocalizedString[];
+  featuresSection: FeaturesSection;
   sections: Record<string, SectionConfig>;
   seo: SeoConfig;
   createdBy?: string;
@@ -606,12 +714,27 @@ export interface CoreValue {
   description: LocalizedString;
 }
 
+export interface WhyItMattersItem {
+  title: LocalizedString;
+  description: LocalizedString;
+  color: string;
+}
+
 export interface MissionVisionData {
   _id?: string;
   title: LocalizedString;
   mission: { title: LocalizedString; description: LocalizedString };
   vision: { title: LocalizedString; description: LocalizedString };
   coreValues: CoreValue[];
+  commitmentHeading: LocalizedString;
+  commitmentDescription: LocalizedString;
+  whyItMattersHeading: LocalizedString;
+  whyItMattersDescription: LocalizedString;
+  whyItMattersItems: WhyItMattersItem[];
+  ctaHeading: LocalizedString;
+  ctaDescription: LocalizedString;
+  ctaPrimaryButtonText: LocalizedString;
+  ctaSecondaryButtonText: LocalizedString;
   image: string;
   sections: Record<string, SectionConfig>;
   seo: SeoConfig;
@@ -651,6 +774,7 @@ export interface GalleryData {
 }
 
 export interface CareerBenefit {
+  id?: number;
   icon: string;
   title: LocalizedString;
   description: LocalizedString;
@@ -660,24 +784,29 @@ export interface CareerPosition {
   id: number;
   title: LocalizedString;
   department: LocalizedString;
-  type: LocalizedString;
-  experience: LocalizedString;
+  location: LocalizedString;
+  jobType: LocalizedString;
   description: LocalizedString;
+  requirements: LocalizedString;
+  applyLink: string;
+  bannerImage: string;
+  isActive: boolean;
 }
 
 export interface CareerStep {
+  id?: number;
   step: number;
+  icon: string;
   title: LocalizedString;
   description: LocalizedString;
 }
 
 export interface CareerData {
   _id?: string;
-  hero: { title: LocalizedString; subtitle: LocalizedString; description: LocalizedString; image: string };
-  whyJoinUs: { title: LocalizedString; benefits: CareerBenefit[] };
-  openPositions: CareerPosition[];
-  applicationProcess: { title: LocalizedString; steps: CareerStep[] };
-  contact: { title: LocalizedString; description: LocalizedString; email: string; phone: string };
+  title: LocalizedString;
+  description: LocalizedString;
+  image: string;
+  jobListings: CareerPosition[];
   sections: Record<string, SectionConfig>;
   seo: SeoConfig;
   createdBy?: string;
@@ -738,13 +867,16 @@ export interface OurTeamData {
 }
 
 export const getOurTeamData = () => fetchReal<OurTeamData>("about/our-team");
-export const updateOurTeamData = (data: Partial<OurTeamData>) => saveReal<OurTeamData>("about/our-team", data, "PUT");
+export const updateOurTeamData = (data: Partial<OurTeamData>) => mutateAdminReal<OurTeamData>("about/our-team", data, "PUT");
 
 // Image upload helper
 export async function uploadCmsImage(base64Data: string): Promise<string> {
   const res = await fetch(`${BACKEND_API}/about/upload`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeaders()
+    },
     body: JSON.stringify({ base64Data }),
   });
   if (!res.ok) {
@@ -879,7 +1011,7 @@ function getAuthHeaders(): Record<string, string> {
         const user = JSON.parse(raw);
         if (user.token) headers["Authorization"] = `Bearer ${user.token}`;
       }
-    } catch {}
+    } catch { }
   }
   return headers;
 }
@@ -892,9 +1024,8 @@ async function fetchAdminReal<T>(path: string): Promise<T> {
   if (!res.ok) {
     const errorText = await res.text();
     let errorMessage = `Failed to fetch ${path}`;
-    let errors: { field: string; message: string }[] | undefined;
-    try { const parsed = JSON.parse(errorText); errorMessage = parsed.message || errorMessage; errors = parsed.errors; } catch {}
-    throw new ApiError(res.status, errorMessage, errors);
+    try { const parsed = JSON.parse(errorText); errorMessage = parsed.message || errorMessage; } catch { }
+    throw new ApiError(res.status, errorMessage);
   }
   const result = await res.json();
   return normalizeImages(result) as T;
@@ -909,12 +1040,11 @@ async function mutateAdminReal<T>(path: string, data: unknown, method: "POST" | 
   if (!res.ok) {
     const errorText = await res.text();
     let errorMessage = `Failed to ${method} ${path}`;
-    let errors: { field: string; message: string }[] | undefined;
-    try { const parsed = JSON.parse(errorText); errorMessage = parsed.message || errorMessage; errors = parsed.errors; } catch {}
-    throw new ApiError(res.status, errorMessage, errors);
+    try { const parsed = JSON.parse(errorText); errorMessage = parsed.message || errorMessage; } catch { }
+    throw new ApiError(res.status, errorMessage);
   }
   const result = await res.json();
-  return normalizeImages(result.data) as T;
+  return result.data as T;
 }
 
 export const getCmsDoctors = (params: DoctorQueryParams = {}) => {
@@ -969,6 +1099,9 @@ export const activateStaffMember = (id: string) =>
 export const deactivateStaffMember = (id: string) =>
   mutateAdminReal<StaffMember>(`admin/staff/${id}/deactivate`, {}, "PATCH");
 
+export const createStaffMember = (data: { fullName: string; email: string; phone?: string; password: string; role: string }) =>
+  mutateAdminReal<StaffMember>("admin/staff", data, "POST");
+
 // ─── Doctor Self Profile (authenticated doctor) ────────────────────────────────
 
 export interface DoctorProfileData {
@@ -1016,7 +1149,7 @@ function getDoctorAuthHeaders(): Record<string, string> {
         const user = JSON.parse(raw);
         if (user.token) headers["Authorization"] = `Bearer ${user.token}`;
       }
-    } catch {}
+    } catch { }
   }
   return headers;
 }
@@ -1029,7 +1162,7 @@ async function fetchDoctorProfile<T>(path: string): Promise<T> {
   if (!res.ok) {
     const errorText = await res.text();
     let errorMessage = `Failed to fetch ${path}`;
-    try { const parsed = JSON.parse(errorText); errorMessage = parsed.message || errorMessage; } catch {}
+    try { const parsed = JSON.parse(errorText); errorMessage = parsed.message || errorMessage; } catch { }
     throw new ApiError(res.status, errorMessage);
   }
   const result = await res.json();
@@ -1045,7 +1178,7 @@ async function updateDoctorProfile<T>(path: string, data: unknown): Promise<T> {
   if (!res.ok) {
     const errorText = await res.text();
     let errorMessage = `Failed to update ${path}`;
-    try { const parsed = JSON.parse(errorText); errorMessage = parsed.message || errorMessage; } catch {}
+    try { const parsed = JSON.parse(errorText); errorMessage = parsed.message || errorMessage; } catch { }
     throw new ApiError(res.status, errorMessage);
   }
   const result = await res.json();
@@ -1347,6 +1480,28 @@ export const deleteCmsAppointment = (id: string) =>
 export const updateCmsAppointmentStatus = (id: string, status: string) =>
   mutateAdminReal<CmsAppointment>(`admin/appointments/${id}/status`, { status }, "PATCH");
 
+// ─── Doctor Appointment API (uses dedicated /doctors/appointments endpoints) ──
+
+export const getDoctorAppointments = (params: Record<string, string> = {}) => {
+  const q = new URLSearchParams(params).toString();
+  return fetchAdminReal<CmsAppointmentListResponse>(`doctors/appointments${q ? `?${q}` : ""}`);
+};
+
+export const getDoctorTodaysAppointments = () => {
+  return fetchAdminReal<{ data: CmsAppointment[]; success?: boolean; message?: string }>("doctors/appointments/today");
+};
+
+export const getDoctorAppointmentById = (id: string) =>
+  fetchAdminReal<{ data: CmsAppointment }>(`doctors/appointments/${id}`);
+
+export const getDoctorCompletedAppointments = (params: Record<string, string> = {}) => {
+  const q = new URLSearchParams(params).toString();
+  return fetchAdminReal<CmsAppointmentListResponse>(`doctors/appointments/completed${q ? `?${q}` : ""}`);
+};
+
+export const updateDoctorAppointmentStatus = (id: string, status: string) =>
+  mutateAdminReal<CmsAppointment>(`doctors/appointments/${id}/status`, { status }, "PATCH");
+
 // ─── Service Page CMS Types ─────────────────────────────────────────────────
 
 export interface ServicePageFeature {
@@ -1441,6 +1596,8 @@ export interface HealthBlogData {
     subtitle: BilingualField;
     description: BilingualField;
     image: string;
+    color?: string;
+    icon?: string;
   };
   categories: { id: string; name: BilingualField }[];
   posts: HealthBlogPost[];
@@ -1543,6 +1700,47 @@ export interface FAQData {
   updatedBy?: string;
 }
 
+export interface AppointmentPageFeatureCard {
+  icon: string;
+  title: LocalizedString;
+  description: LocalizedString;
+}
+
+export interface AppointmentPageData {
+  _id?: string;
+  hero: {
+    title: LocalizedString;
+    subtitle: LocalizedString;
+    description: LocalizedString;
+    image: string;
+  };
+  features: AppointmentPageFeatureCard[];
+  whyChooseUs: {
+    title: LocalizedString;
+    items: LocalizedString[];
+  };
+  emergencyBanner: {
+    title: LocalizedString;
+    description: LocalizedString;
+    buttonText: LocalizedString;
+    phone: string;
+  };
+  contactCard: {
+    title: LocalizedString;
+    description: LocalizedString;
+    phone: string;
+  };
+  formSection: {
+    title: LocalizedString;
+    description: LocalizedString;
+  };
+  disclaimer: LocalizedString;
+  sections: Record<string, SectionConfig>;
+  seo: SeoConfig;
+  createdBy?: string;
+  updatedBy?: string;
+}
+
 // ─── Resource Page CMS API Functions ──────────────────────────────────────
 
 export const getHealthBlog = () => fetchReal<HealthBlogData>("health-blog");
@@ -1556,3 +1754,186 @@ export const updateEmergencyInfo = (data: Partial<EmergencyInfoData>) =>
 export const getFAQData = () => fetchReal<FAQData>("faq");
 export const updateFAQData = (data: Partial<FAQData>) =>
   mutateAdminReal<FAQData>("admin/faq", data, "PUT");
+
+export const getAppointmentPageData = () => fetchReal<AppointmentPageData>("appointment-page");
+export const updateAppointmentPageData = (data: Partial<AppointmentPageData>) =>
+  mutateAdminReal<AppointmentPageData>("admin/appointment-page", data, "PUT");
+
+export interface ContactPageFormFields {
+  name: { label: LocalizedString; placeholder: LocalizedString };
+  phone: { label: LocalizedString; placeholder: LocalizedString };
+  email: { label: LocalizedString; placeholder: LocalizedString };
+  message: { label: LocalizedString; placeholder: LocalizedString };
+}
+
+export interface ContactPageData {
+  _id?: string;
+  hero: {
+    title: LocalizedString;
+    subtitle: LocalizedString;
+    description: LocalizedString;
+    image: string;
+  };
+  contactInfo: {
+    title: LocalizedString;
+    addressCard: { label: LocalizedString; name: LocalizedString; location: LocalizedString };
+    hotlineCard: { label: LocalizedString; number: string; numberLabel: LocalizedString };
+    emailCard: { label: LocalizedString; address: string };
+  };
+  form: {
+    title: LocalizedString;
+    description: LocalizedString;
+    buttonText: LocalizedString;
+    fields: ContactPageFormFields;
+  };
+  sections: Record<string, SectionConfig>;
+  seo: SeoConfig;
+  createdBy?: string;
+  updatedBy?: string;
+}
+
+export const getContactPageData = () => fetchReal<ContactPageData>("contact-page");
+export const updateContactPageData = (data: Partial<ContactPageData>) =>
+  mutateAdminReal<ContactPageData>("admin/contact-page", data, "PUT");
+
+// ─── Services Listing CMS Types & API ──────────────────────────────────────────
+
+export interface ServiceData {
+  _id: string;
+  name: LocalizedString;
+  slug: string;
+  description: LocalizedString;
+  image: string;
+  icon: string;
+  color: string;
+  gradient: string;
+  link: string;
+  highlights: string[];
+  tagline: string;
+  displayOrder: number;
+  isVisible: boolean;
+  doctors?: string[];
+  createdBy?: string;
+  updatedBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface AdminServicesResponse {
+  success: boolean;
+  data: ServiceData[];
+  total: number;
+  page: number;
+  limit: number;
+  message?: string;
+}
+
+export const getServicesData = (params: { page?: number; limit?: number; search?: string } = {}) => {
+  const q = new URLSearchParams();
+  if (params.page) q.set("page", String(params.page));
+  if (params.limit) q.set("limit", String(params.limit));
+  if (params.search) q.set("search", params.search);
+  const qs = q.toString();
+  return fetchAdminReal<AdminServicesResponse>(`admin/services${qs ? `?${qs}` : ""}`);
+};
+
+export const createServiceData = (data: Partial<ServiceData>) =>
+  mutateAdminReal<ServiceData>("admin/services", data, "POST");
+
+export const updateServiceData = (id: string, data: Partial<ServiceData>) =>
+  mutateAdminReal<ServiceData>(`admin/services/${id}`, data, "PUT");
+
+export const deleteServiceData = (id: string) =>
+  mutateAdminReal<null>(`admin/services/${id}`, undefined, "DELETE");
+
+export const reorderServicesData = (orders: { id: string; displayOrder: number }[]) =>
+  mutateAdminReal<null>("admin/services/reorder", orders, "PATCH");
+
+// ── Footer ──────────────────────────────────────────────────────────────────────
+export interface FooterSocialLink {
+  platform: string;
+  icon: string;
+  url: string;
+  hoverColor: string;
+}
+
+export interface FooterLink {
+  label: LocalizedString;
+  href: string;
+}
+
+export interface FooterDepartmentItem {
+  name: LocalizedString;
+  href: string;
+}
+
+export interface FooterContactBlock {
+  icon: string;
+  hospitalName: LocalizedString;
+  location: LocalizedString;
+}
+
+export interface FooterPhoneBlock {
+  icon: string;
+  number: string;
+}
+
+export interface FooterEmailBlock {
+  icon: string;
+  address: string;
+}
+
+export interface FooterEmergencyCard {
+  icon: string;
+  label: LocalizedString;
+  phoneNumber: string;
+  gradient: string;
+  badgeGradient: string;
+  blobColor: string;
+  iconGradient: string;
+}
+
+export interface FooterBottomBarLink {
+  label: LocalizedString;
+  href: string;
+}
+
+export interface FooterBottomBar {
+  hospitalName: LocalizedString;
+  rightsText: LocalizedString;
+  privacyPolicy: FooterBottomBarLink;
+  termsOfService: FooterBottomBarLink;
+}
+
+export interface FooterData {
+  _id?: string;
+  brand: {
+    logo: string;
+    description: LocalizedString;
+    socialLinks: FooterSocialLink[];
+  };
+  exploreLinks: {
+    title: LocalizedString;
+    links: FooterLink[];
+  };
+  departments: {
+    title: LocalizedString;
+    items: FooterDepartmentItem[];
+  };
+  contactInfo: {
+    title: LocalizedString;
+    address: FooterContactBlock;
+    phone: FooterPhoneBlock;
+    email: FooterEmailBlock;
+  };
+  emergencyCard: FooterEmergencyCard;
+  bottomBar: FooterBottomBar;
+  sections: Record<string, SectionConfig>;
+  seo: SeoConfig;
+  createdBy?: string;
+  updatedBy?: string;
+}
+
+export const getFooterData = () => fetchReal<FooterData>("footer");
+export const updateFooterData = (data: Partial<FooterData>) =>
+  mutateAdminReal<FooterData>("admin/footer", data, "PUT");

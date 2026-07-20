@@ -121,6 +121,7 @@ export function ActionButtons({
 interface ActionColumnConfig {
   basePath: string; // e.g. "/super-admin/patients"
   idKey?: string;   // default "id"
+  onDelete?: (row: Record<string, unknown>) => void; // delete callback
 }
 
 export function createActionColumn(
@@ -139,6 +140,7 @@ export function createActionColumn(
             row={row}
             viewHref={`${config.basePath}/${id}`}
             editHref={`${config.basePath}/${id}/edit`}
+            onDelete={config.onDelete ? () => config.onDelete!(row) : undefined}
           />
         );
       }

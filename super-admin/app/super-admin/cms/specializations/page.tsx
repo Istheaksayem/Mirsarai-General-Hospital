@@ -18,6 +18,7 @@ import {
 import { LanguageTabs } from "@/components/cms/LanguageTabs";
 import { FormField, FormInput, FormSelect } from "@/components/ui/FormPage";
 import { env } from "@/config/env";
+import toast from "react-hot-toast";
 
 const API_URL = env.apiUrl;
 
@@ -46,7 +47,11 @@ export default function SpecializationsCmsPage() {
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteCmsSpecialization(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["cms-specializations"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-specializations"] });
+      toast.success("Specialization deleted");
+    },
+    onError: (err: Error) => toast.error(err?.message || "Failed to delete specialization"),
   });
 
   const createMutation = useMutation({
@@ -66,7 +71,9 @@ export default function SpecializationsCmsPage() {
         description: { en: "", bn: "" }, isVisible: true, displayOrder: 0,
         seo: { metaTitle: { en: "", bn: "" }, metaDescription: { en: "", bn: "" } },
       });
+      toast.success("Specialization created");
     },
+    onError: (err: Error) => toast.error(err?.message || "Failed to create specialization"),
   });
 
   const specializations = (data as unknown as { data?: CmsSpecialization[] })?.data || [];
@@ -157,7 +164,11 @@ export default function SpecializationsCmsPage() {
               </div>
               <Badge variant={spec.isVisible ? "success" : "default"}>{spec.isVisible ? "Visible" : "Hidden"}</Badge>
               <button
-                onClick={() => deleteMutation.mutate(spec._id)}
+                onClick={() => {
+                  if (window.confirm("Delete this specialization? This cannot be undone.")) {
+                    deleteMutation.mutate(spec._id);
+                  }
+                }}
                 className="h-8 w-8 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-500 flex items-center justify-center hover:bg-red-100 transition-colors"
                 title="Delete"
               >

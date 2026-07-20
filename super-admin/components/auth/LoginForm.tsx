@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Eye, EyeOff, Lock, Mail, ShieldCheck } from "lucide-react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/Button";
@@ -94,6 +95,11 @@ export function LoginForm() {
               error={errors.password?.message}
               {...register("password")}
             />
+            <div className="flex justify-end">
+              <Link href="/forgot-password" className="text-xs font-semibold text-[#1E2B7A] hover:text-[#2d3fa8] dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
+                Forgot Password?
+              </Link>
+            </div>
           </div>
 
           {/* Server error */}

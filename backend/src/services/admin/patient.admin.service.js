@@ -121,12 +121,7 @@ export const updatePatient = async (id, data) => {
 };
 
 export const deletePatient = async (id) => {
-  const patient = await Patient.findById(id);
+  const patient = await Patient.findByIdAndDelete(id);
   if (!patient) throw new ApiError(StatusCodes.NOT_FOUND, 'Patient not found');
-
-  patient.isActive = false;
-  patient.status = 'inactive';
-  await patient.save();
-
-  return { message: 'Patient deactivated successfully' };
+  return { message: 'Patient deleted successfully' };
 };

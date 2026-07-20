@@ -7,6 +7,8 @@ import sendEmail from '../../utils/sendEmail.js';
 import env from '../../config/env.js';
 import { createNotification } from '../notification.service.js';
 import { createAuditLog } from '../auditLog.service.js';
+import { findOrCreatePatient, linkPatientToAppointment } from '../patient/shared-patient.service.js';
+import { isTransitionAllowed } from '../../constants/statusTransitions.js';
 
 export const registerPatient = async (data, userId) => {
   const existing = await Patient.findOne({ mobile: data.mobile });
@@ -34,6 +36,8 @@ export const registerPatient = async (data, userId) => {
         message: `Dear ${data.fullName},
 
 You have been added as a patient at Mirsarai General Hospital.
+
+Your Patient ID: ${patientId}
 
 You can now access all your information — prescriptions, lab reports, and more — through your patient dashboard.
 
@@ -98,18 +102,47 @@ export const updateAppointmentStatus = async (id, status, userId) => {
   const appointment = await Appointment.findById(id).populate('doctor', 'name designation image department').lean();
   if (!appointment) throw new ApiError(StatusCodes.NOT_FOUND, 'Appointment not found');
 
+  if (!isTransitionAllowed('reception', status)) {
+    throw new ApiError(
+      StatusCodes.FORBIDDEN,
+      `Role 'reception' is not allowed to set status to '${status}'`
+    );
+  }
+
   const updated = await Appointment.findByIdAndUpdate(id, { status }, { new: true, runValidators: true })
     .populate('doctor', 'name designation image department')
     .lean();
 
-  const patient = appointment.patientId
+  let patient = appointment.patientId
     ? await Patient.findById(appointment.patientId).lean()
-    : await Patient.findOne({ mobile: appointment.patientPhone });
+    : null;
+
+  if (!patient && status === 'confirmed') {
+    patient = await findOrCreatePatient({
+      phone: appointment.patientPhone,
+      name: appointment.patientName,
+      email: appointment.patientEmail,
+      age: appointment.patientAge,
+      gender: appointment.patientGender,
+    });
+    if (patient) {
+      await linkPatientToAppointment(id, patient);
+    }
+  }
+
+  if (!patient && !appointment.patientId) {
+    patient = await Patient.findOne({ mobile: appointment.patientPhone }).lean();
+  }
+
   if (patient) {
     const statusMessages = {
       confirmed: 'Your appointment has been confirmed.',
+      rejected: 'Unfortunately, your appointment request has been rejected.',
       cancelled: 'Your appointment has been cancelled.',
       completed: 'Your appointment has been marked as completed.',
+      'checked-in': 'You have been checked in for your appointment.',
+      'in-consultation': 'You are now in consultation with the doctor.',
+      'no-show': 'You missed your appointment.',
     };
     const message = statusMessages[status];
     if (message) {
@@ -117,7 +150,7 @@ export const updateAppointmentStatus = async (id, status, userId) => {
         patientId: patient._id,
         type: 'status_update',
         title: `Appointment ${status}`,
-        message: `${message} — ${appointment.patientName} with ${updated.doctor?.name || 'doctor'} on ${new Date(appointment.date).toLocaleDateString()}`,
+        message: `${message} — ${appointment.patientName} with ${updated.doctor?.name?.en || 'doctor'} on ${new Date(appointment.date).toLocaleDateString()}`,
       });
     }
   }

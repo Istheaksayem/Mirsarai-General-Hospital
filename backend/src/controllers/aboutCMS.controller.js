@@ -6,6 +6,19 @@ import catchAsync from '../utils/catchAsync.js';
 import { sendSuccess } from '../utils/ApiResponse.js';
 import ApiError from '../utils/ApiError.js';
 import AboutUs from '../models/aboutUs.model.js';
+
+/**
+ * Strip absolute URL prefix to keep only the pathname, ensuring only relative paths are stored in the DB.
+ * @param {string} url
+ * @returns {string}
+ */
+function toRelativePath(url) {
+  if (!url || (typeof url !== 'string')) return url;
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    try { return new URL(url).pathname; } catch { return url; }
+  }
+  return url;
+}
 import MissionVision from '../models/missionVision.model.js';
 import Gallery from '../models/gallery.model.js';
 import Career from '../models/career.model.js';
@@ -24,6 +37,7 @@ export const getAboutUs = catchAsync(async (req, res) => {
 
 export const updateAboutUs = catchAsync(async (req, res) => {
   let data = await AboutUs.findOne();
+  if (req.body.image) req.body.image = toRelativePath(req.body.image);
   if (!data) {
     data = new AboutUs(req.body);
     if (req.user) data.createdBy = req.user.email || req.user.id;
@@ -154,13 +168,13 @@ export const addCareerPosition = catchAsync(async (req, res) => {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Career content not found.');
   }
   
-  const highestId = data.openPositions.reduce((max, pos) => (pos.id > max ? pos.id : max), 0);
+  const highestId = data.jobListings.reduce((max, pos) => (pos.id > max ? pos.id : max), 0);
   const newPosition = {
     id: highestId + 1,
     ...req.body
   };
 
-  data.openPositions.push(newPosition);
+  data.jobListings.push(newPosition);
   if (req.user) data.updatedBy = req.user.email || req.user.id;
   await data.save();
   return sendSuccess(res, StatusCodes.CREATED, newPosition, 'Career position added successfully');
@@ -174,10 +188,10 @@ export const deleteCareerPosition = catchAsync(async (req, res) => {
   }
   
   const positionId = parseInt(req.params.id, 10);
-  const initialLength = data.openPositions.length;
-  data.openPositions = data.openPositions.filter(pos => pos.id !== positionId);
+  const initialLength = data.jobListings.length;
+  data.jobListings = data.jobListings.filter(pos => pos.id !== positionId);
 
-  if (data.openPositions.length === initialLength) {
+  if (data.jobListings.length === initialLength) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Position not found.');
   }
 

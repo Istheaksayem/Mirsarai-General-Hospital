@@ -10,6 +10,17 @@ import toast from "react-hot-toast";
 const DEPARTMENTS = ["General Medicine","Cardiology","Orthopedics","Neurology","Gynecology","Pediatrics","Gastroenterology","Dermatology","ENT","Ophthalmology","Urology","Oncology","Radiology","Pathology","Emergency"];
 const BLOOD_GROUPS = ["A+","A-","B+","B-","AB+","AB-","O+","O-"];
 
+const FIELD_MAP: Record<string, string> = {
+  "body.fullName": "name",
+  "body.mobile": "phone",
+  "body.email": "email",
+  "body.dateOfBirth": "dob",
+  "body.gender": "gender",
+  "body.address": "address",
+  "body.department": "department",
+  "body.bloodGroup": "bloodGroup",
+};
+
 function calcAge(dob: string) {
   if (!dob) return 0;
   const today = new Date(), birth = new Date(dob);
@@ -62,14 +73,39 @@ export default function AddPatientPage() {
         router.push("/super-admin/patients?registered=1");
       },
       onError: (err) => {
-        const msg = err instanceof ApiError ? formatApiError(err) : "Failed to register patient";
-        toast.error(msg);
+        if (!(err instanceof ApiError)) {
+          toast.error("Failed to register patient");
+          return;
+        }
+
+        if (err.status === 409) {
+          const fieldErrors: Record<string, string> = {};
+          fieldErrors.phone = "A patient with this phone number already exists.";
+          setErrors(fieldErrors);
+          toast.error("A patient with this phone number already exists.");
+          return;
+        }
+
+        if (err.status === 400 && err.errors && err.errors.length > 0) {
+          const fieldErrors: Record<string, string> = {};
+          for (const be of err.errors) {
+            const formField = FIELD_MAP[be.field] || be.field;
+            if (!fieldErrors[formField]) {
+              fieldErrors[formField] = be.message;
+            }
+          }
+          setErrors(fieldErrors);
+          toast.error(formatApiError(err));
+          return;
+        }
+
+        toast.error(formatApiError(err));
       },
     });
   }
 
   return (
-    <FormPage title="Add New Patient" backHref="/super-admin/patients" onSubmit={handleSubmit} submitLabel="Register Patient">
+    <FormPage title="Add New Patient" backHref="/super-admin/patients" onSubmit={handleSubmit} submitLabel="Register Patient" isSubmitting={createMutation.isPending}>
       <FormSection title="Personal Information">
         <FormField label="Full Name" required error={errors.name}>
           <FormInput placeholder="e.g. Aminul Islam" value={form.name} onChange={e => set("name", e.target.value)} />

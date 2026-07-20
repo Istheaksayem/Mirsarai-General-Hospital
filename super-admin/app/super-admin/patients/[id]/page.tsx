@@ -1,23 +1,55 @@
 "use client";
 import { use, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Pencil, Trash2, User, Phone, Calendar, MapPin, Building2, Droplets, Activity } from "lucide-react";
-import { usePatients, useDeletePatient } from "@/lib/hooks/usePatients";
+import { ArrowLeft, Pencil, Trash2, User, Phone, Calendar, MapPin, Building2, Droplets, Activity, X } from "lucide-react";
+import { usePatientById, useDeletePatient } from "@/lib/hooks/usePatients";
 import { Badge } from "@/components/ui/Badge";
 import toast from "react-hot-toast";
 
 const statusVariant: Record<string, "success" | "warning" | "info"> = { active: "success", inactive: "warning", admitted: "info" };
 
+function DeleteConfirm({ onClose, onConfirm }: { onClose: () => void; onConfirm: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-sm bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-6 space-y-4">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30 mx-auto">
+          <Trash2 className="h-5 w-5 text-red-500" />
+        </div>
+        <div className="text-center">
+          <h3 className="font-bold text-gray-900 dark:text-gray-100 mb-1">Delete Patient</h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Are you sure you want to delete this patient? This action cannot be undone.
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={onClose}
+            className="flex-1 px-4 py-2.5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 rounded-xl text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => { onConfirm(); onClose(); }}
+            className="flex-1 px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-xl text-sm font-medium transition-colors"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ViewPatientPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
-  const { data = [], isLoading } = usePatients();
+  const { data: patient, isLoading, isError } = usePatientById(decodeURIComponent(id));
   const deleteMutation = useDeletePatient();
-  const patient = data.find(p => p.id === decodeURIComponent(id));
-  const [deleting, setDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   if (isLoading) return <div className="flex items-center justify-center h-64"><div className="animate-spin h-8 w-8 rounded-full border-4 border-[#1E2B7A] border-t-transparent" /></div>;
-  if (!patient) return <div className="rounded-2xl border border-dashed border-gray-200 dark:border-gray-700 p-16 text-center text-gray-400">Patient not found</div>;
+  if (isError || !patient) return <div className="rounded-2xl border border-dashed border-gray-200 dark:border-gray-700 p-16 text-center text-gray-400">Patient not found</div>;
 
   const fields = [
     { icon: User, label: "Full Name", value: patient.name },
@@ -32,15 +64,13 @@ export default function ViewPatientPage({ params }: { params: Promise<{ id: stri
   ];
 
   const handleDelete = () => {
-    setDeleting(true);
     deleteMutation.mutate(patient._id, {
       onSuccess: () => {
-        toast.success("Patient deactivated");
+        toast.success("Patient deleted successfully");
         router.push("/super-admin/patients");
       },
       onError: () => {
-        toast.error("Failed to deactivate patient");
-        setDeleting(false);
+        toast.error("Failed to delete patient");
       },
     });
   };
@@ -58,14 +88,28 @@ export default function ViewPatientPage({ params }: { params: Promise<{ id: stri
           </div>
         </div>
         <div className="flex gap-2">
-          <button onClick={handleDelete} disabled={deleting} className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl text-sm font-semibold transition-all">
-            <Trash2 className="h-3.5 w-3.5" /> {deleting ? "Deactivating..." : "Deactivate"}
+          <button
+            onClick={() => setShowDeleteConfirm(true)}
+            disabled={deleteMutation.isPending}
+            className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl text-sm font-semibold transition-all"
+          >
+            <Trash2 className="h-3.5 w-3.5" /> {deleteMutation.isPending ? "Deleting..." : "Delete"}
           </button>
-          <button onClick={() => router.push(`/super-admin/patients/${encodeURIComponent(patient.id)}/edit`)} className="flex items-center gap-2 px-4 py-2 bg-[#1E2B7A] hover:bg-[#76BC21] text-white rounded-xl text-sm font-semibold transition-all">
+          <button
+            onClick={() => router.push(`/super-admin/patients/${patient._id}/edit`)}
+            className="flex items-center gap-2 px-4 py-2 bg-[#1E2B7A] hover:bg-[#76BC21] text-white rounded-xl text-sm font-semibold transition-all"
+          >
             <Pencil className="h-3.5 w-3.5" /> Edit
           </button>
         </div>
       </div>
+
+      {showDeleteConfirm && (
+        <DeleteConfirm
+          onClose={() => setShowDeleteConfirm(false)}
+          onConfirm={handleDelete}
+        />
+      )}
 
       <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div className="h-24 bg-gradient-to-r from-[#1E2B7A] to-[#2c3e7a]" />

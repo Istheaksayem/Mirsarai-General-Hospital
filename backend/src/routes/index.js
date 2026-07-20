@@ -27,14 +27,22 @@ import adminNicuBabyCareRoutes from './admin/nicuBabyCare.admin.routes.js';
 import healthBlogRoutes from './healthBlog.routes.js';
 import emergencyInfoRoutes from './emergencyInfo.routes.js';
 import faqRoutes from './faq.routes.js';
+import appointmentPageRoutes from './appointmentPage.routes.js';
+import contactPageRoutes from './contactPage.routes.js';
+import footerRoutes from './footer.routes.js';
 import adminHealthBlogRoutes from './admin/healthBlog.admin.routes.js';
 import adminEmergencyInfoRoutes from './admin/emergencyInfo.admin.routes.js';
 import adminFaqRoutes from './admin/faq.admin.routes.js';
+import adminAppointmentPageRoutes from './admin/appointmentPage.admin.routes.js';
+import adminContactPageRoutes from './admin/contactPage.admin.routes.js';
+import adminFooterRoutes from './admin/footer.admin.routes.js';
 import adminStaffRoutes from './admin/staff.admin.routes.js';
 import adminPatientRoutes from './admin/patient.admin.routes.js';
+import adminDashboardRoutes from './admin/dashboard.admin.routes.js';
 import receptionPatientRoutes from './reception/patient.reception.routes.js';
 import receptionAppointmentRoutes from './reception/appointment.reception.routes.js';
 import labDocumentRoutes from './lab/document.lab.routes.js';
+import reportRoutes from './report.routes.js';
 import patientLookupRoutes from './patient/lookup.routes.js';
 import patientAuthRoutes from './patient/auth.patient.routes.js';
 import patientProfileRoutes from './patient/profile.patient.routes.js';
@@ -90,11 +98,6 @@ router.get('/', (req, res) => {
 // ============================================
 // MODULE ROUTES
 // ============================================
-// import authRoutes from './auth.routes.js';
-// import userRoutes from './user.routes.js';
-// import doctorRoutes from './doctor.routes.js';
-// import patientRoutes from './patient.routes.js';
-// import appointmentRoutes from './appointment.routes.js';
 
 // ── Auth Routes ───────────────────────────────────────────────────────────────
 router.use('/auth', authRoutes);
@@ -116,6 +119,9 @@ router.use('/service-page', nicuBabyCareRoutes);
 router.use('/health-blog', healthBlogRoutes);
 router.use('/emergency-information', emergencyInfoRoutes);
 router.use('/faq', faqRoutes);
+router.use('/appointment-page', appointmentPageRoutes);
+router.use('/contact-page', contactPageRoutes);
+router.use('/footer', footerRoutes);
 
 // ── Doctor Routes ────────────────────────────────────────────────────────────────
 router.use('/doctors', doctorRoutes);
@@ -145,17 +151,24 @@ router.use('/admin/specializations', authenticate, authorize('super-admin'), adm
 router.use('/admin/health-blog', authenticate, authorize('super-admin'), adminHealthBlogRoutes);
 router.use('/admin/emergency-information', authenticate, authorize('super-admin'), adminEmergencyInfoRoutes);
 router.use('/admin/faq', authenticate, authorize('super-admin'), adminFaqRoutes);
+router.use('/admin/appointment-page', authenticate, authorize('super-admin'), adminAppointmentPageRoutes);
+router.use('/admin/contact-page', authenticate, authorize('super-admin'), adminContactPageRoutes);
+router.use('/admin/footer', authenticate, authorize('super-admin'), adminFooterRoutes);
 router.use('/admin/staff', authenticate, authorize('super-admin'), adminStaffRoutes);
 router.use('/admin/appointments', authenticate, authorize('super-admin'), adminAppointmentRoutes);
-router.use('/admin/patients', authenticate, authorize('super-admin'), adminPatientRoutes);
+router.use('/admin/patients', authenticate, adminPatientRoutes);
+router.use('/admin/dashboard', authenticate, authorize('super-admin'), adminDashboardRoutes);
 
 // ── Reception Routes ─────────────────────────────────────────────────────────
 router.use('/reception/patients', authenticate, authorize('reception'), receptionPatientRoutes);
 router.use('/reception/appointments', authenticate, authorize('reception'), receptionAppointmentRoutes);
 
 // ── Lab Routes ───────────────────────────────────────────────────────────────
-router.use('/lab/documents', authenticate, authorize('lab'), labDocumentRoutes);
-router.use('/patients/lookup', authenticate, authorize('reception', 'lab'), patientLookupRoutes);
+router.use('/lab/documents', authenticate, authorize('lab', 'super-admin', 'doctor'), labDocumentRoutes);
+router.use('/patients/lookup', authenticate, authorize('reception', 'lab', 'super-admin', 'doctor'), patientLookupRoutes);
+
+// ── Unified Reports (replaces legacy /lab-reports) ──────────
+router.use('/reports', authenticate, authorize('lab', 'super-admin', 'doctor'), reportRoutes);
 
 // ── Patient Portal Routes ────────────────────────────────────────────────────
 router.use('/patient/auth', patientAuthRoutes);
