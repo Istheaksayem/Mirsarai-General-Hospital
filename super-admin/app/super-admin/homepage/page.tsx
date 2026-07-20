@@ -523,8 +523,8 @@ export default function EditHomepageCMS() {
                     <input
                       type="text"
                       value={stat.icon}
-                      onChange={(e) => handleStatChange(idx, "icon", e.target.value)}
-                      className="w-full rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-850 px-2 py-1 text-xs text-gray-700"
+                      disabled
+                      className="w-full rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-850 px-2 py-1 text-xs text-gray-700 cursor-not-allowed opacity-60"
                     />
                   </div>
                 </div>
@@ -543,8 +543,8 @@ export default function EditHomepageCMS() {
                     <input
                       type="text"
                       value={stat.color}
-                      onChange={(e) => handleStatChange(idx, "color", e.target.value)}
-                      className="w-full rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-850 px-2 py-1 text-xs text-gray-700"
+                      disabled
+                      className="w-full rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-850 px-2 py-1 text-xs text-gray-700 cursor-not-allowed opacity-60"
                     />
                   </div>
                 </div>

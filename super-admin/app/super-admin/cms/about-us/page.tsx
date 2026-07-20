@@ -268,11 +268,8 @@ export default function AboutUsCmsPage() {
                       <FormField label="Color Gradient Class">
                         <FormInput
                           value={item.color}
-                          onChange={(e) => {
-                            const updated = [...data.featuresSection.items];
-                            updated[i] = { ...item, color: e.target.value };
-                            set((d) => ({ ...d, featuresSection: { ...d.featuresSection, items: updated } }));
-                          }}
+                          disabled
+                          className="cursor-not-allowed opacity-60"
                           placeholder="from-blue-500 via-primary to-blue-900"
                         />
                       </FormField>

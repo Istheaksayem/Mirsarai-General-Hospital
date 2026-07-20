@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { Globe, Edit3, CheckCircle2, XCircle, Settings, Info, Target, ImageIcon, Briefcase, Building2, Stethoscope, Layers, Microscope, Baby, FileText, AlertTriangle, HelpCircle, Users, Calendar } from "lucide-react";
+import { Globe, Edit3, CheckCircle2, XCircle, Settings, Info, Target, ImageIcon, Briefcase, Building2, Stethoscope, Layers, Microscope, Baby, FileText, AlertTriangle, HelpCircle, Users, Calendar, Mail, Footprints } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
@@ -51,6 +51,8 @@ export default function CMSPage() {
             { label: "FAQ", desc: "Categories, questions, answers & contact", href: "/super-admin/cms/faq", Icon: HelpCircle, color: "amber" },
             { label: "Our Team", desc: "Team members, hero section & call-to-action", href: "/super-admin/cms/our-team", Icon: Users, color: "cyan" },
             { label: "Appointment Page", desc: "Hero, features, sidebar, form & disclaimer", href: "/super-admin/cms/appointment", Icon: Calendar, color: "orange" },
+            { label: "Contact Page", desc: "Hero, contact info, form fields & SEO", href: "/super-admin/cms/contact", Icon: Mail, color: "sky" },
+            { label: "Footer", desc: "Brand, social links, explore menu, departments, contact & bottom bar", href: "/super-admin/cms/footer", Icon: Footprints, color: "slate" },
           ].map(({ label, desc, href, Icon, color }) => (
             <div
               key={href}

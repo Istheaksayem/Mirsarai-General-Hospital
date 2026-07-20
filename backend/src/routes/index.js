@@ -28,10 +28,14 @@ import healthBlogRoutes from './healthBlog.routes.js';
 import emergencyInfoRoutes from './emergencyInfo.routes.js';
 import faqRoutes from './faq.routes.js';
 import appointmentPageRoutes from './appointmentPage.routes.js';
+import contactPageRoutes from './contactPage.routes.js';
+import footerRoutes from './footer.routes.js';
 import adminHealthBlogRoutes from './admin/healthBlog.admin.routes.js';
 import adminEmergencyInfoRoutes from './admin/emergencyInfo.admin.routes.js';
 import adminFaqRoutes from './admin/faq.admin.routes.js';
 import adminAppointmentPageRoutes from './admin/appointmentPage.admin.routes.js';
+import adminContactPageRoutes from './admin/contactPage.admin.routes.js';
+import adminFooterRoutes from './admin/footer.admin.routes.js';
 import adminStaffRoutes from './admin/staff.admin.routes.js';
 import adminPatientRoutes from './admin/patient.admin.routes.js';
 import receptionPatientRoutes from './reception/patient.reception.routes.js';
@@ -115,6 +119,8 @@ router.use('/health-blog', healthBlogRoutes);
 router.use('/emergency-information', emergencyInfoRoutes);
 router.use('/faq', faqRoutes);
 router.use('/appointment-page', appointmentPageRoutes);
+router.use('/contact-page', contactPageRoutes);
+router.use('/footer', footerRoutes);
 
 // ── Doctor Routes ────────────────────────────────────────────────────────────────
 router.use('/doctors', doctorRoutes);
@@ -145,6 +151,8 @@ router.use('/admin/health-blog', authenticate, authorize('super-admin'), adminHe
 router.use('/admin/emergency-information', authenticate, authorize('super-admin'), adminEmergencyInfoRoutes);
 router.use('/admin/faq', authenticate, authorize('super-admin'), adminFaqRoutes);
 router.use('/admin/appointment-page', authenticate, authorize('super-admin'), adminAppointmentPageRoutes);
+router.use('/admin/contact-page', authenticate, authorize('super-admin'), adminContactPageRoutes);
+router.use('/admin/footer', authenticate, authorize('super-admin'), adminFooterRoutes);
 router.use('/admin/staff', authenticate, authorize('super-admin'), adminStaffRoutes);
 router.use('/admin/appointments', authenticate, authorize('super-admin'), adminAppointmentRoutes);
 router.use('/admin/patients', authenticate, authorize('super-admin'), adminPatientRoutes);

@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { FaAmbulance, FaStethoscope, FaHeartbeat, FaBone, FaBaby, FaMicroscope, FaArrowRight, FaCalendarCheck } from "react-icons/fa";
+import { FaAmbulance, FaStethoscope, FaHeartbeat, FaBone, FaBaby, FaMicroscope, FaBrain, FaVenus, FaRibbon, FaEye, FaArrowRight, FaCalendarCheck } from "react-icons/fa";
 import { useLanguage } from "@/context/LanguageContext";
 import { useServices } from "@/hooks/useServices";
 import Link from "next/link";
@@ -29,6 +29,10 @@ const iconMap: Record<string, React.ReactNode> = {
   FaBone: <FaBone />,
   FaBaby: <FaBaby />,
   FaMicroscope: <FaMicroscope />,
+  FaBrain: <FaBrain />,
+  FaVenus: <FaVenus />,
+  FaRibbon: <FaRibbon />,
+  FaEye: <FaEye />,
 };
 
 const getServiceName = (service: Service): { en: string; bn: string } => {

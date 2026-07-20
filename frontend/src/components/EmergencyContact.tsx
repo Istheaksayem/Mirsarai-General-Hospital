@@ -19,7 +19,7 @@ interface HomepageData {
 
 const fetchHomepage = async (): Promise<HomepageData> => {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/homepage`, { cache: "no-store" });
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/homepage`, { cache: "no-store" });
     if (!res.ok) throw new Error("API responded with an error status");
     const result = await res.json();
     if (result.success && result.data) return result.data;

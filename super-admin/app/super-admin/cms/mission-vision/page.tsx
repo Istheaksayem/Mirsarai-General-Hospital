@@ -317,13 +317,9 @@ export default function MissionVisionCmsPage() {
                         <input
                           type="text"
                           value={item.color}
-                          onChange={(e) => {
-                            const updated = [...data.whyItMattersItems];
-                            updated[i] = { ...item, color: e.target.value };
-                            set((d) => ({ ...d, whyItMattersItems: updated }));
-                          }}
+                          disabled
                           placeholder="from-red-500 to-pink-600"
-                          className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2.5 text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1E2B7A]/20 focus:border-[#1E2B7A] transition-all"
+                          className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2.5 text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1E2B7A]/20 focus:border-[#1E2B7A] transition-all cursor-not-allowed opacity-60"
                         />
                       </div>
                     </div>
