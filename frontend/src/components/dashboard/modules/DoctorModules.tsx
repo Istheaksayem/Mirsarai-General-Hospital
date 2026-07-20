@@ -5,10 +5,12 @@ import { motion } from "framer-motion";
 import {
   FiCalendar, FiUser, FiFileText, FiUploadCloud, FiBarChart2,
   FiClock, FiCheckCircle, FiPlus, FiEdit3, FiDownload,
-  FiActivity, FiStar, FiMapPin, FiUsers,
+  FiActivity, FiStar, FiMapPin, FiUsers, FiList,
 } from "react-icons/fi";
 import {
   useDashboard, useAppointments, usePatients, useReports,
+  useDoctorTodaysAppointments, useDoctorAllAppointments,
+  useUpdateDoctorAppointmentStatus,
 } from "../../../hooks/useDashboardData";
 import StatsCard from "../StatsCard";
 import DataTable from "../DataTable";
@@ -16,8 +18,9 @@ import SkeletonLoader from "../SkeletonLoader";
 import EmptyState from "../EmptyState";
 import Drawer from "../Drawer";
 import { AreaChart } from "../Charts";
+import toast from "react-hot-toast";
 
-interface ModuleProps { activeModule: string; }
+interface ModuleProps { activeModule: string; token?: string; }
 
 const StatusBadge = ({ status }: { status: string }) => {
   const map: Record<string, string> = {
@@ -54,11 +57,15 @@ const ActionBtn = ({ icon, label, variant = "ghost", onClick }: {
   );
 };
 
-export default function DoctorModules({ activeModule }: ModuleProps) {
+export default function DoctorModules({ activeModule, token }: ModuleProps) {
   const dashboardQuery    = useDashboard("doctor");
   const appointmentsQuery = useAppointments();
   const patientsQuery     = usePatients();
   const reportsQuery      = useReports();
+
+  const todaysApptsQuery   = useDoctorTodaysAppointments(token || "");
+  const allApptsQuery      = useDoctorAllAppointments(token || "");
+  const updateStatusMut    = useUpdateDoctorAppointmentStatus(token || "");
 
   const [drawerOpen, setDrawerOpen]       = useState(false);
   const [drawerContent, setDrawerContent] = useState<any>(null);
@@ -66,6 +73,16 @@ export default function DoctorModules({ activeModule }: ModuleProps) {
   const [presPatient, setPresPatient]     = useState("");
 
   const openDrawer = (item: any) => { setDrawerContent(item); setDrawerOpen(true); };
+
+  const handleMarkCompleted = (id: string) => {
+    updateStatusMut.mutate(
+      { id, status: "completed" },
+      {
+        onSuccess: () => toast.success("Appointment marked as completed"),
+        onError: (err: any) => toast.error(err.message || "Failed to update status"),
+      }
+    );
+  };
 
   const isLoading = dashboardQuery.isLoading || appointmentsQuery.isLoading || patientsQuery.isLoading;
   if (isLoading) return <SkeletonLoader type="card" cardsCount={4} />;
@@ -76,7 +93,7 @@ export default function DoctorModules({ activeModule }: ModuleProps) {
   const containerVariants = { hidden: {}, visible: { transition: { staggerChildren: 0.07 } } };
   const cardVariants      = { hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0, transition: { duration: 0.3 } } };
 
-  const todayAppts = (appointmentsQuery.data || []).filter((a: any) => a.status === "confirmed" || a.status === "pending").slice(0, 5);
+  const dashboardAppts = (appointmentsQuery.data || []).filter((a: any) => a.status === "confirmed" || a.status === "pending").slice(0, 5);
 
   switch (activeModule) {
 
@@ -96,13 +113,13 @@ export default function DoctorModules({ activeModule }: ModuleProps) {
               <AreaChart data={(dashData.consultationHistory as any) || []} title="Consultation Load" />
             </div>
             {/* Today's schedule mini */}
-            <div className="glass-panel rounded-2xl p-5 flex flex-col">
-              <h3 className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-4">Today&apos;s Schedule</h3>
-              <div className="space-y-2 flex-1">
-                {todayAppts.length === 0 ? (
-                  <p className="text-xs text-gray-400 text-center py-6">No appointments scheduled today.</p>
-                ) : (
-                  todayAppts.map((a: any) => (
+              <div className="glass-panel rounded-2xl p-5 flex flex-col">
+               <h3 className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-4">Today&apos;s Schedule</h3>
+               <div className="space-y-2 flex-1">
+                 {dashboardAppts.length === 0 ? (
+                   <p className="text-xs text-gray-400 text-center py-6">No appointments scheduled today.</p>
+                 ) : (
+                   dashboardAppts.map((a: any) => (
                     <div key={a.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-gray-50/60 dark:bg-slate-800/30 hover:bg-gray-100/50 dark:hover:bg-slate-800/50 transition">
                       <div className="flex flex-col items-center text-center w-9 shrink-0">
                         <span className="text-[10px] font-black text-primary dark:text-accent">{a.timeSlot?.split(":")[0] || "—"}</span>
@@ -162,36 +179,52 @@ export default function DoctorModules({ activeModule }: ModuleProps) {
       );
 
     /* ─── TODAY'S APPOINTMENTS ────────────────────────────────────── */
-    case "Today's Appointments":
+    case "Today's Appointments": {
+      const todayData = todaysApptsQuery.data || [];
+      const isUpdating = updateStatusMut.isPending;
       return (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <p className="text-xs text-gray-400 dark:text-slate-500 font-semibold">{todayAppts.length} appointments today</p>
+            <p className="text-xs text-gray-400 dark:text-slate-500 font-semibold">
+              {todaysApptsQuery.isLoading ? "Loading..." : `${todayData.length} appointment(s) today`}
+            </p>
           </div>
           <div className="space-y-3">
-            {todayAppts.length === 0 && <EmptyState />}
-            {todayAppts.map((a: any, idx: number) => (
-              <motion.div key={a.id} layout
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: idx * 0.05 }}
-                className="glass-panel rounded-2xl p-5 flex items-center justify-between hover:shadow-sm transition-all"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-blue-500 dark:from-accent dark:to-emerald-400 text-white flex items-center justify-center text-xs font-black shadow-sm">
-                    #{idx + 1}
+            {todaysApptsQuery.isLoading && <SkeletonLoader type="card" cardsCount={3} />}
+            {!todaysApptsQuery.isLoading && todayData.length === 0 && <EmptyState />}
+            {todayData.map((a: any, idx: number) => {
+              const apptId = a._id || a.id;
+              return (
+                <motion.div key={apptId} layout
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: idx * 0.05 }}
+                  className="glass-panel rounded-2xl p-5 flex items-center justify-between hover:shadow-sm transition-all"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-blue-500 dark:from-accent dark:to-emerald-400 text-white flex items-center justify-center text-xs font-black shadow-sm">
+                      #{idx + 1}
+                    </div>
+                    <div>
+                      <p className="text-sm font-black text-gray-900 dark:text-white">{a.patientName}</p>
+                      <p className="text-[11px] text-gray-400 font-semibold mt-0.5">{a.department || ""} · {a.timeSlot || a.time || ""} · <span className="capitalize">{a.type}</span></p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-black text-gray-900 dark:text-white">{a.patientName}</p>
-                    <p className="text-[11px] text-gray-400 font-semibold mt-0.5">{a.department} · {a.timeSlot} · <span className="capitalize">{a.type}</span></p>
+                  <div className="flex items-center gap-4">
+                    <StatusBadge status={a.status} />
+                    <ActionBtn icon={<FiUser size={14}/>} label="View Patient" variant="primary" onClick={() => openDrawer(a)} />
+                    {a.status !== "completed" && (
+                      <ActionBtn
+                        icon={isUpdating ? <span className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin block" /> : <FiCheckCircle size={14} />}
+                        label="Mark as Completed"
+                        variant="primary"
+                        onClick={() => handleMarkCompleted(apptId)}
+                      />
+                    )}
                   </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <StatusBadge status={a.status} />
-                  <ActionBtn icon={<FiUser size={14}/>} label="View Patient" variant="primary" onClick={() => openDrawer(a)} />
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              );
+            })}
           </div>
           <Drawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} title="Appointment Details" description="Patient consultation info.">
             {drawerContent && (
@@ -199,14 +232,14 @@ export default function DoctorModules({ activeModule }: ModuleProps) {
                 {[
                   ["Patient",    drawerContent.patientName],
                   ["Date",       drawerContent.date],
-                  ["Time",       drawerContent.timeSlot],
+                  ["Time",       drawerContent.timeSlot || drawerContent.time],
                   ["Department", drawerContent.department],
                   ["Type",       drawerContent.type],
                   ["Status",     drawerContent.status],
                 ].map(([k, v]) => (
                   <div key={k} className="space-y-1">
                     <span className="text-[9px] font-black uppercase tracking-widest text-gray-400">{k}</span>
-                    <p className="font-bold text-gray-900 dark:text-white text-xs capitalize">{v}</p>
+                    <p className="font-bold text-gray-900 dark:text-white text-xs capitalize">{String(v || "")}</p>
                   </div>
                 ))}
               </div>
@@ -214,6 +247,40 @@ export default function DoctorModules({ activeModule }: ModuleProps) {
           </Drawer>
         </div>
       );
+    }
+
+    /* ─── ALL APPOINTMENTS ────────────────────────────────────────── */
+    case "All Appointments": {
+      const allData = allApptsQuery.data || [];
+      return (
+        <DataTable
+          columns={[
+            { header: "Patient",   accessor: (i: any) => i.patientName },
+            { header: "Date",      accessor: (i: any) => i.date ? new Date(i.date).toLocaleDateString() : "-" },
+            { header: "Time",      accessor: (i: any) => i.timeSlot || i.time || "-" },
+            { header: "Department",accessor: (i: any) => i.department || "-" },
+            { header: "Type",      accessor: (i: any) => <span className="capitalize">{i.type || "-"}</span> },
+            { header: "Status",    accessor: (i: any) => <StatusBadge status={i.status} /> },
+          ]}
+          data={(allData as any[]).map((a: any) => ({ ...a, id: a._id || a.id }))}
+          searchKey="patientName"
+          filterKey="status"
+          filterOptions={[
+            { label: "Pending",    value: "pending"    },
+            { label: "Confirmed",  value: "confirmed"  },
+            { label: "Completed",  value: "completed"  },
+            { label: "Cancelled",  value: "cancelled"  },
+            { label: "No Show",    value: "no-show"    },
+          ]}
+          loading={allApptsQuery.isLoading}
+          emptyTitle="No appointments found"
+          emptyDescription="There are no appointments matching your current filters."
+          actions={(item: any) => (
+            <ActionBtn icon={<FiUser size={14}/>} label="View Details" variant="primary" onClick={() => openDrawer(item)} />
+          )}
+        />
+      );
+    }
 
     /* ─── PATIENT HISTORY ─────────────────────────────────────────── */
     case "Patient History":

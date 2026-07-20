@@ -39,6 +39,7 @@ import adminFooterRoutes from './admin/footer.admin.routes.js';
 import adminStaffRoutes from './admin/staff.admin.routes.js';
 import adminPatientRoutes from './admin/patient.admin.routes.js';
 import adminDashboardRoutes from './admin/dashboard.admin.routes.js';
+import adminNotificationRoutes from './admin/notification.admin.routes.js';
 import receptionPatientRoutes from './reception/patient.reception.routes.js';
 import receptionAppointmentRoutes from './reception/appointment.reception.routes.js';
 import labDocumentRoutes from './lab/document.lab.routes.js';
@@ -50,6 +51,9 @@ import patientAppointmentRoutes from './patient/appointment.patient.routes.js';
 import patientDocumentRoutes from './patient/document.patient.routes.js';
 import patientNotificationRoutes from './patient/notification.patient.routes.js';
 import patientTimelineRoutes from './patient/timeline.patient.routes.js';
+import doctorPrescriptionRoutes from './doctor/prescription.doctor.routes.js';
+import doctorScheduleRoutes from './doctor/doctorSchedule.routes.js';
+import patientPrescriptionRoutes from './patient/prescription.patient.routes.js';
 import { authenticate, authorize } from '../middlewares/auth.middleware.js';
 import { authenticatePatient } from '../middlewares/auth.patient.middleware.js';
 import catchAsync from '../utils/catchAsync.js';
@@ -124,6 +128,8 @@ router.use('/contact-page', contactPageRoutes);
 router.use('/footer', footerRoutes);
 
 // ── Doctor Routes ────────────────────────────────────────────────────────────────
+router.use('/doctors/prescriptions', doctorPrescriptionRoutes);
+router.use('/doctors/schedule', doctorScheduleRoutes);
 router.use('/doctors', doctorRoutes);
 
 // ── Department Routes ────────────────────────────────────────────────────────────
@@ -158,6 +164,7 @@ router.use('/admin/staff', authenticate, authorize('super-admin'), adminStaffRou
 router.use('/admin/appointments', authenticate, authorize('super-admin'), adminAppointmentRoutes);
 router.use('/admin/patients', authenticate, adminPatientRoutes);
 router.use('/admin/dashboard', authenticate, authorize('super-admin'), adminDashboardRoutes);
+router.use('/admin/notifications', authenticate, adminNotificationRoutes);
 
 // ── Reception Routes ─────────────────────────────────────────────────────────
 router.use('/reception/patients', authenticate, authorize('reception'), receptionPatientRoutes);
@@ -177,5 +184,6 @@ router.use('/patient/appointments', authenticatePatient, patientAppointmentRoute
 router.use('/patient/documents', authenticatePatient, patientDocumentRoutes);
 router.use('/patient/notifications', authenticatePatient, patientNotificationRoutes);
 router.use('/patient/timeline', authenticatePatient, patientTimelineRoutes);
+router.use('/patient/prescriptions', patientPrescriptionRoutes);
 
 export default router;

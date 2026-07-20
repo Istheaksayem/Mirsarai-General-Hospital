@@ -1,14 +1,18 @@
+import http from 'http';
 import { setServers } from 'node:dns/promises';
+import cron from 'node-cron';
 import app from './src/app.js';
 import env from './src/config/env.js';
 import connectDatabase from './src/config/database.js';
 import { seedDefaultAdmins } from './src/scripts/seedDefaultAdmins.js';
+import { setupSocket } from './src/socket/index.js';
+import { startReminderCron } from './src/services/cron.service.js';
 
 // Set custom DNS servers for reliable resolution (Cloudflare + Google)
 setServers(['1.1.1.1', '8.8.8.8']);
 
 /**
- * Start the Express server
+ * Start the Express server with Socket.IO
  */
 const startServer = async () => {
   try {
@@ -18,14 +22,23 @@ const startServer = async () => {
     // Ensure default super admin accounts exist
     await seedDefaultAdmins();
 
+    // Create HTTP server from Express app
+    const server = http.createServer(app);
+
+    // Attach Socket.IO
+    setupSocket(server);
+
+    // Start cron jobs
+    startReminderCron();
+
     // Start listening
-    const server = app.listen(env.port, () => {
+    server.listen(env.port, () => {
       console.log('');
       console.log('='.repeat(50));
       console.log(`🚀 Server running in ${env.nodeEnv} mode`);
       console.log(`📡 Listening on port ${env.port}`);
       console.log(`🌐 API: http://localhost:${env.port}/api/v1`);
-      console.log(`💚 Health: http://localhost:${env.port}/api/v1/health`);
+      console.log(`🔌 Socket.IO: ws://localhost:${env.port}`);
       console.log('='.repeat(50));
       console.log('');
     });
@@ -58,4 +71,3 @@ const startServer = async () => {
 
 // Start the server
 startServer();
-// Trigger restart

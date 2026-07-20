@@ -30,6 +30,8 @@ export const uploadDocument = async (data, file, user) => {
     type: 'report_ready',
     title: 'New Document Available',
     message: `A new ${data.documentType.replace(/_/g, ' ')} — "${data.title}" has been uploaded to your document vault.`,
+    priority: 'medium',
+    link: '/documents',
   });
 
   await createAuditLog({

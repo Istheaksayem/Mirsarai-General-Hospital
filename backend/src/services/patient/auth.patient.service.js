@@ -15,6 +15,70 @@ const generateToken = (patient) => {
   );
 };
 
+export const checkPatientStatus = async (email) => {
+  if (!email) throw new ApiError(StatusCodes.BAD_REQUEST, 'Email is required');
+  const patient = await Patient.findOne({ email: email.toLowerCase() }).select('email hasSetPassword isActive').lean();
+  if (!patient) return { exists: false };
+  return { exists: true, hasSetPassword: patient.hasSetPassword, isActive: patient.isActive };
+};
+
+export const setPassword = async (email, password) => {
+  if (!email || !password) throw new ApiError(StatusCodes.BAD_REQUEST, 'Email and password are required');
+  if (password.length < 6) throw new ApiError(StatusCodes.BAD_REQUEST, 'Password must be at least 6 characters long');
+
+  const patient = await Patient.findOne({ email: email.toLowerCase() }).select('+password');
+  if (!patient) throw new ApiError(StatusCodes.NOT_FOUND, 'No account found with this email');
+  if (patient.hasSetPassword) throw new ApiError(StatusCodes.BAD_REQUEST, 'Password already set. Please login instead.');
+
+  patient.password = password;
+  patient.hasSetPassword = true;
+
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  patient.otp = otp;
+  patient.otpExpires = new Date(Date.now() + 10 * 60 * 1000);
+  await patient.save();
+
+  try {
+    await sendEmail({
+      email: patient.email,
+      subject: 'Verify your Patient Portal Account',
+      message: `Your OTP for Mirsarai General Hospital Patient Portal is: ${otp}\n\nThis OTP is valid for 10 minutes.\n\nPlease use this OTP to complete your account setup.`,
+    });
+  } catch (err) {
+    console.log('Email sending failed (dev mode):', err.message);
+    console.log('OTP for', patient.email, ':', otp);
+  }
+
+  return { message: 'Password set successfully. OTP sent to your email.' };
+};
+
+export const loginWithPassword = async (email, password) => {
+  if (!email || !password) throw new ApiError(StatusCodes.BAD_REQUEST, 'Email and password are required');
+
+  const patient = await Patient.findOne({ email: email.toLowerCase() }).select('+password');
+  if (!patient) throw new ApiError(StatusCodes.NOT_FOUND, 'No account found with this email');
+  if (!patient.isActive) throw new ApiError(StatusCodes.FORBIDDEN, 'Your account has been deactivated. Please contact support.');
+  if (!patient.hasSetPassword) throw new ApiError(StatusCodes.BAD_REQUEST, 'Please set your password first');
+
+  const isMatch = await patient.comparePassword(password);
+  if (!isMatch) throw new ApiError(StatusCodes.UNAUTHORIZED, 'Invalid password');
+
+  patient.otp = undefined;
+  patient.otpExpires = undefined;
+  await patient.save();
+
+  await createAuditLog({
+    actorId: patient._id,
+    actorRole: 'patient',
+    action: 'login',
+    targetEntity: 'Patient',
+    targetId: patient._id.toString(),
+  });
+
+  const token = generateToken(patient);
+  return { token, patient: patient.toObject() };
+};
+
 export const sendOtp = async (email) => {
   if (!email) throw new ApiError(StatusCodes.BAD_REQUEST, 'Email is required');
 

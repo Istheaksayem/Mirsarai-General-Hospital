@@ -75,7 +75,7 @@ export const deleteAdminAppointment = catchAsync(async (req, res) => {
  */
 export const updateAdminAppointmentStatus = catchAsync(async (req, res) => {
   const { status } = req.body;
-  const appointment = await appointmentService.updateAppointmentStatus(req.params.id, status, 'super-admin');
+  const appointment = await appointmentService.updateAppointmentStatus(req.params.id, status, 'super-admin', req.user);
   sendSuccess(res, StatusCodes.OK, appointment, 'Appointment status updated successfully');
 });
 
@@ -140,7 +140,7 @@ export const updateDoctorAppointmentStatus = catchAsync(async (req, res) => {
     throw new ApiError(StatusCodes.FORBIDDEN, 'You can only update your own appointments');
   }
 
-  const updated = await appointmentService.updateAppointmentStatus(req.params.id, status, 'doctor');
+  const updated = await appointmentService.updateAppointmentStatus(req.params.id, status, 'doctor', req.user);
   sendSuccess(res, StatusCodes.OK, updated, 'Appointment status updated successfully');
 });
 

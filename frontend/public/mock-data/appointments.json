@@ -1,12 +1,17 @@
 [
   { "id": "apt-001", "patientName": "Abdul Karim", "doctorName": "Dr. Tasnim Alam", "department": "Cardiology", "date": "2026-07-08", "timeSlot": "09:30 AM", "status": "completed", "type": "consultation" },
-  { "id": "apt-002", "patientName": "Jahanara Begum", "doctorName": "Dr. Rafiqul Islam", "department": "Pediatrics", "date": "2026-07-08", "timeSlot": "09:45 AM", "status": "confirmed", "type": "first-visit" },
-  { "id": "apt-003", "patientName": "Mohammad Yasin", "doctorName": "Dr. Kamrul Hasan", "department": "Orthopedics", "date": "2026-07-08", "timeSlot": "10:00 AM", "status": "confirmed", "type": "follow-up" },
-  { "id": "apt-004", "patientName": "Fariha Sultana", "doctorName": "Dr. Tasnim Alam", "department": "Cardiology", "date": "2026-07-08", "timeSlot": "10:15 AM", "status": "pending", "type": "consultation" },
-  { "id": "apt-005", "patientName": "Nayan Chowdhury", "doctorName": "Dr. Sayed Ahmed", "department": "Neurology", "date": "2026-07-08", "timeSlot": "10:30 AM", "status": "pending", "type": "consultation" },
+  { "id": "apt-002", "patientName": "Jahanara Begum", "doctorName": "Dr. Rafiqul Islam", "department": "Pediatrics", "date": "2026-07-20", "timeSlot": "09:45 AM", "status": "confirmed", "type": "first-visit" },
+  { "id": "apt-003", "patientName": "Mohammad Yasin", "doctorName": "Dr. Kamrul Hasan", "department": "Orthopedics", "date": "2026-07-20", "timeSlot": "10:00 AM", "status": "confirmed", "type": "follow-up" },
+  { "id": "apt-004", "patientName": "Fariha Sultana", "doctorName": "Dr. Tasnim Alam", "department": "Cardiology", "date": "2026-07-20", "timeSlot": "10:15 AM", "status": "pending", "type": "consultation" },
+  { "id": "apt-005", "patientName": "Nayan Chowdhury", "doctorName": "Dr. Sayed Ahmed", "department": "Neurology", "date": "2026-07-20", "timeSlot": "10:30 AM", "status": "confirmed", "type": "consultation" },
   { "id": "apt-006", "patientName": "Sajeda Khatun", "doctorName": "Dr. Nusrat Jahan", "department": "Gynecology", "date": "2026-07-08", "timeSlot": "10:45 AM", "status": "completed", "type": "follow-up" },
   { "id": "apt-007", "patientName": "Kamal Uddin", "doctorName": "Dr. Aminul Islam", "department": "General Surgery", "date": "2026-07-07", "timeSlot": "11:00 AM", "status": "completed", "type": "consultation" },
   { "id": "apt-008", "patientName": "Rumana Akhter", "doctorName": "Dr. Nusrat Jahan", "department": "Gynecology", "date": "2026-07-07", "timeSlot": "11:30 AM", "status": "cancelled", "type": "follow-up" },
-  { "id": "apt-009", "patientName": "Faruk Ahmed", "doctorName": "Dr. Tasnim Alam", "department": "Cardiology", "date": "2026-07-08", "timeSlot": "12:00 PM", "status": "confirmed", "type": "emergency" },
-  { "id": "apt-010", "patientName": "Fatema Begum", "doctorName": "Dr. Rafiqul Islam", "department": "Pediatrics", "date": "2026-07-08", "timeSlot": "12:15 PM", "status": "confirmed", "type": "consultation" }
+  { "id": "apt-009", "patientName": "Faruk Ahmed", "doctorName": "Dr. Tasnim Alam", "department": "Cardiology", "date": "2026-07-20", "timeSlot": "12:00 PM", "status": "confirmed", "type": "emergency" },
+  { "id": "apt-010", "patientName": "Fatema Begum", "doctorName": "Dr. Rafiqul Islam", "department": "Pediatrics", "date": "2026-07-08", "timeSlot": "12:15 PM", "status": "completed", "type": "consultation" },
+  { "id": "apt-011", "patientName": "Shahidul Islam", "doctorName": "Dr. Tasnim Alam", "department": "Cardiology", "date": "2026-07-15", "timeSlot": "09:00 AM", "status": "completed", "type": "follow-up" },
+  { "id": "apt-012", "patientName": "Nargis Akter", "doctorName": "Dr. Tasnim Alam", "department": "Cardiology", "date": "2026-07-18", "timeSlot": "02:00 PM", "status": "completed", "type": "consultation" },
+  { "id": "apt-013", "patientName": "Rafiq Hasan", "doctorName": "Dr. Tasnim Alam", "department": "Cardiology", "date": "2026-07-20", "timeSlot": "03:30 PM", "status": "pending", "type": "first-visit" },
+  { "id": "apt-014", "patientName": "Saleha Begum", "doctorName": "Dr. Tasnim Alam", "department": "Cardiology", "date": "2026-07-19", "timeSlot": "11:15 AM", "status": "completed", "type": "consultation" },
+  { "id": "apt-015", "patientName": "Tanvir Ahmed", "doctorName": "Dr. Tasnim Alam", "department": "Cardiology", "date": "2026-07-22", "timeSlot": "10:00 AM", "status": "confirmed", "type": "follow-up" }
 ]
