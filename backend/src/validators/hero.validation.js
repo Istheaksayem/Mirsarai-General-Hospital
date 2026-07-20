@@ -20,12 +20,12 @@ const slideSchema = z.object({
   buttons: z.array(slideButtonSchema).default([])
 });
 
-const searchBarSchema = z.object({
+const appointmentBookingSchema = z.object({
   enabled: z.boolean().default(true),
   title: localizedStringSchema,
-  searchPlaceholder: localizedStringSchema,
-  locationPlaceholder: localizedStringSchema,
-  advancedSearchLink: localizedStringSchema
+  departmentLabel: localizedStringSchema,
+  doctorLabel: localizedStringSchema,
+  buttonLabel: localizedStringSchema
 });
 
 const joinTeamSchema = z.object({
@@ -53,7 +53,7 @@ const decorativeShapesSchema = z.object({
 export const putHeroSchema = z.object({
   body: z.object({
     slides: z.array(slideSchema),
-    searchBar: searchBarSchema,
+    appointmentBooking: appointmentBookingSchema,
     joinTeam: joinTeamSchema,
     decorativeShapes: decorativeShapesSchema
   })
@@ -63,7 +63,7 @@ export const putHeroSchema = z.object({
 export const patchHeroSchema = z.object({
   body: z.object({
     slides: z.array(slideSchema).optional(),
-    searchBar: searchBarSchema.partial().optional(),
+    appointmentBooking: appointmentBookingSchema.partial().optional(),
     joinTeam: joinTeamSchema.partial().optional(),
     decorativeShapes: decorativeShapesSchema.partial().optional()
   })

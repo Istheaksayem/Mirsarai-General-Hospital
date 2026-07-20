@@ -156,9 +156,7 @@ export default function DoctorDashboardPage() {
             <button onClick={() => setMobileSidebarOpen(true)} className="p-2.5 xl:hidden border border-slate-200 dark:border-slate-800 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-950 transition">
               <FiMenu size={16} />
             </button>
-            <div className="hidden sm:block">
-              <Breadcrumbs items={[{ label: "Doctor Portal" }, { label: activeModule }]} />
-            </div>
+            <Breadcrumbs items={[{ label: "Doctor Portal" }, { label: activeModule }]} homeHref="/dashboard/doctor" />
           </div>
 
           <div className="flex items-center gap-3">

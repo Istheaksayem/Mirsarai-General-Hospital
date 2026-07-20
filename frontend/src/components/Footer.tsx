@@ -111,7 +111,7 @@ const Footer = () => {
   const renderIcon = (name: string, className?: string) => {
     const icon = iconMap[name];
     if (!icon) return <FaArrowRight className={className} />;
-    return React.cloneElement(icon as React.ReactElement, { className });
+    return React.cloneElement(icon as React.ReactElement<{ className?: string }>, { className });
   };
 
   return (

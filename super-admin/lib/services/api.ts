@@ -432,6 +432,19 @@ export const deleteLabReport = (id: string) =>
 export const downloadLabReport = (id: string) =>
   fetchAdminReal<{ data: { fileUrl: string; testName: string } }>(`lab-reports/${id}/download`);
 
+// Download a file by URL (returns blob and filename)
+export async function downloadReportFile(url: string) {
+  const res = await fetch(url.startsWith("http") ? url : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1"}${url}`);
+  const blob = await res.blob();
+  const disposition = res.headers.get("Content-Disposition");
+  let filename = "report.pdf";
+  if (disposition) {
+    const match = disposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+    if (match?.[1]) filename = match[1].replace(/['"]/g, "");
+  }
+  return { blob, filename };
+}
+
 // Upload new lab report
 export const uploadLabReport = (formData: FormData) => {
   const headers: Record<string, string> = {};
@@ -643,12 +656,12 @@ export interface HeroSlide {
   buttons: SlideButton[];
 }
 
-export interface SearchBarConfig {
+export interface AppointmentBookingConfig {
   enabled: boolean;
   title: LocalizedString;
-  searchPlaceholder: LocalizedString;
-  locationPlaceholder: LocalizedString;
-  advancedSearchLink: LocalizedString;
+  departmentLabel: LocalizedString;
+  doctorLabel: LocalizedString;
+  buttonLabel: LocalizedString;
 }
 
 export interface JoinTeamConfig {
@@ -674,7 +687,7 @@ export interface DecorativeShapesConfig {
 
 export interface HeroData {
   slides: HeroSlide[];
-  searchBar: SearchBarConfig;
+  appointmentBooking: AppointmentBookingConfig;
   joinTeam: JoinTeamConfig;
   decorativeShapes: DecorativeShapesConfig;
 }

@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Globe, Save, ArrowLeft, Plus, Trash, Check, Loader2, Image as ImageIcon, Sliders, Search, Sparkles } from "lucide-react";
+import { Globe, Save, ArrowLeft, Plus, Trash, Check, Loader2, Image as ImageIcon, Sliders, Calendar, Sparkles } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
+import { ImageUploader } from "@/components/cms/ImageUploader";
 import { getAdminHero, updateAdminHero, HeroData, HeroSlide, SlideButton, ShapeConfig } from "@/lib/services/api";
 import { env } from "@/config/env";
 
@@ -14,7 +15,7 @@ export default function EditHeroCMS() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<"en" | "bn">("en");
-  const [activeSubSection, setActiveSubSection] = useState<"slides" | "search-team" | "shapes">("slides");
+  const [activeSubSection, setActiveSubSection] = useState<"slides" | "booking-team" | "shapes">("slides");
   const [statusMessage, setStatusMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   // Fetch initial Hero data
@@ -22,7 +23,16 @@ export default function EditHeroCMS() {
     async function loadData() {
       try {
         const res = await getAdminHero();
-        setData(res);
+        setData({
+          ...res,
+          appointmentBooking: res.appointmentBooking || {
+            enabled: true,
+            title: { en: "Book an Appointment", bn: "অ্যাপয়েন্টমেন্ট বুক করুন" },
+            departmentLabel: { en: "Select Department", bn: "বিভাগ নির্বাচন করুন" },
+            doctorLabel: { en: "Select Doctor", bn: "ডাক্তার নির্বাচন করুন" },
+            buttonLabel: { en: "Book Appointment", bn: "অ্যাপয়েন্টমেন্ট বুক করুন" }
+          }
+        });
       } catch (err: any) {
         console.error(err);
         setStatusMessage({ type: "error", text: err.message || "Failed to load Hero section content." });
@@ -51,7 +61,7 @@ export default function EditHeroCMS() {
 
   // Helper to update root sub-object localized strings
   const updateSubObjLocStr = (
-    module: "searchBar" | "joinTeam",
+    module: "appointmentBooking" | "joinTeam",
     field: string,
     lang: "en" | "bn",
     value: string
@@ -70,7 +80,7 @@ export default function EditHeroCMS() {
   };
 
   // Helper to toggle boolean configs
-  const handleToggle = (module: "searchBar" | "joinTeam" | "decorativeShapes", field: "enabled") => {
+  const handleToggle = (module: "appointmentBooking" | "joinTeam" | "decorativeShapes", field: "enabled") => {
     if (!data) return;
     setData({
       ...data,
@@ -79,6 +89,17 @@ export default function EditHeroCMS() {
         [field]: !data[module][field]
       }
     });
+  };
+
+  const uploadImage = async (base64: string) => {
+    const res = await fetch(`${env.apiUrl}/admin/upload`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ base64Data: base64 }),
+    });
+    if (!res.ok) throw new Error("Image upload failed");
+    const json = await res.json();
+    return json.data.url as string;
   };
 
   // Slides management
@@ -288,14 +309,14 @@ export default function EditHeroCMS() {
           <ImageIcon className="h-4 w-4" /> Slides ({data.slides.length})
         </button>
         <button
-          onClick={() => setActiveSubSection("search-team")}
+          onClick={() => setActiveSubSection("booking-team")}
           className={`flex items-center gap-2 border-b-2 px-6 py-3.5 text-sm font-semibold transition-all ${
-            activeSubSection === "search-team"
+            activeSubSection === "booking-team"
               ? "border-[#1E2B7A] text-[#1E2B7A] dark:border-blue-400 dark:text-blue-400"
               : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
           }`}
         >
-          <Search className="h-4 w-4" /> Search Bar & Join Team
+          <Calendar className="h-4 w-4" /> Appointment Booking & Join Team
         </button>
         <button
           onClick={() => setActiveSubSection("shapes")}
@@ -341,15 +362,13 @@ export default function EditHeroCMS() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Slide Image URL</label>
-                    <input
-                      type="text"
-                      value={slide.image}
-                      onChange={(e) => handleSlideChange(idx, "image", e.target.value)}
-                      className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-[#1E2B7A]"
-                    />
-                  </div>
+                  <ImageUploader
+                    label="Slide Image"
+                    value={slide.image}
+                    onChange={(url) => handleSlideChange(idx, "image", url)}
+                    onUpload={uploadImage}
+                    helpText="Upload an image from your device. Recommended: 1920×800px"
+                  />
 
                   <div className="space-y-1.5">
                     <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
@@ -423,25 +442,25 @@ export default function EditHeroCMS() {
         </div>
       )}
 
-      {/* ─── SECTION 2: SEARCH & JOIN TEAM ─── */}
-      {activeSubSection === "search-team" && (
+      {/* ─── SECTION 2: APPOINTMENT BOOKING & JOIN TEAM ─── */}
+      {activeSubSection === "booking-team" && (
         <div className="space-y-6">
-          {/* Search bar card */}
+          {/* Appointment booking card */}
           <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-2">
-              <h2 className="text-base font-bold text-gray-800 dark:text-gray-200">Interactive Search Bar</h2>
+              <h2 className="text-base font-bold text-gray-800 dark:text-gray-200">Appointment Booking Widget</h2>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-500 font-semibold">{data.searchBar.enabled ? "Enabled" : "Disabled"}</span>
+                <span className="text-xs text-gray-500 font-semibold">{data.appointmentBooking.enabled ? "Enabled" : "Disabled"}</span>
                 <input
                   type="checkbox"
-                  checked={data.searchBar.enabled}
-                  onChange={() => handleToggle("searchBar", "enabled")}
+                  checked={data.appointmentBooking.enabled}
+                  onChange={() => handleToggle("appointmentBooking", "enabled")}
                   className="rounded border-gray-300 text-[#1E2B7A] focus:ring-[#1E2B7A] h-4 w-4"
                 />
               </div>
             </div>
 
-            {data.searchBar.enabled && (
+            {data.appointmentBooking.enabled && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
@@ -449,41 +468,41 @@ export default function EditHeroCMS() {
                   </label>
                   <input
                     type="text"
-                    value={data.searchBar.title[activeTab]}
-                    onChange={(e) => updateSubObjLocStr("searchBar", "title", activeTab, e.target.value)}
+                    value={data.appointmentBooking.title[activeTab]}
+                    onChange={(e) => updateSubObjLocStr("appointmentBooking", "title", activeTab, e.target.value)}
                     className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-[#1E2B7A]"
                   />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                    Search Placeholder ({activeTab === "en" ? "English" : "Bangla"})
+                    Department Label ({activeTab === "en" ? "English" : "Bangla"})
                   </label>
                   <input
                     type="text"
-                    value={data.searchBar.searchPlaceholder[activeTab]}
-                    onChange={(e) => updateSubObjLocStr("searchBar", "searchPlaceholder", activeTab, e.target.value)}
+                    value={data.appointmentBooking.departmentLabel[activeTab]}
+                    onChange={(e) => updateSubObjLocStr("appointmentBooking", "departmentLabel", activeTab, e.target.value)}
                     className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-[#1E2B7A]"
                   />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                    Location Placeholder ({activeTab === "en" ? "English" : "Bangla"})
+                    Doctor Label ({activeTab === "en" ? "English" : "Bangla"})
                   </label>
                   <input
                     type="text"
-                    value={data.searchBar.locationPlaceholder[activeTab]}
-                    onChange={(e) => updateSubObjLocStr("searchBar", "locationPlaceholder", activeTab, e.target.value)}
+                    value={data.appointmentBooking.doctorLabel[activeTab]}
+                    onChange={(e) => updateSubObjLocStr("appointmentBooking", "doctorLabel", activeTab, e.target.value)}
                     className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-[#1E2B7A]"
                   />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                    Advanced Search link Label ({activeTab === "en" ? "English" : "Bangla"})
+                    Button Label ({activeTab === "en" ? "English" : "Bangla"})
                   </label>
                   <input
                     type="text"
-                    value={data.searchBar.advancedSearchLink[activeTab]}
-                    onChange={(e) => updateSubObjLocStr("searchBar", "advancedSearchLink", activeTab, e.target.value)}
+                    value={data.appointmentBooking.buttonLabel[activeTab]}
+                    onChange={(e) => updateSubObjLocStr("appointmentBooking", "buttonLabel", activeTab, e.target.value)}
                     className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-[#1E2B7A]"
                   />
                 </div>

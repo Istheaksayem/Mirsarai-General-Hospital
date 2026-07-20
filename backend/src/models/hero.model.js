@@ -20,12 +20,12 @@ const slideSchema = new mongoose.Schema({
   buttons: { type: [slideButtonSchema], default: [] }
 }, { _id: false });
 
-const searchBarSchema = new mongoose.Schema({
+const appointmentBookingSchema = new mongoose.Schema({
   enabled: { type: Boolean, default: true },
   title: { type: localizedStringSchema, required: true },
-  searchPlaceholder: { type: localizedStringSchema, required: true },
-  locationPlaceholder: { type: localizedStringSchema, required: true },
-  advancedSearchLink: { type: localizedStringSchema, required: true }
+  departmentLabel: { type: localizedStringSchema, required: true },
+  doctorLabel: { type: localizedStringSchema, required: true },
+  buttonLabel: { type: localizedStringSchema, required: true }
 }, { _id: false });
 
 const joinTeamSchema = new mongoose.Schema({
@@ -52,7 +52,7 @@ const decorativeShapesSchema = new mongoose.Schema({
 const heroSchema = new mongoose.Schema(
   {
     slides: { type: [slideSchema], default: [] },
-    searchBar: { type: searchBarSchema, required: true },
+    appointmentBooking: { type: appointmentBookingSchema, required: true },
     joinTeam: { type: joinTeamSchema, required: true },
     decorativeShapes: { type: decorativeShapesSchema, required: true },
     createdBy: { type: String },

@@ -2,14 +2,16 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { signOut } from "next-auth/react";
 import { useTheme } from "@/components/ThemeProvider";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FiGrid, FiCalendar, FiBell, FiFileText, FiUser,
   FiClock, FiFolder, FiActivity, FiSun, FiMoon,
   FiMenu, FiX, FiChevronLeft, FiChevronRight, FiLogOut,
-  FiSearch, FiHeart, FiLoader,
+  FiSearch, FiHeart, FiLoader, FiHome,
 } from "react-icons/fi";
+import Link from "next/link";
 import Breadcrumbs from "@/components/dashboard/Breadcrumbs";
 import Tooltip from "@/components/dashboard/Tooltip";
 
@@ -88,7 +90,7 @@ export default function PatientPortalPage() {
   useEffect(() => {
     const token = sessionStorage.getItem("mgh_patient_token");
     if (!token) {
-      router.replace("/login-patient");
+      router.replace("/");
     } else {
       setAuthChecked(true);
     }
@@ -188,12 +190,17 @@ export default function PatientPortalPage() {
             <button onClick={() => setMobileSidebarOpen(true)} className="p-2.5 xl:hidden border border-slate-200 dark:border-slate-800 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-950 transition">
               <FiMenu size={16} />
             </button>
-            <div className="hidden sm:block">
-              <Breadcrumbs items={[{ label: "Patient Portal" }, { label: activeModule }]} />
-            </div>
+            <Breadcrumbs items={[{ label: "Patient Portal" }, { label: activeModule }]} />
           </div>
 
           <div className="flex items-center gap-3">
+            <Link
+              href="/"
+              className="p-2.5 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-800 transition"
+              aria-label="Go to Home"
+            >
+              <FiHome size={14} />
+            </Link>
             <button onClick={toggleTheme} className="p-2.5 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-850 rounded-xl border border-slate-200 dark:border-slate-800 transition">
               {theme === "dark" ? <FiSun size={14} className="text-amber-400" /> : <FiMoon size={14} />}
             </button>
@@ -202,7 +209,7 @@ export default function PatientPortalPage() {
             </button>
             <div className="pl-3 border-l border-slate-200 dark:border-slate-800 flex items-center gap-2">
               <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#1E2B7A] to-[#76BC21] text-white font-extrabold text-xs flex items-center justify-center shadow-md">P</div>
-              <button onClick={() => { sessionStorage.removeItem("mgh_patient_token"); router.push("/login-patient"); }} className="p-1.5 text-slate-400 hover:text-rose-500 transition" title="Sign Out">
+              <button onClick={async () => { sessionStorage.removeItem("mgh_patient_token"); try { await signOut({ redirect: false }); } catch {} window.location.href = "/"; }} className="p-1.5 text-slate-400 hover:text-rose-500 transition" title="Sign Out">
                 <FiLogOut size={14} />
               </button>
             </div>

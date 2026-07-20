@@ -40,6 +40,7 @@ import adminStaffRoutes from './admin/staff.admin.routes.js';
 import adminPatientRoutes from './admin/patient.admin.routes.js';
 import adminDashboardRoutes from './admin/dashboard.admin.routes.js';
 import adminNotificationRoutes from './admin/notification.admin.routes.js';
+import { uploadCMSImage } from '../controllers/aboutCMS.controller.js';
 import receptionPatientRoutes from './reception/patient.reception.routes.js';
 import receptionAppointmentRoutes from './reception/appointment.reception.routes.js';
 import labDocumentRoutes from './lab/document.lab.routes.js';
@@ -148,6 +149,8 @@ router.use('/lab-reports', labReportRoutes);
 router.use('/upload', uploadRoutes);
 
 // ── Admin Routes ────────────────────────────────────────────────────────────────
+router.route('/admin/upload')
+  .post(authenticate, authorize('super-admin'), uploadCMSImage);
 router.use('/admin/services', authenticate, authorize('super-admin'), adminServiceRoutes);
 router.use('/admin/service-page', authenticate, authorize('super-admin'), adminDiagnosticServiceRoutes);
 router.use('/admin/service-page', authenticate, authorize('super-admin'), adminNicuBabyCareRoutes);

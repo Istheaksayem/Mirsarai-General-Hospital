@@ -1,13 +1,16 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiSearch, FiMapPin, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { FaUserMd, FaCalendarAlt } from "react-icons/fa";
 import { useLanguage } from "@/context/LanguageContext";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useDoctors, Doctor } from "@/hooks/useDoctors";
+import { getImageUrl } from "@/lib/getImageUrl";
 
-// ── Types ──────────────────────────────────────────────────────────────────
 interface HeroButton {
   label: { en: string; bn: string };
   link: string;
@@ -25,12 +28,12 @@ interface HeroSlide {
 
 interface HeroData {
   slides: HeroSlide[];
-  searchBar: {
+  appointmentBooking: {
     enabled: boolean;
     title: { en: string; bn: string };
-    searchPlaceholder: { en: string; bn: string };
-    locationPlaceholder: { en: string; bn: string };
-    advancedSearchLink: { en: string; bn: string };
+    departmentLabel: { en: string; bn: string };
+    doctorLabel: { en: string; bn: string };
+    buttonLabel: { en: string; bn: string };
   };
   joinTeam: {
     enabled: boolean;
@@ -42,23 +45,41 @@ interface HeroData {
   };
 }
 
-// ── Fetcher ────────────────────────────────────────────────────────────────
+const normalizeHeroData = (raw: any): HeroData => ({
+  slides: raw.slides || [],
+  appointmentBooking: raw.appointmentBooking || {
+    enabled: true,
+    title: { en: "Book an Appointment", bn: "অ্যাপয়েন্টমেন্ট বুক করুন" },
+    departmentLabel: { en: "Select Department", bn: "বিভাগ নির্বাচন করুন" },
+    doctorLabel: { en: "Select Doctor", bn: "ডাক্তার নির্বাচন করুন" },
+    buttonLabel: { en: "Book Appointment", bn: "অ্যাপয়েন্টমেন্ট বুক করুন" }
+  },
+  joinTeam: raw.joinTeam || {
+    enabled: true,
+    question: { en: "Are You A Doctor?", bn: "আপনি কি ডাক্তার?" },
+    title: { en: "Join Our Team", bn: "আমাদের দলে যোগ দিন" },
+    buttonLabel: { en: "Join As Doctors", bn: "ডাক্তার হিসাবে যোগ দিন" },
+    buttonLink: "/register",
+    image: "/genaral_Hospital_logo.jpeg"
+  },
+  decorativeShapes: raw.decorativeShapes
+});
+
 const fetchHeroData = async (): Promise<HeroData> => {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/homepage/hero`, { cache: "no-store" });
     if (!res.ok) throw new Error("API responded with an error status");
     const result = await res.json();
-    if (result.success && result.data) return result.data;
+    if (result.success && result.data) return normalizeHeroData(result.data);
     throw new Error(result.message || "Invalid API response");
   } catch (error) {
     console.warn("Backend API not reachable for hero data. Falling back to local data/hero.json", error);
     const res = await fetch("/data/hero.json", { cache: "no-store" });
     if (!res.ok) throw new Error("Failed to fetch fallback hero data");
-    return res.json();
+    return normalizeHeroData(await res.json());
   }
 };
 
-// ── Skeleton ───────────────────────────────────────────────────────────────
 const HeroSkeleton = () => (
   <section className="relative w-full h-screen bg-gray-900 animate-pulse">
     <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent z-10" />
@@ -76,7 +97,6 @@ const HeroSkeleton = () => (
   </section>
 );
 
-// ── Main Hero ──────────────────────────────────────────────────────────────
 const Hero = () => {
   const { data, isLoading, isError } = useQuery<HeroData>({
     queryKey: ["hero"],
@@ -84,11 +104,12 @@ const Hero = () => {
     staleTime: 1000 * 60 * 10,
   });
   const { lang } = useLanguage();
+  const router = useRouter();
+  const { data: doctorsList, isLoading: doctorsLoading } = useDoctors();
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [location, setLocation] = useState("");
+  const [selectedDepartment, setSelectedDepartment] = useState("");
+  const [selectedDoctor, setSelectedDoctor] = useState("");
 
-  // Auto-advance slides every 5 seconds
   useEffect(() => {
     if (!data) return;
     const timer = setInterval(() => {
@@ -96,6 +117,24 @@ const Hero = () => {
     }, 5000);
     return () => clearInterval(timer);
   }, [data]);
+
+  const departments = useMemo(() => {
+    if (!doctorsList) return [];
+    return Array.from(new Set(doctorsList.map((d) => d.department?.en).filter(Boolean))) as string[];
+  }, [doctorsList]);
+
+  const filteredDoctors = useMemo(() => {
+    if (!doctorsList) return [];
+    if (!selectedDepartment) return doctorsList;
+    return doctorsList.filter((d) => d.department?.en === selectedDepartment);
+  }, [doctorsList, selectedDepartment]);
+
+  const handleBookAppointment = () => {
+    const params = new URLSearchParams();
+    if (selectedDepartment) params.set("department", selectedDepartment);
+    if (selectedDoctor) params.set("doctor", selectedDoctor);
+    router.push(`/appointment${params.toString() ? `?${params.toString()}` : ""}`);
+  };
 
   if (isLoading) return <HeroSkeleton />;
   if (isError || !data) {
@@ -114,7 +153,6 @@ const Hero = () => {
 
   return (
     <>
-      {/* Fullscreen Slider */}
       <section className="relative w-full h-screen overflow-hidden">
         <AnimatePresence mode="wait">
           <motion.div
@@ -125,21 +163,18 @@ const Hero = () => {
             transition={{ duration: 0.8 }}
             className="absolute inset-0"
           >
-            {/* Background Image */}
             <motion.div
               initial={{ scale: 1.1 }}
               animate={{ scale: 1 }}
               transition={{ duration: 8, ease: "linear" }}
               className="absolute inset-0 bg-cover bg-center"
               style={{
-                backgroundImage: `url('${current.image}')`,
+                backgroundImage: `url('${getImageUrl(current.image)}')`,
               }}
             />
 
-            {/* Gradient Overlay */}
             <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-transparent" />
 
-            {/* Content */}
             <div className="relative z-10 h-full flex items-center max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
               <motion.div
                 initial={{ opacity: 0, x: -50 }}
@@ -148,7 +183,6 @@ const Hero = () => {
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className="max-w-2xl space-y-6"
               >
-                {/* Slide Number */}
                 <motion.p
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -158,7 +192,6 @@ const Hero = () => {
                   {current.slideNumber}
                 </motion.p>
 
-                {/* Heading */}
                 <motion.h1
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -176,7 +209,6 @@ const Hero = () => {
                   </span>
                 </motion.h1>
 
-                {/* Description */}
                 <motion.p
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -186,7 +218,6 @@ const Hero = () => {
                   {lang === "bn" ? current.description.bn : current.description.en}
                 </motion.p>
 
-                {/* Buttons */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -210,7 +241,6 @@ const Hero = () => {
               </motion.div>
             </div>
 
-            {/* Left Arrow */}
             <button
               onClick={prevSlide}
               aria-label="Previous slide"
@@ -219,7 +249,6 @@ const Hero = () => {
               <FiChevronLeft size={28} className="group-hover:scale-125 transition-transform" />
             </button>
 
-            {/* Right Arrow */}
             <button
               onClick={nextSlide}
               aria-label="Next slide"
@@ -228,7 +257,6 @@ const Hero = () => {
               <FiChevronRight size={28} className="group-hover:scale-125 transition-transform" />
             </button>
 
-            {/* Slide Indicators (bottom center) */}
             <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3">
               {slides.map((_, idx) => (
                 <button
@@ -247,76 +275,68 @@ const Hero = () => {
         </AnimatePresence>
       </section>
 
-      {/* Bottom Search + Join Section */}
+      {/* Bottom Appointment Booking + Join Section */}
       <div className="relative -mt-20 z-30 max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pb-12">
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 overflow-hidden">
           <div className="grid md:grid-cols-[1.5fr_1fr]">
-            {/* Search Bar */}
-            {data.searchBar.enabled && (
+            {/* Appointment Booking */}
+            {data.appointmentBooking && data.appointmentBooking.enabled && (
               <div className="p-6 lg:p-8">
                 <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4">
-                  {lang === "bn" ? data.searchBar.title.bn : data.searchBar.title.en}
+                  {lang === "bn" ? data.appointmentBooking.title?.bn : data.appointmentBooking.title?.en}
                 </h3>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  {/* Search Input */}
-                  <div className="flex-1 relative">
-                    <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                    <input
-                      type="text"
-                      placeholder={
-                        lang === "bn"
-                          ? data.searchBar.searchPlaceholder.bn
-                          : data.searchBar.searchPlaceholder.en
-                      }
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-11 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1E2B7A] transition-all"
-                    />
-                  </div>
-
-                  {/* Location Dropdown */}
-                  <div className="relative sm:w-48">
-                    <FiMapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                <div className="flex flex-col gap-3">
+                  <div className="relative">
+                    <FaCalendarAlt className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                     <select
-                      value={location}
-                      onChange={(e) => setLocation(e.target.value)}
+                      value={selectedDepartment}
+                      onChange={(e) => { setSelectedDepartment(e.target.value); setSelectedDoctor(""); }}
                       className="w-full pl-11 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1E2B7A] transition-all appearance-none cursor-pointer"
                     >
                       <option value="">
-                        {lang === "bn"
-                          ? data.searchBar.locationPlaceholder.bn
-                          : data.searchBar.locationPlaceholder.en}
+                        {lang === "bn" ? data.appointmentBooking.departmentLabel?.bn : data.appointmentBooking.departmentLabel?.en}
                       </option>
-                      <option value="dhaka">{lang === "bn" ? "ঢাকা" : "Dhaka"}</option>
-                      <option value="chittagong">{lang === "bn" ? "চট্টগ্রাম" : "Chittagong"}</option>
-                      <option value="mirsarai">{lang === "bn" ? "মীরসরাই" : "Mirsarai"}</option>
+                      {departments.map((dept) => (
+                        <option key={dept} value={dept}>{dept}</option>
+                      ))}
                     </select>
                   </div>
 
-                  {/* Search Button */}
-                  <button className="px-8 py-3 bg-[#1E2B7A] text-white rounded-lg font-semibold hover:bg-[#76BC21] transition-all duration-300 shadow-md whitespace-nowrap">
-                    <FiSearch className="inline mr-2" size={18} />
-                    {lang === "bn" ? "খুঁজুন" : "Search"}
+                  <div className="relative">
+                    <FaUserMd className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                    <select
+                      value={selectedDoctor}
+                      onChange={(e) => setSelectedDoctor(e.target.value)}
+                      className="w-full pl-11 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1E2B7A] transition-all appearance-none cursor-pointer"
+                      disabled={doctorsLoading}
+                    >
+                      <option value="">
+                        {lang === "bn" ? data.appointmentBooking.doctorLabel?.bn : data.appointmentBooking.doctorLabel?.en}
+                      </option>
+                      {filteredDoctors.map((d) => (
+                        <option key={d._id} value={d._id}>
+                          {d.name ? (lang === "bn" ? d.name.bn : d.name.en) : "Unknown"}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <button
+                    onClick={handleBookAppointment}
+                    className="w-full px-8 py-3 bg-[#1E2B7A] text-white rounded-lg font-semibold hover:bg-[#76BC21] transition-all duration-300 shadow-md whitespace-nowrap"
+                  >
+                    <FaCalendarAlt className="inline mr-2" size={16} />
+                    {lang === "bn" ? data.appointmentBooking.buttonLabel?.bn : data.appointmentBooking.buttonLabel?.en}
                   </button>
                 </div>
-
-                <Link
-                  href="/doctors"
-                  className="inline-block mt-3 text-xs font-semibold text-gray-400 hover:text-[#1E2B7A] transition-colors uppercase tracking-wide"
-                >
-                  {lang === "bn"
-                    ? data.searchBar.advancedSearchLink.bn
-                    : data.searchBar.advancedSearchLink.en}
-                </Link>
               </div>
             )}
 
             {/* Join Team */}
             {data.joinTeam.enabled && (
               <div className="relative bg-gradient-to-br from-[#1E2B7A] to-[#2c3e7a] text-white p-6 lg:p-8 flex items-center gap-4 overflow-hidden">
-                {/* Decorative background shape */}
                 <div className="absolute top-0 right-0 w-64 h-64 bg-[#76BC21]/10 rounded-full blur-3xl" />
-                
+
                 <div className="flex-1 z-10">
                   <p className="text-sm opacity-90 mb-1">
                     {lang === "bn" ? data.joinTeam.question.bn : data.joinTeam.question.en}
@@ -333,7 +353,7 @@ const Hero = () => {
 
                 <div className="hidden sm:block relative w-32 h-32 rounded-full overflow-hidden border-4 border-white/20 shadow-xl flex-shrink-0 z-10">
                   <img
-                    src={data.joinTeam.image}
+                    src={getImageUrl(data.joinTeam.image)}
                     alt="Doctor"
                     className="w-full h-full object-cover"
                   />

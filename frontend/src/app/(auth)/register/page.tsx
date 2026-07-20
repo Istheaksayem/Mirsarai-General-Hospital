@@ -1,8 +1,14 @@
 "use client";
 
-import React from "react";
-import RegisterForm from "@/components/auth/RegisterForm";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
-  return <RegisterForm />;
+  const router = useRouter();
+
+  useEffect(() => {
+    router.replace("/login");
+  }, [router]);
+
+  return null;
 }
