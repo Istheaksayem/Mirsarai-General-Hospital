@@ -273,6 +273,12 @@ export function patientUpdateProfile(data: Record<string, unknown>) {
   });
 }
 
+export async function fetchAvailableSlots(doctorId: string, date: string) {
+  const res = await fetch(`${API_URL}/doctors/available-slots?doctorId=${encodeURIComponent(doctorId)}&date=${encodeURIComponent(date)}`);
+  const json = await res.json();
+  return json.data as { date: string; slots: { time: string; available: boolean }[] };
+}
+
 export function patientGetAppointments() {
   return patientFetch<PatientAppointment[]>('patient/appointments');
 }

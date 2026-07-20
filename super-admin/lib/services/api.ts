@@ -1312,6 +1312,71 @@ export const getMyDoctorProfile = () =>
 export const updateMyDoctorProfile = (data: Partial<DoctorProfileData>) =>
   updateDoctorProfile<DoctorProfileData>("doctors/me", data);
 
+// ─── Doctor Schedule (authenticated doctor) ─────────────────────────────────────
+
+export interface WeeklySlot {
+  _id?: string;
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+  breakStart?: string;
+  breakEnd?: string;
+  slotDuration: number;
+  maxPatients: number;
+  type: 'online' | 'offline' | 'both';
+  isActive: boolean;
+}
+
+export interface ScheduleException {
+  _id?: string;
+  date: string;
+  type: 'holiday' | 'vacation' | 'blocked' | 'custom';
+  reason?: string;
+  isFullDay: boolean;
+  slots?: { startTime: string; endTime: string }[];
+}
+
+export interface DoctorScheduleData {
+  doctorId: string;
+  weeklySlots: WeeklySlot[];
+  exceptions: ScheduleException[];
+  defaultSlotDuration: number;
+}
+
+export interface AvailableSlot {
+  time: string;
+  available: boolean;
+}
+
+export interface AvailableSlotsResponse {
+  date: string;
+  slots: AvailableSlot[];
+}
+
+export const getDoctorSchedule = () =>
+  fetchAdminReal<{ data: DoctorScheduleData }>("doctors/schedule");
+
+export const upsertDoctorSchedule = (data: { weeklySlots?: WeeklySlot[]; exceptions?: ScheduleException[]; defaultSlotDuration?: number }) =>
+  mutateAdminReal<{ data: DoctorScheduleData }>("doctors/schedule", data, "PUT");
+
+export const addDoctorWeeklySlot = (data: Omit<WeeklySlot, '_id'>) =>
+  mutateAdminReal<{ data: WeeklySlot }>("doctors/schedule/slots", data, "POST");
+
+export const updateDoctorWeeklySlot = (slotId: string, data: Partial<WeeklySlot>) =>
+  mutateAdminReal<{ data: WeeklySlot }>(`doctors/schedule/slots/${slotId}`, data, "PUT");
+
+export const deleteDoctorWeeklySlot = (slotId: string) =>
+  mutateAdminReal<{ data: { message: string } }>(`doctors/schedule/slots/${slotId}`, undefined, "DELETE");
+
+export const addDoctorScheduleException = (data: Omit<ScheduleException, '_id'>) =>
+  mutateAdminReal<{ data: ScheduleException }>("doctors/schedule/exceptions", data, "POST");
+
+export const deleteDoctorScheduleException = (exceptionId: string) =>
+  mutateAdminReal<{ data: { message: string } }>(`doctors/schedule/exceptions/${exceptionId}`, undefined, "DELETE");
+
+export const getDoctorAvailableSlots = (date: string) =>
+  fetchAdminReal<{ data: AvailableSlotsResponse }>(`doctors/schedule/available-slots?date=${encodeURIComponent(date)}`);
+
 // ─── Receptionist Self Profile ────────────────────────────────────────────
 
 export interface ReceptionistProfileData {

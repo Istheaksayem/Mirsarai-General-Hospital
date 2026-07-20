@@ -12,6 +12,7 @@ import { notifyNewAppointment, notifyAppointmentConfirmed } from './appointment-
 import { APPOINTMENT_SOURCE } from '../constants/index.js';
 import { isTransitionAllowed } from '../constants/statusTransitions.js';
 import { findOrCreatePatient, linkPatientToAppointment } from './patient/shared-patient.service.js';
+import { validateBookingSlot } from './doctorSchedule.service.js';
 
 /**
  * When an appointment is confirmed: find or create the patient,
@@ -129,6 +130,19 @@ export const createAppointment = async (data, source = APPOINTMENT_SOURCE.ONLINE
   const doctor = await Doctor.findById(data.doctor);
   if (!doctor) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Doctor not found');
+  }
+
+  if (data.date && data.time) {
+    try {
+      const userDoc = await User.findOne({ doctorRef: doctor._id }).select('_id').lean();
+      if (userDoc) {
+        const dateStr = typeof data.date === 'string' ? data.date : new Date(data.date).toISOString().split('T')[0];
+        await validateBookingSlot(userDoc._id, dateStr, data.time);
+      }
+    } catch (err) {
+      if (err.statusCode) throw err;
+      console.log('Slot validation skipped:', err.message);
+    }
   }
 
   const appointmentId = await generateAppointmentId();

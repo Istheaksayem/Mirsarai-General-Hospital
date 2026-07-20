@@ -52,6 +52,7 @@ import patientDocumentRoutes from './patient/document.patient.routes.js';
 import patientNotificationRoutes from './patient/notification.patient.routes.js';
 import patientTimelineRoutes from './patient/timeline.patient.routes.js';
 import doctorPrescriptionRoutes from './doctor/prescription.doctor.routes.js';
+import doctorScheduleRoutes from './doctor/doctorSchedule.routes.js';
 import patientPrescriptionRoutes from './patient/prescription.patient.routes.js';
 import { authenticate, authorize } from '../middlewares/auth.middleware.js';
 import { authenticatePatient } from '../middlewares/auth.patient.middleware.js';
@@ -128,6 +129,7 @@ router.use('/footer', footerRoutes);
 
 // ── Doctor Routes ────────────────────────────────────────────────────────────────
 router.use('/doctors/prescriptions', doctorPrescriptionRoutes);
+router.use('/doctors/schedule', doctorScheduleRoutes);
 router.use('/doctors', doctorRoutes);
 
 // ── Department Routes ────────────────────────────────────────────────────────────

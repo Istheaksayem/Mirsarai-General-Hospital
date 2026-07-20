@@ -1,6 +1,7 @@
 import express from 'express';
 import * as DoctorController from '../controllers/doctor.controller.js';
 import * as AppointmentController from '../controllers/appointment.controller.js';
+import * as ScheduleController from '../controllers/doctor/doctorSchedule.controller.js';
 import validate from '../middlewares/validate.middleware.js';
 import { authenticate, authorize } from '../middlewares/auth.middleware.js';
 import {
@@ -89,6 +90,13 @@ router.get('/featured', DoctorController.getFeaturedDoctors);
  * @access Public
  */
 router.get('/departments', DoctorController.getDepartments);
+
+/**
+ * @route  GET /api/v1/doctors/:id/available-slots
+ * @desc   Get available time slots for a doctor on a given date
+ * @access Public
+ */
+router.get('/available-slots', ScheduleController.getPublicAvailableSlots);
 
 /**
  * @route  GET /api/v1/doctors/:slug

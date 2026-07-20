@@ -18,10 +18,12 @@ import {
   FaIdBadge,
   FaInfoCircle,
 } from "react-icons/fa";
+import { useQuery } from "@tanstack/react-query";
 import jsPDF from "jspdf";
 import { useDoctors } from "@/hooks/useDoctors";
 import { useCreateAppointment } from "@/hooks/useCreateAppointment";
 import { useSearchParams } from "next/navigation";
+import { fetchAvailableSlots } from "@/services/api";
 
 const steps = ["Personal Info", "Select Doctor", "Schedule", "Confirm"];
 
@@ -56,9 +58,6 @@ export default function AppointmentForm() {
       name: d.name.en,
       specialty: d.department.en,
       image: d.image,
-      slots: d._id
-        ? ["08:30 AM", "11:00 AM", "01:30 PM", "03:30 PM"]
-        : ["09:00 AM", "10:00 AM", "02:00 PM", "04:00 PM"],
     }));
   }, [rawDoctors]);
 
@@ -97,6 +96,15 @@ export default function AppointmentForm() {
     const d = rawDoctors.find((d) => d.name.en === form.doctor);
     return d?._id || "";
   }, [rawDoctors, form.doctor]);
+
+  const { data: slotData, isLoading: slotsLoading } = useQuery({
+    queryKey: ["available-slots", selectedDoctorId, form.date],
+    queryFn: () => fetchAvailableSlots(selectedDoctorId, form.date),
+    enabled: !!selectedDoctorId && !!form.date && step === 2,
+    staleTime: 1000 * 30,
+    retry: false,
+  });
+  const availableSlots = slotData?.slots ?? [];
 
   useEffect(() => {
     if (!preselectedService || !departments.length) return;
@@ -498,22 +506,30 @@ export default function AppointmentForm() {
                     <FaClock className="text-primary" /> Available Time Slots
                   </p>
                   {errors.time && <p className="text-red-500 text-xs mb-2">{errors.time}</p>}
-                  <div className="flex flex-wrap gap-3">
-                    {selectedDoctor.slots.map((slot) => (
-                      <button
-                        key={slot}
-                        type="button"
-                        onClick={() => update("time", slot)}
-                        className={`px-5 py-2.5 rounded-xl border font-medium text-sm transition-all duration-200 ${
-                          form.time === slot
-                            ? "bg-primary text-white border-primary shadow-md"
-                            : "border-gray-200 text-gray-600 hover:border-primary hover:text-primary"
-                        }`}
-                      >
-                        {slot}
-                      </button>
-                    ))}
-                  </div>
+                  {slotsLoading ? (
+                    <div className="flex items-center justify-center py-6">
+                      <FaSpinner className="animate-spin text-primary text-lg" />
+                    </div>
+                  ) : availableSlots.length === 0 ? (
+                    <p className="text-sm text-gray-400 text-center py-4">No available slots on this date.</p>
+                  ) : (
+                    <div className="flex flex-wrap gap-3">
+                      {availableSlots.filter((s) => s.available).map((slot) => (
+                        <button
+                          key={slot.time}
+                          type="button"
+                          onClick={() => update("time", slot.time)}
+                          className={`px-5 py-2.5 rounded-xl border font-medium text-sm transition-all duration-200 ${
+                            form.time === slot.time
+                              ? "bg-primary text-white border-primary shadow-md"
+                              : "border-gray-200 text-gray-600 hover:border-primary hover:text-primary"
+                          }`}
+                        >
+                          {slot.time}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </motion.div>
               )}
               {!form.date && (
