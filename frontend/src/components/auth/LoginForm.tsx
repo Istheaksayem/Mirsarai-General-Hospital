@@ -86,7 +86,12 @@ const LoginForm = () => {
         toast.error("Login failed. Please try again.", { id: "signin-error" });
       } else {
         toast.success("Welcome back! Signing you in...", { id: "login-success" });
-        router.push("/dashboard");
+        const role = checkData?.data?.user?.role;
+        if (role === "doctor") {
+          router.push("/dashboard/doctor");
+        } else {
+          router.push("/dashboard");
+        }
         router.refresh();
       }
     } catch {

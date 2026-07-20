@@ -6,7 +6,9 @@ import generatePatientId from '../../utils/generatePatientId.js';
 import sendEmail from '../../utils/sendEmail.js';
 import env from '../../config/env.js';
 import { createNotification } from '../notification.service.js';
+import { notifyAppointmentConfirmed } from '../appointment-notification.service.js';
 import { createAuditLog } from '../auditLog.service.js';
+import User from '../../models/user.model.js';
 import { findOrCreatePatient, linkPatientToAppointment } from '../patient/shared-patient.service.js';
 import { isTransitionAllowed } from '../../constants/statusTransitions.js';
 
@@ -78,9 +80,16 @@ export const searchPatients = async (query) => {
 };
 
 export const getReceptionAppointments = async (query = {}) => {
-  const { page = 1, limit = 20, status } = query;
+  const { page = 1, limit = 20, status, date } = query;
   const filter = {};
   if (status) filter.status = status;
+  if (date) {
+    const start = new Date(date);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(date);
+    end.setHours(23, 59, 59, 999);
+    filter.date = { $gte: start, $lte: end };
+  }
 
   const skip = (parseInt(page, 10) - 1) * parseInt(limit, 10);
   const limitNum = parseInt(limit, 10);
@@ -153,6 +162,12 @@ export const updateAppointmentStatus = async (id, status, userId) => {
         message: `${message} — ${appointment.patientName} with ${updated.doctor?.name?.en || 'doctor'} on ${new Date(appointment.date).toLocaleDateString()}`,
       });
     }
+  }
+
+  // Notify staff when confirmed
+  if (status === 'confirmed') {
+    const confirmor = userId ? await User.findById(userId).select('fullName').lean() : null;
+    await notifyAppointmentConfirmed(updated, confirmor?.fullName);
   }
 
   await createAuditLog({

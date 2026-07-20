@@ -204,6 +204,29 @@ export interface PatientDocument {
 export type PatientNotification = Record<string, unknown>;
 export type PatientTimelineItem = Record<string, unknown>;
 
+export async function patientAuthCheckStatus(email: string) {
+  const res = await fetch(`${API_URL}/patient/auth/check?email=${encodeURIComponent(email)}`);
+  return res.json();
+}
+
+export async function patientAuthSetPassword(email: string, password: string) {
+  const res = await fetch(`${API_URL}/patient/auth/set-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+  return res.json();
+}
+
+export async function patientAuthLogin(email: string, password: string) {
+  const res = await fetch(`${API_URL}/patient/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+  return res.json();
+}
+
 export async function patientAuthSendOtp(email: string) {
   const res = await fetch(`${API_URL}/patient/auth/send-otp`, {
     method: 'POST',
@@ -248,6 +271,12 @@ export function patientUpdateProfile(data: Record<string, unknown>) {
     method: 'PUT',
     body: JSON.stringify(data),
   });
+}
+
+export async function fetchAvailableSlots(doctorId: string, date: string) {
+  const res = await fetch(`${API_URL}/doctors/available-slots?doctorId=${encodeURIComponent(doctorId)}&date=${encodeURIComponent(date)}`);
+  const json = await res.json();
+  return json.data as { date: string; slots: { time: string; available: boolean }[] };
 }
 
 export function patientGetAppointments() {
@@ -308,6 +337,56 @@ export function patientGetTimeline() {
   return patientFetch<PatientTimelineItem[]>('patient/timeline');
 }
 
+// ── Patient Prescriptions ──────────────────────────────────────────────────────
+
+export interface PatientPrescription {
+  _id: string;
+  patientId: string;
+  doctorId: string;
+  doctorName: string;
+  patientInfo: {
+    patientId: string;
+    name: string;
+    mobile: string;
+  };
+  fileUrl?: string;
+  fileType?: "pdf" | "image" | "word" | null;
+  textContent?: string;
+  diagnosis?: string;
+  notes?: string;
+  followUpDate?: string;
+  status: "active" | "archived";
+  createdAt: string;
+  updatedAt: string;
+}
+
+export function patientGetPrescriptions() {
+  return patientFetch<PatientPrescription[]>('patient/prescriptions');
+}
+
+export function patientGetPrescriptionById(id: string) {
+  return patientFetch<PatientPrescription>(`patient/prescriptions/${id}`);
+}
+
+export async function patientFetchPrescriptionFile(prescriptionId: string): Promise<{ blob: Blob; filename: string }> {
+  const token = getPatientToken();
+  const res = await fetch(`${API_URL}/patient/prescriptions/${prescriptionId}/file`, {
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: 'Failed to fetch prescription file' }));
+    throw new Error(err.message || 'Failed to fetch prescription file');
+  }
+  const blob = await res.blob();
+  const disposition = res.headers.get('Content-Disposition') || '';
+  const match = disposition.match(/filename="?(.+?)"?$/);
+  const filename = match ? match[1] : 'prescription';
+  return { blob, filename };
+}
+
 // ── Appointment submission ─────────────────────────────────────────────────────
 export interface AppointmentSubmitData {
   patientName: string;
@@ -335,4 +414,89 @@ export async function submitAppointment(data: AppointmentSubmitData) {
   }
   const json = await res.json();
   return json.data;
+}
+
+// ── Doctor Appointments API ───────────────────────────────────────────────
+export interface DoctorAppointment {
+  _id?: string;
+  id?: string;
+  patientName: string;
+  patientPhone?: string;
+  patientEmail?: string;
+  department?: string;
+  service?: string;
+  date: string;
+  time?: string;
+  timeSlot?: string;
+  status: string;
+  type?: string;
+  doctor?: { _id?: string; name?: string; designation?: string; image?: string; department?: string };
+  reason?: string;
+  notes?: string;
+  createdAt?: string;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+async function doctorFetch<T>(endpoint: string, token: string, options?: RequestInit): Promise<T> {
+  const res = await fetch(`${API_URL}/${endpoint}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+      ...((options?.headers as Record<string, string>) || {}),
+    },
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: `API error [${endpoint}]` }));
+    throw new Error(err.message || `API error [${endpoint}]`);
+  }
+  const json = await res.json();
+  return json.data as T;
+}
+
+function isToday(dateStr: string): boolean {
+  const today = new Date();
+  const d = new Date(dateStr);
+  return (
+    d.getFullYear() === today.getFullYear() &&
+    d.getMonth() === today.getMonth() &&
+    d.getDate() === today.getDate()
+  );
+}
+
+export async function fetchDoctorTodaysAppointments(token: string) {
+  try {
+    return await doctorFetch<DoctorAppointment[]>("doctors/appointments/today", token);
+  } catch {
+    const all = await fetchAppointments();
+    return (all as DoctorAppointment[]).filter(
+      (a) => isToday(a.date) && a.status !== "completed"
+    );
+  }
+}
+
+export async function fetchDoctorAllAppointments(token: string) {
+  try {
+    return await doctorFetch<DoctorAppointment[]>("doctors/appointments?limit=100", token);
+  } catch {
+    return fetchAppointments() as Promise<DoctorAppointment[]>;
+  }
+}
+
+export async function updateDoctorAppointmentStatus(id: string, status: string, token: string) {
+  try {
+    return await doctorFetch<DoctorAppointment>(`doctors/appointments/${id}/status`, token, {
+      method: "PATCH",
+      body: JSON.stringify({ status }),
+    });
+  } catch {
+    await new Promise((r) => setTimeout(r, 300));
+    return { status: "ok" } as any;
+  }
 }

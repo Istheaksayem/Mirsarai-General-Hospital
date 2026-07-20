@@ -101,10 +101,45 @@ export interface LabTest {
 }
 
 export interface Prescription {
-  id: string; patientId: string; patientName: string; doctorId: string;
-  doctorName: string; appointmentId: string; date: string; diagnosis: string;
-  medications: { name: string; dosage: string; frequency: string; duration: string; instructions: string }[];
-  instructions: string; followUp: string; status: "active" | "expired";
+  _id: string;
+  patientId: string;
+  doctorId: string;
+  doctorName: string;
+  patientInfo: {
+    patientId: string;
+    name: string;
+    mobile: string;
+  };
+  fileUrl?: string;
+  fileType?: "pdf" | "image" | "word" | null;
+  textContent?: string;
+  diagnosis?: string;
+  notes?: string;
+  followUpDate?: string;
+  status: "active" | "archived";
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface LookupPatientResult {
+  _id: string;
+  patientId: string;
+  fullName: string;
+  mobile: string;
+}
+
+export interface PaginatedPrescriptions {
+  success: boolean;
+  message: string;
+  data: Prescription[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+  };
 }
 
 export type DashboardRole = "super-admin" | "reception-admin" | "lab-admin" | "doctor";
@@ -511,7 +546,42 @@ export const getActivities = async (): Promise<Activity[]> => {
 };
 export const getWebsiteContent = () => fetchMock<WebsiteContent>("website-content.json");
 export const getLabTests = () => fetchMock<LabTest[]>("lab-tests.json");
-export const getPrescriptions = () => fetchMock<Prescription[]>("prescriptions.json");
+export const lookupPrescriptionPatient = (query: string) =>
+  mutateAdminReal<LookupPatientResult>("doctors/prescriptions/lookup", { query }, "POST");
+
+export const createPrescription = async (formData: FormData): Promise<Prescription> => {
+  const headers: Record<string, string> = {};
+  if (typeof window !== "undefined") {
+    try {
+      const raw = sessionStorage.getItem(env.authStorageKey);
+      if (raw) {
+        const user = JSON.parse(raw);
+        if (user.token) headers["Authorization"] = `Bearer ${user.token}`;
+      }
+    } catch {}
+  }
+  const res = await fetch(`${BACKEND_API}/doctors/prescriptions`, {
+    method: "POST",
+    headers,
+    body: formData,
+  });
+  const json = await res.json();
+  if (!res.ok || !json.success) {
+    throw new ApiError(res.status, json.message || "Failed to create prescription");
+  }
+  return json.data;
+};
+
+export const getDoctorPrescriptions = (params?: Record<string, string>) => {
+  const q = params ? "?" + new URLSearchParams(params).toString() : "";
+  return fetchAdminReal<PaginatedPrescriptions>(`doctors/prescriptions${q}`);
+};
+
+export const getDoctorPrescriptionById = (id: string) =>
+  fetchAdminReal<{ data: Prescription }>(`doctors/prescriptions/${id}`);
+
+export const deletePrescription = (id: string) =>
+  mutateAdminReal<Prescription>(`doctors/prescriptions/${id}`, undefined, "DELETE");
 
 // ─── Real Backend APIs (Homepage & Hero CMS) ───────────────────────────
 
@@ -1102,6 +1172,57 @@ export const deactivateStaffMember = (id: string) =>
 export const createStaffMember = (data: { fullName: string; email: string; phone?: string; password: string; role: string }) =>
   mutateAdminReal<StaffMember>("admin/staff", data, "POST");
 
+// ─── Staff Notifications ─────────────────────────────────────────────────────
+
+export interface StaffNotification {
+  _id: string;
+  recipientType: "user";
+  userId: string;
+  type: "appointment_reminder" | "report_ready" | "announcement" | "status_update" | "general";
+  title: string;
+  message: string;
+  priority: "low" | "medium" | "high" | "urgent";
+  link?: string;
+  isRead: boolean;
+  readAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PaginatedStaffNotifications {
+  success: boolean;
+  message: string;
+  data: StaffNotification[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+  };
+}
+
+export const getStaffNotifications = (params?: Record<string, string>) => {
+  const q = params ? "?" + new URLSearchParams(params).toString() : "";
+  return fetchAdminReal<PaginatedStaffNotifications>(`admin/notifications${q}`);
+};
+
+export const getUnreadCount = () =>
+  fetchAdminReal<{ data: { count: number } }>("admin/notifications/unread-count");
+
+export const markNotificationRead = (id: string) =>
+  mutateAdminReal<StaffNotification>(`admin/notifications/${id}/read`, {}, "PATCH");
+
+export const markAllNotificationsRead = () =>
+  mutateAdminReal<{ modifiedCount: number }>("admin/notifications/read-all", {}, "PATCH");
+
+export const deleteNotification = (id: string) =>
+  mutateAdminReal<null>(`admin/notifications/${id}`, undefined, "DELETE");
+
+export const createAnnouncement = (data: { title: string; message: string; priority?: string }) =>
+  mutateAdminReal<{ sentTo: number }>("admin/notifications/announcement", data, "POST");
+
 // ─── Doctor Self Profile (authenticated doctor) ────────────────────────────────
 
 export interface DoctorProfileData {
@@ -1190,6 +1311,71 @@ export const getMyDoctorProfile = () =>
 
 export const updateMyDoctorProfile = (data: Partial<DoctorProfileData>) =>
   updateDoctorProfile<DoctorProfileData>("doctors/me", data);
+
+// ─── Doctor Schedule (authenticated doctor) ─────────────────────────────────────
+
+export interface WeeklySlot {
+  _id?: string;
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+  breakStart?: string;
+  breakEnd?: string;
+  slotDuration: number;
+  maxPatients: number;
+  type: 'online' | 'offline' | 'both';
+  isActive: boolean;
+}
+
+export interface ScheduleException {
+  _id?: string;
+  date: string;
+  type: 'holiday' | 'vacation' | 'blocked' | 'custom';
+  reason?: string;
+  isFullDay: boolean;
+  slots?: { startTime: string; endTime: string }[];
+}
+
+export interface DoctorScheduleData {
+  doctorId: string;
+  weeklySlots: WeeklySlot[];
+  exceptions: ScheduleException[];
+  defaultSlotDuration: number;
+}
+
+export interface AvailableSlot {
+  time: string;
+  available: boolean;
+}
+
+export interface AvailableSlotsResponse {
+  date: string;
+  slots: AvailableSlot[];
+}
+
+export const getDoctorSchedule = () =>
+  fetchAdminReal<{ data: DoctorScheduleData }>("doctors/schedule");
+
+export const upsertDoctorSchedule = (data: { weeklySlots?: WeeklySlot[]; exceptions?: ScheduleException[]; defaultSlotDuration?: number }) =>
+  mutateAdminReal<{ data: DoctorScheduleData }>("doctors/schedule", data, "PUT");
+
+export const addDoctorWeeklySlot = (data: Omit<WeeklySlot, '_id'>) =>
+  mutateAdminReal<{ data: WeeklySlot }>("doctors/schedule/slots", data, "POST");
+
+export const updateDoctorWeeklySlot = (slotId: string, data: Partial<WeeklySlot>) =>
+  mutateAdminReal<{ data: WeeklySlot }>(`doctors/schedule/slots/${slotId}`, data, "PUT");
+
+export const deleteDoctorWeeklySlot = (slotId: string) =>
+  mutateAdminReal<{ data: { message: string } }>(`doctors/schedule/slots/${slotId}`, undefined, "DELETE");
+
+export const addDoctorScheduleException = (data: Omit<ScheduleException, '_id'>) =>
+  mutateAdminReal<{ data: ScheduleException }>("doctors/schedule/exceptions", data, "POST");
+
+export const deleteDoctorScheduleException = (exceptionId: string) =>
+  mutateAdminReal<{ data: { message: string } }>(`doctors/schedule/exceptions/${exceptionId}`, undefined, "DELETE");
+
+export const getDoctorAvailableSlots = (date: string) =>
+  fetchAdminReal<{ data: AvailableSlotsResponse }>(`doctors/schedule/available-slots?date=${encodeURIComponent(date)}`);
 
 // ─── Receptionist Self Profile ────────────────────────────────────────────
 

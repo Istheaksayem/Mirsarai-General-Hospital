@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronRight, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
+import { useNotifications } from "@/components/notifications/NotificationProvider";
 import { Role, ROLE_LABELS } from "@/types/auth";
 import { NavItem, NAV_CONFIG } from "@/config/navigation";
 
@@ -18,10 +19,14 @@ interface SidebarProps {
 
 function NavLink({ item }: { item: NavItem }) {
   const pathname = usePathname();
+  const { unreadCount } = useNotifications();
   const isActive =
     item.href === pathname ||
     (item.href !== "/" && pathname.startsWith(item.href + "/")) ||
     (item.href === "/super-admin/cms" && pathname.startsWith("/super-admin/homepage"));
+
+  const isNotifications = item.href.endsWith("/notifications");
+  const badge = isNotifications && unreadCount > 0 ? String(unreadCount) : item.badge;
 
   return (
     <li>
@@ -50,7 +55,7 @@ function NavLink({ item }: { item: NavItem }) {
 
         <span className="flex-1 truncate">{item.label}</span>
 
-        {item.badge && (
+        {badge && (
           <span
             className={cn(
               "ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full px-1.5",
@@ -60,11 +65,11 @@ function NavLink({ item }: { item: NavItem }) {
                 : "bg-[#76BC21]/15 text-[#76BC21] dark:bg-[#76BC21]/20"
             )}
           >
-            {item.badge}
+            {badge}
           </span>
         )}
 
-        {isActive && !item.badge && (
+        {isActive && !badge && (
           <ChevronRight
             className="ml-auto h-3.5 w-3.5 shrink-0 opacity-60"
             strokeWidth={2.5}

@@ -21,6 +21,7 @@ import AppointmentHistory from "@/components/dashboard/patient/AppointmentHistor
 import PatientNotifications from "@/components/dashboard/patient/PatientNotifications";
 import DocumentVault from "@/components/dashboard/patient/DocumentVault";
 import MedicalTimeline from "@/components/dashboard/patient/MedicalTimeline";
+import { PatientPrescriptions } from "@/components/dashboard/patient/PatientPrescriptions";
 
 // ── Nav config ────────────────────────────────────────────────────────────────
 interface NavGroup { title: string; modules: { key: string; icon: React.ReactNode }[] }
@@ -44,6 +45,7 @@ const NAV_GROUPS: NavGroup[] = [
     title: "Records",
     modules: [
       { key: "Notifications",   icon: <FiBell size={16} /> },
+      { key: "Prescriptions",   icon: <FiFileText size={16} /> },
       { key: "Document Vault",  icon: <FiFolder size={16} /> },
       { key: "Medical Timeline", icon: <FiActivity size={16} /> },
     ],
@@ -60,6 +62,7 @@ function ActiveModule({ mod }: { mod: string }) {
     case "Upcoming Appointments": return <UpcomingAppointments />;
     case "Appointment History":  return <AppointmentHistory />;
     case "Notifications":        return <PatientNotifications />;
+    case "Prescriptions":        return <PatientPrescriptions />;
     case "Document Vault":       return <DocumentVault />;
     case "Medical Timeline":     return <MedicalTimeline />;
     default:                     return <PatientDashboard />;

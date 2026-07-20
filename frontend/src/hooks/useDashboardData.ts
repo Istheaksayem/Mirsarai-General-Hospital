@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   fetchDashboard,
   fetchPatients,
@@ -89,5 +89,44 @@ export const useWebsiteContent = () => {
     queryKey: ["websiteContent"],
     queryFn: fetchWebsiteContent,
     staleTime: 1000 * 60 * 30,
+  });
+};
+
+// ── Doctor Appointment Hooks ─────────────────────────────────────────────
+import {
+  fetchDoctorTodaysAppointments,
+  fetchDoctorAllAppointments,
+  updateDoctorAppointmentStatus,
+  type DoctorAppointment,
+} from "../services/api";
+
+export const useDoctorTodaysAppointments = (token: string) => {
+  return useQuery<DoctorAppointment[]>({
+    queryKey: ["doctorAppointments", "today", token],
+    queryFn: () => fetchDoctorTodaysAppointments(token),
+    enabled: !!token,
+    staleTime: 1000 * 30,
+    refetchInterval: 1000 * 60,
+  });
+};
+
+export const useDoctorAllAppointments = (token: string) => {
+  return useQuery<DoctorAppointment[]>({
+    queryKey: ["doctorAppointments", "all", token],
+    queryFn: () => fetchDoctorAllAppointments(token),
+    enabled: !!token,
+    staleTime: 1000 * 60 * 2,
+  });
+};
+
+export const useUpdateDoctorAppointmentStatus = (token: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, status }: { id: string; status: string }) =>
+      updateDoctorAppointmentStatus(id, status, token),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["doctorAppointments"] });
+    },
   });
 };

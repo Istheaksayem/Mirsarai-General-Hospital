@@ -3,6 +3,21 @@ import catchAsync from '../../utils/catchAsync.js';
 import { sendSuccess } from '../../utils/ApiResponse.js';
 import * as AuthPatientService from '../../services/patient/auth.patient.service.js';
 
+export const checkStatus = catchAsync(async (req, res) => {
+  const result = await AuthPatientService.checkPatientStatus(req.query.email);
+  sendSuccess(res, StatusCodes.OK, result);
+});
+
+export const setPassword = catchAsync(async (req, res) => {
+  const result = await AuthPatientService.setPassword(req.body.email, req.body.password);
+  sendSuccess(res, StatusCodes.OK, result, 'Password set successfully');
+});
+
+export const loginWithPassword = catchAsync(async (req, res) => {
+  const result = await AuthPatientService.loginWithPassword(req.body.email, req.body.password);
+  sendSuccess(res, StatusCodes.OK, result, 'Login successful');
+});
+
 export const sendOtp = catchAsync(async (req, res) => {
   const result = await AuthPatientService.sendOtp(req.body.email);
   sendSuccess(res, StatusCodes.OK, result, 'OTP sent successfully');
