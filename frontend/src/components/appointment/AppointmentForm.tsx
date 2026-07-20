@@ -36,6 +36,8 @@ const stepVariants: any = {
 export default function AppointmentForm() {
   const searchParams = useSearchParams();
   const preselectedService = searchParams.get("service");
+  const preselectedDepartment = searchParams.get("department");
+  const preselectedDoctorId = searchParams.get("doctor");
 
   const [step, setStep] = useState(0);
   const [dir, setDir] = useState(1);
@@ -114,6 +116,25 @@ export default function AppointmentForm() {
       update("department", match);
     }
   }, [preselectedService, departments]);
+
+  useEffect(() => {
+    if (!preselectedDepartment || !departments.length) return;
+    const match = departments.find((d) => d.toLowerCase() === preselectedDepartment.toLowerCase());
+    if (match) {
+      update("department", match);
+    }
+  }, [preselectedDepartment, departments]);
+
+  useEffect(() => {
+    if (!preselectedDoctorId || !rawDoctors) return;
+    const match = rawDoctors.find(d => d._id === preselectedDoctorId);
+    if (match) {
+      update("doctor", match.name.en);
+      if (!preselectedService && !preselectedDepartment) {
+        update("department", match.department.en);
+      }
+    }
+  }, [preselectedDoctorId, rawDoctors]);
 
   const validateStep = () => {
     const errs: Record<string, string> = {};
@@ -363,9 +384,12 @@ export default function AppointmentForm() {
         ))}
       </div>
 
-      {preselectedService && form.department && (
+      {(preselectedService || preselectedDepartment || preselectedDoctorId) && form.department && (
         <div className="mb-6 px-4 py-3 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/40 text-sm text-blue-700 dark:text-blue-300">
-          Service pre-selected: <strong>{decodeURIComponent(preselectedService)}</strong>. You can change the department below if needed.
+          {preselectedService && <>Service pre-selected: <strong>{decodeURIComponent(preselectedService)}</strong>. </>}
+          {preselectedDepartment && !preselectedService && <>Department pre-selected: <strong>{preselectedDepartment}</strong>. </>}
+          {preselectedDoctorId && form.doctor && <>Doctor pre-selected: <strong>{form.doctor}</strong>. </>}
+          You can change the selections below if needed.
         </div>
       )}
 

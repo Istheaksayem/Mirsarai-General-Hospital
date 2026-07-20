@@ -7,7 +7,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import AuthInput from "./AuthInput";
 import PasswordInput from "./PasswordInput";
 import SubmitButton from "./SubmitButton";
-import GoogleButton from "./GoogleButton";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { registerSchema, RegisterFormValues, otpSchema, OtpFormValues } from "@/lib/validations/auth.schema";
@@ -192,17 +191,6 @@ const RegisterForm = () => {
           </div>
 
           <SubmitButton text={isSubmitting ? "Sending OTP..." : "Create Account"} />
-
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-500 font-medium">OR</span>
-            </div>
-          </div>
-
-          <GoogleButton />
         </form>
       ) : (
         <form key={step} autoComplete="off" onSubmit={handleOtpSubmit(onOtpVerification)} className="space-y-5">
