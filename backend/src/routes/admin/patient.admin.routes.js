@@ -1,6 +1,7 @@
 import express from 'express';
 import * as PatientController from '../../controllers/admin/patient.admin.controller.js';
 import validate from '../../middlewares/validate.middleware.js';
+import { authenticate, authorize } from '../../middlewares/auth.middleware.js';
 import {
   createPatientSchema,
   updatePatientSchema,
@@ -9,11 +10,11 @@ import {
 
 const router = express.Router();
 
-router.get('/', validate(patientQuerySchema), PatientController.getPatients);
-router.get('/:id', PatientController.getPatientById);
-router.post('/', validate(createPatientSchema), PatientController.createPatient);
-router.put('/:id', validate(updatePatientSchema), PatientController.updatePatient);
-router.patch('/:id', validate(updatePatientSchema), PatientController.updatePatient);
-router.delete('/:id', PatientController.deletePatient);
+router.get('/', authenticate, authorize('super-admin', 'reception', 'lab', 'doctor'), validate(patientQuerySchema), PatientController.getPatients);
+router.get('/:id', authenticate, authorize('super-admin', 'reception', 'lab', 'doctor'), PatientController.getPatientById);
+router.post('/', authenticate, authorize('super-admin'), validate(createPatientSchema), PatientController.createPatient);
+router.put('/:id', authenticate, authorize('super-admin'), validate(updatePatientSchema), PatientController.updatePatient);
+router.patch('/:id', authenticate, authorize('super-admin'), validate(updatePatientSchema), PatientController.updatePatient);
+router.delete('/:id', authenticate, authorize('super-admin'), PatientController.deletePatient);
 
 export default router;

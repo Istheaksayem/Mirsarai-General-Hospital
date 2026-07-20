@@ -38,6 +38,7 @@ import adminContactPageRoutes from './admin/contactPage.admin.routes.js';
 import adminFooterRoutes from './admin/footer.admin.routes.js';
 import adminStaffRoutes from './admin/staff.admin.routes.js';
 import adminPatientRoutes from './admin/patient.admin.routes.js';
+import adminDashboardRoutes from './admin/dashboard.admin.routes.js';
 import receptionPatientRoutes from './reception/patient.reception.routes.js';
 import receptionAppointmentRoutes from './reception/appointment.reception.routes.js';
 import labDocumentRoutes from './lab/document.lab.routes.js';
@@ -155,7 +156,8 @@ router.use('/admin/contact-page', authenticate, authorize('super-admin'), adminC
 router.use('/admin/footer', authenticate, authorize('super-admin'), adminFooterRoutes);
 router.use('/admin/staff', authenticate, authorize('super-admin'), adminStaffRoutes);
 router.use('/admin/appointments', authenticate, authorize('super-admin'), adminAppointmentRoutes);
-router.use('/admin/patients', authenticate, authorize('super-admin'), adminPatientRoutes);
+router.use('/admin/patients', authenticate, adminPatientRoutes);
+router.use('/admin/dashboard', authenticate, authorize('super-admin'), adminDashboardRoutes);
 
 // ── Reception Routes ─────────────────────────────────────────────────────────
 router.use('/reception/patients', authenticate, authorize('reception'), receptionPatientRoutes);

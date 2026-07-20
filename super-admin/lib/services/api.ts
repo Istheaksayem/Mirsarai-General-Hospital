@@ -157,8 +157,18 @@ async function fetchMock<T>(path: string): Promise<T> {
 
 // ─── API Functions ────────────────────────────────────────────────────────────
 
-export const getDashboardStats = (role: DashboardRole) =>
-  fetchMock<Record<string, unknown>>(`dashboard/${role}.json`);
+export const getDashboardStats = async (role: DashboardRole): Promise<Record<string, unknown>> => {
+  if (role === "super-admin") {
+    const res = await fetch(`${BACKEND_API}/admin/dashboard/stats`, {
+      cache: "no-store",
+      headers: getAuthHeaders(),
+    });
+    if (!res.ok) throw new ApiError(res.status, "Failed to fetch dashboard stats");
+    const json: { success: boolean; data: Record<string, unknown> } = await res.json();
+    return json.data;
+  }
+  return fetchMock<Record<string, unknown>>(`dashboard/${role}.json`);
+};
 
 export const getPatients = () => fetchMock<Patient[]>("patients.json");
 export const getDoctors = () => fetchMock<Doctor[]>("doctors.json");
@@ -486,7 +496,19 @@ export const createUnifiedReport = (formData: FormData) => {
 
 export const getNotifications = () => fetchMock<Notification[]>("notifications.json");
 export const getRoles = () => fetchMock<RoleData[]>("roles.json");
-export const getActivities = () => fetchMock<Activity[]>("activities.json");
+export const getActivities = async (): Promise<Activity[]> => {
+  try {
+    const res = await fetch(`${BACKEND_API}/admin/dashboard/activities`, {
+      cache: "no-store",
+      headers: getAuthHeaders(),
+    });
+    if (!res.ok) throw new Error("Not available");
+    const json: { success: boolean; data: Activity[] } = await res.json();
+    return json.data;
+  } catch {
+    return fetchMock<Activity[]>("activities.json");
+  }
+};
 export const getWebsiteContent = () => fetchMock<WebsiteContent>("website-content.json");
 export const getLabTests = () => fetchMock<LabTest[]>("lab-tests.json");
 export const getPrescriptions = () => fetchMock<Prescription[]>("prescriptions.json");
