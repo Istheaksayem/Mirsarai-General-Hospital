@@ -53,16 +53,16 @@ export const patchHero = catchAsync(async (req, res) => {
       hero.createdBy = req.user.email || req.user.id;
     }
   } else {
-    const { slides, searchBar, joinTeam, decorativeShapes } = req.body;
+    const { slides, appointmentBooking, joinTeam, decorativeShapes } = req.body;
 
     if (slides !== undefined) {
       hero.slides = slides;
     }
 
-    if (searchBar) {
-      hero.searchBar = {
-        ...hero.searchBar?.toObject(),
-        ...searchBar
+    if (appointmentBooking) {
+      hero.appointmentBooking = {
+        ...hero.appointmentBooking?.toObject(),
+        ...appointmentBooking
       };
     }
 

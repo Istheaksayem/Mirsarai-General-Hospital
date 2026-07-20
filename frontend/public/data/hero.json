@@ -69,23 +69,23 @@
       ]
     }
   ],
-  "searchBar": {
+  "appointmentBooking": {
     "enabled": true,
     "title": {
-      "en": "Start Your Search",
-      "bn": "আপনার অনুসন্ধান শুরু করুন"
+      "en": "Book an Appointment",
+      "bn": "অ্যাপয়েন্টমেন্ট বুক করুন"
     },
-    "searchPlaceholder": {
-      "en": "Search doctors, clinics, hospitals, etc.",
-      "bn": "ডাক্তার, ক্লিনিক, হাসপাতাল ইত্যাদি অনুসন্ধান করুন"
+    "departmentLabel": {
+      "en": "Select Department",
+      "bn": "বিভাগ নির্বাচন করুন"
     },
-    "locationPlaceholder": {
-      "en": "Select a location",
-      "bn": "একটি অবস্থান নির্বাচন করুন"
+    "doctorLabel": {
+      "en": "Select Doctor",
+      "bn": "ডাক্তার নির্বাচন করুন"
     },
-    "advancedSearchLink": {
-      "en": "ADVANCED SEARCH",
-      "bn": "উন্নত অনুসন্ধান"
+    "buttonLabel": {
+      "en": "Book Appointment",
+      "bn": "অ্যাপয়েন্টমেন্ট বুক করুন"
     }
   },
   "joinTeam": {

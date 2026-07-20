@@ -115,29 +115,16 @@ const ServiceCard = ({ service, index, lang }: { service: Service; index: number
             </div>
           )}
 
-          <div className="flex flex-col sm:flex-row gap-2 mt-auto">
-            <Link
-              href={service.link}
-              className="flex items-center justify-center gap-2 text-sm font-semibold px-4 py-2.5 rounded-xl border transition-all duration-300 hover:gap-3 flex-1"
-              style={{
-                borderColor: `${service.color}30`,
-                color: service.color,
-              }}
-            >
-              {lang === "bn" ? "আরও জানুন" : "Learn More"}
-              <FaArrowRight className="text-xs transition-transform duration-300 group-hover:translate-x-1" />
-            </Link>
-            <Link
-              href={`/appointment?service=${encodeURIComponent(slug)}`}
-              className="flex items-center justify-center gap-2 text-sm font-semibold px-4 py-2.5 rounded-xl text-white transition-all duration-300 flex-1 hover:-translate-y-0.5"
-              style={{
-                background: `linear-gradient(135deg, ${service.color}, ${service.color}dd)`,
-              }}
-            >
-              <FaCalendarCheck className="text-xs" />
-              {lang === "bn" ? "অ্যাপয়েন্টমেন্ট বুক করুন" : "Book Appointment"}
-            </Link>
-          </div>
+          <Link
+            href={`/appointment?service=${encodeURIComponent(slug)}`}
+            className="flex items-center justify-center gap-2 text-sm font-semibold px-4 py-2.5 rounded-xl text-white transition-all duration-300 w-full hover:-translate-y-0.5 mt-auto"
+            style={{
+              background: `linear-gradient(135deg, ${service.color}, ${service.color}dd)`,
+            }}
+          >
+            <FaCalendarCheck className="text-xs" />
+            {lang === "bn" ? "অ্যাপয়েন্টমেন্ট বুক করুন" : "Book Appointment"}
+          </Link>
         </div>
 
         <div

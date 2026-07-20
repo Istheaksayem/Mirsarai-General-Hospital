@@ -7,8 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import AuthInput from "./AuthInput";
 import PasswordInput from "./PasswordInput";
 import SubmitButton from "./SubmitButton";
-import GoogleButton from "./GoogleButton";
 import Link from "next/link";
+import { FiHome } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { loginSchema, LoginFormValues } from "@/lib/validations/auth.schema";
 import { signIn } from "next-auth/react";
@@ -75,6 +75,10 @@ const LoginForm = () => {
         return;
       }
 
+      // Store token for patient portal API access
+      const token = checkData?.data?.token;
+      if (token) sessionStorage.setItem("mgh_patient_token", token);
+
       // Step 2: Credentials are valid — now use NextAuth signIn for session
       const res = await signIn("credentials", {
         redirect: false,
@@ -107,8 +111,15 @@ const LoginForm = () => {
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.6, delay: 0.2 }}
-      className="w-full max-w-md mx-auto"
+      className="w-full max-w-md mx-auto relative"
     >
+      <Link
+        href="/"
+        className="absolute -top-2 right-0 flex h-9 w-9 items-center justify-center rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+        aria-label="Go to Home"
+      >
+        <FiHome size={18} />
+      </Link>
       <div className="text-center mb-10">
         <h2 className="text-3xl font-extrabold text-gray-900 mb-2">Welcome Back</h2>
         <p className="text-gray-500 font-medium">Sign in to continue</p>
@@ -146,25 +157,7 @@ const LoginForm = () => {
         </div>
 
         <SubmitButton text={isSubmitting ? "Signing In..." : "Sign In"} />
-
-        <div className="relative my-8">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-200"></div>
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-4 bg-white text-gray-500 font-medium">OR</span>
-          </div>
-        </div>
-
-        <GoogleButton />
       </form>
-
-      <p className="text-center mt-8 text-gray-600 font-medium">
-        Don&apos;t have an account?{" "}
-        <Link href="/register" className="text-primary hover:text-primary/80 font-bold transition-colors">
-          Create Account
-        </Link>
-      </p>
     </motion.div>
   );
 };
