@@ -11,7 +11,7 @@ import { useFooterData, FooterData } from "@/hooks/useFooterData";
 import { getImageUrl } from "@/lib/getImageUrl";
 import Link from "next/link";
 
-const iconMap: Record<string, React.ReactNode> = {
+const iconMap: Record<string, React.ReactElement<{className?: string}>> = {
   FaFacebookF: <FaFacebookF />,
   FaYoutube: <FaYoutube />,
   FaInstagram: <FaInstagram />,
@@ -111,7 +111,7 @@ const Footer = () => {
   const renderIcon = (name: string, className?: string) => {
     const icon = iconMap[name];
     if (!icon) return <FaArrowRight className={className} />;
-    return React.cloneElement(icon as React.ReactElement, { className });
+    return React.cloneElement(icon, { className });
   };
 
   return (
