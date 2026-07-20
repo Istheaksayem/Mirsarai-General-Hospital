@@ -157,8 +157,18 @@ async function fetchMock<T>(path: string): Promise<T> {
 
 // ─── API Functions ────────────────────────────────────────────────────────────
 
-export const getDashboardStats = (role: DashboardRole) =>
-  fetchMock<Record<string, unknown>>(`dashboard/${role}.json`);
+export const getDashboardStats = async (role: DashboardRole): Promise<Record<string, unknown>> => {
+  if (role === "super-admin") {
+    const res = await fetch(`${BACKEND_API}/admin/dashboard/stats`, {
+      cache: "no-store",
+      headers: getAuthHeaders(),
+    });
+    if (!res.ok) throw new ApiError(res.status, "Failed to fetch dashboard stats");
+    const json: { success: boolean; data: Record<string, unknown> } = await res.json();
+    return json.data;
+  }
+  return fetchMock<Record<string, unknown>>(`dashboard/${role}.json`);
+};
 
 export const getPatients = () => fetchMock<Patient[]>("patients.json");
 export const getDoctors = () => fetchMock<Doctor[]>("doctors.json");
@@ -486,7 +496,19 @@ export const createUnifiedReport = (formData: FormData) => {
 
 export const getNotifications = () => fetchMock<Notification[]>("notifications.json");
 export const getRoles = () => fetchMock<RoleData[]>("roles.json");
-export const getActivities = () => fetchMock<Activity[]>("activities.json");
+export const getActivities = async (): Promise<Activity[]> => {
+  try {
+    const res = await fetch(`${BACKEND_API}/admin/dashboard/activities`, {
+      cache: "no-store",
+      headers: getAuthHeaders(),
+    });
+    if (!res.ok) throw new Error("Not available");
+    const json: { success: boolean; data: Activity[] } = await res.json();
+    return json.data;
+  } catch {
+    return fetchMock<Activity[]>("activities.json");
+  }
+};
 export const getWebsiteContent = () => fetchMock<WebsiteContent>("website-content.json");
 export const getLabTests = () => fetchMock<LabTest[]>("lab-tests.json");
 export const getPrescriptions = () => fetchMock<Prescription[]>("prescriptions.json");
@@ -1736,3 +1758,182 @@ export const updateFAQData = (data: Partial<FAQData>) =>
 export const getAppointmentPageData = () => fetchReal<AppointmentPageData>("appointment-page");
 export const updateAppointmentPageData = (data: Partial<AppointmentPageData>) =>
   mutateAdminReal<AppointmentPageData>("admin/appointment-page", data, "PUT");
+
+export interface ContactPageFormFields {
+  name: { label: LocalizedString; placeholder: LocalizedString };
+  phone: { label: LocalizedString; placeholder: LocalizedString };
+  email: { label: LocalizedString; placeholder: LocalizedString };
+  message: { label: LocalizedString; placeholder: LocalizedString };
+}
+
+export interface ContactPageData {
+  _id?: string;
+  hero: {
+    title: LocalizedString;
+    subtitle: LocalizedString;
+    description: LocalizedString;
+    image: string;
+  };
+  contactInfo: {
+    title: LocalizedString;
+    addressCard: { label: LocalizedString; name: LocalizedString; location: LocalizedString };
+    hotlineCard: { label: LocalizedString; number: string; numberLabel: LocalizedString };
+    emailCard: { label: LocalizedString; address: string };
+  };
+  form: {
+    title: LocalizedString;
+    description: LocalizedString;
+    buttonText: LocalizedString;
+    fields: ContactPageFormFields;
+  };
+  sections: Record<string, SectionConfig>;
+  seo: SeoConfig;
+  createdBy?: string;
+  updatedBy?: string;
+}
+
+export const getContactPageData = () => fetchReal<ContactPageData>("contact-page");
+export const updateContactPageData = (data: Partial<ContactPageData>) =>
+  mutateAdminReal<ContactPageData>("admin/contact-page", data, "PUT");
+
+// ─── Services Listing CMS Types & API ──────────────────────────────────────────
+
+export interface ServiceData {
+  _id: string;
+  name: LocalizedString;
+  slug: string;
+  description: LocalizedString;
+  image: string;
+  icon: string;
+  color: string;
+  gradient: string;
+  link: string;
+  highlights: string[];
+  tagline: string;
+  displayOrder: number;
+  isVisible: boolean;
+  doctors?: string[];
+  createdBy?: string;
+  updatedBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface AdminServicesResponse {
+  success: boolean;
+  data: ServiceData[];
+  total: number;
+  page: number;
+  limit: number;
+  message?: string;
+}
+
+export const getServicesData = (params: { page?: number; limit?: number; search?: string } = {}) => {
+  const q = new URLSearchParams();
+  if (params.page) q.set("page", String(params.page));
+  if (params.limit) q.set("limit", String(params.limit));
+  if (params.search) q.set("search", params.search);
+  const qs = q.toString();
+  return fetchAdminReal<AdminServicesResponse>(`admin/services${qs ? `?${qs}` : ""}`);
+};
+
+export const createServiceData = (data: Partial<ServiceData>) =>
+  mutateAdminReal<ServiceData>("admin/services", data, "POST");
+
+export const updateServiceData = (id: string, data: Partial<ServiceData>) =>
+  mutateAdminReal<ServiceData>(`admin/services/${id}`, data, "PUT");
+
+export const deleteServiceData = (id: string) =>
+  mutateAdminReal<null>(`admin/services/${id}`, undefined, "DELETE");
+
+export const reorderServicesData = (orders: { id: string; displayOrder: number }[]) =>
+  mutateAdminReal<null>("admin/services/reorder", orders, "PATCH");
+
+// ── Footer ──────────────────────────────────────────────────────────────────────
+export interface FooterSocialLink {
+  platform: string;
+  icon: string;
+  url: string;
+  hoverColor: string;
+}
+
+export interface FooterLink {
+  label: LocalizedString;
+  href: string;
+}
+
+export interface FooterDepartmentItem {
+  name: LocalizedString;
+  href: string;
+}
+
+export interface FooterContactBlock {
+  icon: string;
+  hospitalName: LocalizedString;
+  location: LocalizedString;
+}
+
+export interface FooterPhoneBlock {
+  icon: string;
+  number: string;
+}
+
+export interface FooterEmailBlock {
+  icon: string;
+  address: string;
+}
+
+export interface FooterEmergencyCard {
+  icon: string;
+  label: LocalizedString;
+  phoneNumber: string;
+  gradient: string;
+  badgeGradient: string;
+  blobColor: string;
+  iconGradient: string;
+}
+
+export interface FooterBottomBarLink {
+  label: LocalizedString;
+  href: string;
+}
+
+export interface FooterBottomBar {
+  hospitalName: LocalizedString;
+  rightsText: LocalizedString;
+  privacyPolicy: FooterBottomBarLink;
+  termsOfService: FooterBottomBarLink;
+}
+
+export interface FooterData {
+  _id?: string;
+  brand: {
+    logo: string;
+    description: LocalizedString;
+    socialLinks: FooterSocialLink[];
+  };
+  exploreLinks: {
+    title: LocalizedString;
+    links: FooterLink[];
+  };
+  departments: {
+    title: LocalizedString;
+    items: FooterDepartmentItem[];
+  };
+  contactInfo: {
+    title: LocalizedString;
+    address: FooterContactBlock;
+    phone: FooterPhoneBlock;
+    email: FooterEmailBlock;
+  };
+  emergencyCard: FooterEmergencyCard;
+  bottomBar: FooterBottomBar;
+  sections: Record<string, SectionConfig>;
+  seo: SeoConfig;
+  createdBy?: string;
+  updatedBy?: string;
+}
+
+export const getFooterData = () => fetchReal<FooterData>("footer");
+export const updateFooterData = (data: Partial<FooterData>) =>
+  mutateAdminReal<FooterData>("admin/footer", data, "PUT");

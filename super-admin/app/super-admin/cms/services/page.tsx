@@ -17,6 +17,12 @@ const SERVICE_TYPES = [
     description: "Neonatal services, equipment, vaccination schedule, guidelines, working hours, statistics & SEO",
     href: "/super-admin/cms/services/nicu",
   },
+  {
+    type: "listing",
+    label: "Services Listing",
+    description: "Manage service cards shown on homepage & services page — add, edit, reorder, delete",
+    href: "/super-admin/cms/services/listing",
+  },
 ];
 
 export default function ServicePagesCmsPage() {

@@ -188,11 +188,8 @@ export default function EmergencyInfoCmsPage() {
                         <FormField label="Icon Name">
                           <FormInput
                             value={contact.icon}
-                            onChange={(e) => {
-                              const updated = [...data.emergencyContacts.contacts];
-                              updated[i] = { ...contact, icon: e.target.value };
-                              set((d) => ({ ...d, emergencyContacts: { ...d.emergencyContacts, contacts: updated } }));
-                            }}
+                            disabled
+                            className="cursor-not-allowed opacity-60"
                             placeholder="FaAmbulance"
                           />
                         </FormField>
@@ -291,11 +288,8 @@ export default function EmergencyInfoCmsPage() {
                         <FormField label="Icon Name">
                           <FormInput
                             value={item.icon}
-                            onChange={(e) => {
-                              const updated = [...data.firstAid.items];
-                              updated[i] = { ...item, icon: e.target.value };
-                              set((d) => ({ ...d, firstAid: { ...d.firstAid, items: updated } }));
-                            }}
+                            disabled
+                            className="cursor-not-allowed opacity-60"
                             placeholder="FaHeartbeat"
                           />
                         </FormField>
@@ -498,11 +492,8 @@ export default function EmergencyInfoCmsPage() {
                         <FormField label="Icon Name">
                           <FormInput
                             value={tip.icon}
-                            onChange={(e) => {
-                              const updated = [...data.emergencyPreparedness.tips];
-                              updated[i] = { ...tip, icon: e.target.value };
-                              set((d) => ({ ...d, emergencyPreparedness: { ...d.emergencyPreparedness, tips: updated } }));
-                            }}
+                            disabled
+                            className="cursor-not-allowed opacity-60"
                             placeholder="FaFirstAid"
                           />
                         </FormField>

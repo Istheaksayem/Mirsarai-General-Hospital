@@ -54,7 +54,8 @@ export const NAV_CONFIG: Record<Role, NavSection[]> = {
       items: [
         { label: "Appointments", href: "/super-admin/appointments", icon: CalendarDays, badge: "12" },
         { label: "Reports", href: "/super-admin/reports", icon: BarChart3 },
-        { label: "Billing", href: "/super-admin/billing", icon: CreditCard },
+        // TODO: Billing — temporarily hidden
+        // { label: "Billing", href: "/super-admin/billing", icon: CreditCard },
       ],
     },
     {
@@ -85,7 +86,8 @@ export const NAV_CONFIG: Record<Role, NavSection[]> = {
     {
       title: "Finance",
       items: [
-        { label: "Billing", href: "/reception-admin/billing", icon: CreditCard },
+        // TODO: Billing — temporarily hidden
+        // { label: "Billing", href: "/reception-admin/billing", icon: CreditCard },
         { label: "Notifications", href: "/reception-admin/notifications", icon: Bell, badge: "3" },
       ],
     },
