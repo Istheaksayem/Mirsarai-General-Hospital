@@ -61,9 +61,12 @@ export const NAV_CONFIG: Record<Role, NavSection[]> = {
     {
       title: "System",
       items: [
-        { label: "Roles", href: "/super-admin/roles", icon: Shield },
+        // TODO: Roles — temporarily hidden
+        // { label: "Roles", href: "/super-admin/roles", icon: Shield },
+        { label: "Notifications", href: "/super-admin/notifications", icon: Bell },
         { label: "Website CMS", href: "/super-admin/cms", icon: Globe },
-        { label: "Settings", href: "/super-admin/settings", icon: Settings },
+        // TODO: Settings — temporarily hidden
+        // { label: "Settings", href: "/super-admin/settings", icon: Settings },
       ],
     },
   ],
@@ -88,7 +91,7 @@ export const NAV_CONFIG: Record<Role, NavSection[]> = {
       items: [
         // TODO: Billing — temporarily hidden
         // { label: "Billing", href: "/reception-admin/billing", icon: CreditCard },
-        { label: "Notifications", href: "/reception-admin/notifications", icon: Bell, badge: "3" },
+        { label: "Notifications", href: "/reception-admin/notifications", icon: Bell },
       ],
     },
   ],
@@ -114,6 +117,12 @@ export const NAV_CONFIG: Record<Role, NavSection[]> = {
         { label: "Patient Search", href: "/lab-admin/patients", icon: Search },
       ],
     },
+    {
+      title: "System",
+      items: [
+        { label: "Notifications", href: "/lab-admin/notifications", icon: Bell },
+      ],
+    },
   ],
 
   doctor: [
@@ -134,6 +143,12 @@ export const NAV_CONFIG: Record<Role, NavSection[]> = {
         { label: "Medical Reports", href: "/doctor/reports", icon: BarChart3 },
         { label: "Schedule", href: "/doctor/schedule", icon: CalendarDays },
         { label: "Profile", href: "/doctor/profile", icon: UserCheck },
+      ],
+    },
+    {
+      title: "System",
+      items: [
+        { label: "Notifications", href: "/doctor/notifications", icon: Bell },
       ],
     },
   ],

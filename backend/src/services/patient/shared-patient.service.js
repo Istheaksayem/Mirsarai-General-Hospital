@@ -14,9 +14,10 @@ import env from '../../config/env.js';
  * @param {string} params.name   - Patient full name (used for creation)
  * @param {number} [params.age]  - Patient age
  * @param {string} [params.gender] - Patient gender
+ * @param {boolean} [params.skipWelcomeEmail=false] - Skip sending the welcome email
  * @returns {Promise<Object|null>} Patient document (lean), or null if no identifiers provided
  */
-export const findOrCreatePatient = async ({ phone, email, name, age, gender } = {}) => {
+export const findOrCreatePatient = async ({ phone, email, name, age, gender, skipWelcomeEmail = false } = {}) => {
   const conditions = [];
   if (phone) conditions.push({ mobile: phone });
   if (email) conditions.push({ email: email.toLowerCase() });
@@ -35,7 +36,7 @@ export const findOrCreatePatient = async ({ phone, email, name, age, gender } = 
     patient = await Patient.create(data);
     patient = patient.toObject();
 
-    if (email) {
+    if (!skipWelcomeEmail && email) {
       try {
         await sendEmail({
           email,

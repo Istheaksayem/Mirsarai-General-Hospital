@@ -5,6 +5,7 @@ import ApiError from '../../utils/ApiError.js';
 import generateAppointmentId from '../../utils/generateAppointmentId.js';
 import { APPOINTMENT_SOURCE } from '../../constants/index.js';
 import { createNotification } from '../notification.service.js';
+import { notifyNewAppointment } from '../appointment-notification.service.js';
 
 export const getMyAppointments = async (patientId) => {
   const patient = await Patient.findById(patientId).lean();
@@ -47,6 +48,12 @@ export const createMyAppointment = async (patientId, data) => {
   const populated = await Appointment.findById(appointment._id)
     .populate('doctor', 'name designation image department')
     .lean();
+
+  try {
+    await notifyNewAppointment(populated);
+  } catch (err) {
+    console.log('Staff notification failed:', err.message);
+  }
 
   return {
     appointment: populated,

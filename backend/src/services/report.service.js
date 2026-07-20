@@ -1,8 +1,9 @@
 import { StatusCodes } from 'http-status-codes';
 import Document from '../models/document.model.js';
 import Patient from '../models/patient.model.js';
+import DoctorProfile from '../models/doctorProfile.model.js';
 import ApiError from '../utils/ApiError.js';
-import { createNotification } from './notification.service.js';
+import { createNotification, createStaffNotification } from './notification.service.js';
 import { createAuditLog } from './auditLog.service.js';
 
 const LAB_FILTER = { documentType: 'diagnostic_report', isDeleted: false };
@@ -92,7 +93,28 @@ export const createReport = async (data, file, user) => {
     type: 'report_ready',
     title: 'New Lab Report Available',
     message: `Your ${data.reportType || 'lab'} report — "${data.testName || doc.title}" is ready.`,
+    priority: 'high',
+    link: '/documents',
   });
+
+  // Notify the requesting doctor if available
+  if (data.requestingDoctorId) {
+    try {
+      const doctorProfile = await DoctorProfile.findById(data.requestingDoctorId).select('userId').lean();
+      if (doctorProfile?.userId) {
+        await createStaffNotification({
+          userId: doctorProfile.userId,
+          type: 'report_ready',
+          title: 'Lab Report Ready',
+          message: `Report for patient is ready — "${data.testName || doc.title}".`,
+          priority: 'medium',
+          link: '/reports',
+        });
+      }
+    } catch (err) {
+      console.log('Doctor notification failed:', err.message);
+    }
+  }
 
   await createAuditLog({
     actorId: user.id,

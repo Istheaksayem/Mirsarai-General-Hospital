@@ -16,6 +16,20 @@ const verifyOtpSchema = z.object({
   }),
 });
 
+const setPasswordSchema = z.object({
+  body: z.object({
+    email: z.string().email('Valid email is required'),
+    password: z.string().min(6, 'Password must be at least 6 characters'),
+  }),
+});
+
+const loginSchema = z.object({
+  body: z.object({
+    email: z.string().email('Valid email is required'),
+    password: z.string().min(1, 'Password is required'),
+  }),
+});
+
 const registerSchema = z.object({
   body: z.object({
     fullName: z.string().min(2, 'Name must be at least 2 characters'),
@@ -30,8 +44,11 @@ const registerSchema = z.object({
 
 const router = express.Router();
 
+router.get('/check', AuthPatientController.checkStatus);
 router.post('/send-otp', validate(sendOtpSchema), AuthPatientController.sendOtp);
 router.post('/verify-otp', validate(verifyOtpSchema), AuthPatientController.verifyOtp);
+router.post('/set-password', validate(setPasswordSchema), AuthPatientController.setPassword);
+router.post('/login', validate(loginSchema), AuthPatientController.loginWithPassword);
 router.post('/register', validate(registerSchema), AuthPatientController.registerPatient);
 
 export default router;

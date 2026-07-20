@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
 import { GENDER, BLOOD_GROUPS } from '../constants/index.js';
 
 const patientSchema = new mongoose.Schema(
@@ -75,6 +76,15 @@ const patientSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
+    password: {
+      type: String,
+      minlength: [6, 'Password must be at least 6 characters long'],
+      select: false,
+    },
+    hasSetPassword: {
+      type: Boolean,
+      default: false,
+    },
     isActive: {
       type: Boolean,
       default: true,
@@ -95,6 +105,27 @@ patientSchema.index({ patientId: 1 });
 patientSchema.index({ mobile: 1 });
 patientSchema.index({ email: 1 });
 patientSchema.index({ fullName: 'text', patientId: 'text' });
+
+patientSchema.pre('save', async function (next) {
+  if (!this.isModified('password') || !this.password) return next();
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
+patientSchema.methods.comparePassword = async function (candidatePassword) {
+  return bcrypt.compare(candidatePassword, this.password);
+};
+
+patientSchema.methods.toJSON = function () {
+  const obj = this.toObject();
+  delete obj.password;
+  return obj;
+};
 
 const Patient = mongoose.model('Patient', patientSchema);
 export default Patient;
