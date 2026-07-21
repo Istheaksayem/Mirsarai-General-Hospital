@@ -177,6 +177,24 @@ export const putCareerSchema = z.object({
 });
 
 // Our Team Validation
+const qualificationValSchema = z.object({
+  title: localizedStringSchema,
+  institution: localizedStringSchema,
+  year: z.string().optional().default('')
+});
+
+const experienceValSchema = z.object({
+  title: localizedStringSchema,
+  institution: localizedStringSchema,
+  period: z.string().optional().default(''),
+  description: localizedStringSchema.optional().default({ en: '', bn: '' })
+});
+
+const socialLinkValSchema = z.object({
+  platform: z.string().min(1, 'Platform is required'),
+  url: z.string().min(1, 'URL is required')
+});
+
 const teamMemberValSchema = z.object({
   name: localizedStringSchema,
   designation: localizedStringSchema,
@@ -185,7 +203,12 @@ const teamMemberValSchema = z.object({
   image: z.string().optional().default(''),
   email: z.string().optional().default(''),
   phone: z.string().optional().default(''),
-  order: z.number().int().optional().default(0)
+  order: z.number().int().optional().default(0),
+  slug: z.string().optional().default(''),
+  qualifications: z.array(qualificationValSchema).optional().default([]),
+  experience: z.array(experienceValSchema).optional().default([]),
+  specialties: z.array(localizedStringSchema).optional().default([]),
+  socialLinks: z.array(socialLinkValSchema).optional().default([])
 });
 
 export const putOurTeamSchema = z.object({

@@ -2,14 +2,14 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Trash2, Loader2, GripVertical, Layers } from "lucide-react";
+import { Plus, Trash2, Loader2, GripVertical, ChevronDown, ChevronRight, GraduationCap, Briefcase, Star, Link as LinkIcon } from "lucide-react";
 import {
   getOurTeamData,
   updateOurTeamData,
   uploadCmsImage,
   OurTeamData,
   OurTeamMember,
-  OurTeamCustomSection,
+  LocalizedString,
 } from "@/lib/services/api";
 import { CmsTabNav, CmsTab, CmsCard, CmsStatusBar, CmsPageHeader } from "@/components/cms/CmsLayout";
 import { LanguageTabs } from "@/components/cms/LanguageTabs";
@@ -33,6 +33,11 @@ const EMPTY_MEMBER: OurTeamMember = {
   email: "",
   phone: "",
   order: 0,
+  slug: "",
+  qualifications: [],
+  experience: [],
+  specialties: [],
+  socialLinks: [],
 };
 
 export default function OurTeamCmsPage() {
@@ -44,6 +49,15 @@ export default function OurTeamCmsPage() {
   const [langTab, setLangTab] = useState<"en" | "bn">("en");
   const [seoLangTab, setSeoLangTab] = useState<"en" | "bn">("en");
   const [status, setStatus] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [expandedMembers, setExpandedMembers] = useState<Set<number>>(new Set());
+
+  const toggleMemberExpand = (i: number) => {
+    setExpandedMembers(prev => {
+      const next = new Set(prev);
+      if (next.has(i)) next.delete(i); else next.add(i);
+      return next;
+    });
+  };
 
   useEffect(() => {
     getOurTeamData()
@@ -89,31 +103,105 @@ export default function OurTeamCmsPage() {
       return { ...d, members };
     });
 
-  // ── Custom Sections helpers ──
-  const addCustomSection = () =>
+  // ── Member nested arrays helpers ──
+  const addQualification = (memberIdx: number) =>
     set((d) => {
-      const existing = d.customSections || [];
-      const newSection: OurTeamCustomSection = {
-        id: `section_${Date.now()}`,
-        title: { en: "New Section Title", bn: "নতুন সেকশনের শিরোনাম" },
-        description: { en: "Section description goes here…", bn: "সেকশনের বিবরণ এখানে লিখুন…" },
-        image: "",
-        order: existing.length,
-      };
-      return { ...d, customSections: [...existing, newSection] };
+      const members = [...d.members];
+      const quals = [...(members[memberIdx].qualifications || [])];
+      quals.push({ title: { en: "Qualification Title", bn: "যোগ্যতার শিরোনাম" }, institution: { en: "Institution", bn: "প্রতিষ্ঠান" }, year: "" });
+      members[memberIdx] = { ...members[memberIdx], qualifications: quals };
+      return { ...d, members };
     });
 
-  const removeCustomSection = (i: number) =>
-    set((d) => ({
-      ...d,
-      customSections: (d.customSections || []).filter((_, idx) => idx !== i),
-    }));
-
-  const updateCustomSection = (i: number, updated: Partial<OurTeamCustomSection>) =>
+  const removeQualification = (memberIdx: number, qualIdx: number) =>
     set((d) => {
-      const sections = [...(d.customSections || [])];
-      sections[i] = { ...sections[i], ...updated };
-      return { ...d, customSections: sections };
+      const members = [...d.members];
+      members[memberIdx] = { ...members[memberIdx], qualifications: members[memberIdx].qualifications.filter((_, qi) => qi !== qualIdx) };
+      return { ...d, members };
+    });
+
+  const updateQualification = (memberIdx: number, qualIdx: number, updated: Partial<OurTeamMember['qualifications'][0]>) =>
+    set((d) => {
+      const members = [...d.members];
+      const quals = [...members[memberIdx].qualifications];
+      quals[qualIdx] = { ...quals[qualIdx], ...updated };
+      members[memberIdx] = { ...members[memberIdx], qualifications: quals };
+      return { ...d, members };
+    });
+
+  const addExperience = (memberIdx: number) =>
+    set((d) => {
+      const members = [...d.members];
+      const exp = [...(members[memberIdx].experience || [])];
+      exp.push({ title: { en: "Position Title", bn: "পদের শিরোনাম" }, institution: { en: "Institution", bn: "প্রতিষ্ঠান" }, period: "", description: { en: "", bn: "" } });
+      members[memberIdx] = { ...members[memberIdx], experience: exp };
+      return { ...d, members };
+    });
+
+  const removeExperience = (memberIdx: number, expIdx: number) =>
+    set((d) => {
+      const members = [...d.members];
+      members[memberIdx] = { ...members[memberIdx], experience: members[memberIdx].experience.filter((_, ei) => ei !== expIdx) };
+      return { ...d, members };
+    });
+
+  const updateExperience = (memberIdx: number, expIdx: number, updated: Partial<OurTeamMember['experience'][0]>) =>
+    set((d) => {
+      const members = [...d.members];
+      const exp = [...members[memberIdx].experience];
+      exp[expIdx] = { ...exp[expIdx], ...updated };
+      members[memberIdx] = { ...members[memberIdx], experience: exp };
+      return { ...d, members };
+    });
+
+  const addSpecialty = (memberIdx: number) =>
+    set((d) => {
+      const members = [...d.members];
+      const specs = [...(members[memberIdx].specialties || [])];
+      specs.push({ en: "Specialty", bn: "বিশেষত্ব" });
+      members[memberIdx] = { ...members[memberIdx], specialties: specs };
+      return { ...d, members };
+    });
+
+  const removeSpecialty = (memberIdx: number, specIdx: number) =>
+    set((d) => {
+      const members = [...d.members];
+      members[memberIdx] = { ...members[memberIdx], specialties: members[memberIdx].specialties.filter((_, si) => si !== specIdx) };
+      return { ...d, members };
+    });
+
+  const updateSpecialty = (memberIdx: number, specIdx: number, updated: LocalizedString) =>
+    set((d) => {
+      const members = [...d.members];
+      const specs = [...members[memberIdx].specialties];
+      specs[specIdx] = { ...specs[specIdx], ...updated };
+      members[memberIdx] = { ...members[memberIdx], specialties: specs };
+      return { ...d, members };
+    });
+
+  const addSocialLink = (memberIdx: number) =>
+    set((d) => {
+      const members = [...d.members];
+      const links = [...(members[memberIdx].socialLinks || [])];
+      links.push({ platform: "", url: "" });
+      members[memberIdx] = { ...members[memberIdx], socialLinks: links };
+      return { ...d, members };
+    });
+
+  const removeSocialLink = (memberIdx: number, linkIdx: number) =>
+    set((d) => {
+      const members = [...d.members];
+      members[memberIdx] = { ...members[memberIdx], socialLinks: members[memberIdx].socialLinks.filter((_, li) => li !== linkIdx) };
+      return { ...d, members };
+    });
+
+  const updateSocialLink = (memberIdx: number, linkIdx: number, updated: Partial<OurTeamMember['socialLinks'][0]>) =>
+    set((d) => {
+      const members = [...d.members];
+      const links = [...members[memberIdx].socialLinks];
+      links[linkIdx] = { ...links[linkIdx], ...updated };
+      members[memberIdx] = { ...members[memberIdx], socialLinks: links };
+      return { ...d, members };
     });
 
   if (isLoading) {
@@ -232,7 +320,7 @@ export default function OurTeamCmsPage() {
               <div className="space-y-4">
                 <SectionDivider
                   title={`Team Members (${data.members.length})`}
-                  description="Individual team member cards — each with name, designation, department, bio, image, email, phone"
+                  description="Individual team member cards — each with name, designation, department, bio, image, email, phone, qualifications, experience, specialties, social links"
                 />
                 <div className="space-y-4">
                   {data.members.map((member, i) => (
@@ -344,6 +432,232 @@ export default function OurTeamCmsPage() {
                         onUpload={handleImageUpload}
                         helpText="Recommended: square photo 400×400px"
                       />
+
+                      {/* ── Expandable Additional Details ── */}
+                      <div className="pt-2">
+                        <button
+                          type="button"
+                          onClick={() => toggleMemberExpand(i)}
+                          className="flex items-center gap-2 w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                        >
+                          {expandedMembers.has(i) ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                          Additional Details (Qualifications, Experience, Specialties, Social Links)
+                        </button>
+
+                        {expandedMembers.has(i) && (
+                          <div className="mt-4 space-y-5 pl-2 border-l-2 border-gray-100 dark:border-gray-800">
+                            {/* Slug */}
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">
+                                URL Slug
+                              </label>
+                              <input
+                                type="text"
+                                value={member.slug || ''}
+                                onChange={(e) => updateMember(i, { slug: e.target.value })}
+                                placeholder="dr-john-doe"
+                                className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2.5 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1E2B7A]/20 focus:border-[#1E2B7A]"
+                              />
+                              <p className="text-xs text-gray-400">URL-friendly identifier (e.g., dr-john-doe). Leave empty to auto-generate.</p>
+                            </div>
+
+                            {/* ── Qualifications ── */}
+                            <div>
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center gap-2">
+                                  <GraduationCap className="h-4 w-4 text-blue-500" />
+                                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Qualifications ({member.qualifications?.length || 0})</span>
+                                </div>
+                                <button type="button" onClick={() => addQualification(i)} className="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-blue-200 text-blue-600 text-xs font-semibold hover:bg-blue-50 transition-colors">
+                                  <Plus className="h-3 w-3" /> Add
+                                </button>
+                              </div>
+                              <div className="space-y-2">
+                                {(member.qualifications || []).map((q, qi) => (
+                                  <div key={qi} className="rounded-lg border border-gray-100 dark:border-gray-800 p-3 space-y-2 bg-white dark:bg-gray-900/50">
+                                    <div className="flex justify-end">
+                                      <button type="button" onClick={() => removeQualification(i, qi)} className="text-red-400 hover:text-red-600">
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                      </button>
+                                    </div>
+                                    <LocalizedInput
+                                      label="Title"
+                                      value={q.title}
+                                      activeTab={langTab}
+                                      onChange={(v) => updateQualification(i, qi, { title: v })}
+                                      placeholder={{ en: "MBBS", bn: "এমবিবিএস" }}
+                                    />
+                                    <LocalizedInput
+                                      label="Institution"
+                                      value={q.institution}
+                                      activeTab={langTab}
+                                      onChange={(v) => updateQualification(i, qi, { institution: v })}
+                                      placeholder={{ en: "University", bn: "বিশ্ববিদ্যালয়" }}
+                                    />
+                                    <div className="space-y-1.5">
+                                      <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Year</label>
+                                      <input
+                                        type="text"
+                                        value={q.year}
+                                        onChange={(e) => updateQualification(i, qi, { year: e.target.value })}
+                                        placeholder="2010"
+                                        className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1E2B7A]/20 focus:border-[#1E2B7A]"
+                                      />
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* ── Experience ── */}
+                            <div>
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center gap-2">
+                                  <Briefcase className="h-4 w-4 text-emerald-500" />
+                                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Experience ({member.experience?.length || 0})</span>
+                                </div>
+                                <button type="button" onClick={() => addExperience(i)} className="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-emerald-200 text-emerald-600 text-xs font-semibold hover:bg-emerald-50 transition-colors">
+                                  <Plus className="h-3 w-3" /> Add
+                                </button>
+                              </div>
+                              <div className="space-y-2">
+                                {(member.experience || []).map((ex, ei) => (
+                                  <div key={ei} className="rounded-lg border border-gray-100 dark:border-gray-800 p-3 space-y-2 bg-white dark:bg-gray-900/50">
+                                    <div className="flex justify-end">
+                                      <button type="button" onClick={() => removeExperience(i, ei)} className="text-red-400 hover:text-red-600">
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                      </button>
+                                    </div>
+                                    <LocalizedInput
+                                      label="Position Title"
+                                      value={ex.title}
+                                      activeTab={langTab}
+                                      onChange={(v) => updateExperience(i, ei, { title: v })}
+                                      placeholder={{ en: "Senior Cardiologist", bn: "সিনিয়র কার্ডিওলজিস্ট" }}
+                                    />
+                                    <LocalizedInput
+                                      label="Institution"
+                                      value={ex.institution}
+                                      activeTab={langTab}
+                                      onChange={(v) => updateExperience(i, ei, { institution: v })}
+                                      placeholder={{ en: "Hospital Name", bn: "হাসপাতালের নাম" }}
+                                    />
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                      <div className="space-y-1.5">
+                                        <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Period</label>
+                                        <input
+                                          type="text"
+                                          value={ex.period}
+                                          onChange={(e) => updateExperience(i, ei, { period: e.target.value })}
+                                          placeholder="2015 - 2020"
+                                          className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1E2B7A]/20 focus:border-[#1E2B7A]"
+                                        />
+                                      </div>
+                                    </div>
+                                    <LocalizedTextarea
+                                      label="Description"
+                                      value={ex.description || { en: '', bn: '' }}
+                                      activeTab={langTab}
+                                      onChange={(v) => updateExperience(i, ei, { description: v })}
+                                      placeholder={{ en: "Brief description of role…", bn: "ভূমিকার সংক্ষিপ্ত বিবরণ…" }}
+                                      rows={2}
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* ── Specialties ── */}
+                            <div>
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center gap-2">
+                                  <Star className="h-4 w-4 text-amber-500" />
+                                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Specialties ({member.specialties?.length || 0})</span>
+                                </div>
+                                <button type="button" onClick={() => addSpecialty(i)} className="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-amber-200 text-amber-600 text-xs font-semibold hover:bg-amber-50 transition-colors">
+                                  <Plus className="h-3 w-3" /> Add
+                                </button>
+                              </div>
+                              <div className="space-y-2">
+                                {(member.specialties || []).map((spec, si) => (
+                                  <div key={si} className="flex items-start gap-2">
+                                    <div className="flex-1">
+                                      <LocalizedInput
+                                        label={`Specialty #${si + 1}`}
+                                        value={spec}
+                                        activeTab={langTab}
+                                        onChange={(v) => updateSpecialty(i, si, v)}
+                                        placeholder={{ en: "Cardiology", bn: "কার্ডিওলজি" }}
+                                      />
+                                    </div>
+                                    <button
+                                      type="button"
+                                      onClick={() => removeSpecialty(i, si)}
+                                      className="mt-6 flex h-7 w-7 items-center justify-center rounded-lg border border-red-200 text-red-500 hover:bg-red-50 transition-colors"
+                                    >
+                                      <Trash2 className="h-3.5 w-3.5" />
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* ── Social Links ── */}
+                            <div>
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center gap-2">
+                                  <LinkIcon className="h-4 w-4 text-purple-500" />
+                                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Social Links ({member.socialLinks?.length || 0})</span>
+                                </div>
+                                <button type="button" onClick={() => addSocialLink(i)} className="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-purple-200 text-purple-600 text-xs font-semibold hover:bg-purple-50 transition-colors">
+                                  <Plus className="h-3 w-3" /> Add
+                                </button>
+                              </div>
+                              <div className="space-y-2">
+                                {(member.socialLinks || []).map((link, li) => (
+                                  <div key={li} className="flex items-start gap-2">
+                                    <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                      <div className="space-y-1.5">
+                                        <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Platform</label>
+                                        <select
+                                          value={link.platform}
+                                          onChange={(e) => updateSocialLink(i, li, { platform: e.target.value })}
+                                          className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2.5 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1E2B7A]/20 focus:border-[#1E2B7A]"
+                                        >
+                                          <option value="">Select platform</option>
+                                          <option value="facebook">Facebook</option>
+                                          <option value="twitter">Twitter / X</option>
+                                          <option value="linkedin">LinkedIn</option>
+                                          <option value="instagram">Instagram</option>
+                                          <option value="youtube">YouTube</option>
+                                          <option value="website">Website</option>
+                                        </select>
+                                      </div>
+                                      <div className="space-y-1.5">
+                                        <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">URL</label>
+                                        <input
+                                          type="url"
+                                          value={link.url}
+                                          onChange={(e) => updateSocialLink(i, li, { url: e.target.value })}
+                                          placeholder="https://facebook.com/..."
+                                          className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2.5 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1E2B7A]/20 focus:border-[#1E2B7A]"
+                                        />
+                                      </div>
+                                    </div>
+                                    <button
+                                      type="button"
+                                      onClick={() => removeSocialLink(i, li)}
+                                      className="mt-6 flex h-7 w-7 items-center justify-center rounded-lg border border-red-200 text-red-500 hover:bg-red-50 transition-colors"
+                                    >
+                                      <Trash2 className="h-3.5 w-3.5" />
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   ))}
 
@@ -358,96 +672,6 @@ export default function OurTeamCmsPage() {
                 </div>
               </div>
 
-              <hr className="border-gray-100 dark:border-gray-800" />
-
-              {/* Custom Sections */}
-              <div className="space-y-4">
-                <SectionDivider
-                  title={`Custom Sections (${(data.customSections || []).length})`}
-                  description="Add extra content sections to the page — each with a title, description, and optional image"
-                />
-                <div className="space-y-4">
-                  {(data.customSections || []).map((section, i) => (
-                    <div
-                      key={section.id}
-                      className="rounded-xl border border-gray-100 dark:border-gray-800 p-5 space-y-4 bg-gradient-to-br from-indigo-50/40 to-purple-50/30 dark:from-gray-800/40 dark:to-gray-800/20"
-                    >
-                      {/* Section header */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Layers className="h-4 w-4 text-indigo-400" />
-                          <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">
-                            Section #{i + 1}
-                          </span>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => removeCustomSection(i)}
-                          className="flex h-7 w-7 items-center justify-center rounded-lg border border-red-200 text-red-500 hover:bg-red-50 transition-colors"
-                          title="Remove this section"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-
-                      {/* Title */}
-                      <LocalizedInput
-                        label="Section Title"
-                        value={section.title}
-                        activeTab={langTab}
-                        onChange={(v) => updateCustomSection(i, { title: v })}
-                        placeholder={{ en: "Section Title", bn: "সেকশন শিরোনাম" }}
-                        required
-                      />
-
-                      {/* Description */}
-                      <LocalizedTextarea
-                        label="Section Description"
-                        value={section.description}
-                        activeTab={langTab}
-                        onChange={(v) => updateCustomSection(i, { description: v })}
-                        placeholder={{ en: "Describe this section…", bn: "এই সেকশনের বিবরণ লিখুন…" }}
-                        rows={4}
-                      />
-
-                      {/* Order */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">
-                            Display Order
-                          </label>
-                          <input
-                            type="number"
-                            min={0}
-                            value={section.order}
-                            onChange={(e) => updateCustomSection(i, { order: Number(e.target.value) })}
-                            className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2.5 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1E2B7A]/20 focus:border-[#1E2B7A]"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Image */}
-                      <ImageUploader
-                        label="Section Image"
-                        value={section.image}
-                        onChange={(url) => updateCustomSection(i, { image: url })}
-                        onUpload={handleImageUpload}
-                        helpText="Optional image for this section (recommended: 1200×600px)"
-                      />
-                    </div>
-                  ))}
-
-                  {/* Add section button */}
-                  <button
-                    type="button"
-                    onClick={addCustomSection}
-                    className="flex items-center gap-2 px-4 py-3 rounded-xl border-2 border-dashed border-indigo-200 dark:border-indigo-800 text-sm font-semibold text-indigo-500 hover:border-indigo-400 hover:text-indigo-600 hover:bg-indigo-50/50 dark:hover:bg-indigo-900/20 transition-all duration-200 w-full justify-center group"
-                  >
-                    <Plus className="h-4 w-4 transition-transform group-hover:rotate-90 duration-200" />
-                    Add New Section
-                  </button>
-                </div>
-              </div>
             </>
           )}
 

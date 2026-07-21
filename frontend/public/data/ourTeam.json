@@ -1,25 +1,40 @@
 {
   "hero": {
     "title": { "en": "Meet Our Team", "bn": "আমাদের টিমের সাথে পরিচিত হন" },
-    "subtitle": { "en": "Dedicated Professionals", "bn": "নিবেদিতপ্রাণ পেশাদার" },
-    "description": { "en": "Our team of dedicated healthcare professionals is committed to providing the highest quality care to our community.", "bn": "আমাদের নিবেদিতপ্রাণ স্বাস্থ্যসেবা পেশাদারদের টিম আমাদের সম্প্রদায়কে সর্বোচ্চ মানের সেবা প্রদানে প্রতিশ্রুতিবদ্ধ।" },
+    "subtitle": { "en": "Dedicated Healthcare Professionals", "bn": "নিবেদিতপ্রাণ স্বাস্থ্যসেবা পেশাদার" },
+    "description": { "en": "Our team of experienced doctors, nurses, and specialists work tirelessly to provide the best care for every patient.", "bn": "আমাদের অভিজ্ঞ ডাক্তার, নার্স এবং বিশেষজ্ঞদের টিম প্রতিটি রোগীর জন্য সর্বোত্তম সেবা প্রদানে নিরলসভাবে কাজ করে।" },
     "image": "/images/team-hero.jpg"
   },
-  "sectionTitle": { "en": "Our Team Members", "bn": "আমাদের টিম সদস্যরা" },
-  "sectionDescription": { "en": "Meet our team of experienced doctors and healthcare professionals.", "bn": "আমাদের অভিজ্ঞ ডাক্তার এবং স্বাস্থ্যসেবা পেশাদারদের সাথে পরিচিত হন।" },
+  "sectionTitle": { "en": "Our Expert Team Members", "bn": "আমাদের বিশেষজ্ঞ টিম সদস্যরা" },
+  "sectionDescription": { "en": "Meet the dedicated professionals who make Mirsarai General Hospital a trusted healthcare institution.", "bn": "সেই নিবেদিতপ্রাণ পেশাদারদের সাথে পরিচিত হন যারা মীরসরাই জেনারেল হাসপাতালকে একটি বিশ্বস্ত স্বাস্থ্যসেবা প্রতিষ্ঠান হিসেবে গড়ে তুলেছেন।" },
   "members": [
     {
       "name": { "en": "Dr. Sample Name", "bn": "ডা. নমুনা নাম" },
       "designation": { "en": "Senior Consultant", "bn": "সিনিয়র পরামর্শক" },
       "department": { "en": "General Medicine", "bn": "জেনারেল মেডিসিন" },
-      "bio": { "en": "Experienced physician dedicated to patient care.", "bn": "রোগী সেবায় নিবেদিত অভিজ্ঞ চিকিৎসক।" },
+      "bio": { "en": "Experienced physician dedicated to patient care with over 15 years of clinical practice.", "bn": "১৫ বছরেরও বেশি ক্লিনিকাল অনুশীলন সহ রোগী সেবায় নিবেদিত অভিজ্ঞ চিকিৎসক।" },
       "image": "/images/doctor-placeholder.jpg",
       "email": "doctor@hospital.com",
-      "phone": "+880 1XXX-XXXXXX",
-      "order": 0
+      "phone": "+880 1700-000000",
+      "order": 0,
+      "slug": "dr-sample-name",
+      "qualifications": [
+        { "title": { "en": "MBBS", "bn": "এমবিবিএস" }, "institution": { "en": "Dhaka Medical College", "bn": "ঢাকা মেডিকেল কলেজ" }, "year": "2005" },
+        { "title": { "en": "FCPS (Medicine)", "bn": "এফসিপিএস (মেডিসিন)" }, "institution": { "en": "Bangladesh College of Physicians & Surgeons", "bn": "বাংলাদেশ কলেজ অব ফিজিশিয়ানস অ্যান্ড সার্জনস" }, "year": "2011" }
+      ],
+      "experience": [
+        { "title": { "en": "Senior Consultant", "bn": "সিনিয়র পরামর্শক" }, "institution": { "en": "Mirsarai General Hospital", "bn": "মীরসরাই জেনারেল হাসপাতাল" }, "period": "2018 - Present", "description": { "en": "Leading the general medicine department.", "bn": "জেনারেল মেডিসিন বিভাগের নেতৃত্ব।" } },
+        { "title": { "en": "Registrar", "bn": "রেজিস্ট্রার" }, "institution": { "en": "Chittagong Medical College", "bn": "চট্টগ্রাম মেডিকেল কলেজ" }, "period": "2011 - 2018", "description": { "en": "Managed inpatient and outpatient care.", "bn": "আন্তঃবিভাগীয় এবং বহির্বিভাগীয় সেবা ব্যবস্থাপনা।" } }
+      ],
+      "specialties": [
+        { "en": "General Medicine", "bn": "জেনারেল মেডিসিন" },
+        { "en": "Diabetes Care", "bn": "ডায়াবেটিস সেবা" }
+      ],
+      "socialLinks": [
+        { "platform": "linkedin", "url": "https://linkedin.com/in/dr-sample" }
+      ]
     }
   ],
-  "customSections": [],
   "sections": {
     "hero": { "isVisible": true, "order": 1 },
     "members": { "isVisible": true, "order": 2 },

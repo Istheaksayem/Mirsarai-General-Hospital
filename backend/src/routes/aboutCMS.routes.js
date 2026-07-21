@@ -14,6 +14,7 @@ import {
   deleteCareerPosition,
   getOurTeam,
   updateOurTeam,
+  getTeamMemberBySlug,
   uploadCMSImage
 } from '../controllers/aboutCMS.controller.js';
 import validate from '../middlewares/validate.middleware.js';
@@ -68,5 +69,8 @@ router.route('/upload')
 router.route('/our-team')
   .get(getOurTeam)
   .put(authenticate, authorize('super-admin'), validate(putOurTeamSchema), updateOurTeam);
+
+router.route('/our-team/:slug')
+  .get(getTeamMemberBySlug);
 
 export default router;

@@ -1,32 +1,23 @@
 "use client";
 import { useState } from "react";
-import { BarChart3, FileText, CheckCircle2, Clock, AlertCircle, TrendingUp, Download, Eye } from "lucide-react";
+import { BarChart3, FileText, CheckCircle2, Clock, AlertCircle, Download, Eye } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SearchFilter, SelectFilter } from "@/components/ui/SearchFilter";
 import { DataTable, Column } from "@/components/ui/DataTable";
-import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { StatsCard } from "@/components/ui/StatsCard";
 import { StatsCardSkeleton } from "@/components/ui/Skeleton";
-import { useReports, useReportStats, useUpdateReportStatus, useDeleteReport } from "@/lib/hooks/useReports";
+import { useReports, useReportStats, useDeleteReport } from "@/lib/hooks/useReports";
 import type { UnifiedReport } from "@/lib/services/api";
 import { ActionButtons } from "@/components/ui/ActionButtons";
 import { env } from "@/config/env";
 
-const statusVariant: Record<string, "warning" | "info" | "success"> = {
-  pending: "warning",
-  "in-progress": "info",
-  completed: "success",
-};
-
 export default function LabReportsPage() {
   const { data: rawData = [], isLoading } = useReports();
   const { data: stats } = useReportStats();
-  const updateStatus = useUpdateReportStatus();
   const deleteReport = useDeleteReport();
 
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
   const [notification, setNotification] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
@@ -50,9 +41,8 @@ export default function LabReportsPage() {
       r.patientName.toLowerCase().includes(search.toLowerCase()) ||
       r.testName.toLowerCase().includes(search.toLowerCase()) ||
       r.id.toLowerCase().includes(search.toLowerCase());
-    const matchStatus = !statusFilter || r.status === statusFilter;
     const matchType = !typeFilter || r.reportType === typeFilter;
-    return matchSearch && matchStatus && matchType;
+    return matchSearch && matchType;
   });
 
   const handleDelete = async (row: Record<string, unknown>) => {
@@ -112,36 +102,6 @@ export default function LabReportsPage() {
       cell: (r) => (
         <span className="text-sm text-gray-400">{(r.completedDate as string) ? formatDate(r.completedDate as string) : "—"}</span>
       ),
-    },
-    {
-      key: "status",
-      header: "Status",
-      cell: (r) => {
-        const s = r.status as string;
-        return (
-          <select
-            value={s}
-            onChange={async (e) => {
-              const newStatus = e.target.value;
-              try {
-                await updateStatus.mutateAsync({ id: r._id as string, status: newStatus });
-                showNotification("success", `Report marked as ${newStatus}`);
-              } catch {
-                showNotification("error", "Failed to update report status");
-              }
-            }}
-            className={`text-xs px-2 py-1 rounded-md font-medium border focus:ring-2 focus:ring-offset-1 focus:outline-none ${
-              s === 'completed' ? 'bg-green-50 text-green-700 border-green-200 focus:ring-green-500' :
-              s === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-200 focus:ring-amber-500' :
-              'bg-blue-50 text-blue-700 border-blue-200 focus:ring-blue-500'
-            }`}
-          >
-            <option value="pending">Pending</option>
-            <option value="in-progress">In Progress</option>
-            <option value="completed">Completed</option>
-          </select>
-        );
-      },
     },
     {
       key: "__actions__",
@@ -228,16 +188,6 @@ export default function LabReportsPage() {
           onChange={setSearch}
           placeholder="Search by patient, test or report ID..."
           className="flex-1"
-        />
-        <SelectFilter
-          value={statusFilter}
-          onChange={setStatusFilter}
-          options={[
-            { label: "Pending", value: "pending" },
-            { label: "In Progress", value: "in-progress" },
-            { label: "Completed", value: "completed" },
-          ]}
-          placeholder="All Status"
         />
         <SelectFilter
           value={typeFilter}

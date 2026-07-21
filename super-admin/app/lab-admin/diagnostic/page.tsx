@@ -99,7 +99,8 @@ export default function DiagnosticRecordsPage() {
   const types = [...new Set(fetched.map((r) => r.documentType))];
 
   const filtered = fetched.filter((r) => {
-    const pid = r.patientId as Record<string, unknown> | string;
+    const pid = r.patientId as Record<string, unknown> | string | null;
+    if (pid === null) return false;
     const name = typeof pid === 'object' ? (pid as Record<string, unknown>).fullName as string : "";
     const idStr = typeof pid === 'object' ? (pid as Record<string, unknown>).patientId as string : "";
     const matchSearch = !search || name.toLowerCase().includes(search.toLowerCase()) || r.title.toLowerCase().includes(search.toLowerCase()) || idStr.includes(search);

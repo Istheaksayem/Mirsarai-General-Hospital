@@ -225,6 +225,14 @@ export const getOurTeam = catchAsync(async (req, res) => {
 
 export const updateOurTeam = catchAsync(async (req, res) => {
   let data = await OurTeam.findOne();
+  if (req.body?.hero?.image) req.body.hero.image = toRelativePath(req.body.hero.image);
+  if (req.body?.seo?.ogImage) req.body.seo.ogImage = toRelativePath(req.body.seo.ogImage);
+  if (req.body?.members) {
+    req.body.members = req.body.members.map(m => ({
+      ...m,
+      image: m.image ? toRelativePath(m.image) : m.image
+    }));
+  }
   if (!data) {
     data = new OurTeam(req.body);
     if (req.user) data.createdBy = req.user.email || req.user.id;
@@ -234,6 +242,22 @@ export const updateOurTeam = catchAsync(async (req, res) => {
   if (req.user) data.updatedBy = req.user.email || req.user.id;
   await data.save();
   return sendSuccess(res, StatusCodes.OK, data, 'Our Team data updated successfully');
+});
+
+// ============================================
+// TEAM MEMBER BY SLUG
+// ============================================
+export const getTeamMemberBySlug = catchAsync(async (req, res) => {
+  const { slug } = req.params;
+  const team = await OurTeam.findOne();
+  if (!team) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Our Team data not found.');
+  }
+  const member = team.members.find(m => m.slug === slug);
+  if (!member) {
+    throw new ApiError(StatusCodes.NOT_FOUND, `Team member with slug "${slug}" not found.`);
+  }
+  return sendSuccess(res, StatusCodes.OK, member, 'Team member fetched successfully');
 });
 
 // ============================================

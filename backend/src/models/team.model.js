@@ -17,6 +17,24 @@ const sectionConfigSchema = new mongoose.Schema({
   order: { type: Number, required: true }
 }, { _id: false });
 
+const qualificationSchema = new mongoose.Schema({
+  title: { type: localizedStringSchema, required: true },
+  institution: { type: localizedStringSchema, required: true },
+  year: { type: String, default: '' }
+}, { _id: false });
+
+const experienceSchema = new mongoose.Schema({
+  title: { type: localizedStringSchema, required: true },
+  institution: { type: localizedStringSchema, required: true },
+  period: { type: String, default: '' },
+  description: { type: localizedStringSchema, default: () => ({ en: '', bn: '' }) }
+}, { _id: false });
+
+const socialLinkSchema = new mongoose.Schema({
+  platform: { type: String, required: true },
+  url: { type: String, required: true }
+}, { _id: false });
+
 const teamMemberSchema = new mongoose.Schema({
   name: { type: localizedStringSchema, required: true },
   designation: { type: localizedStringSchema, required: true },
@@ -25,15 +43,12 @@ const teamMemberSchema = new mongoose.Schema({
   image: { type: String, default: '' },
   email: { type: String, default: '' },
   phone: { type: String, default: '' },
-  order: { type: Number, default: 0 }
-}, { _id: false });
-
-const customSectionSchema = new mongoose.Schema({
-  id: { type: String, required: true },
-  title: { type: localizedStringSchema, required: true },
-  description: { type: localizedStringSchema, required: true },
-  image: { type: String, default: '' },
-  order: { type: Number, default: 0 }
+  order: { type: Number, default: 0 },
+  slug: { type: String, default: '' },
+  qualifications: { type: [qualificationSchema], default: [] },
+  experience: { type: [experienceSchema], default: [] },
+  specialties: { type: [localizedStringSchema], default: [] },
+  socialLinks: { type: [socialLinkSchema], default: [] }
 }, { _id: false });
 
 const ourTeamSchema = new mongoose.Schema(
@@ -47,7 +62,6 @@ const ourTeamSchema = new mongoose.Schema(
     sectionTitle: { type: localizedStringSchema, required: true },
     sectionDescription: { type: localizedStringSchema, required: true },
     members: { type: [teamMemberSchema], default: [] },
-    customSections: { type: [customSectionSchema], default: [] },
     sections: {
       hero: { type: sectionConfigSchema, default: () => ({ isVisible: true, order: 1 }) },
       members: { type: sectionConfigSchema, default: () => ({ isVisible: true, order: 2 }) },

@@ -7,8 +7,13 @@ import { FiArrowRight, FiMail, FiPhone } from "react-icons/fi";
 import { FaUserMd, FaUsers, FaHeartbeat } from "react-icons/fa";
 import { BsFillHeartPulseFill } from "react-icons/bs";
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect } from "react";
 import { getImageUrl } from "@/lib/getImageUrl";
+
+function slugify(text: string): string {
+  return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
 
 const OurTeamPage = () => {
   const { data, isLoading, isError } = useOurTeamData();
@@ -163,7 +168,6 @@ const OurTeamPage = () => {
                 transition={{ duration: 0.5, delay: i * 0.08 }}
                 className="group relative"
               >
-                {/* Member Card */}
                 <div className="glass-card rounded-3xl p-0 overflow-hidden hover-lift border-2 border-gray-100 hover:border-secondary/30 transition-all duration-300 shadow-md hover:shadow-xl">
                   {/* Image Area */}
                   <div className="relative h-56 bg-gradient-to-br from-primary/10 to-blue-100 overflow-hidden">
@@ -225,6 +229,15 @@ const OurTeamPage = () => {
                         )}
                       </div>
                     )}
+
+                    {/* View Profile link */}
+                    <Link
+                      href={`/resources/our-team/${member.slug || slugify(member.name.en)}`}
+                      className="mt-4 inline-flex w-full items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary/5 hover:bg-primary/10 text-primary text-sm font-semibold transition-colors"
+                    >
+                      {t("View Full Profile", "সম্পূর্ণ প্রোফাইল দেখুন")}
+                      <FiArrowRight className="h-4 w-4" />
+                    </Link>
                   </div>
                 </div>
               </motion.div>

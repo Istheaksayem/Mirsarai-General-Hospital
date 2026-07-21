@@ -1,14 +1,20 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function PatientLoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
-    router.replace("/login");
-  }, [router]);
+    const email = searchParams.get("email");
+    if (email) {
+      router.replace(`/login?email=${encodeURIComponent(email)}`);
+    } else {
+      router.replace("/login");
+    }
+  }, [router, searchParams]);
 
   return null;
 }

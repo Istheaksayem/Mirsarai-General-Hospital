@@ -148,6 +148,24 @@ export const useAboutData = () =>
 export default useAboutData;
 
 // ── Our Team Types ─────────────────────────────────────────────────────────────
+export interface Qualification {
+  title: BiText;
+  institution: BiText;
+  year: string;
+}
+
+export interface Experience {
+  title: BiText;
+  institution: BiText;
+  period: string;
+  description: BiText;
+}
+
+export interface SocialLink {
+  platform: string;
+  url: string;
+}
+
 export interface TeamMember {
   name: BiText;
   designation: BiText;
@@ -157,6 +175,11 @@ export interface TeamMember {
   email: string;
   phone: string;
   order: number;
+  slug: string;
+  qualifications: Qualification[];
+  experience: Experience[];
+  specialties: BiText[];
+  socialLinks: SocialLink[];
 }
 
 export interface OurTeamSection {
@@ -198,6 +221,43 @@ export const useOurTeamData = () =>
     queryFn: fetchOurTeamData,
     staleTime: 1000 * 60 * 15,
   });
+
+function slugify(text: string): string {
+  return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
+// ── Team Member by Slug ─────────────────────────────────────────────────────────
+const fetchTeamMemberBySlug = async (slug: string): Promise<TeamMember | null> => {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+  try {
+    const res = await fetch(`${apiUrl}/about/our-team/${encodeURIComponent(slug)}`, { cache: "no-store" });
+    if (res.ok) {
+      const json = await res.json();
+      return normalizeImages(json.data) as TeamMember;
+    }
+  } catch {}
+  return null;
+};
+
+export const useTeamMemberBySlug = (slug: string | undefined) => {
+  const teamQuery = useOurTeamData();
+
+  return useQuery<TeamMember | null>({
+    queryKey: ["teamMemberBySlug", slug],
+    queryFn: async () => {
+      if (!slug) return null;
+      const result = await fetchTeamMemberBySlug(slug);
+      if (result) return result;
+      if (!teamQuery.data) return null;
+      const member = teamQuery.data.members.find(
+        (m) => m.slug === slug || slugify(m.name.en) === slug
+      );
+      return member || null;
+    },
+    enabled: !!slug,
+    staleTime: 1000 * 60 * 15,
+  });
+};
 
 // ── Career Types ──────────────────────────────────────────────────────────────
 export interface CareerPosition {
