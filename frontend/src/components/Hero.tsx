@@ -26,6 +26,13 @@ interface HeroSlide {
   buttons: HeroButton[];
 }
 
+interface ShapeConfig {
+  color: string;
+  size: number;
+  position: Record<string, string>;
+  opacity: number;
+}
+
 interface HeroData {
   slides: HeroSlide[];
   appointmentBooking: {
@@ -42,6 +49,10 @@ interface HeroData {
     buttonLabel: { en: string; bn: string };
     buttonLink: string;
     image: string;
+  };
+  decorativeShapes: {
+    enabled: boolean;
+    shapes: ShapeConfig[];
   };
 }
 

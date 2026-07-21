@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  getUnifiedReports, updateUnifiedReportStatus,
+  getUnifiedReports, getUnifiedReportById, updateUnifiedReportStatus,
   deleteUnifiedReport, getReportStats,
 } from '@/lib/services/api';
 
@@ -12,6 +12,17 @@ export function useReports(params?: Record<string, string>) {
       return response.data || [];
     },
     staleTime: 1000 * 60 * 5,
+  });
+}
+
+export function useReportById(id: string) {
+  return useQuery({
+    queryKey: ['reports', id],
+    queryFn: async () => {
+      const res = await getUnifiedReportById(id);
+      return res.data;
+    },
+    enabled: !!id,
   });
 }
 

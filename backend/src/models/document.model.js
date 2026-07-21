@@ -34,6 +34,7 @@ const documentSchema = new mongoose.Schema(
     requestingDoctor: { type: String, trim: true },
     requestingDoctorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     status: { type: String, enum: ['pending', 'in-progress', 'completed'], default: 'pending' },
+    completedDate: { type: Date, default: null },
     notes: {
       type: String,
       trim: true,

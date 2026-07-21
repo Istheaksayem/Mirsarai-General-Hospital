@@ -133,10 +133,15 @@ export const updateReportStatus = async (id, status, user) => {
   if (!allowed.includes(status))
     throw new ApiError(StatusCodes.BAD_REQUEST, `Invalid status. Allowed: ${allowed.join(', ')}`);
 
-  const doc = await Document.findByIdAndUpdate(
-    id,
-    { $set: { status } },
-    { new: true, runValidators: true },
+  const doc = await Document.findOneAndUpdate(
+    { _id: id, ...LAB_FILTER },
+    {
+      $set: {
+        status,
+        completedDate: status === 'completed' ? new Date() : null,
+      },
+    },
+    { new: true, runValidators: true, timestamps: true },
   ).populate(POPULATE).lean();
 
   if (!doc) throw new ApiError(StatusCodes.NOT_FOUND, 'Report not found');
@@ -197,6 +202,6 @@ function normalizeReport(doc) {
     notes: doc.notes || '',
     createdAt: doc.createdAt,
     updatedAt: doc.updatedAt,
-    completedDate: doc.status === 'completed' ? doc.updatedAt : null,
+    completedDate: doc.completedDate || null,
   };
 }
