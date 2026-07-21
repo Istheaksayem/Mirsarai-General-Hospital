@@ -1,5 +1,7 @@
 import { StatusCodes } from 'http-status-codes';
 import User from '../../models/user.model.js';
+import Doctor from '../../models/doctor.model.js';
+import DoctorProfile from '../../models/doctorProfile.model.js';
 import catchAsync from '../../utils/catchAsync.js';
 import { sendSuccess } from '../../utils/ApiResponse.js';
 import * as ScheduleService from '../../services/doctorSchedule.service.js';
@@ -47,7 +49,15 @@ export const getAvailableSlots = catchAsync(async (req, res) => {
 export const getPublicAvailableSlots = catchAsync(async (req, res) => {
   const doctorId = req.query.doctorId;
   const user = await User.findOne({ doctorRef: doctorId }).select('_id').lean();
-  const userId = user?._id || doctorId;
+  let userId = user?._id;
+  if (!userId) {
+    const doctor = await Doctor.findById(doctorId).select('slug').lean();
+    if (doctor?.slug) {
+      const profile = await DoctorProfile.findOne({ slug: doctor.slug }).select('userId').lean();
+      userId = profile?.userId;
+    }
+  }
+  if (!userId) return sendSuccess(res, StatusCodes.OK, { date: req.query.date, slots: [] });
   const data = await ScheduleService.getAvailableSlots(userId, req.query.date);
   sendSuccess(res, StatusCodes.OK, data);
 });

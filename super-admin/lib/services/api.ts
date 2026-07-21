@@ -912,6 +912,24 @@ export const updateCareerData = (data: Partial<CareerData>) => saveReal<CareerDa
 
 // ─── Our Team CMS Types ─────────────────────────────────────────────────
 
+export interface Qualification {
+  title: LocalizedString;
+  institution: LocalizedString;
+  year: string;
+}
+
+export interface Experience {
+  title: LocalizedString;
+  institution: LocalizedString;
+  period: string;
+  description: LocalizedString;
+}
+
+export interface SocialLink {
+  platform: string;
+  url: string;
+}
+
 export interface OurTeamMember {
   name: LocalizedString;
   designation: LocalizedString;
@@ -921,14 +939,11 @@ export interface OurTeamMember {
   email: string;
   phone: string;
   order: number;
-}
-
-export interface OurTeamCustomSection {
-  id: string;
-  title: LocalizedString;
-  description: LocalizedString;
-  image: string;
-  order: number;
+  slug: string;
+  qualifications: Qualification[];
+  experience: Experience[];
+  specialties: LocalizedString[];
+  socialLinks: SocialLink[];
 }
 
 export interface OurTeamData {
@@ -942,7 +957,6 @@ export interface OurTeamData {
   sectionTitle: LocalizedString;
   sectionDescription: LocalizedString;
   members: OurTeamMember[];
-  customSections?: OurTeamCustomSection[];
   sections: Record<string, SectionConfig>;
   seo: SeoConfig;
   createdBy?: string;

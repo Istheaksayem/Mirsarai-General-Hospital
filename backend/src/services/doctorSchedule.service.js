@@ -2,6 +2,7 @@ import { StatusCodes } from 'http-status-codes';
 import DoctorSchedule from '../models/doctorSchedule.model.js';
 import Doctor from '../models/doctor.model.js';
 import Appointment from '../models/appointment.model.js';
+import User from '../models/user.model.js';
 import ApiError from '../utils/ApiError.js';
 
 const DAY_NAMES = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
@@ -185,8 +186,11 @@ export const getAvailableSlots = async (doctorId, dateStr) => {
   const endOfDay = new Date(date);
   endOfDay.setHours(23, 59, 59, 999);
 
+  const user = await User.findById(doctorId).select('doctorRef').lean();
+  const doctorRef = user?.doctorRef || doctorId;
+
   const bookedAppointments = await Appointment.find({
-    doctor: doctorId,
+    doctor: doctorRef,
     date: { $gte: startOfDay, $lte: endOfDay },
     status: { $nin: ['cancelled', 'rejected', 'no-show'] },
   }).select('time').lean();
@@ -234,7 +238,9 @@ export const validateBookingSlot = async (doctorId, date, time) => {
 
 async function syncDoctorModel(doctorId, weeklySlots) {
   try {
-    const doctor = await Doctor.findOne({ slug: doctorId.toString() });
+    const user = await User.findById(doctorId).select('doctorRef').lean();
+    if (!user?.doctorRef) return;
+    const doctor = await Doctor.findById(user.doctorRef);
     if (!doctor) return;
 
     const activeSlots = weeklySlots.filter((s) => s.isActive);

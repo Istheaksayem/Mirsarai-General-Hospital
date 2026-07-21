@@ -4,7 +4,6 @@ import "./globals.css";
 import QueryProvider from "@/components/QueryProvider";
 import ThemeProvider from "@/components/ThemeProvider";
 import LayoutContent from "@/components/LayoutContent";
-import LenisProvider from "@/components/LenisProvider";
 import AuthProvider from "@/components/auth/AuthProvider";
 import { Toaster } from "react-hot-toast";
 
@@ -37,8 +36,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col font-sans bg-background text-foreground transition-colors duration-300">
         <AuthProvider>
           <QueryProvider>
-            <LenisProvider>
-              <ThemeProvider>
+            <ThemeProvider>
                 <LayoutContent>{children}</LayoutContent>
                 <Toaster
                   position="top-right"
@@ -52,7 +50,6 @@ export default function RootLayout({
                   }}
                 />
               </ThemeProvider>
-            </LenisProvider>
           </QueryProvider>
         </AuthProvider>
       </body>
