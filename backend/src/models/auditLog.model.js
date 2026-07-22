@@ -11,7 +11,7 @@ const auditLogSchema = new mongoose.Schema(
     },
     action: {
       type: String,
-      enum: ['create', 'update', 'delete', 'upload', 'login', 'activate', 'deactivate', 'register', 'verify_otp'],
+      enum: ['create', 'update', 'delete', 'upload', 'login', 'activate', 'deactivate', 'register', 'verify_otp', 'view', 'download', 'search'],
       required: [true, 'Action type is required'],
     },
     targetEntity: {
