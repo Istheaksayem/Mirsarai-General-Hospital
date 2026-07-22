@@ -55,6 +55,8 @@ import patientTimelineRoutes from './patient/timeline.patient.routes.js';
 import doctorPrescriptionRoutes from './doctor/prescription.doctor.routes.js';
 import doctorScheduleRoutes from './doctor/doctorSchedule.routes.js';
 import patientPrescriptionRoutes from './patient/prescription.patient.routes.js';
+import reportCollectionRoutes from './reportCollection.routes.js';
+import adminReportBatchRoutes from './admin/reportBatch.admin.routes.js';
 import { authenticate, authorize } from '../middlewares/auth.middleware.js';
 import { authenticatePatient } from '../middlewares/auth.patient.middleware.js';
 import catchAsync from '../utils/catchAsync.js';
@@ -179,6 +181,12 @@ router.use('/patients/lookup', authenticate, authorize('reception', 'lab', 'supe
 
 // ── Unified Reports (replaces legacy /lab-reports) ──────────
 router.use('/reports', authenticate, authorize('lab', 'super-admin', 'doctor'), reportRoutes);
+
+// ── Report Collection Routes ─────────────────────────────────────────────────
+router.use('/report-collection', reportCollectionRoutes);
+
+// ── Admin Report Batch Routes ────────────────────────────────────────────────
+router.use('/admin/report-batches', authenticate, authorize('super-admin', 'lab-admin'), adminReportBatchRoutes);
 
 // ── Patient Portal Routes ────────────────────────────────────────────────────
 router.use('/patient/auth', patientAuthRoutes);

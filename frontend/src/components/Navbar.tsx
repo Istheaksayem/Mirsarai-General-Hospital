@@ -50,6 +50,7 @@ const NAV_ITEMS: NavItem[] = [
       { en: "Our Team", bn: "আমাদের টিম", href: "/resources/our-team" },
     ],
   },
+  { type: "link", en: "Online Report", bn: "অনলাইন রিপোর্ট", href: "/report-collection" },
   { type: "link", en: "Appointment", bn: "অ্যাপয়েন্টমেন্ট", href: "/appointment" },
   { type: "link", en: "Contact", bn: "যোগাযোগ", href: "/contact" },
 ];

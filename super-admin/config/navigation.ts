@@ -54,6 +54,7 @@ export const NAV_CONFIG: Record<Role, NavSection[]> = {
       items: [
         { label: "Appointments", href: "/super-admin/appointments", icon: CalendarDays, badge: "12" },
         { label: "Reports", href: "/super-admin/reports", icon: BarChart3 },
+        { label: "Report Management", href: "/super-admin/report-management", icon: FileText },
         // TODO: Billing — temporarily hidden
         // { label: "Billing", href: "/super-admin/billing", icon: CreditCard },
       ],
