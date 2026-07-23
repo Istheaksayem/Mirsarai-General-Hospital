@@ -3,21 +3,18 @@
 import { useOurTeamData, TeamMember } from "@/hooks/useAboutData";
 import { useLanguage } from "@/context/LanguageContext";
 import { motion } from "framer-motion";
-import { FiArrowRight, FiMail, FiPhone } from "react-icons/fi";
+import { FiArrowRight, FiMail, FiPhone, FiEye } from "react-icons/fi";
 import { FaUserMd, FaUsers, FaHeartbeat } from "react-icons/fa";
 import { BsFillHeartPulseFill } from "react-icons/bs";
 import Image from "next/image";
-import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { getImageUrl } from "@/lib/getImageUrl";
-
-function slugify(text: string): string {
-  return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-}
+import EmployeeIdCardModal from "@/components/our-team/EmployeeIdCardModal";
 
 const OurTeamPage = () => {
   const { data, isLoading, isError } = useOurTeamData();
   const { lang, t } = useLanguage();
+  const [idCardMember, setIdCardMember] = useState<TeamMember | null>(null);
 
   // SEO meta tag update
   useEffect(() => {
@@ -168,24 +165,22 @@ const OurTeamPage = () => {
                 transition={{ duration: 0.5, delay: i * 0.08 }}
                 className="group relative"
               >
-                <div className="glass-card rounded-3xl p-0 overflow-hidden hover-lift border-2 border-gray-100 hover:border-secondary/30 transition-all duration-300 shadow-md hover:shadow-xl">
+                <div className="glass-card rounded-3xl p-0 overflow-hidden hover-lift border-2 border-gray-100 hover:border-secondary/30 transition-all duration-300 shadow-md hover:shadow-xl flex flex-col sm:flex-row">
                   {/* Image Area */}
-                  <div className="relative h-56 bg-gradient-to-br from-primary/10 to-blue-100 overflow-hidden">
+                  <div className="relative w-full sm:w-48 aspect-[3/4] sm:aspect-auto bg-gradient-to-br from-primary/10 to-blue-100 shrink-0">
                     {member.image ? (
                       <Image
                         src={getImageUrl(member.image)}
                         alt={lang === "bn" ? member.name.bn : member.name.en}
                         fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        className="object-cover sm:object-cover transition-transform duration-500"
+                        sizes="(max-width: 640px) 100vw, 12rem"
                       />
                     ) : (
                       <div className="absolute inset-0 flex items-center justify-center">
                         <FaUserMd className="text-6xl text-primary/30" />
                       </div>
                     )}
-                    {/* Overlay gradient */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-primary/60 via-transparent to-transparent" />
-
                     {/* Department badge */}
                     <div className="absolute bottom-3 left-3 right-3">
                       <span className="inline-block px-3 py-1 rounded-full bg-secondary text-white text-xs font-bold shadow-lg">
@@ -195,7 +190,7 @@ const OurTeamPage = () => {
                   </div>
 
                   {/* Info */}
-                  <div className="p-6">
+                  <div className="flex-1 p-6">
                     <h3 className="text-xl font-extrabold text-primary mb-1 group-hover:text-secondary transition-colors">
                       {t(member.name.en, member.name.bn)}
                     </h3>
@@ -230,14 +225,14 @@ const OurTeamPage = () => {
                       </div>
                     )}
 
-                    {/* View Profile link */}
-                    <Link
-                      href={`/resources/our-team/${member.slug || slugify(member.name.en)}`}
-                      className="mt-4 inline-flex w-full items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary/5 hover:bg-primary/10 text-primary text-sm font-semibold transition-colors"
+                    {/* View ID action */}
+                    <button
+                      onClick={() => setIdCardMember(member)}
+                      className="mt-4 w-full inline-flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-secondary/5 hover:bg-secondary/10 text-secondary text-sm font-semibold transition-colors"
                     >
-                      {t("View Full Profile", "সম্পূর্ণ প্রোফাইল দেখুন")}
-                      <FiArrowRight className="h-4 w-4" />
-                    </Link>
+                      <FiEye className="h-4 w-4" />
+                      {t("View ID", "ভিউ আইডি")}
+                    </button>
                   </div>
                 </div>
               </motion.div>
@@ -307,6 +302,12 @@ const OurTeamPage = () => {
           default: return null;
         }
       })}
+
+      <EmployeeIdCardModal
+        member={idCardMember}
+        isOpen={!!idCardMember}
+        onClose={() => setIdCardMember(null)}
+      />
     </main>
   );
 };

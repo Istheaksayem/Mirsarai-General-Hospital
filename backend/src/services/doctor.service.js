@@ -4,6 +4,7 @@ import DoctorProfile from '../models/doctorProfile.model.js';
 import ReceptionistProfile from '../models/receptionistProfile.model.js';
 import LabAdminProfile from '../models/labAdminProfile.model.js';
 import Counter from '../models/counter.model.js';
+import DoctorSchedule from '../models/doctorSchedule.model.js';
 import ApiError from '../utils/ApiError.js';
 import { StatusCodes } from 'http-status-codes';
 import { PAGINATION } from '../constants/index.js';
@@ -282,6 +283,47 @@ export const getAdminDoctorById = async (id) => {
   return doctor;
 };
 
+// ── SCHEDULE SYNC ──────────────────────────────────────────────────────────────
+
+const DAY_NAME_TO_NUM = {
+  sunday: 0, monday: 1, tuesday: 2, wednesday: 3,
+  thursday: 4, friday: 5, saturday: 6,
+};
+
+function parseChamberTimeForSchedule(chamberTimeEn) {
+  if (!chamberTimeEn) return null;
+  const m = chamberTimeEn.match(
+    /\|\s*(\d{1,2}:\d{2}\s*(?:AM|PM))\s*[-–—]\s*(\d{1,2}:\d{2}\s*(?:AM|PM))/i
+  );
+  if (m) return { startTime: m[1].trim(), endTime: m[2].trim() };
+  return null;
+}
+
+async function syncDoctorSchedule(doctorId, availableDays, chamberTime, slotDuration, breakStart, breakEnd) {
+  if (!availableDays || availableDays.length === 0) return;
+
+  const parsed = chamberTime?.en ? parseChamberTimeForSchedule(chamberTime.en) : null;
+  if (!parsed) return;
+
+  const weeklySlots = availableDays.map((day) => ({
+    dayOfWeek: DAY_NAME_TO_NUM[day.toLowerCase()],
+    startTime: parsed.startTime,
+    endTime: parsed.endTime,
+    breakStart: breakStart || null,
+    breakEnd: breakEnd || null,
+    slotDuration: slotDuration || 15,
+    maxPatients: 1,
+    type: 'offline',
+    isActive: true,
+  }));
+
+  await DoctorSchedule.findOneAndUpdate(
+    { doctorId },
+    { $set: { doctorId, weeklySlots } },
+    { upsert: true, new: true }
+  );
+}
+
 // ── MUTATIONS ─────────────────────────────────────────────────────────────────
 
 /**
@@ -308,6 +350,9 @@ export const createDoctor = async (data, userId) => {
   }
 
   const doctor = await Doctor.create({ ...data, createdBy: userId, updatedBy: userId });
+
+  await syncDoctorSchedule(doctor._id, data.availableDays, data.chamberTime, data.slotDuration, data.breakStart, data.breakEnd);
+
   return doctor;
 };
 
@@ -333,6 +378,13 @@ export const updateDoctor = async (id, data, userId) => {
     { $set: { ...data, updatedBy: userId } },
     { new: true, runValidators: true }
   ).select('-__v');
+
+  const days = data.availableDays !== undefined ? data.availableDays : doctor.availableDays;
+  const ct = data.chamberTime !== undefined ? data.chamberTime : doctor.chamberTime;
+  const slotDur = data.slotDuration !== undefined ? data.slotDuration : (doctor.slotDuration ?? 15);
+  const brkStart = data.breakStart !== undefined ? data.breakStart : (doctor.breakStart || '');
+  const brkEnd = data.breakEnd !== undefined ? data.breakEnd : (doctor.breakEnd || '');
+  await syncDoctorSchedule(id, days, ct, slotDur, brkStart, brkEnd);
 
   return updated;
 };

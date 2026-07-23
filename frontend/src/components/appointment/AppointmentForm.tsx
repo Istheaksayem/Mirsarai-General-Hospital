@@ -535,7 +535,16 @@ export default function AppointmentForm() {
                       <FaSpinner className="animate-spin text-primary text-lg" />
                     </div>
                   ) : availableSlots.length === 0 ? (
-                    <p className="text-sm text-gray-400 text-center py-4">No available slots on this date.</p>
+                    <div className="flex flex-col items-center gap-3 py-8 px-4 rounded-xl bg-amber-50 border border-amber-200">
+                      <FaClock className="text-amber-500 text-xl" />
+                      <div className="text-center">
+                        <p className="text-sm font-semibold text-amber-800">No Available Slots</p>
+                        <p className="text-xs text-amber-600 mt-1">
+                          This doctor has no available time slots for the selected date.
+                          Please try a different date or choose another doctor.
+                        </p>
+                      </div>
+                    </div>
                   ) : (
                     <div className="flex flex-wrap gap-3">
                       {availableSlots.filter((s) => s.available).map((slot) => (

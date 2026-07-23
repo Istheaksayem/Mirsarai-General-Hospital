@@ -16,6 +16,20 @@ const API_URL = env.apiUrl;
 const DEPARTMENTS = ["General Medicine","Cardiology","Orthopedics","Neurology","Gynecology","Pediatrics","Gastroenterology","Dermatology","ENT","Ophthalmology","Urology","Radiology","Pathology","Emergency"];
 const SPECIALIZATIONS = ["Medicine Specialist","Cardiologist","Orthopedic Surgeon","Neurologist","Gynecologist","Pediatrician","Gastroenterologist","Dermatologist","ENT Specialist","Ophthalmologist","Urologist","Radiologist","Pathologist","Emergency Medicine Specialist"];
 
+const SLOT_DURATIONS = [10, 15, 20, 30, 60];
+
+const TIME_SLOTS = (() => {
+  const slots: string[] = [];
+  for (let h = 0; h < 24; h++) {
+    for (let m = 0; m < 60; m += 30) {
+      const period = h < 12 ? "AM" : "PM";
+      const hour12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+      slots.push(`${hour12}:${m === 0 ? "00" : "30"} ${period}`);
+    }
+  }
+  return slots;
+})();
+
 type Bi = { en: string; bn: string };
 const bi = (en = "", bn = ""): Bi => ({ en, bn });
 
@@ -63,6 +77,9 @@ export default function EditDoctorCmsPage({ params }: { params: Promise<{ id: st
           chamberTimeEn:   d.chamberTime?.en  || "",
           chamberTimeBn:   d.chamberTime?.bn  || "",
           availableDays:   d.availableDays    || [],
+          slotDuration:    d.slotDuration     || 15,
+          breakStart:      d.breakStart       || "",
+          breakEnd:        d.breakEnd         || "",
           languages:       d.languages || ["Bangla", "English"],
           phone:           d.phone            || "",
           email:           d.email            || "",
@@ -144,6 +161,9 @@ export default function EditDoctorCmsPage({ params }: { params: Promise<{ id: st
         consultationFee: form.consultationFee,
         chamberTime: { en: form.chamberTimeEn, bn: form.chamberTimeBn },
         availableDays: form.availableDays,
+        slotDuration: form.slotDuration,
+        breakStart: form.breakStart || undefined,
+        breakEnd: form.breakEnd || undefined,
         onlineConsultation: form.onlineConsultation, offlineConsultation: form.offlineConsultation,
         appointmentAvailable: form.appointmentAvailable,
         phone: form.phone, email: form.email,
@@ -328,6 +348,25 @@ export default function EditDoctorCmsPage({ params }: { params: Promise<{ id: st
           }}
           showTitle={false}
         />
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <FormField label="Slot Duration">
+            <FormSelect value={String(n("slotDuration"))} onChange={e => set("slotDuration", parseInt(e.target.value) || 15)}>
+              {SLOT_DURATIONS.map(d => <option key={d} value={d}>{d} min</option>)}
+            </FormSelect>
+          </FormField>
+          <FormField label="Break Start (optional)">
+            <FormSelect value={s("breakStart")} onChange={e => set("breakStart", e.target.value)}>
+              <option value="">No break</option>
+              {TIME_SLOTS.map(t => <option key={t} value={t}>{t}</option>)}
+            </FormSelect>
+          </FormField>
+          <FormField label="Break End (optional)">
+            <FormSelect value={s("breakEnd")} onChange={e => set("breakEnd", e.target.value)}>
+              <option value="">No break</option>
+              {TIME_SLOTS.map(t => <option key={t} value={t}>{t}</option>)}
+            </FormSelect>
+          </FormField>
+        </div>
       </section>
 
       {/* Contact */}

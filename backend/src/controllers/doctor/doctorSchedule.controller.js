@@ -2,6 +2,7 @@ import { StatusCodes } from 'http-status-codes';
 import User from '../../models/user.model.js';
 import Doctor from '../../models/doctor.model.js';
 import DoctorProfile from '../../models/doctorProfile.model.js';
+import DoctorSchedule from '../../models/doctorSchedule.model.js';
 import catchAsync from '../../utils/catchAsync.js';
 import { sendSuccess } from '../../utils/ApiResponse.js';
 import * as ScheduleService from '../../services/doctorSchedule.service.js';
@@ -57,7 +58,14 @@ export const getPublicAvailableSlots = catchAsync(async (req, res) => {
       userId = profile?.userId;
     }
   }
-  if (!userId) return sendSuccess(res, StatusCodes.OK, { date: req.query.date, slots: [] });
+  if (!userId) {
+    const schedule = await DoctorSchedule.findOne({ doctorId }).select('_id').lean();
+    if (schedule) {
+      const data = await ScheduleService.getAvailableSlots(doctorId, req.query.date);
+      return sendSuccess(res, StatusCodes.OK, data);
+    }
+    return sendSuccess(res, StatusCodes.OK, { date: req.query.date, slots: [] });
+  }
   const data = await ScheduleService.getAvailableSlots(userId, req.query.date);
   sendSuccess(res, StatusCodes.OK, data);
 });

@@ -6,7 +6,6 @@ import User from '../models/user.model.js';
 import ApiError from '../utils/ApiError.js';
 import generateAppointmentId from '../utils/generateAppointmentId.js';
 import sendEmail from '../utils/sendEmail.js';
-import env from '../config/env.js';
 import { createNotification } from './notification.service.js';
 import { notifyNewAppointment, notifyAppointmentConfirmed } from './appointment-notification.service.js';
 import { APPOINTMENT_SOURCE } from '../constants/index.js';
@@ -52,14 +51,9 @@ const handleAppointmentConfirmed = async (appointment, confirmingUser = null) =>
 
   if (appointment.patientEmail) {
     try {
-      const portalLink = `${env.clientUrl || 'http://localhost:3000'}/login-patient?email=${encodeURIComponent(appointment.patientEmail)}`;
-      const portalMessage = patient?.hasSetPassword
-        ? `Log in to your dashboard to view details:\n${portalLink}`
-        : `If you haven't already, set up your password and access your dashboard:\n${portalLink}`;
-
       await sendEmail({
         email: appointment.patientEmail,
-        subject: 'Appointment Confirmed — Mirsarai General Hospital',
+        subject: 'Appointment Confirmed — Mirsarai General Hospital Baby Care & Diagnostic Center',
         message: `Dear ${appointment.patientName},
 
 Your appointment has been confirmed successfully.
@@ -68,10 +62,8 @@ Doctor: ${appointment.doctor?.name?.en || 'Assigned doctor'}
 Date: ${new Date(appointment.date).toLocaleDateString()}
 Time: ${appointment.time}
 
-${portalMessage}
-
 Thank you,
-Mirsarai General Hospital`,
+Mirsarai General Hospital Baby Care & Diagnostic Center`,
       });
     } catch (err) {
       console.log('Confirmation email sending failed:', err.message);
@@ -102,7 +94,7 @@ const handleAppointmentRejected = async (appointment) => {
     try {
       await sendEmail({
         email: appointment.patientEmail,
-        subject: 'Appointment Request Update — Mirsarai General Hospital',
+        subject: 'Appointment Request Update — Mirsarai General Hospital Baby Care & Diagnostic Center',
         message: `Dear ${appointment.patientName},
 
 Unfortunately, your appointment request has been rejected.
@@ -114,7 +106,7 @@ Time: ${appointment.time}
 If you have any questions, please contact the hospital.
 
 Thank you,
-Mirsarai General Hospital`,
+Mirsarai General Hospital Baby Care & Diagnostic Center`,
       });
     } catch (err) {
       console.log('Rejection email sending failed:', err.message);
@@ -199,10 +191,9 @@ export const createAppointment = async (data, source = APPOINTMENT_SOURCE.ONLINE
       }
 
       try {
-        const portalLink = `${env.clientUrl || 'http://localhost:3000'}/login-patient?email=${encodeURIComponent(populated.patientEmail)}`;
         await sendEmail({
           email: populated.patientEmail,
-          subject: 'Appointment Booked — Mirsarai General Hospital',
+          subject: 'Appointment Booked — Mirsarai General Hospital Baby Care & Diagnostic Center',
           message: `Dear ${populated.patientName},
 
 Your appointment has been booked successfully.
@@ -213,13 +204,8 @@ Doctor: ${populated.doctor?.name?.en || 'Assigned doctor'}
 Date: ${new Date(populated.date).toLocaleDateString()}
 Time: ${populated.time}
 
-You can access your patient portal to view prescriptions, lab reports, and more.
-
-Set up your password and access your dashboard:
-${portalLink}
-
 Thank you,
-Mirsarai General Hospital`,
+Mirsarai General Hospital Baby Care & Diagnostic Center`,
         });
       } catch (emailErr) {
         console.log('Booking email sending failed:', emailErr.message);
