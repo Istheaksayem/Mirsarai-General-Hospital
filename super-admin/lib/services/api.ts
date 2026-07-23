@@ -1026,6 +1026,9 @@ export interface CmsDoctor {
   chamberAddress: BilingualField;
   address: BilingualField;
   timeSlots: TimeSlot[];
+  slotDuration: number;
+  breakStart?: string;
+  breakEnd?: string;
   availableDays: string[];
   onlineConsultation: boolean;
   offlineConsultation: boolean;

@@ -3,10 +3,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FiMenu, FiX, FiUser, FiChevronDown, FiGrid } from "react-icons/fi";
+import { FiMenu, FiX, FiChevronDown, FiFileText } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
-import { useSession } from "next-auth/react";
 
 // ── Nav data ──────────────────────────────────────────────────────────────────
 type NavLink = { en: string; bn: string; href: string };
@@ -50,7 +49,6 @@ const NAV_ITEMS: NavItem[] = [
       { en: "Our Team", bn: "আমাদের টিম", href: "/resources/our-team" },
     ],
   },
-  { type: "link", en: "Online Report", bn: "অনলাইন রিপোর্ট", href: "/report-collection" },
   { type: "link", en: "Appointment", bn: "অ্যাপয়েন্টমেন্ট", href: "/appointment" },
   { type: "link", en: "Contact", bn: "যোগাযোগ", href: "/contact" },
 ];
@@ -183,34 +181,6 @@ function MobileDropdown({ label, links }: { label: string; links: NavLink[] }) {
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { lang, t } = useLanguage();
-  const { data: session, status } = useSession();
-
-  const [sessionVerified, setSessionVerified] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    fetch("/api/auth/session")
-      .then((r) => r.json())
-      .then((data) => setSessionVerified(!!data?.user))
-      .catch(() => setSessionVerified(false));
-  }, []);
-
-  const patientToken =
-    typeof window !== "undefined"
-      ? sessionStorage.getItem("mgh_patient_token")
-      : null;
-
-  const hasValidSession = sessionVerified ?? status === "authenticated";
-  const isLoggedIn = hasValidSession || !!patientToken;
-
-  const dashboardHref = (() => {
-    if (sessionVerified || status === "authenticated") {
-      const role = (session as any)?.user?.role;
-      if (role === "doctor") return "/dashboard/doctor";
-      return "/dashboard";
-    }
-    if (patientToken) return "/dashboard";
-    return "/login";
-  })();
 
   // close mobile menu on resize to desktop
   useEffect(() => {
@@ -279,33 +249,18 @@ const Navbar = () => {
             {/* Language toggle */}
             <LangToggle />
 
-            {/* User / Login or Dashboard */}
-            {isLoggedIn ? (
-              <Link
-                href={dashboardHref}
-                className="flex items-center gap-2 group"
-              >
-                <div className="w-9 h-9 rounded-full bg-[#1E2B7A] border border-[#1E2B7A] flex items-center justify-center overflow-hidden group-hover:bg-[#3b82f6] group-hover:border-[#3b82f6] transition-colors">
-                  <FiGrid size={18} className="text-white" />
-                </div>
-                <span className="text-[#4e5b6f] font-semibold text-[15px] group-hover:text-[#3b82f6] transition-colors">
-                  {t("Dashboard", "ড্যাশবোর্ড")}
-                </span>
-              </Link>
-            ) : (
-              <Link
-                href="/login"
-                className="flex items-center gap-2 group"
-              >
-                <div className="w-9 h-9 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center overflow-hidden group-hover:border-[#3b82f6] transition-colors">
-                  <FiUser size={20} className="text-gray-400 mt-1.5" />
-                </div>
-                <span className="text-[#4e5b6f] font-semibold text-[15px] group-hover:text-[#3b82f6] transition-colors">
-                  {t("Login", "লগইন")}
-                </span>
-              </Link>
-            )}
-
+            {/* Online Report */}
+            <Link
+              href="/report-collection"
+              className="flex items-center gap-2 group"
+            >
+              <div className="w-9 h-9 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center overflow-hidden group-hover:border-[#3b82f6] transition-colors">
+                <FiFileText size={18} className="text-gray-400" />
+              </div>
+              <span className="text-[#4e5b6f] font-semibold text-[15px] group-hover:text-[#3b82f6] transition-colors">
+                {t("Online Report", "অনলাইন রিপোর্ট")}
+              </span>
+            </Link>
 
           </div>
 
@@ -355,29 +310,18 @@ const Navbar = () => {
 
               {/* Mobile auth */}
               <div className="border-t border-gray-100 mt-3 pt-4 space-y-3 px-1">
-                {isLoggedIn ? (
-                  <Link
-                    href={dashboardHref}
-                    onClick={() => setIsOpen(false)}
-                    className="flex items-center gap-3 px-3 py-2.5 text-[#4e5b6f] hover:text-[#3b82f6] hover:bg-blue-50/60 rounded-xl font-semibold transition-colors"
-                  >
-                    <div className="w-9 h-9 rounded-full bg-[#1E2B7A] border border-[#1E2B7A] flex items-center justify-center overflow-hidden">
-                      <FiGrid size={18} className="text-white" />
-                    </div>
-                    {t("Dashboard", "ড্যাশবোর্ড")}
-                  </Link>
-                ) : (
-                  <Link
-                    href="/login"
-                    onClick={() => setIsOpen(false)}
-                    className="flex items-center gap-3 px-3 py-2.5 text-[#4e5b6f] hover:text-[#3b82f6] hover:bg-blue-50/60 rounded-xl font-semibold transition-colors"
-                  >
-                    <div className="w-9 h-9 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center overflow-hidden">
-                      <FiUser size={20} className="text-gray-400 mt-1.5" />
-                    </div>
-                    {t("Login", "লগইন")}
-                  </Link>
-                )}
+                {/* Online Report */}
+                <Link
+                  href="/report-collection"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center gap-3 px-3 py-2.5 text-[#4e5b6f] hover:text-[#3b82f6] hover:bg-blue-50/60 rounded-xl font-semibold transition-colors"
+                >
+                  <div className="w-9 h-9 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center overflow-hidden">
+                    <FiFileText size={18} className="text-gray-400" />
+                  </div>
+                  {t("Online Report", "অনলাইন রিপোর্ট")}
+                </Link>
+
               </div>
             </div>
           </motion.div>

@@ -21,6 +21,20 @@ import toast from "react-hot-toast";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
+const SLOT_DURATIONS = [10, 15, 20, 30, 60];
+
+const TIME_SLOTS = (() => {
+  const slots: string[] = [];
+  for (let h = 0; h < 24; h++) {
+    for (let m = 0; m < 60; m += 30) {
+      const period = h < 12 ? "AM" : "PM";
+      const hour12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+      slots.push(`${hour12}:${m === 0 ? "00" : "30"} ${period}`);
+    }
+  }
+  return slots;
+})();
+
 const STATUS_OPTIONS = [
   { value: "active", label: "Active", color: "text-emerald-600" },
   { value: "on-leave", label: "On Leave", color: "text-amber-600" },
@@ -46,6 +60,9 @@ const defaultDoctor = (): Partial<CmsDoctor> => ({
   chamberAddress: emptyBilingual(),
   address: emptyBilingual(),
   timeSlots: [],
+  slotDuration: 15,
+  breakStart: "",
+  breakEnd: "",
   availableDays: [],
   onlineConsultation: false,
   offlineConsultation: true,
@@ -510,6 +527,41 @@ export default function DoctorCmsEditorPage({
             />
             {errors["chamberTime.en"] && <p className="text-xs text-red-500 mt-1">{errors["chamberTime.en"]}</p>}
             {errors["chamberTime.bn"] && <p className="text-xs text-red-500 mt-1">{errors["chamberTime.bn"]}</p>}
+
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <FieldLabel>Slot Duration</FieldLabel>
+                <select
+                  value={form.slotDuration ?? 15}
+                  onChange={(e) => setField("slotDuration", parseInt(e.target.value) || 15)}
+                  className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1E2B7A]/20"
+                >
+                  {SLOT_DURATIONS.map(d => <option key={d} value={d}>{d} min</option>)}
+                </select>
+              </div>
+              <div>
+                <FieldLabel>Break Start</FieldLabel>
+                <select
+                  value={form.breakStart || ""}
+                  onChange={(e) => setField("breakStart", e.target.value)}
+                  className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1E2B7A]/20"
+                >
+                  <option value="">No break</option>
+                  {TIME_SLOTS.map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
+              </div>
+              <div>
+                <FieldLabel>Break End</FieldLabel>
+                <select
+                  value={form.breakEnd || ""}
+                  onChange={(e) => setField("breakEnd", e.target.value)}
+                  className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1E2B7A]/20"
+                >
+                  <option value="">No break</option>
+                  {TIME_SLOTS.map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
+              </div>
+            </div>
 
             <BilingualField
               label="Chamber Address"
